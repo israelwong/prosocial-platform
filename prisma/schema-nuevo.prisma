@@ -13,17 +13,17 @@ datasource db {
 // =====================================================================
 
 model Plan {
-  id                  String  @id @default(cuid())
-  name                String  // "Starter", "Professional", "Enterprise"
-  slug                String  @unique // "starter", "professional", "enterprise"
-  activeProjectLimit  Int     // 5, 15, 50
-  priceMonthly        Decimal // 29, 79, 199
-  priceYearly         Decimal // 290, 790, 1990 (con descuento)
-  features            Json    // Lista de características del plan
-  stripePriceId       String? // ID del precio en Stripe
-  active              Boolean @default(true)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                   String  @id @default(cuid())
+  name                 String  // "Starter", "Professional", "Enterprise"
+  slug                 String  @unique // "starter", "professional", "enterprise"
+  active_project_limit Int     // 5, 15, 50
+  price_monthly        Decimal // 29, 79, 199
+  price_yearly         Decimal // 290, 790, 1990 (con descuento)
+  features             Json    // Lista de características del plan
+  stripe_price_id      String? // ID del precio en Stripe
+  active               Boolean @default(true)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   // Relaciones
   studios Studio[]
@@ -43,28 +43,28 @@ model Studio {
   phone           String?
   address         String?
   website         String?
-  logoUrl         String?
+  logo_url        String?
   
   // Suscripción
-  planId              String
-  plan                Plan     @relation(fields: [planId], references: [id])
-  subscriptionStatus  String @default("trial") // trial, active, past_due, canceled
-  subscriptionStart   DateTime?
-  subscriptionEnd     DateTime?
-  stripeCustomerId    String? @unique
-  stripeSubscriptionId String? @unique
+  plan_id         String
+  plan            Plan     @relation(fields: [plan_id], references: [id])
+  subscription_status String @default("trial") // trial, active, past_due, canceled
+  subscription_start  DateTime?
+  subscription_end    DateTime?
+  stripe_customer_id  String? @unique
+  stripe_subscription_id String? @unique
   
   // Configuración Stripe Connect
-  stripeAccountId     String? @unique // Para pagos directos al studio
-  stripeOnboardingComplete Boolean @default(false)
+  stripe_account_id   String? @unique // Para pagos directos al studio
+  stripe_onboarding_complete Boolean @default(false)
   
   // Configuración de comisiones
-  commissionRate      Decimal @default(0.30) // 30% para ProSocial por defecto
+  commission_rate     Decimal @default(0.30) // 30% para ProSocial por defecto
   
   // Metadatos
   active          Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
   // === RELACIONES CON MODELOS MIGRADOS ===
   users                StudioUser[]
@@ -81,11 +81,11 @@ model Studio {
   nominas             Nomina[]
   gastos              Gasto[]
   negocios            Negocio[]
-  revenueTransactions RevenueTransaction[]
+  revenue_transactions RevenueTransaction[]
 
   @@map("studios")
   @@index([slug])
-  @@index([planId])
+  @@index([plan_id])
 }
 
 // =====================================================================
@@ -100,16 +100,16 @@ model StudioUser {
   email     String   @unique
   password  String
   role      String   @default("user") // owner, admin, user, photographer, editor
-  telefono  String   // Obligatorio para comunicación del equipo
+  telefono  String?
   status    String   @default("inactive") // active, inactive, pending
   
   // Relación con Studio
-  studioId  String
-  studio    Studio   @relation(fields: [studioId], references: [id])
+  studio_id String
+  studio    Studio   @relation(fields: [studio_id], references: [id])
   
   // Metadatos
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   
   // === RELACIONES MIGRADAS ===
   sesiones            Sesion[]
@@ -127,7 +127,7 @@ model StudioUser {
   gastos              Gasto[]
 
   @@map("studio_users")
-  @@index([studioId, status])
+  @@index([studio_id, status])
   @@index([email])
 }
 
@@ -137,30 +137,30 @@ model StudioUser {
 
 model RevenueTransaction {
   id                    String   @id @default(cuid())
-  studioId              String
-  studio                Studio   @relation(fields: [studioId], references: [id])
+  studio_id             String
+  studio                Studio   @relation(fields: [studio_id], references: [id])
   
   // Información de la transacción
-  paymentId             String   // ID del pago que generó esta transacción
-  amountTotal           Decimal  // Monto total del pago
-  prosocialCommission   Decimal  // Comisión para ProSocial
-  studioAmount          Decimal  // Monto para el Studio
-  commissionRate        Decimal  // Tasa de comisión aplicada
+  payment_id            String   // ID del pago que generó esta transacción
+  amount_total          Decimal  // Monto total del pago
+  prosocial_commission  Decimal  // Comisión para ProSocial
+  studio_amount         Decimal  // Monto para el Studio
+  commission_rate       Decimal  // Tasa de comisión aplicada
   
   // Detalles
   description           String?
-  transactionDate       DateTime @default(now())
-  status                String   @default("pending") // pending, completed, failed
+  transaction_date      DateTime @default(now())
+  status               String   @default("pending") // pending, completed, failed
   
   // Metadatos de Stripe
-  stripeTransferId      String?  // ID de la transferencia a studio
-  stripeFee             Decimal? // Comisión de Stripe
+  stripe_transfer_id   String?  // ID de la transferencia a studio
+  stripe_fee           Decimal? // Comisión de Stripe
   
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   @@map("revenue_transactions")
-  @@index([studioId, transactionDate])
+  @@index([studio_id, transaction_date])
   @@index([status])
 }
 
@@ -184,12 +184,12 @@ model Cliente {
   id        String   @id @default(cuid())
   
   // Relación con Studio
-  studioId  String
-  studio    Studio   @relation(fields: [studioId], references: [id])
+  studio_id String
+  studio    Studio   @relation(fields: [studio_id], references: [id])
   
   nombre    String
-  email     String   // Obligatorio para comunicación
-  telefono  String   // Obligatorio para contacto
+  email     String?
+  telefono  String?
   direccion String?
   status    String   @default("activo") //prospecto, cliente
   canalId   String?
@@ -209,17 +209,16 @@ model Cliente {
   Suscripcion Suscripcion?
 
   @@map("clientes")
-  @@index([studioId, status])
-  @@index([studioId, telefono])
-  @@index([studioId, email])
+  @@index([studio_id, status])
+  @@index([telefono])
 }
 
 model Evento {
   id           String      @id @default(cuid())
   
   // Relación con Studio
-  studioId    String
-  studio       Studio      @relation(fields: [studioId], references: [id])
+  studio_id    String
+  studio       Studio      @relation(fields: [studio_id], references: [id])
   
   clienteId    String
   Cliente      Cliente     @relation(fields: [clienteId], references: [id])
@@ -246,7 +245,7 @@ model Evento {
   Gasto          Gasto[]
 
   @@map("eventos")
-  @@index([studioId, status])
+  @@index([studio_id, status])
   @@index([clienteId])
   @@index([fecha_evento])
 }
@@ -334,8 +333,8 @@ model Cotizacion {
   id                                 String                             @id @default(cuid())
   
   // Relación con Studio
-  studioId                          String
-  studio                             Studio                             @relation(fields: [studioId], references: [id])
+  studio_id                          String
+  studio                             Studio                             @relation(fields: [studio_id], references: [id])
   
   eventoTipoId                       String
   EventoTipo                         EventoTipo                         @relation(fields: [eventoTipoId], references: [id])
@@ -364,7 +363,7 @@ model Cotizacion {
   SolicitudPaquete                   SolicitudPaquete[]
 
   @@map("cotizaciones")
-  @@index([studioId, status])
+  @@index([studio_id, status])
   @@index([eventoId])
 }
 
@@ -461,8 +460,8 @@ model Servicio {
   id                  String               @id @default(cuid())
   
   // Relación con Studio
-  studioId           String
-  studio              Studio               @relation(fields: [studioId], references: [id])
+  studio_id           String
+  studio              Studio               @relation(fields: [studio_id], references: [id])
   
   servicioCategoriaId String
   ServicioCategoria   ServicioCategoria    @relation(fields: [servicioCategoriaId], references: [id])
@@ -494,7 +493,7 @@ model Servicio {
   PaqueteServicio     PaqueteServicio[]
 
   @@map("servicios")
-  @@index([studioId, status])
+  @@index([studio_id, status])
 }
 
 model ServicioSeccion {
@@ -553,8 +552,8 @@ model Paquete {
   id              String            @id @default(cuid())
   
   // Relación con Studio
-  studioId       String
-  studio          Studio            @relation(fields: [studioId], references: [id])
+  studio_id       String
+  studio          Studio            @relation(fields: [studio_id], references: [id])
   
   eventoTipoId    String
   EventoTipo      EventoTipo        @relation(fields: [eventoTipoId], references: [id])
@@ -571,7 +570,7 @@ model Paquete {
   SolicitudPaquete SolicitudPaquete[]
 
   @@map("paquetes")
-  @@index([studioId, status])
+  @@index([studio_id, status])
 }
 
 model PaqueteServicio {
@@ -596,8 +595,8 @@ model Configuracion {
   id                          String   @id @default(cuid())
   
   // Relación con Studio
-  studioId                   String
-  studio                      Studio   @relation(fields: [studioId], references: [id])
+  studio_id                   String
+  studio                      Studio   @relation(fields: [studio_id], references: [id])
   
   nombre                      String
   utilidad_servicio           Float
@@ -611,15 +610,15 @@ model Configuracion {
   updatedAt                   DateTime @updatedAt
 
   @@map("configuraciones")
-  @@index([studioId])
+  @@index([studio_id])
 }
 
 model MetodoPago {
   id                               String                             @id @default(cuid())
   
   // Relación con Studio
-  studioId                        String
-  studio                           Studio                             @relation(fields: [studioId], references: [id])
+  studio_id                        String
+  studio                           Studio                             @relation(fields: [studio_id], references: [id])
   
   metodo_pago                      String //efectivo, tarjeta de crédito, tarjeta de debito, transferencia interbancaria, oxxo
   comision_porcentaje_base         Float?                             @map("comision_porcentaje_base") //3.6
@@ -635,15 +634,15 @@ model MetodoPago {
   Pago                             Pago[]
 
   @@map("metodos_pago")
-  @@index([studioId])
+  @@index([studio_id])
 }
 
 model CondicionesComerciales {
   id                               String                             @id @default(cuid())
   
   // Relación con Studio
-  studioId                        String
-  studio                           Studio                             @relation(fields: [studioId], references: [id])
+  studio_id                        String
+  studio                           Studio                             @relation(fields: [studio_id], references: [id])
   
   nombre                           String // 3/6/9/12 msi / 10% de desc plan estandar (30% anticipo / 70 en exibiciones) 
   descripcion                      String?
@@ -659,7 +658,7 @@ model CondicionesComerciales {
   Pago                             Pago[]
 
   @@map("condiciones_comerciales")
-  @@index([studioId])
+  @@index([studio_id])
 }
 
 model CondicionesComercialesMetodoPago {
@@ -683,8 +682,8 @@ model Campania {
   id        String    @id @default(cuid())
   
   // Relación con Studio
-  studioId String
-  studio    Studio    @relation(fields: [studioId], references: [id])
+  studio_id String
+  studio    Studio    @relation(fields: [studio_id], references: [id])
   
   nombre    String
   status    String    @default("active")
@@ -693,7 +692,7 @@ model Campania {
   Anuncio   Anuncio[]
 
   @@map("campanias")
-  @@index([studioId])
+  @@index([studio_id])
 }
 
 model AnuncioPlataforma {
@@ -761,8 +760,8 @@ model Agenda {
   id            String      @id @default(cuid())
   
   // Relación con Studio
-  studioId     String
-  studio        Studio      @relation(fields: [studioId], references: [id])
+  studio_id     String
+  studio        Studio      @relation(fields: [studio_id], references: [id])
   
   userId        String?
   User          StudioUser? @relation(fields: [userId], references: [id])
@@ -780,7 +779,7 @@ model Agenda {
   agendaTipo    String?
 
   @@map("agenda")
-  @@index([studioId])
+  @@index([studio_id])
 }
 
 model AgendaTipo {
@@ -815,8 +814,8 @@ model Nomina {
   id                    String                @id @default(cuid())
   
   // Relación con Studio
-  studioId             String
-  studio                Studio                @relation(fields: [studioId], references: [id])
+  studio_id             String
+  studio                Studio                @relation(fields: [studio_id], references: [id])
   
   // === RELACIONES PRINCIPALES ===
   userId                String
@@ -863,7 +862,7 @@ model Nomina {
   NominaServicio        NominaServicio[]
 
   @@map("nominas")
-  @@index([studioId])
+  @@index([studio_id])
 }
 
 // Tabla intermedia para relacionar nómina con servicios específicos
@@ -913,8 +912,8 @@ model Gasto {
   id              String      @id @default(cuid())
   
   // Relación con Studio
-  studioId       String
-  studio          Studio      @relation(fields: [studioId], references: [id])
+  studio_id       String
+  studio          Studio      @relation(fields: [studio_id], references: [id])
   
   concepto        String
   descripcion     String?
@@ -942,7 +941,7 @@ model Gasto {
   
   @@index([fecha, categoria])
   @@index([eventoId])
-  @@index([studioId])
+  @@index([studio_id])
   @@map("gastos")
 }
 
@@ -954,8 +953,8 @@ model Negocio {
   id          String   @id @default(cuid())
   
   // Relación con Studio
-  studioId   String
-  studio      Studio   @relation(fields: [studioId], references: [id])
+  studio_id   String
+  studio      Studio   @relation(fields: [studio_id], references: [id])
   
   nombre      String   // Nombre del negocio
   descripcion String?  // Descripción breve
@@ -982,7 +981,7 @@ model Negocio {
   NegocioHorarios NegocioHorarios[]
 
   @@map("negocios")
-  @@index([studioId])
+  @@index([studio_id])
 }
 
 model NegocioRRSS {
