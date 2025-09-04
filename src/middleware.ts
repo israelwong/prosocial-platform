@@ -1,66 +1,106 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from '@supabase/ssr'
 
 export async function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
-    // Skip middleware for API routes, static files, and auth pages
-    if (
-        pathname.startsWith("/api/") ||
-        pathname.startsWith("/_next/") ||
-        pathname.startsWith("/auth/") ||
-        pathname.includes(".")
-    ) {
-        return NextResponse.next();
-    }
-
-    // Extract studio slug from path: /[studioSlug]/...
-    const studioSlugMatch = pathname.match(/^\/([^\/]+)/);
-    const studioSlug = studioSlugMatch?.[1];
-
-    // Root path - redirect to landing
-    if (pathname === "/") {
-        return NextResponse.next();
-    }
-
-    // Platform admin routes
-    if (pathname.startsWith("/platform/")) {
-        return NextResponse.next();
-    }
-
-    // Studio routes - validate studio exists
-    if (studioSlug) {
-        try {
-            // TODO: Add studio validation logic here
-            // const studio = await getStudioBySlug(studioSlug)
-            // if (!studio) return NextResponse.redirect(new URL('/', request.url))
-
-            // Add studio context to headers
-            const requestHeaders = new Headers(request.headers);
-            requestHeaders.set("x-studio-slug", studioSlug);
-
-            return NextResponse.next({
-                request: {
-                    headers: requestHeaders,
-                },
-            });
-        } catch {
-            return NextResponse.redirect(new URL("/", request.url));
-        }
-    }
-
+  // Excluir rutas públicas
+  if (
+    pathname.startsWith('/auth') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname === '/' ||
+    pathname.includes('.')
+  ) {
     return NextResponse.next();
+  }
+
+  // Detectar studio slug
+  const studioSlugMatch = pathname.match(/^\/([^\/]+)/);
+  if (!studioSlugMatch) {
+    return NextResponse.redirect(new URL('/auth/signin', request.url));
+  }
+
+  const studioSlug = studioSlugMatch[1];
+
+  // Crear cliente de Supabase para el middleware
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: Record<string, unknown>) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: Record<string, unknown>) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  // Verificar autenticación
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    const signInUrl = new URL('/auth/signin', request.url);
+    signInUrl.searchParams.set('callbackUrl', pathname);
+    signInUrl.searchParams.set('studio', studioSlug);
+    return NextResponse.redirect(signInUrl);
+  }
+
+  // Agregar headers de contexto del tenant
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-studio-slug', studioSlug);
+  requestHeaders.set('x-user-id', user.id);
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 }
 
 export const config = {
-    matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         */
-        "/((?!api|_next/static|_next/image|favicon.ico).*)",
-    ],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };
