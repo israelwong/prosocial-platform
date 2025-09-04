@@ -20,7 +20,7 @@ import {
 
 export default function StudioDashboard() {
     const params = useParams()
-    const studioSlug = params.studioSlug as string
+    const studioSlug = params?.studioSlug as string
     const { user, studioUser, loading } = useStudioAuth()
 
     const [stats, setStats] = useState({
