@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# legacy components folder (local migration work)
+src/components/legacy/
+src/hooks/legacy/
+src/lib/legacy/
+src/app/legacy/
+COMPONENTES_A_COPIAR.md
