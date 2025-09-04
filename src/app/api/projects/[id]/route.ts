@@ -22,23 +22,23 @@ export async function GET(
             return NextResponse.json({ error: 'Studio not found' }, { status: 404 })
         }
 
-        // Obtener proyecto específico del studio
-        const project = await prisma.project.findFirst({
+        // Obtener evento específico del studio
+        const evento = await prisma.evento.findFirst({
             where: {
                 id: id,
-                studio_id: studio.id
+                studioId: studio.id
             },
             include: {
-                client: true,
-                quotations: true
+                Cliente: true,
+                Cotizacion: true
             }
         })
 
-        if (!project) {
-            return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+        if (!evento) {
+            return NextResponse.json({ error: 'Event not found' }, { status: 404 })
         }
 
-        return NextResponse.json(project)
+        return NextResponse.json(evento)
     } catch (error) {
         console.error('Error fetching project:', error)
         return NextResponse.json(
@@ -71,35 +71,33 @@ export async function PUT(
 
         const body = await request.json()
         const {
-            name,
-            description,
-            event_date,
+            nombre,
+            fechaEvento,
             status,
-            location,
-            event_type
+            sede,
+            direccion
         } = body
 
-        // Actualizar el proyecto
-        const project = await prisma.project.update({
+        // Actualizar el evento
+        const evento = await prisma.evento.update({
             where: {
                 id: id,
-                studio_id: studio.id
+                studioId: studio.id
             },
             data: {
-                name,
-                description,
-                event_date: event_date ? new Date(event_date) : undefined,
+                nombre,
+                fecha_evento: fechaEvento ? new Date(fechaEvento) : undefined,
                 status,
-                location,
-                event_type
+                sede,
+                direccion
             },
             include: {
-                client: true,
-                quotations: true
+                Cliente: true,
+                Cotizacion: true
             }
         })
 
-        return NextResponse.json(project)
+        return NextResponse.json(evento)
     } catch (error) {
         console.error('Error updating project:', error)
         return NextResponse.json(
@@ -130,19 +128,18 @@ export async function DELETE(
             return NextResponse.json({ error: 'Studio not found' }, { status: 404 })
         }
 
-        // Soft delete - archivar el proyecto
-        const project = await prisma.project.update({
+        // Soft delete - archivar el evento
+        const evento = await prisma.evento.update({
             where: {
                 id: id,
-                studio_id: studio.id
+                studioId: studio.id
             },
             data: {
-                archived_at: new Date(),
-                status: 'ARCHIVED'
+                status: 'archived'
             }
         })
 
-        return NextResponse.json({ message: 'Project archived successfully', project })
+        return NextResponse.json({ message: 'Event archived successfully', evento })
     } catch (error) {
         console.error('Error deleting project:', error)
         return NextResponse.json(

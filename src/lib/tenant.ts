@@ -5,7 +5,7 @@ import { Studio, Plan } from "@prisma/client";
 type StudioWithPlan = Studio & {
     plan: Plan;
     _count?: {
-        projects: number;
+        eventos: number;
     };
 };
 
@@ -35,7 +35,7 @@ export async function getStudioBySlug(
     slug: string
 ): Promise<StudioWithPlan | null> {
     try {
-        const { prisma } = await import("@/lib/db");
+        const { prisma } = await import("./db");
 
         const studio = await prisma.studio.findUnique({
             where: { slug },
@@ -43,9 +43,9 @@ export async function getStudioBySlug(
                 plan: true,
                 _count: {
                     select: {
-                        projects: {
+                        eventos: {
                             where: {
-                                status: "ACTIVE",
+                                status: "active",
                             },
                         },
                     },

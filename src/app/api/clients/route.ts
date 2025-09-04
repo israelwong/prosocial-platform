@@ -19,22 +19,22 @@ export async function GET(request: NextRequest) {
         }
 
         // Obtener clientes del studio
-        const clients = await prisma.client.findMany({
-            where: { studio_id: studio.id },
+        const clientes = await prisma.cliente.findMany({
+            where: { studioId: studio.id },
             include: {
-                projects: {
+                Evento: {
                     select: {
                         id: true,
-                        name: true,
+                        nombre: true,
                         status: true,
-                        event_date: true
+                        fecha_evento: true
                     }
                 }
             },
             orderBy: { createdAt: 'desc' }
         })
 
-        return NextResponse.json(clients)
+        return NextResponse.json(clientes)
     } catch (error) {
         console.error('Error fetching clients:', error)
         return NextResponse.json(
@@ -63,28 +63,24 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json()
         const {
-            name,
+            nombre,
             email,
-            phone,
-            address,
-            notes,
-            tags = []
+            telefono,
+            direccion
         } = body
 
         // Crear el cliente
-        const client = await prisma.client.create({
+        const cliente = await prisma.cliente.create({
             data: {
-                name,
+                nombre,
                 email,
-                phone,
-                address,
-                notes,
-                tags,
-                studio_id: studio.id
+                telefono,
+                direccion,
+                studioId: studio.id
             }
         })
 
-        return NextResponse.json(client, { status: 201 })
+        return NextResponse.json(cliente, { status: 201 })
     } catch (error) {
         console.error('Error creating client:', error)
         return NextResponse.json(

@@ -19,21 +19,21 @@ export async function GET(request: NextRequest) {
         }
 
         // Obtener proyectos del studio con clientes
-        const projects = await prisma.project.findMany({
-            where: { studio_id: studio.id },
+        const eventos = await prisma.evento.findMany({
+            where: { studioId: studio.id },
             include: {
-                client: {
+                Cliente: {
                     select: {
                         id: true,
-                        name: true,
+                        nombre: true,
                         email: true,
-                        phone: true
+                        telefono: true
                     }
                 },
-                quotations: {
+                Cotizacion: {
                     select: {
                         id: true,
-                        total: true,
+                        precio: true,
                         status: true
                     }
                 }
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
             orderBy: { createdAt: 'desc' }
         })
 
-        return NextResponse.json(projects)
+        return NextResponse.json(eventos)
     } catch (error) {
         console.error('Error fetching projects:', error)
         return NextResponse.json(
@@ -70,63 +70,61 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json()
         const {
-            name,
-            description,
-            event_date,
-            status = 'PENDING',
-            client_id,
+            nombre,
+            fechaEvento,
+            status = 'active',
+            clienteId,
             // Datos del cliente si es nuevo
-            client_name,
-            client_email,
-            client_phone
+            clienteNombre,
+            clienteEmail,
+            clienteTelefono
         } = body
 
-        // Si no hay client_id, crear un nuevo cliente
-        let clientId = client_id
-        if (!clientId && client_name) {
-            const newClient = await prisma.client.create({
+        // Si no hay clienteId, crear un nuevo cliente
+        let finalClienteId = clienteId
+        if (!finalClienteId && clienteNombre) {
+            const newCliente = await prisma.cliente.create({
                 data: {
-                    name: client_name,
-                    email: client_email,
-                    phone: client_phone,
-                    studio_id: studio.id
+                    nombre: clienteNombre,
+                    email: clienteEmail,
+                    telefono: clienteTelefono,
+                    studioId: studio.id
                 }
             })
-            clientId = newClient.id
+            finalClienteId = newCliente.id
         }
 
-        if (!clientId) {
+        if (!finalClienteId) {
             return NextResponse.json(
                 { error: 'Client information is required' },
                 { status: 400 }
             )
         }
 
-        // Crear el proyecto
-        const project = await prisma.project.create({
+        // Crear el evento
+        const evento = await prisma.evento.create({
             data: {
-                name,
-                description,
-                event_date: event_date ? new Date(event_date) : new Date(),
+                nombre,
+                fecha_evento: fechaEvento ? new Date(fechaEvento) : new Date(),
                 status,
-                client_id: clientId,
-                studio_id: studio.id
+                clienteId: finalClienteId,
+                studioId: studio.id
             },
             include: {
-                client: {
+                Cliente: {
                     select: {
                         id: true,
-                        name: true,
+                        nombre: true,
                         email: true,
-                        phone: true
+                        telefono: true
                     }
                 }
             }
         })
 
-        return NextResponse.json(project, { status: 201 })
+        return NextResponse.json(evento, { status: 201 })
     } catch (error) {
-        console.error('Error creating project:', error)
+        console.error('Error creating evento:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

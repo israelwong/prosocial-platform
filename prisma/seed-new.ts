@@ -62,20 +62,20 @@ async function main() {
         }
     })
 
-  // Crear usuario del studio
-  const studioUser = await prisma.studioUser.upsert({
-    where: { email: 'admin@estudio.com' },
-    update: {},
-    create: {
-      email: 'admin@estudio.com',
-      username: 'admin',
-      password: '$2a$10$hash_ejemplo', // En producción usar bcrypt real
-      role: 'owner',
-      status: 'active',
-      telefono: '+52 55 1234 5678', // Teléfono obligatorio
-      studioId: studio.id
-    }
-  })    // Crear tipos de evento
+    // Crear usuario del studio
+    const studioUser = await prisma.studioUser.upsert({
+        where: { email: 'admin@estudio.com' },
+        update: {},
+        create: {
+            email: 'admin@estudio.com',
+            username: 'admin',
+            password: '$2a$10$hash_ejemplo', // En producción usar bcrypt real
+            role: 'owner',
+            status: 'active',
+            telefono: '+52 55 1234 5678', // Teléfono obligatorio
+            studioId: studio.id
+        }
+    })    // Crear tipos de evento
     const eventoTipoBoda = await prisma.eventoTipo.upsert({
         where: { id: 'evento_tipo_boda' },
         update: {},

@@ -5,29 +5,26 @@ import { useStudioAuth } from './use-studio-auth'
 
 interface Client {
     id: string
-    name: string
-    email?: string
-    phone?: string
-    address?: string
-    notes?: string
-    tags: string[]
-    projects: Array<{
+    nombre: string
+    email: string  // Ahora requerido
+    telefono: string  // Ahora requerido
+    direccion?: string
+    status: string
+    Evento: Array<{
         id: string
-        name: string
+        nombre: string
         status: string
-        event_date: string
+        fecha_evento: string
     }>
     createdAt: string
     updatedAt: string
 }
 
 interface CreateClientData {
-    name: string
-    email?: string
-    phone?: string
-    address?: string
-    notes?: string
-    tags?: string[]
+    nombre: string
+    email: string  // Ahora requerido
+    telefono: string  // Ahora requerido
+    direccion?: string
 }
 
 export function useClients() {

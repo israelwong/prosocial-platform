@@ -60,28 +60,28 @@ export default function ProjectsPage() {
     const [isNewClient, setIsNewClient] = useState(false)
 
     const filteredProjects = projects.filter(project => {
-        const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            project.client.name.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesSearch = project.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            project.Cliente.nombre.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesStatus = statusFilter === 'all' || project.status === statusFilter
         return matchesSearch && matchesStatus
     })
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'ACTIVE': return 'bg-green-100 text-green-800'
-            case 'COMPLETED': return 'bg-blue-100 text-blue-800'
-            case 'ARCHIVED': return 'bg-gray-100 text-gray-800'
-            case 'CANCELLED': return 'bg-red-100 text-red-800'
+            case 'active': return 'bg-green-100 text-green-800'
+            case 'completed': return 'bg-blue-100 text-blue-800'
+            case 'archived': return 'bg-gray-100 text-gray-800'
+            case 'cancelled': return 'bg-red-100 text-red-800'
             default: return 'bg-gray-100 text-gray-800'
         }
     }
 
     const getStatusText = (status: string) => {
         switch (status) {
-            case 'ACTIVE': return 'Activo'
-            case 'COMPLETED': return 'Completado'
-            case 'ARCHIVED': return 'Archivado'
-            case 'CANCELLED': return 'Cancelado'
+            case 'active': return 'Activo'
+            case 'completed': return 'Completado'
+            case 'archived': return 'Archivado'
+            case 'cancelled': return 'Cancelado'
             default: return status
         }
     }
@@ -90,17 +90,15 @@ export default function ProjectsPage() {
         e.preventDefault()
 
         const projectData = {
-            name: formData.name,
-            description: formData.description,
-            event_date: formData.event_date,
-            location: formData.location,
-            event_type: formData.event_type,
+            nombre: formData.name,
+            fechaEvento: formData.event_date,
+            sede: formData.location,
             ...(isNewClient ? {
-                client_name: formData.client_name,
-                client_email: formData.client_email,
-                client_phone: formData.client_phone
+                clienteNombre: formData.client_name,
+                clienteEmail: formData.client_email,
+                clienteTelefono: formData.client_phone
             } : {
-                client_id: formData.client_id
+                clienteId: formData.client_id
             })
         }
 
@@ -275,7 +273,7 @@ export default function ProjectsPage() {
                                                 <SelectContent>
                                                     {clients.map((client) => (
                                                         <SelectItem key={client.id} value={client.id}>
-                                                            {client.name} {client.email && `(${client.email})`}
+                                                            {client.nombre} {client.email && `(${client.email})`}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
@@ -376,11 +374,11 @@ export default function ProjectsPage() {
                                         <div className="flex justify-between items-start">
                                             <div className="flex-1">
                                                 <CardTitle className="text-lg font-semibold line-clamp-1">
-                                                    {project.name}
+                                                    {project.nombre}
                                                 </CardTitle>
                                                 <CardDescription className="flex items-center mt-1">
                                                     <User className="mr-1 h-3 w-3" />
-                                                    {project.client.name}
+                                                    {project.Cliente.nombre}
                                                 </CardDescription>
                                             </div>
                                             <Badge className={getStatusColor(project.status)}>
@@ -391,10 +389,10 @@ export default function ProjectsPage() {
 
                                     <CardContent>
                                         <div className="space-y-3">
-                                            {project.event_date && (
+                                            {project.fecha_evento && (
                                                 <div className="flex items-center text-sm text-gray-600">
                                                     <Calendar className="mr-2 h-4 w-4" />
-                                                    {new Date(project.event_date).toLocaleDateString('es-ES', {
+                                                    {new Date(project.fecha_evento).toLocaleDateString('es-ES', {
                                                         year: 'numeric',
                                                         month: 'long',
                                                         day: 'numeric'
@@ -402,24 +400,18 @@ export default function ProjectsPage() {
                                                 </div>
                                             )}
 
-                                            {project.location && (
+                                            {project.sede && (
                                                 <div className="flex items-center text-sm text-gray-600">
                                                     <MapPin className="mr-2 h-4 w-4" />
-                                                    {project.location}
+                                                    {project.sede}
                                                 </div>
                                             )}
 
-                                            {project.quotations.length > 0 && (
+                                            {project.Cotizacion.length > 0 && (
                                                 <div className="flex items-center text-sm text-gray-600">
                                                     <DollarSign className="mr-2 h-4 w-4" />
-                                                    {project.quotations.length} cotización{project.quotations.length !== 1 ? 'es' : ''}
+                                                    {project.Cotizacion.length} cotización{project.Cotizacion.length !== 1 ? 'es' : ''}
                                                 </div>
-                                            )}
-
-                                            {project.description && (
-                                                <p className="text-sm text-gray-600 line-clamp-2">
-                                                    {project.description}
-                                                </p>
                                             )}
                                         </div>
 
@@ -433,7 +425,7 @@ export default function ProjectsPage() {
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                onClick={() => handleDelete(project.id, project.name)}
+                                                onClick={() => handleDelete(project.id, project.nombre)}
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

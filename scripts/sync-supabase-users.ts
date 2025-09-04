@@ -23,8 +23,8 @@ async function syncUsersToSupabase() {
                 password: 'admin123', // Contraseña temporal, el usuario podrá cambiarla
                 email_confirm: true,
                 user_metadata: {
-                    name: user.name,
-                    studio_id: user.studio_id,
+                    username: user.username,
+                    studio_id: user.studioId,
                     studio_slug: user.studio.slug,
                     role: user.role
                 }
