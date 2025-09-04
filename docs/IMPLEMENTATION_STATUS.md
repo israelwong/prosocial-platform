@@ -1,7 +1,8 @@
 # 🎉 ProSocial Platform - Implementación Fase 1-3 COMPLETADA
 
 **Fecha:** 4 de septiembre de 2025  
-**Estado:** ✅ EXITOSO - Fundamentos Implementados
+**Estado:** ✅ EXITOSO - Fundamentos Implementados  
+**Repositorio:** https://github.com/israelwong/prosocial-platform.git
 
 ---
 
