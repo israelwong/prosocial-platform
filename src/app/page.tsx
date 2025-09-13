@@ -8,6 +8,9 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 
+// Force dynamic rendering to avoid build-time Supabase client creation
+export const dynamic = 'force-dynamic';
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

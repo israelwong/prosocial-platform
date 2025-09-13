@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { User } from '@supabase/supabase-js'
+import { User, SupabaseClient, AuthChangeEvent, Session } from '@supabase/supabase-js'
 import { createClientSupabase } from '@/lib/supabase'
 
 interface AuthContextType {
@@ -25,9 +25,17 @@ export const useAuth = () => {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
-    const supabase = createClientSupabase()
+    const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
 
     useEffect(() => {
+        // Create Supabase client only on client side
+        const client = createClientSupabase()
+        setSupabase(client)
+    }, [])
+
+    useEffect(() => {
+        if (!supabase) return
+
         // Obtener sesión inicial
         const getSession = async () => {
             const { data: { session } } = await supabase.auth.getSession()
@@ -39,14 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Escuchar cambios de autenticación
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (event, session) => {
+            (event: AuthChangeEvent, session: Session | null) => {
                 setUser(session?.user ?? null)
                 setLoading(false)
             }
         )
 
         return () => subscription.unsubscribe()
-    }, [supabase.auth])
+    }, [supabase])
 
     return (
         <AuthContext.Provider value={{ user, loading }}>
