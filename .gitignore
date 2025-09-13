@@ -45,4 +45,5 @@ src/components/legacy/
 src/hooks/legacy/
 src/lib/legacy/
 src/app/legacy/
+legacy-temp/
 COMPONENTES_A_COPIAR.md
