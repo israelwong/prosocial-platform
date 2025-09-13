@@ -536,7 +536,6 @@ model Cotizacion {
   Costos                             CotizacionCosto[]
   Pago                               Pago[]
   CotizacionVisita                   CotizacionVisita[]
-  SolicitudPaquete                   SolicitudPaquete[]
 
   @@index([studioId, status])
   @@index([eventoId])
@@ -743,7 +742,6 @@ model Paquete {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   PaqueteServicio  PaqueteServicio[]
-  SolicitudPaquete SolicitudPaquete[]
 
   @@index([studioId, status])
   @@map("paquetes")
@@ -865,71 +863,9 @@ model Campania {
   status    String    @default("active")
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Anuncio   Anuncio[]
 
   @@index([studioId])
   @@map("campanias")
-}
-
-model AnuncioPlataforma {
-  id        String    @id @default(cuid())
-  nombre    String //facebook, instagram, google, youtube, impreso
-  status    String    @default("active")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Anuncio   Anuncio[]
-
-  @@map("anuncio_plataformas")
-}
-
-model AnuncioTipo {
-  id        String    @id @default(cuid())
-  nombre    String //imagen, video, carousel
-  status    String    @default("active")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  anuncio   Anuncio[]
-
-  @@map("anuncio_tipos")
-}
-
-model AnuncioCategoria {
-  id        String    @id @default(cuid())
-  nombre    String //banner, video, carousel
-  status    String    @default("active")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  anuncio   Anuncio[]
-
-  @@map("anuncio_categorias")
-}
-
-model Anuncio {
-  id                  String            @id @default(cuid())
-  campaniaId          String
-  Campania            Campania          @relation(fields: [campaniaId], references: [id])
-  nombre              String
-  anuncioTipoId       String
-  AnuncioTipo         AnuncioTipo       @relation(fields: [anuncioTipoId], references: [id])
-  anuncioCategoriaId  String
-  AnuncioCategoria    AnuncioCategoria  @relation(fields: [anuncioCategoriaId], references: [id])
-  anuncioPlataformaId String
-  AnuncioPlataforma   AnuncioPlataforma @relation(fields: [anuncioPlataformaId], references: [id])
-  imagen_url          String
-  status              String            @default("active")
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-
-  @@map("anuncios")
-}
-
-model AnuncioVisita {
-  id        String   @id @default(cuid())
-  anuncioId String
-  fecha     DateTime
-  createdAt DateTime @default(now())
-
-  @@map("anuncio_visitas")
 }
 
 model Agenda {
@@ -1200,42 +1136,4 @@ model NegocioHorarios {
   @@unique([negocioId, diaSemana])
   @@index([negocioId, activo])
   @@map("negocio_horarios")
-}
-
-model SolicitudPaquete {
-  id           String     @id @default(cuid())
-  cotizacionId String
-  Cotizacion   Cotizacion @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
-  paqueteId    String
-  Paquete      Paquete    @relation(fields: [paqueteId], references: [id])
-
-  // Datos del cliente
-  clienteNombre   String
-  clienteEmail    String
-  clienteTelefono String?
-  mensaje         String?
-
-  // Datos del paquete (snapshot para referencia)
-  paqueteNombre    String
-  precioPaquete    Float
-  diferenciaPrecio Float? // Diferencia con cotización original
-
-  // Datos del evento (para referencia rápida)
-  eventoFecha DateTime?
-  eventoLugar String?
-
-  // Estado de la solicitud
-  estado         String    @default("pendiente") // pendiente, procesando, completada, rechazada
-  notas          String? // Notas del asesor
-  fechaSolicitud DateTime  @default(now())
-  fechaProcesada DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([cotizacionId])
-  @@index([paqueteId])
-  @@index([estado])
-  @@index([fechaSolicitud])
-  @@map("solicitud_paquetes")
 }

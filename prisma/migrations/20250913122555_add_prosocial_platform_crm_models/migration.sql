@@ -90,8 +90,8 @@ CREATE TABLE "studio_revenue_products" (
     CONSTRAINT "studio_revenue_products_pkey" PRIMARY KEY ("id")
 );
 
--- DropIndex
-DROP INDEX "plans_active_idx";
+-- DropIndex (only if exists)
+DROP INDEX IF EXISTS "plans_active_idx";
 
 -- AlterTable
 ALTER TABLE "plans" DROP COLUMN "stripePriceId",
