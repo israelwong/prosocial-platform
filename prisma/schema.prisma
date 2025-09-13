@@ -9,6 +9,38 @@ datasource db {
 }
 
 // =====================================================================
+// SISTEMA DE USUARIOS UNIFICADO
+// =====================================================================
+
+model UserProfile {
+  id String @id @default(cuid())
+
+  // Información básica
+  email     String @unique
+  fullName  String?
+  avatarUrl String?
+
+  // Rol y permisos
+  role String // 'super_admin', 'asesor', 'suscriptor'
+  // Relación con Studio (solo para suscriptores)
+  studioId String?
+  studio   Studio? @relation(fields: [studioId], references: [id])
+
+  // Estado
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  activities ProSocialActivity[]
+
+  @@index([email])
+  @@index([role])
+  @@index([studioId])
+  @@map("user_profiles")
+}
+
+// =====================================================================
 // PROSOCIAL PLATFORM - CRM Y GESTIÓN
 // =====================================================================
 
@@ -76,8 +108,7 @@ model ProSocialAgent {
   updatedAt DateTime @updatedAt
 
   // Relaciones
-  leads       ProSocialLead[]
-  actividades ProSocialActivity[]
+  leads ProSocialLead[]
 
   @@index([activo])
   @@map("prosocial_agents")
@@ -90,8 +121,8 @@ model ProSocialActivity {
   leadId String
   lead   ProSocialLead @relation(fields: [leadId], references: [id])
 
-  agentId String?
-  agent   ProSocialAgent? @relation(fields: [agentId], references: [id])
+  userId String?
+  user   UserProfile? @relation(fields: [userId], references: [id])
 
   // Actividad
   tipo               String // llamada, email, reunion, demo, propuesta
@@ -104,7 +135,7 @@ model ProSocialActivity {
   createdAt DateTime @default(now())
 
   @@index([leadId, createdAt])
-  @@index([agentId, createdAt])
+  @@index([userId, createdAt])
   @@map("prosocial_activities")
 }
 
@@ -257,6 +288,7 @@ model Studio {
   // === RELACIONES PROSOCIAL PLATFORM ===
   leadConvertido  ProSocialLead? // Si este studio se convirtió desde un lead
   revenueProducts StudioRevenueProduct[] // Productos B2B2C activados
+  userProfiles    UserProfile[] // Usuarios suscriptores del studio
 
   @@index([slug])
   @@index([planId])
