@@ -8,17 +8,12 @@ export async function middleware(request: NextRequest) {
     '/about',
     '/pricing',
     '/contact',
-    '/contacto',
     '/features',
     '/blog',
     '/auth',
     '/admin',
     '/asesor',
-    '/studio',
-    '/weddings',
-    '/fifteens',
-    '/bolsa-trabajo',
-    '/aviso-de-privacidad'
+    '/studio'
   ];
 
   // Si es una ruta de marketing o ya tiene prefijo, permitir

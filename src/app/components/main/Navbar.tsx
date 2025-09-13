@@ -75,14 +75,14 @@ export default function NavbarV2() {
             status: 'active'
         },
         {
-            name: 'Events',
+            name: 'Plataforma',
             link: null,
-            icon: <Calendar className="w-4 h-4" />,
+            icon: <Building2 className="w-4 h-4" />,
             status: 'active',
             submenu: [
-                { name: 'Fifteens', link: "/fifteens", description: "Quinceañeras únicas", status: 'active' },
-                { name: 'Weddings', link: "/weddings", description: "Bodas de ensueño", status: 'active' },
-                { name: 'Cliente Portal', link: "/cliente", description: "Acceso clientes ProSocial Events", status: 'active' }
+                { name: 'Acerca de', link: "/about", description: "Conoce más sobre ProSocial Platform", status: 'active' },
+                { name: 'Precios', link: "/pricing", description: "Planes y precios", status: 'active' },
+                { name: 'Contacto', link: "/contact", description: "Contáctanos", status: 'active' }
             ]
         },
         {
