@@ -143,8 +143,8 @@ export default async function CRMKanbanPage() {
         leads: leads.filter(lead => {
             // Si el lead tiene una etapa asignada, usar el nombre de la etapa
             if (lead.etapa) {
-                return lead.etapa.nombre.toLowerCase().includes(stage.id.toLowerCase()) || 
-                       stage.id.toLowerCase().includes(lead.etapa.nombre.toLowerCase());
+                return lead.etapa.nombre.toLowerCase().includes(stage.id.toLowerCase()) ||
+                    stage.id.toLowerCase().includes(lead.etapa.nombre.toLowerCase());
             }
             // Si no tiene etapa asignada, asignar a "nuevo"
             return stage.id === 'nuevo';

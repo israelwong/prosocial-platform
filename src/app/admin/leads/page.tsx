@@ -62,14 +62,9 @@ export default function LeadsPage() {
     const contactadosLeads = leads.filter(l => l.estado === 'contactado').length;
     const calificadosLeads = leads.filter(l => l.estado === 'calificado').length;
 
-    const handleNewLead = () => {
-        // TODO: Implementar navegación a formulario de nuevo lead
-        console.log('Crear nuevo lead');
-    };
-
     const handleViewDetails = (lead: Lead) => {
-        // TODO: Implementar navegación a detalles del lead
-        console.log('Ver detalles del lead:', lead);
+        // Navegar a la página de detalles del lead
+        window.location.href = `/admin/leads/${lead.id}`;
     };
 
     const handleFilterClick = () => {
@@ -117,7 +112,6 @@ export default function LeadsPage() {
             {/* Leads List */}
             <LeadsList
                 leads={filteredLeads}
-                onNewLead={handleNewLead}
                 onViewDetails={handleViewDetails}
             />
         </div>

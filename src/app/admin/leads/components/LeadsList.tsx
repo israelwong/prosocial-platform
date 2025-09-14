@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -17,23 +18,21 @@ interface Lead {
 
 interface LeadsListProps {
     leads: Lead[];
-    onNewLead: () => void;
     onViewDetails: (lead: Lead) => void;
 }
 
-export default function LeadsList({ leads, onNewLead, onViewDetails }: LeadsListProps) {
+export default function LeadsList({ leads, onViewDetails }: LeadsListProps) {
     return (
         <Card className="bg-zinc-900 border-zinc-800">
             <CardHeader className="border-b border-zinc-800">
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-lg font-semibold text-white">Lista de Leads</CardTitle>
-                    <Button 
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                        onClick={onNewLead}
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Nuevo Lead
-                    </Button>
+                    <Link href="/admin/leads/new">
+                        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Nuevo Lead
+                        </Button>
+                    </Link>
                 </div>
             </CardHeader>
             <CardContent className="pt-6">
