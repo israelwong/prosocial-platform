@@ -37,7 +37,7 @@ export default function AsesorLeadsPage() {
                     email: 'maria@fotografia.com',
                     telefono: '+52 55 1234 5678',
                     nombreEstudio: 'Fotografía María',
-                    etapa: 'nuevo',
+                    etapaId: 'nuevos-leads-id', // ID temporal para "Nuevos Leads"
                     prioridad: 'alta',
                     planInteres: 'Pro',
                     presupuestoMensual: 500,
@@ -51,7 +51,7 @@ export default function AsesorLeadsPage() {
                     email: 'carlos@eventos.com',
                     telefono: '+52 55 2345 6789',
                     nombreEstudio: 'Eventos Carlos',
-                    etapa: 'seguimiento',
+                    etapaId: 'en-seguimiento-id', // ID temporal para "En Seguimiento"
                     prioridad: 'media',
                     planInteres: 'Básico',
                     presupuestoMensual: 200,
@@ -71,7 +71,7 @@ export default function AsesorLeadsPage() {
                     email: 'ana@diseno.com',
                     telefono: '+52 55 3456 7890',
                     nombreEstudio: 'Diseño Ana',
-                    etapa: 'promesa',
+                    etapaId: 'promesa-compra-id', // ID temporal para "Promesa de Compra"
                     prioridad: 'alta',
                     planInteres: 'Enterprise',
                     presupuestoMensual: 1000,

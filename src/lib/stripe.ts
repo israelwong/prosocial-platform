@@ -1,13 +1,63 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY is not set");
+// Función para obtener la instancia de Stripe de manera segura
+function getStripeInstance() {
+    if (!process.env.STRIPE_SECRET_KEY) {
+        throw new Error("STRIPE_SECRET_KEY is not set");
+    }
+    
+    return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+        apiVersion: "2023-10-16",
+        typescript: true,
+    });
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2023-10-16",
-    typescript: true,
-});
+// Exportar una función que retorna la instancia de Stripe
+export const getStripe = getStripeInstance;
+
+// Para compatibilidad con código existente, exportar stripe como una función
+export const stripe = {
+    webhooks: {
+        constructEvent: (body: string, signature: string, secret: string) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.webhooks.constructEvent(body, signature, secret);
+        }
+    },
+    products: {
+        create: async (params: any) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.products.create(params);
+        }
+    },
+    prices: {
+        create: async (params: any) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.prices.create(params);
+        },
+        list: async (params: any) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.prices.list(params);
+        }
+    },
+    subscriptions: {
+        create: async (params: any) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.subscriptions.create(params);
+        },
+        retrieve: async (id: string) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.subscriptions.retrieve(id);
+        },
+        update: async (id: string, params: any) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.subscriptions.update(id, params);
+        },
+        cancel: async (id: string) => {
+            const stripeInstance = getStripeInstance();
+            return stripeInstance.subscriptions.cancel(id);
+        }
+    }
+};
 
 // Configuración de planes de suscripción
 export const SUBSCRIPTION_PLANS = {
@@ -77,12 +127,13 @@ export type PlanType = keyof typeof SUBSCRIPTION_PLANS;
 
 // Función para crear productos y precios en Stripe
 export async function createStripeProducts() {
+    const stripeInstance = getStripeInstance();
     const products = [];
 
     for (const [planKey, plan] of Object.entries(SUBSCRIPTION_PLANS)) {
         try {
             // Crear producto
-            const product = await stripe.products.create({
+            const product = await stripeInstance.products.create({
                 name: plan.name,
                 description: plan.description,
                 metadata: {
@@ -91,7 +142,7 @@ export async function createStripeProducts() {
             });
 
             // Crear precio mensual
-            const monthlyPrice = await stripe.prices.create({
+            const monthlyPrice = await stripeInstance.prices.create({
                 product: product.id,
                 unit_amount: Math.round(plan.price_monthly * 100), // Convertir a centavos
                 currency: "usd",
@@ -103,7 +154,7 @@ export async function createStripeProducts() {
             });
 
             // Crear precio anual
-            const yearlyPrice = await stripe.prices.create({
+            const yearlyPrice = await stripeInstance.prices.create({
                 product: product.id,
                 unit_amount: Math.round(plan.price_yearly * 100), // Convertir a centavos
                 currency: "usd",
@@ -132,7 +183,8 @@ export async function createStripeProducts() {
 
 // Función para obtener precios de un plan
 export async function getPlanPrices(planType: PlanType) {
-    const prices = await stripe.prices.list({
+    const stripeInstance = getStripeInstance();
+    const prices = await stripeInstance.prices.list({
         active: true,
         metadata: {
             plan_type: planType,
@@ -151,7 +203,8 @@ export async function createSubscription(
     priceId: string,
     studioId: string
 ) {
-    const subscription = await stripe.subscriptions.create({
+    const stripeInstance = getStripeInstance();
+    const subscription = await stripeInstance.subscriptions.create({
         customer: customerId,
         items: [{ price: priceId }],
         billing_cycle_anchor: Math.floor(Date.now() / 1000), // Fecha actual
@@ -170,9 +223,10 @@ export async function updateSubscription(
     subscriptionId: string,
     newPriceId: string
 ) {
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const stripeInstance = getStripeInstance();
+    const subscription = await stripeInstance.subscriptions.retrieve(subscriptionId);
 
-    const updatedSubscription = await stripe.subscriptions.update(subscriptionId, {
+    const updatedSubscription = await stripeInstance.subscriptions.update(subscriptionId, {
         items: [
             {
                 id: subscription.items.data[0].id,

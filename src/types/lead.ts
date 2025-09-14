@@ -7,7 +7,7 @@ export interface Lead {
     slugEstudio?: string;
 
     // Ciclo de vida CRM
-    etapa: 'nuevo' | 'seguimiento' | 'promesa' | 'suscrito' | 'cancelado' | 'perdido';
+    etapaId?: string; // ID de la etapa del pipeline
     prioridad: 'baja' | 'media' | 'alta';
     fechaUltimoContacto?: Date;
     notasConversacion?: string;
@@ -43,7 +43,7 @@ export interface LeadFormData {
 }
 
 export interface LeadUpdateData {
-    etapa?: Lead['etapa'];
+    etapaId?: string;
     prioridad?: Lead['prioridad'];
     agentId?: string;
     fechaUltimoContacto?: Date;

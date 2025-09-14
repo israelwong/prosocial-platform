@@ -82,9 +82,16 @@ async function getLeads() {
 async function getMetrics() {
     try {
         const totalLeads = await prisma.proSocialLead.count();
-        const suscritos = await prisma.proSocialLead.count({
-            where: { etapa: 'suscrito' }
+
+        // Buscar la etapa "Suscritos" por nombre
+        const etapaSuscritos = await prisma.proSocialPipelineStage.findFirst({
+            where: { nombre: 'Suscritos' }
         });
+
+        const suscritos = etapaSuscritos ? await prisma.proSocialLead.count({
+            where: { etapaId: etapaSuscritos.id }
+        }) : 0;
+
         const conversionRate = totalLeads > 0 ? (suscritos / totalLeads) * 100 : 0;
 
         const avgBudget = await prisma.proSocialLead.aggregate({
