@@ -34,6 +34,7 @@ model UserProfile {
   // Relaciones
   activities ProSocialActivity[]
   notifications ProSocialNotification[]
+  leadBitacora ProSocialLeadBitacora[]
 
   @@index([email])
   @@index([role])
@@ -59,7 +60,6 @@ model ProSocialLead {
   etapaId             String?
   etapa               ProSocialPipelineStage? @relation(fields: [etapaId], references: [id])
   fechaUltimoContacto DateTime?
-  notasConversacion   String?
 
   // Plan de interés
   planInteres         String? // basico, negocio, agencia
@@ -87,10 +87,38 @@ model ProSocialLead {
   // Relaciones
   actividades ProSocialActivity[]
   notifications ProSocialNotification[]
+  bitacora ProSocialLeadBitacora[]
 
   @@index([etapaId, prioridad])
   @@index([agentId])
   @@map("prosocial_leads")
+}
+
+model ProSocialLeadBitacora {
+  id          String   @id @default(cuid())
+  leadId      String
+  lead        ProSocialLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  // Tipo de entrada
+  tipo        LeadBitacoraTipo
+  
+  // Contenido
+  titulo      String?
+  descripcion String
+  metadata    Json?    // Para datos adicionales específicos del tipo
+  
+  // Usuario que realizó la acción
+  usuarioId   String?
+  usuario     UserProfile? @relation(fields: [usuarioId], references: [id])
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([leadId])
+  @@index([tipo])
+  @@index([createdAt])
+  @@map("prosocial_lead_bitacora")
 }
 
 model ProSocialAgent {
@@ -1291,4 +1319,19 @@ model NegocioHorarios {
   @@unique([negocioId, diaSemana])
   @@index([negocioId, activo])
   @@map("negocio_horarios")
+}
+
+enum LeadBitacoraTipo {
+  NOTA_PERSONALIZADA    // Comentario del asesor
+  CAMBIO_ETAPA         // Cambio de etapa del pipeline
+  ASIGNACION_ASESOR    // Asignación a asesor
+  DESASIGNACION_ASESOR // Desasignación de asesor
+  CREACION_LEAD        // Lead creado
+  ACTUALIZACION_DATOS  // Actualización de datos del lead
+  LLAMADA_REALIZADA    // Llamada realizada
+  EMAIL_ENVIADO        // Email enviado
+  REUNION_AGENDADA     // Reunión agendada
+  CONTRATO_FIRMADO     // Contrato firmado
+  SUSCRIPCION_ACTIVA   // Suscripción activada
+  CANCELACION          // Lead cancelado
 }
