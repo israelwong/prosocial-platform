@@ -13,7 +13,7 @@ import {
     TrendingUp,
     Clock
 } from 'lucide-react';
-import { KanbanBoard } from '@/components/shared/kanban/KanbanBoard';
+import { KanbanBoard } from '@/app/components/shared/kanban/KanbanBoard';
 import { Lead } from '@/types/lead';
 
 export default function AsesorLeadsPage() {
