@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,18 +10,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import {
-    ArrowLeft,
-    Save,
-    User,
-    Building,
-    Target,
+import { 
+    ArrowLeft, 
+    Save, 
+    User, 
+    Building, 
+    Target, 
     Calendar,
     MessageSquare,
-    Plus,
-    Clock,
-    Phone,
-    Mail
+    Plus
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -99,7 +96,7 @@ export default function LeadDetailPage() {
     const [canales, setCanales] = useState<CanalAdquisicion[]>([]);
     const [agentes, setAgentes] = useState<Agente[]>([]);
     const [etapas, setEtapas] = useState<PipelineStage[]>([]);
-    const [bitacora, setBitacora] = useState<BitacoraEntry[]>([]);
+    // const [bitacora, setBitacora] = useState<BitacoraEntry[]>([]); // TODO: Implementar cuando se agregue la API de bitácora
 
     const [formData, setFormData] = useState<LeadFormData>({
         nombre: '',
@@ -132,38 +129,31 @@ export default function LeadDetailPage() {
         fecha: new Date().toISOString().split('T')[0]
     });
 
-    useEffect(() => {
-        fetchInitialData();
-        if (!isNew) {
-            fetchLeadData();
-        }
-    }, [leadId, isNew]);
-
     const fetchInitialData = async () => {
         try {
             setLoading(true);
-
+            
             // Fetch canales de adquisición
             const canalesResponse = await fetch('/api/canales');
             if (canalesResponse.ok) {
                 const canalesData = await canalesResponse.json();
                 setCanales(canalesData.filter((c: CanalAdquisicion) => c.isActive));
             }
-
+            
             // Fetch agentes
             const agentesResponse = await fetch('/api/agents');
             if (agentesResponse.ok) {
                 const agentesData = await agentesResponse.json();
                 setAgentes(agentesData);
             }
-
+            
             // Fetch etapas del pipeline
             const etapasResponse = await fetch('/api/pipeline');
             if (etapasResponse.ok) {
                 const etapasData = await etapasResponse.json();
                 setEtapas(etapasData.sort((a: PipelineStage, b: PipelineStage) => a.orden - b.orden));
             }
-
+            
         } catch (error) {
             console.error('Error fetching initial data:', error);
             toast.error('Error al cargar los datos iniciales');
@@ -172,7 +162,7 @@ export default function LeadDetailPage() {
         }
     };
 
-    const fetchLeadData = async () => {
+    const fetchLeadData = useCallback(async () => {
         try {
             setLoading(true);
             const response = await fetch(`/api/leads/${leadId}`);
@@ -186,7 +176,7 @@ export default function LeadDetailPage() {
                     slugEstudio: leadData.slugEstudio || '',
                     planInteres: leadData.planInteres || '',
                     presupuestoMensual: leadData.presupuestoMensual?.toString() || '',
-                    fechaProbableInicio: leadData.fechaProbableInicio ?
+                    fechaProbableInicio: leadData.fechaProbableInicio ? 
                         new Date(leadData.fechaProbableInicio).toISOString().split('T')[0] : '',
                     agentId: leadData.agentId || '',
                     etapaId: leadData.etapaId || '',
@@ -194,7 +184,7 @@ export default function LeadDetailPage() {
                     puntaje: leadData.puntaje?.toString() || '5',
                     prioridad: leadData.prioridad || 'media'
                 });
-
+                
                 // TODO: Fetch bitácora del lead
                 // const bitacoraResponse = await fetch(`/api/leads/${leadId}/bitacora`);
                 // if (bitacoraResponse.ok) {
@@ -208,7 +198,14 @@ export default function LeadDetailPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [leadId]);
+
+    useEffect(() => {
+        fetchInitialData();
+        if (!isNew) {
+            fetchLeadData();
+        }
+    }, [leadId, isNew, fetchLeadData]);
 
     const handleInputChange = (field: keyof LeadFormData, value: string) => {
         setFormData(prev => ({
