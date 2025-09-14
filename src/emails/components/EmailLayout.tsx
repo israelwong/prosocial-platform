@@ -1,0 +1,117 @@
+import {
+    Html,
+    Head,
+    Body,
+    Container,
+    Section,
+    Img,
+    Text,
+    Link,
+    Hr,
+} from '@react-email/components';
+import * as React from 'react';
+
+interface EmailLayoutProps {
+    children: React.ReactNode;
+    title?: string;
+    previewText?: string;
+}
+
+export function EmailLayout({ children, title, previewText }: EmailLayoutProps) {
+    return (
+        <Html>
+            <Head>
+                <title>{title || 'ProSocial Platform'}</title>
+                {previewText && (
+                    <meta name="description" content={previewText} />
+                )}
+            </Head>
+            <Body style={main}>
+                <Container style={container}>
+                    {/* Header con Logo */}
+                    <Section style={header}>
+                        <Img
+                            src="https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg"
+                            width="160"
+                            height="32"
+                            alt="ProSocial Platform"
+                            style={logo}
+                        />
+                    </Section>
+
+                    {/* Contenido Principal */}
+                    <Section style={content}>
+                        {children}
+                    </Section>
+
+                    {/* Footer */}
+                    <Section style={footer}>
+                        <Hr style={hr} />
+                        <Text style={footerText}>
+                            © 2024 ProSocial Platform. Todos los derechos reservados.
+                        </Text>
+                        <Text style={footerText}>
+                            <Link href="https://prosocialmx.com" style={footerLink}>
+                                Sitio Web
+                            </Link>
+                            {' • '}
+                            <Link href="mailto:soporte@prosocialmx.com" style={footerLink}>
+                                Soporte
+                            </Link>
+                        </Text>
+                    </Section>
+                </Container>
+            </Body>
+        </Html>
+    );
+}
+
+// Estilos
+const main = {
+    backgroundColor: '#f6f9fc',
+    fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+};
+
+const container = {
+    backgroundColor: '#ffffff',
+    margin: '0 auto',
+    padding: '20px 0 48px',
+    marginBottom: '64px',
+    maxWidth: '600px',
+};
+
+const header = {
+    padding: '32px 24px 24px',
+    textAlign: 'center' as const,
+    backgroundColor: '#18181b', // zinc-950
+};
+
+const logo = {
+    margin: '0 auto',
+};
+
+const content = {
+    padding: '24px 24px 0',
+};
+
+const footer = {
+    padding: '24px',
+    textAlign: 'center' as const,
+};
+
+const hr = {
+    borderColor: '#e6ebf1',
+    margin: '20px 0',
+};
+
+const footerText = {
+    color: '#8898aa',
+    fontSize: '12px',
+    lineHeight: '16px',
+    margin: '4px 0',
+};
+
+const footerLink = {
+    color: '#556cd6',
+    textDecoration: 'none',
+};

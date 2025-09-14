@@ -63,8 +63,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
-          <CardDescription>Ingresa tu email para acceder a tu cuenta</CardDescription>
+          <CardTitle className="text-xl text-center">Iniciar Sesión</CardTitle>
+          <CardDescription className="text-center">Ingresa tus credenciales para acceder</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
@@ -102,12 +102,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              ¿No tienes cuenta?{' '}
-              <Link href="/auth/sign-up" className="underline underline-offset-4">
-                Regístrate
-              </Link>
             </div>
           </form>
         </CardContent>

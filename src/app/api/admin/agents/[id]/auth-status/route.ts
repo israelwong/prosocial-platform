@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { isValidSupabaseAuthId } from '@/lib/uuid-utils';
 
 // GET /api/admin/agents/[id]/auth-status - Obtener estado de autenticación del agente
 export async function GET(
@@ -8,6 +9,14 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
+
+        // Validar que el ID sea un UUID válido
+        if (!isValidSupabaseAuthId(id)) {
+            return NextResponse.json({
+                exists: false,
+                error: 'ID no es un UUID válido - usuario no existe en Supabase Auth'
+            });
+        }
 
         // Obtener información del usuario en Supabase Auth
         const { data: authUser, error } = await supabaseAdmin.auth.admin.getUserById(id);

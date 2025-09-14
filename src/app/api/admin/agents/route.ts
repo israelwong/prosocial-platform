@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
+import { sendAgentCredentialsEmail } from '@/lib/email/agent-email-service';
 
 // Schema de validación para crear agente
 const createAgentSchema = z.object({
@@ -116,13 +117,23 @@ export async function POST(request: NextRequest) {
             // 4. Enviar email de invitación con credenciales
             // TODO: Implementar envío de email con credenciales temporales
 
+            // Enviar email con credenciales
+            const emailResult = await sendAgentCredentialsEmail({
+                agentName: validatedData.nombre,
+                email: validatedData.email,
+                temporaryPassword: tempPassword,
+                isNewAgent: true
+            });
+
             return NextResponse.json({
                 agent,
                 authUser: {
                     id: authUser.user.id,
                     email: authUser.user.email,
-                    tempPassword // En producción, esto se enviaría por email
-                }
+                    tempPassword // En desarrollo, mostramos la contraseña
+                },
+                emailSent: emailResult.success,
+                emailId: emailResult.success ? emailResult.emailId : null
             }, { status: 201 });
 
         } catch (dbError) {

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,8 +14,9 @@ import {
     Mail,
     Calendar,
     Search,
-    Filter,
-    Plus
+    Plus,
+    LogOut,
+    User
 } from 'lucide-react'
 
 interface Lead {
@@ -31,30 +33,112 @@ interface Lead {
     notasConversacion: string | null
 }
 
+interface UserProfile {
+    id: string
+    email: string
+    fullName: string | null
+    role: string
+    studioId: string | null
+    isActive: boolean
+}
+
+
 export default function AgenteDashboard() {
+    const router = useRouter()
     const [leads, setLeads] = useState<Lead[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [filterEtapa, setFilterEtapa] = useState('all')
+    const [user, setUser] = useState<{ id: string; email: string } | null>(null)
+    const [agentProfile, setAgentProfile] = useState<UserProfile | null>(null)
 
-    useEffect(() => {
-        fetchLeads()
-    }, [])
-
-    const fetchLeads = async () => {
+    const fetchLeads = useCallback(async (agentId?: string) => {
         const supabase = createClient()
+
+        if (!agentId && !user?.id) {
+            console.log('No hay agentId para obtener leads')
+            setLoading(false)
+            return
+        }
+
+        const targetAgentId = agentId || user?.id
 
         const { data, error } = await supabase
             .from('prosocial_leads')
             .select('*')
+            .eq('agentId', targetAgentId)
             .order('createdAt', { ascending: false })
 
         if (error) {
             console.error('Error fetching leads:', error)
         } else {
+            console.log('Leads obtenidos:', data?.length || 0)
             setLeads(data || [])
         }
         setLoading(false)
+    }, [user])
+
+    const checkAuthAndFetchData = useCallback(async () => {
+        const supabase = createClient()
+
+        // Verificar si el usuario está autenticado
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+            console.log('Usuario no autenticado, redirigiendo a login')
+            router.push('/auth/login')
+            return
+        }
+
+        setUser({ id: user.id, email: user.email || '' })
+
+        // Obtener el perfil del agente
+        const { data: profile, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+
+        if (profileError || !profile) {
+            console.error('Error obteniendo perfil:', profileError)
+            router.push('/auth/complete-profile')
+            return
+        }
+
+        // Verificar que el usuario tenga rol de agente
+        if (profile.role !== 'agente') {
+            console.error('Usuario no tiene rol de agente:', profile.role)
+            router.push('/auth/login')
+            return
+        }
+
+        setAgentProfile(profile)
+
+        // Obtener información del agente desde la tabla prosocial_agents
+        const { data: agentData, error: agentError } = await supabase
+            .from('prosocial_agents')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+
+        if (agentError) {
+            console.error('Error obteniendo datos del agente:', agentError)
+        } else {
+            console.log('Datos del agente:', agentData)
+        }
+
+        // Ahora obtener los leads asignados a este agente
+        fetchLeads(user.id)
+    }, [router, fetchLeads])
+
+    useEffect(() => {
+        checkAuthAndFetchData()
+    }, [checkAuthAndFetchData])
+
+    const handleLogout = async () => {
+        const supabase = createClient()
+        await supabase.auth.signOut()
+        router.push('/auth/login')
     }
 
     const filteredLeads = leads.filter(lead => {
@@ -123,9 +207,23 @@ export default function AgenteDashboard() {
         <div className="container mx-auto py-8 space-y-8">
             {/* Header */}
             <div className="space-y-4">
-                <div>
-                    <h1 className="text-3xl font-bold">Dashboard Agente</h1>
-                    <p className="text-gray-600 mt-1">Gestión de leads y conversiones</p>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-bold">Dashboard Agente</h1>
+                        <p className="text-gray-600 mt-1">
+                            {agentProfile ? `Bienvenido, ${agentProfile.fullName || agentProfile.email}` : 'Gestión de leads y conversiones'}
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm">
+                            <User className="h-4 w-4 mr-2" />
+                            Perfil
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={handleLogout}>
+                            <LogOut className="h-4 w-4 mr-2" />
+                            Salir
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Métricas */}

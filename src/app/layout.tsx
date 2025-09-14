@@ -8,7 +8,25 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "ProSocial Platform",
-  description: "Plataforma SaaS para estudios de fotografía y video",
+  description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía con sistema de leads, campañas y agentes comerciales",
+  keywords: ["ProSocial", "fotografía", "leads", "CRM", "estudios", "agentes", "campañas"],
+  authors: [{ name: "ProSocial MX" }],
+  icons: {
+    icon: "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
+    shortcut: "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
+    apple: "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
+  },
+  openGraph: {
+    title: "ProSocial Platform",
+    description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía",
+    siteName: "ProSocial Platform",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ProSocial Platform",
+    description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía",
+  },
 };
 
 export default function RootLayout({
@@ -18,10 +36,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="dark" style={{ backgroundColor: '#18181b', color: '#ffffff' }}>
-      <body 
-        className={inter.className} 
-        style={{ 
-          backgroundColor: '#18181b', 
+      <body
+        className={inter.className}
+        style={{
+          backgroundColor: '#18181b',
           color: '#ffffff',
           margin: 0,
           padding: 0,
