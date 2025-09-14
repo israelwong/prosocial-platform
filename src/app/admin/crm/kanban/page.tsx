@@ -1,16 +1,15 @@
 import React from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     UserPlus,
     Phone,
-    MessageSquare,
     CheckCircle,
     DollarSign,
     Calendar,
     Mail,
-    MapPin,
     Plus
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
@@ -64,6 +63,20 @@ async function getLeads() {
                     select: {
                         nombre: true,
                         email: true
+                    }
+                },
+                etapa: {
+                    select: {
+                        id: true,
+                        nombre: true,
+                        descripcion: true
+                    }
+                },
+                canalAdquisicion: {
+                    select: {
+                        id: true,
+                        nombre: true,
+                        categoria: true
                     }
                 }
             },
@@ -127,7 +140,15 @@ export default async function CRMKanbanPage() {
     // Agrupar leads por etapa
     const leadsByStage = crmStages.map(stage => ({
         ...stage,
-        leads: leads.filter(lead => lead.etapa === stage.id)
+        leads: leads.filter(lead => {
+            // Si el lead tiene una etapa asignada, usar el nombre de la etapa
+            if (lead.etapa) {
+                return lead.etapa.nombre.toLowerCase().includes(stage.id.toLowerCase()) || 
+                       stage.id.toLowerCase().includes(lead.etapa.nombre.toLowerCase());
+            }
+            // Si no tiene etapa asignada, asignar a "nuevo"
+            return stage.id === 'nuevo';
+        })
     }));
 
     return (
@@ -140,10 +161,12 @@ export default async function CRMKanbanPage() {
                         Gestión de leads por etapas del ciclo de vida del CRM
                     </p>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Crear Nuevo Lead
-                </Button>
+                <Link href="/admin/leads/new">
+                    <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Crear Nuevo Lead
+                    </Button>
+                </Link>
             </div>
 
             {/* Stats Cards - Más pequeñas */}
@@ -250,17 +273,17 @@ export default async function CRMKanbanPage() {
                                                 )}
                                             </div>
 
-                                            {lead.fuente && (
+                                            {lead.canalAdquisicion && (
                                                 <div className="text-xs">
-                                                    <span className="text-zinc-500">Fuente: </span>
-                                                    <span className="text-zinc-300">{lead.fuente}</span>
+                                                    <span className="text-zinc-500">Canal: </span>
+                                                    <span className="text-zinc-300">{lead.canalAdquisicion.nombre}</span>
                                                 </div>
                                             )}
 
-                                            {lead.notasConversacion && (
+                                            {lead.etapa && (
                                                 <div className="text-xs">
-                                                    <span className="text-zinc-500">Notas: </span>
-                                                    <span className="text-zinc-300">{lead.notasConversacion}</span>
+                                                    <span className="text-zinc-500">Etapa: </span>
+                                                    <span className="text-zinc-300">{lead.etapa.nombre}</span>
                                                 </div>
                                             )}
 

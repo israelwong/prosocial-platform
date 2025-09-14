@@ -42,17 +42,17 @@ interface LeadFormData {
     telefono: string;
     nombreEstudio: string;
     slugEstudio: string;
-    
+
     // Plan de interés
     planInteres: string;
     presupuestoMensual: string;
     fechaProbableInicio: string;
-    
+
     // Asignación
     agentId: string;
     etapaId: string;
     canalAdquisicionId: string;
-    
+
     // Seguimiento
     puntaje: string;
     prioridad: string;
@@ -64,7 +64,7 @@ export default function NewLeadPage() {
     const [canales, setCanales] = useState<CanalAdquisicion[]>([]);
     const [agentes, setAgentes] = useState<Agente[]>([]);
     const [etapas, setEtapas] = useState<PipelineStage[]>([]);
-    
+
     const [formData, setFormData] = useState<LeadFormData>({
         nombre: '',
         email: '',
@@ -88,28 +88,28 @@ export default function NewLeadPage() {
     const fetchInitialData = async () => {
         try {
             setLoading(true);
-            
+
             // Fetch canales de adquisición
             const canalesResponse = await fetch('/api/canales');
             if (canalesResponse.ok) {
                 const canalesData = await canalesResponse.json();
                 setCanales(canalesData.filter((c: CanalAdquisicion) => c.isActive));
             }
-            
+
             // Fetch agentes
             const agentesResponse = await fetch('/api/agents');
             if (agentesResponse.ok) {
                 const agentesData = await agentesResponse.json();
                 setAgentes(agentesData);
             }
-            
+
             // Fetch etapas del pipeline
             const etapasResponse = await fetch('/api/pipeline');
             if (etapasResponse.ok) {
                 const etapasData = await etapasResponse.json();
                 setEtapas(etapasData.sort((a: PipelineStage, b: PipelineStage) => a.orden - b.orden));
             }
-            
+
         } catch (error) {
             console.error('Error fetching initial data:', error);
             toast.error('Error al cargar los datos iniciales');
@@ -127,10 +127,10 @@ export default function NewLeadPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         try {
             setLoading(true);
-            
+
             const leadData = {
                 ...formData,
                 presupuestoMensual: formData.presupuestoMensual ? parseFloat(formData.presupuestoMensual) : null,
@@ -155,7 +155,7 @@ export default function NewLeadPage() {
 
             toast.success('Lead creado exitosamente');
             router.push('/admin/leads');
-            
+
         } catch (error) {
             console.error('Error creating lead:', error);
             toast.error('Error al crear el lead');
@@ -221,7 +221,7 @@ export default function NewLeadPage() {
                                     required
                                 />
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="email" className="text-zinc-300">Email *</Label>
                                 <Input
@@ -234,7 +234,7 @@ export default function NewLeadPage() {
                                     required
                                 />
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="telefono" className="text-zinc-300">Teléfono *</Label>
                                 <Input
@@ -246,7 +246,7 @@ export default function NewLeadPage() {
                                     required
                                 />
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="nombreEstudio" className="text-zinc-300">Nombre del Estudio</Label>
                                 <Input
@@ -257,7 +257,7 @@ export default function NewLeadPage() {
                                     placeholder="Nombre del estudio propuesto"
                                 />
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="slugEstudio" className="text-zinc-300">Slug del Estudio</Label>
                                 <Input
@@ -297,7 +297,7 @@ export default function NewLeadPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="presupuestoMensual" className="text-zinc-300">Presupuesto Mensual</Label>
                                 <Input
@@ -309,7 +309,7 @@ export default function NewLeadPage() {
                                     placeholder="5000"
                                 />
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="fechaProbableInicio" className="text-zinc-300">Fecha Probable de Inicio</Label>
                                 <Input
@@ -349,7 +349,7 @@ export default function NewLeadPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="etapaId" className="text-zinc-300">Etapa del Pipeline</Label>
                                 <Select value={formData.etapaId} onValueChange={(value) => handleInputChange('etapaId', value)}>
@@ -365,7 +365,7 @@ export default function NewLeadPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="canalAdquisicionId" className="text-zinc-300">Canal de Adquisición</Label>
                                 <Select value={formData.canalAdquisicionId} onValueChange={(value) => handleInputChange('canalAdquisicionId', value)}>
@@ -381,7 +381,7 @@ export default function NewLeadPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="prioridad" className="text-zinc-300">Prioridad</Label>
                                 <Select value={formData.prioridad} onValueChange={(value) => handleInputChange('prioridad', value)}>
@@ -397,7 +397,7 @@ export default function NewLeadPage() {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <Label htmlFor="puntaje" className="text-zinc-300">Puntaje (1-10)</Label>
                                 <Input

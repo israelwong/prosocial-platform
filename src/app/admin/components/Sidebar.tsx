@@ -21,22 +21,14 @@ import {
     Target,
     Megaphone,
     Play,
-    History,
-    UserPlus
+    History
 } from 'lucide-react';
 import { createClientSupabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
 const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    {
-        name: 'CRM',
-        icon: Columns3,
-        children: [
-            { name: 'Kanban', href: '/admin/crm/kanban', icon: Columns3 },
-            { name: 'Nuevo Lead+', href: '/admin/leads/new', icon: UserPlus },
-        ]
-    },
+    { name: 'CRM', href: '/admin/crm/kanban', icon: Columns3 },
     {
         name: 'Gestión',
         icon: Building2,
