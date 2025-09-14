@@ -73,7 +73,10 @@ model ProSocialLead {
   // Seguimiento
   puntaje   Int? // 1-10 para priorización
   prioridad String  @default("media") // alta, media, baja
-  fuente    String? // web, referido, evento, publicidad
+  
+  // Canal de adquisición
+  canalAdquisicionId String?
+  canalAdquisicion   ProSocialCanalAdquisicion? @relation(fields: [canalAdquisicionId], references: [id])
 
   // Conversión
   fechaConversion DateTime? // Cuando se convirtió en Studio
@@ -91,6 +94,7 @@ model ProSocialLead {
 
   @@index([etapaId, prioridad])
   @@index([agentId])
+  @@index([canalAdquisicionId])
   @@map("prosocial_leads")
 }
 
@@ -119,6 +123,32 @@ model ProSocialLeadBitacora {
   @@index([tipo])
   @@index([createdAt])
   @@map("prosocial_lead_bitacora")
+}
+
+model ProSocialCanalAdquisicion {
+  id          String   @id @default(cuid())
+  nombre      String   @unique // "Facebook", "Instagram", "Landing Page", etc.
+  descripcion String?  // Descripción del canal
+  categoria   String   // "Redes Sociales", "Pago", "Orgánico", "Referidos", etc.
+  color       String?  // Color para UI (hex)
+  icono       String?  // Nombre del icono (lucide-react)
+  
+  // Configuración
+  isActive    Boolean  @default(true) // Activo/Inactivo para administración
+  isVisible   Boolean  @default(true) // Visible para clientes de la plataforma
+  orden       Int      @default(0) // Para ordenar en UI
+  
+  // Metadatos
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relaciones
+  leads       ProSocialLead[]
+  
+  @@index([categoria])
+  @@index([isActive])
+  @@index([isVisible])
+  @@map("prosocial_canales_adquisicion")
 }
 
 model ProSocialAgent {
