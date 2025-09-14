@@ -49,41 +49,41 @@ export function AdminNavigation() {
     return (
         <div className="flex items-center justify-between w-full">
             <div className="flex items-center space-x-8">
-                <Link href="/platform/admin" className="flex items-center space-x-3">
+                <Link href="/admin" className="flex items-center space-x-3">
                     <HeaderLogo />
                 </Link>
 
                 <nav className="hidden md:flex items-center space-x-6">
                     <Link
-                        href="/platform/admin"
+                        href="/admin"
                         className="text-sm font-medium hover:text-primary transition-colors flex items-center space-x-1"
                     >
                         <BarChart3 className="h-4 w-4" />
                         <span>Dashboard</span>
                     </Link>
                     <Link
-                        href="/platform/admin/studios"
+                        href="/admin/studios"
                         className="text-sm font-medium hover:text-primary transition-colors flex items-center space-x-1"
                     >
                         <Building2 className="h-4 w-4" />
                         <span>Estudios</span>
                     </Link>
                     <Link
-                        href="/platform/admin/leads"
+                        href="/admin/leads"
                         className="text-sm font-medium hover:text-primary transition-colors flex items-center space-x-1"
                     >
                         <Users className="h-4 w-4" />
                         <span>Leads</span>
                     </Link>
                     <Link
-                        href="/platform/admin/revenue"
+                        href="/admin/revenue"
                         className="text-sm font-medium hover:text-primary transition-colors flex items-center space-x-1"
                     >
                         <DollarSign className="h-4 w-4" />
                         <span>Revenue</span>
                     </Link>
                     <Link
-                        href="/platform/admin/analytics"
+                        href="/admin/analytics"
                         className="text-sm font-medium hover:text-primary transition-colors flex items-center space-x-1"
                     >
                         <Activity className="h-4 w-4" />
@@ -120,13 +120,13 @@ export function AdminNavigation() {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link href="/platform/admin/profile" className="cursor-pointer">
+                            <Link href="/admin/profile" className="cursor-pointer">
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Perfil</span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                            <Link href="/platform/admin/settings" className="cursor-pointer">
+                            <Link href="/admin/settings" className="cursor-pointer">
                                 <Settings className="mr-2 h-4 w-4" />
                                 <span>Configuración</span>
                             </Link>

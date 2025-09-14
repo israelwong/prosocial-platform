@@ -33,6 +33,7 @@ model UserProfile {
 
   // Relaciones
   activities ProSocialActivity[]
+  notifications ProSocialNotification[]
 
   @@index([email])
   @@index([role])
@@ -55,7 +56,8 @@ model ProSocialLead {
   slugEstudio   String? // Slug deseado (validar disponibilidad)
 
   // Ciclo de vida CRM
-  etapa               String    @default("nuevo") // nuevo, seguimiento, promesa, suscrito, cancelado, perdido
+  etapaId             String?
+  etapa               ProSocialPipelineStage? @relation(fields: [etapaId], references: [id])
   fechaUltimoContacto DateTime?
   notasConversacion   String?
 
@@ -84,8 +86,9 @@ model ProSocialLead {
 
   // Relaciones
   actividades ProSocialActivity[]
+  notifications ProSocialNotification[]
 
-  @@index([etapa, prioridad])
+  @@index([etapaId, prioridad])
   @@index([agentId])
   @@map("prosocial_leads")
 }
@@ -109,6 +112,7 @@ model ProSocialAgent {
 
   // Relaciones
   leads ProSocialLead[]
+  notifications ProSocialNotification[]
 
   @@index([activo])
   @@map("prosocial_agents")
@@ -137,6 +141,70 @@ model ProSocialActivity {
   @@index([leadId, createdAt])
   @@index([userId, createdAt])
   @@map("prosocial_activities")
+}
+
+model ProSocialPipelineStage {
+  id String @id @default(cuid())
+
+  // Información básica
+  nombre        String
+  descripcion   String?
+  color         String  @default("#3B82F6") // Color hexadecimal para la UI
+  orden         Int     @default(0) // Para ordenar las etapas
+  isActive      Boolean @default(true) // Si la etapa está activa
+
+  // Metadatos
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  leads ProSocialLead[]
+
+  @@index([orden])
+  @@index([isActive])
+  @@map("prosocial_pipeline_stages")
+}
+
+model ProSocialNotification {
+  id String @id @default(cuid())
+
+  // Relación con usuario del sistema de administración
+  userId String
+  user   UserProfile @relation(fields: [userId], references: [id])
+
+  // Contenido de la notificación
+  titulo   String
+  mensaje  String
+  tipo     String @default("info") // info, success, warning, error, reminder
+  categoria String @default("general") // general, lead, agent, pipeline, subscription, appointment, task
+
+  // Metadatos y estado
+  metadata Json? // Datos estructurados adicionales (ej: fecha de cita, ID de lead, etc.)
+  isRead   Boolean @default(false)
+  isActive Boolean @default(true)
+  priority String @default("medium") // low, medium, high, urgent
+
+  // Relaciones opcionales para contexto
+  leadId String?
+  lead   ProSocialLead? @relation(fields: [leadId], references: [id])
+
+  agentId String?
+  agent   ProSocialAgent? @relation(fields: [agentId], references: [id])
+
+  // Fechas programadas
+  scheduledFor DateTime? // Para notificaciones programadas (recordatorios, citas)
+  expiresAt    DateTime? // Para notificaciones que expiran
+
+  // Metadatos
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, isRead])
+  @@index([userId, isActive])
+  @@index([tipo, categoria])
+  @@index([scheduledFor])
+  @@index([createdAt])
+  @@map("prosocial_notifications")
 }
 
 model RevenueProduct {
@@ -206,16 +274,21 @@ model StudioRevenueProduct {
 
 model Plan {
   id                 String  @id @default(cuid())
-  name               String // "Básico", "Negocio", "Agencia"
-  slug               String  @unique // "basico", "negocio", "agencia"
-  activeProjectLimit Int // 3, 8, -1 (ilimitado)
-  priceMonthly       Decimal // Precio mensual
-  priceYearly        Decimal // Precio anual (con descuento)
-  features           Json // Lista de características del plan
+  name               String // "Plan Básico", "Plan Pro", "Plan Enterprise"
+  description        String? // Descripción del plan
+  slug               String  @unique // "basic", "pro", "enterprise"
+  
+  // Precios
+  price_monthly      Decimal? // Precio mensual en USD
+  price_yearly       Decimal? // Precio anual en USD (opcional)
+  
+  // Características y límites
+  features           Json? // Lista de características del plan
+  limits             Json? // Límites del plan (eventos, clientes, storage, etc.)
 
-  // Stripe
-  stripePriceIdMonthly String? // ID del precio mensual en Stripe
-  stripePriceIdYearly  String? // ID del precio anual en Stripe
+  // Stripe Integration
+  stripe_price_id    String? @unique // ID del precio en Stripe (mensual o anual)
+  stripe_product_id  String? // ID del producto en Stripe
 
   // Configuración
   popular Boolean @default(false) // Plan recomendado
@@ -227,10 +300,59 @@ model Plan {
   updatedAt DateTime @updatedAt
 
   // Relaciones
-  studios Studio[]
+  subscriptions Subscription[]
+  studios       Studio[] // Relación legacy para compatibilidad
 
   @@index([active, orden])
+  @@index([stripe_price_id])
   @@map("plans")
+}
+
+// =====================================================================
+// SUSCRIPCIONES Y FACTURACIÓN
+// =====================================================================
+
+model Subscription {
+  id                      String   @id @default(cuid())
+  studio_id               String
+  stripe_subscription_id  String   @unique
+  stripe_customer_id      String
+  plan_id                 String
+  status                  String   // active, canceled, past_due, unpaid, trialing
+  current_period_start    DateTime
+  current_period_end      DateTime
+  billing_cycle_anchor    DateTime
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+
+  // Relaciones
+  studio                  Studio   @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  plan                    Plan     @relation(fields: [plan_id], references: [id])
+  billing_cycles          BillingCycle[]
+
+  @@index([studio_id])
+  @@index([stripe_subscription_id])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model BillingCycle {
+  id                String   @id @default(cuid())
+  subscription_id   String
+  period_start      DateTime
+  period_end        DateTime
+  amount            Decimal
+  status            String   // pending, paid, failed, refunded
+  stripe_invoice_id String?
+  created_at        DateTime @default(now())
+
+  // Relaciones
+  subscription      Subscription @relation(fields: [subscription_id], references: [id], onDelete: Cascade)
+
+  @@index([subscription_id])
+  @@index([status])
+  @@index([period_start, period_end])
+  @@map("billing_cycles")
 }
 
 // =====================================================================
@@ -247,9 +369,9 @@ model Studio {
   website String?
   logoUrl String?
 
-  // Suscripción
-  planId               String
-  plan                 Plan      @relation(fields: [planId], references: [id])
+  // Suscripción (Legacy - mantener por compatibilidad)
+  planId               String?
+  plan                 Plan?      @relation(fields: [planId], references: [id])
   subscriptionStatus   String    @default("trial") // trial, active, past_due, canceled
   subscriptionStart    DateTime?
   subscriptionEnd      DateTime?
@@ -289,6 +411,7 @@ model Studio {
   leadConvertido  ProSocialLead? // Si este studio se convirtió desde un lead
   revenueProducts StudioRevenueProduct[] // Productos B2B2C activados
   userProfiles    UserProfile[] // Usuarios suscriptores del studio
+  subscriptions   Subscription[] // Suscripciones activas
 
   @@index([slug])
   @@index([planId])

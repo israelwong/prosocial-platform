@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -44,7 +44,7 @@ interface Evento {
     cliente: {
         nombre: string
         email: string
-    }
+    }[]
 }
 
 interface Cliente {
@@ -65,68 +65,68 @@ export default function StudioDashboard() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (studioSlug) {
-            fetchStudioData()
-        }
-    }, [studioSlug])
+        const fetchStudioData = async () => {
+            const supabase = createClient()
 
-    const fetchStudioData = async () => {
-        const supabase = createClient()
-
-        try {
-            // Obtener información del studio
-            const { data: studioData, error: studioError } = await supabase
-                .from('studios')
-                .select(`
+            try {
+                // Obtener información del studio
+                const { data: studioData, error: studioError } = await supabase
+                    .from('studios')
+                    .select(`
           *,
           plan:plans(name, priceMonthly)
         `)
-                .eq('slug', studioSlug)
-                .single()
+                    .eq('slug', studioSlug)
+                    .single()
 
-            if (studioError) {
-                console.error('Error fetching studio:', studioError)
-                return
-            }
+                if (studioError) {
+                    console.error('Error fetching studio:', studioError)
+                    return
+                }
 
-            setStudio(studioData)
+                setStudio(studioData)
 
-            // Obtener eventos recientes
-            const { data: eventosData, error: eventosError } = await supabase
-                .from('eventos')
-                .select(`
+                // Obtener eventos recientes
+                const { data: eventosData, error: eventosError } = await supabase
+                    .from('eventos')
+                    .select(`
           id,
           nombre,
           fecha_evento,
           status,
           cliente:clientes(nombre, email)
         `)
-                .eq('studioId', studioData.id)
-                .order('fecha_evento', { ascending: false })
-                .limit(5)
+                    .eq('studioId', studioData.id)
+                    .order('fecha_evento', { ascending: false })
+                    .limit(5)
 
-            if (!eventosError) {
-                setEventos(eventosData || [])
+                if (!eventosError) {
+                    setEventos(eventosData || [])
+                }
+
+                // Obtener clientes recientes
+                const { data: clientesData, error: clientesError } = await supabase
+                    .from('clientes')
+                    .select('id, nombre, email, telefono, status')
+                    .eq('studioId', studioData.id)
+                    .order('createdAt', { ascending: false })
+                    .limit(5)
+
+                if (!clientesError) {
+                    setClientes(clientesData || [])
+                }
+
+            } catch (error) {
+                console.error('Error fetching studio data:', error)
+            } finally {
+                setLoading(false)
             }
-
-            // Obtener clientes recientes
-            const { data: clientesData, error: clientesError } = await supabase
-                .from('clientes')
-                .select('id, nombre, email, telefono, status')
-                .eq('studioId', studioData.id)
-                .order('createdAt', { ascending: false })
-                .limit(5)
-
-            if (!clientesError) {
-                setClientes(clientesData || [])
-            }
-
-        } catch (error) {
-            console.error('Error fetching studio data:', error)
-        } finally {
-            setLoading(false)
         }
-    }
+
+        if (studioSlug) {
+            fetchStudioData()
+        }
+    }, [studioSlug])
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -302,7 +302,7 @@ export default function StudioDashboard() {
                                         <div className="flex-1">
                                             <h4 className="font-medium">{evento.nombre}</h4>
                                             <p className="text-sm text-gray-600">
-                                                {evento.cliente.nombre} • {new Date(evento.fecha_evento).toLocaleDateString()}
+                                                {evento.cliente.length > 0 ? evento.cliente[0].nombre : 'Sin cliente'} • {new Date(evento.fecha_evento).toLocaleDateString()}
                                             </p>
                                         </div>
                                         <div className="flex items-center gap-2">

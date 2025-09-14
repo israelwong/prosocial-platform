@@ -116,9 +116,9 @@ export function canAccessRoute(userRole: UserRole, pathname: string): boolean {
 export function getDefaultRoute(userRole: UserRole, studioSlug?: string): string {
     switch (userRole) {
         case UserRole.SUPER_ADMIN:
-            return "/platform/admin"
+            return "/admin"
         case UserRole.ASESOR:
-            return "/platform/asesor"
+            return "/asesor"
         case UserRole.SUSCRIPTOR:
             return studioSlug ? `/studio/${studioSlug}` : "/unauthorized"
         default:

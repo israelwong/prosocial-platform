@@ -1,46 +1,283 @@
-import Link from 'next/link'
+'use client';
 
-export default function AdminLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
+import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+    LayoutDashboard,
+    Users,
+    UserCheck,
+    Building2,
+    CreditCard,
+    BarChart3,
+    Settings,
+    Menu,
+    X,
+    LogOut,
+    User,
+    Columns3,
+    ChevronDown,
+    ChevronRight
+} from 'lucide-react';
+import { createClientSupabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
+
+const navigation = [
+    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'CRM', href: '/admin/crm/kanban', icon: Columns3 },
+    {
+        name: 'Gestión',
+        icon: Building2,
+        children: [
+            { name: 'Leads', href: '/admin/leads', icon: UserCheck },
+            { name: 'Estudios', href: '/admin/studios', icon: Building2 },
+        ]
+    },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    {
+        name: 'Configuración',
+        icon: Settings,
+        children: [
+            { name: 'Planes', href: '/admin/plans', icon: CreditCard },
+            { name: 'Agentes', href: '/admin/agents', icon: Users },
+            { name: 'Pipeline', href: '/admin/pipeline', icon: Columns3 },
+        ]
+    },
+];
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [expandedMenus, setExpandedMenus] = useState<string[]>(['Gestión', 'Configuración']); // Gestión y Configuración expandidos por defecto
+    const pathname = usePathname();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        const supabase = createClientSupabase();
+        await supabase.auth.signOut();
+        router.push('/auth/signin');
+    };
+
+    const toggleMenu = (menuName: string) => {
+        setExpandedMenus(prev =>
+            prev.includes(menuName)
+                ? prev.filter(name => name !== menuName)
+                : [...prev, menuName]
+        );
+    };
+
+    const isMenuExpanded = (menuName: string) => expandedMenus.includes(menuName);
+
+    const isActiveLink = (href: string) => {
+        if (!pathname) return false;
+        if (href === '/admin/dashboard') {
+            return pathname === href;
+        }
+        return pathname.startsWith(href);
+    };
+
     return (
-        <div className="min-h-screen bg-zinc-900">
-            <header className="border-b border-zinc-700 bg-zinc-800">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-8">
-                            <Link href="/admin" className="flex items-center space-x-3">
-                                <div className="text-xl font-bold text-white">ProSocial Platform</div>
-                            </Link>
-                            <nav className="hidden md:flex items-center space-x-6">
-                                <Link href="/admin/dashboard" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Dashboard
-                                </Link>
-                                <Link href="/admin/studios" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Estudios
-                                </Link>
-                                <Link href="/admin/leads" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Leads
-                                </Link>
-                                <Link href="/admin/revenue" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Revenue
-                                </Link>
-                                <Link href="/admin/analytics" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Analytics
-                                </Link>
-                            </nav>
+        <div className="h-screen flex flex-col relative">
+            {/* Navbar superior */}
+            <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-zinc-800 bg-zinc-900 px-6 shadow-sm">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    className="lg:hidden text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    onClick={() => setSidebarOpen(true)}
+                >
+                    <Menu className="h-5 w-5" />
+                </Button>
+
+                <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
+                    <div className="flex flex-1 items-center">
+                        <div className="flex items-center space-x-3">
+                            <Image
+                                src="https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg"
+                                alt="ProSocial Platform"
+                                width={32}
+                                height={32}
+                                className="h-8 w-8"
+                            />
+                            <h1 className="text-lg font-semibold text-white">
+                                ProSocial Platform
+                            </h1>
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                            Admin Panel
+                    </div>
+                    <div className="flex items-center gap-x-4 lg:gap-x-6">
+                        <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-zinc-700" />
+                        <div className="flex items-center gap-x-3">
+                            <div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center">
+                                <User className="h-4 w-4 text-zinc-300" />
+                            </div>
+                            <span className="hidden lg:block text-sm font-medium text-white">
+                                Admin User
+                            </span>
                         </div>
                     </div>
                 </div>
-            </header>
-            <main className="container mx-auto px-4 py-6">
-                {children}
-            </main>
+            </div>
+
+            {/* Contenido principal con sidebar */}
+            <div className="flex flex-1 overflow-hidden">
+                {/* Mobile sidebar overlay */}
+                {sidebarOpen && (
+                    <div
+                        className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+                        onClick={() => setSidebarOpen(false)}
+                    />
+                )}
+
+                {/* Sidebar */}
+                <div className={cn(
+                    "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-zinc-950 border-r-2 border-zinc-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+                    sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                )}>
+                    {/* <div className="flex items-center justify-between h-16 px-6 border-b-2 border-zinc-700">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-sm">PS</span>
+                            </div>
+                            <span className="font-semibold text-white text-lg">ProSocial</span>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="lg:hidden text-zinc-400 hover:text-white hover:bg-zinc-800"
+                            onClick={() => setSidebarOpen(false)}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    </div> */}
+
+                    <nav className="mt-6 px-3">
+                        <div className="space-y-1">
+                            {navigation.map((item) => {
+                                // Si tiene children, es un menú expandible
+                                if (item.children) {
+                                    const isExpanded = isMenuExpanded(item.name);
+                                    const hasActiveChild = item.children.some(child => isActiveLink(child.href));
+
+                                    return (
+                                        <div key={item.name}>
+                                            <button
+                                                onClick={() => toggleMenu(item.name)}
+                                                className={cn(
+                                                    "group flex items-center justify-between w-full px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                                                    hasActiveChild
+                                                        ? "bg-blue-600 text-white"
+                                                        : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                                                )}
+                                            >
+                                                <div className="flex items-center">
+                                                    <item.icon
+                                                        className={cn(
+                                                            "mr-3 h-5 w-5 flex-shrink-0",
+                                                            hasActiveChild ? "text-white" : "text-zinc-500 group-hover:text-zinc-300"
+                                                        )}
+                                                    />
+                                                    {item.name}
+                                                </div>
+                                                {isExpanded ? (
+                                                    <ChevronDown className="h-4 w-4" />
+                                                ) : (
+                                                    <ChevronRight className="h-4 w-4" />
+                                                )}
+                                            </button>
+
+                                            {isExpanded && (
+                                                <div className="ml-6 mt-1 space-y-1">
+                                                    {item.children.map((child) => {
+                                                        const isChildActive = isActiveLink(child.href);
+                                                        return (
+                                                            <Link
+                                                                key={child.name}
+                                                                href={child.href}
+                                                                className={cn(
+                                                                    "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+                                                                    isChildActive
+                                                                        ? "bg-blue-600 text-white"
+                                                                        : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                                                                )}
+                                                            >
+                                                                <child.icon
+                                                                    className={cn(
+                                                                        "mr-3 h-4 w-4 flex-shrink-0",
+                                                                        isChildActive ? "text-white" : "text-zinc-500 group-hover:text-zinc-300"
+                                                                    )}
+                                                                />
+                                                                {child.name}
+                                                            </Link>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                }
+
+                                // Si no tiene children, es un enlace normal
+                                const isActive = isActiveLink(item.href);
+                                return (
+                                    <Link
+                                        key={item.name}
+                                        href={item.href}
+                                        className={cn(
+                                            "group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                                            isActive
+                                                ? "bg-blue-600 text-white"
+                                                : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
+                                        )}
+                                    >
+                                        <item.icon
+                                            className={cn(
+                                                "mr-3 h-5 w-5 flex-shrink-0",
+                                                isActive ? "text-white" : "text-zinc-500 group-hover:text-zinc-300"
+                                            )}
+                                        />
+                                        {item.name}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </nav>
+
+                    {/* User section at bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 border-t-2 border-zinc-700 bg-zinc-900">
+                        <div className="flex items-center space-x-3 mb-3">
+                            <div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center">
+                                <User className="h-4 w-4 text-zinc-300" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-white truncate">
+                                    Admin User
+                                </p>
+                                <p className="text-xs text-zinc-400 truncate">
+                                    Super Administrador
+                                </p>
+                            </div>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleLogout}
+                            className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800"
+                        >
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Cerrar Sesión
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Main content */}
+                <main className="flex-1 overflow-auto bg-zinc-950">
+                    <div className="p-4 lg:p-6">
+                        {children}
+                    </div>
+                </main>
+            </div>
         </div>
-    )
+    );
 }

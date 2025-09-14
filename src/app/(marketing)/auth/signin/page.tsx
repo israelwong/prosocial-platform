@@ -30,7 +30,7 @@ export default function SignInPage() {
             setError(error.message)
             setLoading(false)
         } else {
-            router.push('/platform/admin')
+            router.push('/admin')
         }
     }
 
