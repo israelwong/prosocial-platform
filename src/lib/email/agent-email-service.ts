@@ -15,7 +15,7 @@ export interface AgentCredentialsData {
 export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
     try {
         // Generar URL de login
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://prosocial-platform.vercel.app';
         const loginUrl = `${baseUrl}/auth/login`;
 
         // Renderizar el template de React a HTML

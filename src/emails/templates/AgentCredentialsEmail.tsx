@@ -2,7 +2,6 @@ import {
     Text,
     Button,
     Section,
-    Code,
 } from '@react-email/components';
 import * as React from 'react';
 import { EmailLayout } from '../components/EmailLayout';
@@ -54,17 +53,17 @@ export function AgentCredentialsEmail({
 
                 <Text style={credentialItem}>
                     <strong>Email:</strong><br />
-                    <Code style={credentialValue}>{email}</Code>
+                    <Text style={credentialValue}>{email}</Text>
                 </Text>
 
                 <Text style={credentialItem}>
                     <strong>Contraseña Temporal:</strong><br />
-                    <Code style={credentialValue}>{temporaryPassword}</Code>
+                    <Text style={credentialValue}>{temporaryPassword}</Text>
                 </Text>
 
                 <Text style={credentialItem}>
                     <strong>URL de Acceso:</strong><br />
-                    <Code style={credentialValue}>{loginUrl}</Code>
+                    <Text style={credentialValue}>{loginUrl}</Text>
                 </Text>
             </Section>
 

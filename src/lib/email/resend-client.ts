@@ -8,8 +8,8 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Configuración de emails
 export const EMAIL_CONFIG = {
-    from: process.env.RESEND_FROM_EMAIL || 'ProSocial Platform <noreply@prosocialmx.com>',
-    replyTo: process.env.RESEND_REPLY_TO || 'soporte@prosocialmx.com',
+    from: process.env.RESEND_FROM_EMAIL || 'ProSocial Platform <noreply@prosocial.mx>',
+    replyTo: process.env.RESEND_REPLY_TO || 'contacto@prosocial.mx',
 } as const;
 
 // Tipos para emails
