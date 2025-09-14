@@ -16,7 +16,7 @@ import {
 import { KanbanBoard } from '@/app/components/shared/kanban/KanbanBoard';
 import { Lead } from '@/types/lead';
 
-export default function AsesorLeadsPage() {
+export default function AgenteLeadsPage() {
     const [leads, setLeads] = useState<Lead[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');

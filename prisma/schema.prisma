@@ -21,7 +21,7 @@ model UserProfile {
   avatarUrl String?
 
   // Rol y permisos
-  role String // 'super_admin', 'asesor', 'suscriptor'
+  role String // 'super_admin', 'agente', 'suscriptor'
   // Relación con Studio (solo para suscriptores)
   studioId String?
   studio   Studio? @relation(fields: [studioId], references: [id])
@@ -1443,10 +1443,10 @@ model NegocioHorarios {
 }
 
 enum LeadBitacoraTipo {
-  NOTA_PERSONALIZADA    // Comentario del asesor
+  NOTA_PERSONALIZADA    // Comentario del agente
   CAMBIO_ETAPA         // Cambio de etapa del pipeline
-  ASIGNACION_ASESOR    // Asignación a asesor
-  DESASIGNACION_ASESOR // Desasignación de asesor
+  ASIGNACION_AGENTE    // Asignación a agente
+  DESASIGNACION_AGENTE // Desasignación de agente
   CREACION_LEAD        // Lead creado
   ACTUALIZACION_DATOS  // Actualización de datos del lead
   LLAMADA_REALIZADA    // Llamada realizada

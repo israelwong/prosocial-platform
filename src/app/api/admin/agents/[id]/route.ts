@@ -15,11 +15,12 @@ const updateAgentSchema = z.object({
 // GET /api/admin/agents/[id] - Obtener agente por ID
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const agent = await prisma.proSocialAgent.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 leads: {
                     select: {
@@ -62,9 +63,10 @@ export async function GET(
 // PUT /api/admin/agents/[id] - Actualizar agente
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const body = await request.json();
 
         // Validar datos
@@ -72,7 +74,7 @@ export async function PUT(
 
         // Verificar si el agente existe
         const existingAgent = await prisma.proSocialAgent.findUnique({
-            where: { id: params.id }
+            where: { id }
         });
 
         if (!existingAgent) {
@@ -98,7 +100,7 @@ export async function PUT(
 
         // Actualizar agente
         const agent = await prisma.proSocialAgent.update({
-            where: { id: params.id },
+            where: { id },
             data: validatedData,
             include: {
                 _count: {
@@ -130,12 +132,13 @@ export async function PUT(
 // DELETE /api/admin/agents/[id] - Eliminar agente
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         // Verificar si el agente existe
         const existingAgent = await prisma.proSocialAgent.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 _count: {
                     select: {
@@ -162,7 +165,7 @@ export async function DELETE(
 
         // Eliminar agente
         await prisma.proSocialAgent.delete({
-            where: { id: params.id }
+            where: { id }
         });
 
         return NextResponse.json({ message: 'Agente eliminado exitosamente' });

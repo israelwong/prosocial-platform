@@ -31,7 +31,7 @@ interface Lead {
     notasConversacion: string | null
 }
 
-export default function AsesorDashboard() {
+export default function AgenteDashboard() {
     const [leads, setLeads] = useState<Lead[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
@@ -124,7 +124,7 @@ export default function AsesorDashboard() {
             {/* Header */}
             <div className="space-y-4">
                 <div>
-                    <h1 className="text-3xl font-bold">Dashboard Asesor</h1>
+                    <h1 className="text-3xl font-bold">Dashboard Agente</h1>
                     <p className="text-gray-600 mt-1">Gestión de leads y conversiones</p>
                 </div>
 

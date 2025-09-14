@@ -4,7 +4,7 @@
 
 export enum UserRole {
     SUPER_ADMIN = "super_admin", // ProSocial Platform
-    ASESOR = "asesor", // ProSocial Platform
+    AGENTE = "agente", // ProSocial Platform
     SUSCRIPTOR = "suscriptor", // Studio específico
 }
 
@@ -14,7 +14,7 @@ export enum Permission {
     MANAGE_REVENUE = "manage_revenue",
     MANAGE_STUDIOS = "manage_studios",
 
-    // Asesor
+    // Agente
     MANAGE_LEADS = "manage_leads",
     MANAGE_CONVERSIONS = "manage_conversions",
     VIEW_ANALYTICS = "view_analytics",
@@ -61,7 +61,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
         Permission.MANAGE_CLIENTS,
         Permission.MANAGE_QUOTATIONS,
     ],
-    [UserRole.ASESOR]: [
+    [UserRole.AGENTE]: [
         Permission.MANAGE_LEADS,
         Permission.MANAGE_CONVERSIONS,
         Permission.VIEW_ANALYTICS,
@@ -80,7 +80,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 
 export const ROLE_ROUTES: Record<UserRole, string> = {
     [UserRole.SUPER_ADMIN]: "/platform/admin",
-    [UserRole.ASESOR]: "/platform/asesor",
+    [UserRole.AGENTE]: "/platform/agente",
     [UserRole.SUSCRIPTOR]: "/studio", // Se completará con el slug del studio
 }
 
@@ -100,8 +100,8 @@ export function canAccessRoute(userRole: UserRole, pathname: string): boolean {
 
     // Verificar rutas específicas por rol
     switch (userRole) {
-        case UserRole.ASESOR:
-            return pathname.startsWith("/platform/asesor") ||
+        case UserRole.AGENTE:
+            return pathname.startsWith("/platform/agente") ||
                 pathname.startsWith("/platform/admin/leads") ||
                 pathname.startsWith("/platform/admin/analytics")
 
@@ -117,8 +117,8 @@ export function getDefaultRoute(userRole: UserRole, studioSlug?: string): string
     switch (userRole) {
         case UserRole.SUPER_ADMIN:
             return "/admin"
-        case UserRole.ASESOR:
-            return "/asesor"
+        case UserRole.AGENTE:
+            return "/agente"
         case UserRole.SUSCRIPTOR:
             return studioSlug ? `/studio/${studioSlug}` : "/unauthorized"
         default:

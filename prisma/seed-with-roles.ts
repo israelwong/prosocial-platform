@@ -261,15 +261,15 @@ async function main() {
         }
     });
 
-    // Asesor
-    const asesor = await prisma.userProfile.upsert({
-        where: { email: 'asesor@prosocial.mx' },
+    // Agente
+    const agente = await prisma.userProfile.upsert({
+        where: { email: 'agente@prosocial.mx' },
         update: {},
         create: {
-            id: 'asesor-user-id', // Este ID debe coincidir con el de Supabase Auth
-            email: 'asesor@prosocial.mx',
-            fullName: 'Asesor Comercial',
-            role: 'asesor',
+            id: 'agente-user-id', // Este ID debe coincidir con el de Supabase Auth
+            email: 'agente@prosocial.mx',
+            fullName: 'Agente Comercial',
+            role: 'agente',
             isActive: true
         }
     });
@@ -287,7 +287,7 @@ async function main() {
         }
     });
 
-    console.log('✅ Created users with roles:', superAdmin.role, asesor.role, suscriptor.role);
+    console.log('✅ Created users with roles:', superAdmin.role, agente.role, suscriptor.role);
 
     // =====================================================================
     // STUDIO DEMO
@@ -331,7 +331,7 @@ async function main() {
     const actividad1 = await prisma.proSocialActivity.create({
         data: {
             leadId: lead1.id,
-            userId: asesor.id,
+            userId: agente.id,
             tipo: 'llamada',
             descripcion: 'Llamada inicial para presentar la plataforma',
             resultado: 'interesado',
@@ -343,7 +343,7 @@ async function main() {
     const actividad2 = await prisma.proSocialActivity.create({
         data: {
             leadId: lead2.id,
-            userId: asesor.id,
+            userId: agente.id,
             tipo: 'email',
             descripcion: 'Envío de información sobre planes y precios',
             resultado: 'sin_interes',

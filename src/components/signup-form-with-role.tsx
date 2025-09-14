@@ -163,8 +163,8 @@ export function SignupFormWithRole({ className, ...props }: React.ComponentProps
                                         <SelectItem value={UserRole.SUSCRIPTOR}>
                                             📸 Suscriptor (Estudio de Fotografía)
                                         </SelectItem>
-                                        <SelectItem value={UserRole.ASESOR}>
-                                            💼 Asesor ProSocial
+                                        <SelectItem value={UserRole.AGENTE}>
+                                            💼 Agente ProSocial
                                         </SelectItem>
                                         <SelectItem value={UserRole.SUPER_ADMIN}>
                                             🔧 Super Administrador

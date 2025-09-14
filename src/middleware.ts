@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
     '/blog',
     '/auth',
     '/admin',
-    '/asesor',
+    '/agente',
     '/studio'
   ];
 

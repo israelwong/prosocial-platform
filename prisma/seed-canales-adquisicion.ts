@@ -134,8 +134,8 @@ async function seedCanalesAdquisicion() {
             orden: 15
         },
         {
-            nombre: 'Referido Asesor',
-            descripcion: 'Leads referidos por asesores',
+            nombre: 'Referido Agente',
+            descripcion: 'Leads referidos por agentes',
             categoria: 'Referidos',
             color: '#F59E0B',
             icono: 'UserCheck',

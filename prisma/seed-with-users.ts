@@ -33,10 +33,10 @@ async function main() {
             fullName: 'Administrador ProSocial'
         },
         {
-            email: 'asesor@prosocial.com',
-            password: 'asesor123',
-            role: 'asesor',
-            fullName: 'Asesor Comercial'
+            email: 'agente@prosocial.com',
+            password: 'agente123',
+            role: 'agente',
+            fullName: 'Agente Comercial'
         },
         {
             email: 'suscriptor@prosocial.com',

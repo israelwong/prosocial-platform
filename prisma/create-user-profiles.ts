@@ -15,10 +15,10 @@ async function main() {
             isActive: true
         },
         {
-            id: 'asesor-user-id', // Este ID debe coincidir con el ID del usuario en Supabase Auth
-            email: 'asesor@prosocial.com',
-            fullName: 'Asesor Comercial',
-            role: 'asesor',
+            id: 'agente-user-id', // Este ID debe coincidir con el ID del usuario en Supabase Auth
+            email: 'agente@prosocial.com',
+            fullName: 'Agente Comercial',
+            role: 'agente',
             isActive: true
         },
         {

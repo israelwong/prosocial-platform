@@ -1,7 +1,9 @@
 # ProSocial Platform - Cursor Rules
 
 ## 🎯 **PROYECTO OVERVIEW**
+
 ProSocial Platform es una plataforma SaaS multi-tenant para gestión de estudios de fotografía con:
+
 - **Next.js 15** (App Router) + **TypeScript** + **Tailwind CSS**
 - **Supabase** (Auth + Database) + **Prisma** (ORM)
 - **Stripe** (Pagos) + **Shadcn/ui** (Componentes)
@@ -10,6 +12,7 @@ ProSocial Platform es una plataforma SaaS multi-tenant para gestión de estudios
 ## 🏗️ **ARQUITECTURA Y ESTRUCTURA**
 
 ### **Estructura de Directorios**
+
 ```
 src/
 ├── app/                    # Next.js App Router
@@ -24,6 +27,7 @@ src/
 ```
 
 ### **Rutas Principales**
+
 - `/admin/*` - Panel de administración (Super Admin)
 - `/asesor/*` - Panel de asesores
 - `/studio/[slug]` - Landing page de estudios
@@ -32,6 +36,7 @@ src/
 ## 🎨 **DISEÑO Y UI/UX**
 
 ### **Tema Oscuro (Zinc)**
+
 ```css
 /* Colores principales */
 bg-zinc-950    /* Fondo principal */
@@ -42,12 +47,14 @@ text-zinc-300  /* Texto secundario */
 ```
 
 ### **Componentes UI**
+
 - **Shadcn/ui** como base de componentes
 - **Lucide React** para iconos
 - **Tailwind CSS** para estilos
 - **Sonner** para notificaciones toast
 
 ### **Patrones de Diseño**
+
 - **Cards** con `bg-zinc-900 border-zinc-800`
 - **Botones** con colores semánticos (blue-600, red-600, etc.)
 - **Formularios** con validación y estados de carga
@@ -56,15 +63,17 @@ text-zinc-300  /* Texto secundario */
 ## 🔧 **DESARROLLO Y CÓDIGO**
 
 ### **TypeScript**
+
 - **Strict mode** habilitado
 - **Interfaces** para todos los tipos de datos
 - **Tipado fuerte** en props y estados
 - **Paths aliases** con `@/*` para imports
 
 ### **React Patterns**
+
 ```typescript
 // Componentes funcionales con hooks
-'use client';
+"use client";
 
 // Estados con useState
 const [loading, setLoading] = useState(false);
@@ -81,6 +90,7 @@ const fetchData = useCallback(async () => {
 ```
 
 ### **Next.js App Router**
+
 - **Server Components** por defecto
 - **Client Components** con `'use client'` cuando necesario
 - **API Routes** en `app/api/`
@@ -89,12 +99,14 @@ const fetchData = useCallback(async () => {
 ## 🗄️ **BASE DE DATOS Y API**
 
 ### **Prisma Schema**
+
 - **Modelos** con naming convention `ProSocial*`
 - **Relaciones** bien definidas con `@relation`
 - **Índices** para optimización de queries
 - **Campos** con tipos apropiados (String, Int, DateTime, Decimal)
 
 ### **API Routes**
+
 ```typescript
 // Estructura estándar
 export async function GET(request: Request) {
@@ -102,12 +114,13 @@ export async function GET(request: Request) {
     // Lógica de negocio
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error: 'Message' }, { status: 500 });
+    return NextResponse.json({ error: "Message" }, { status: 500 });
   }
 }
 ```
 
 ### **Supabase Integration**
+
 - **Auth** con `@supabase/ssr`
 - **RLS** (Row Level Security) habilitado
 - **Client/Server** separation correcta
@@ -115,17 +128,20 @@ export async function GET(request: Request) {
 ## 🚀 **FUNCIONALIDADES PRINCIPALES**
 
 ### **Sistema de Leads (CRM)**
+
 - **Kanban Board** con drag & drop
 - **Pipeline** configurable por etapas
 - **Bitácora** de actividades
 - **Canales de adquisición** trackeables
 
 ### **Gestión de Campañas**
+
 - **Campañas activas** vs **historial**
 - **Plataformas** de publicidad
 - **Métricas** de ROI y conversión
 
 ### **Multi-tenant**
+
 - **Estudios** como tenants
 - **Roles** y permisos granulares
 - **Aislamiento** de datos por tenant
@@ -133,28 +149,31 @@ export async function GET(request: Request) {
 ## 📝 **CONVENCIONES DE CÓDIGO**
 
 ### **Naming**
+
 - **Archivos**: kebab-case (`lead-form.tsx`)
 - **Componentes**: PascalCase (`LeadForm`)
 - **Variables**: camelCase (`leadData`)
 - **Constantes**: UPPER_SNAKE_CASE (`API_BASE_URL`)
 
 ### **Imports**
+
 ```typescript
 // Orden de imports
-import React from 'react';
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { Button } from '@/components/ui/button';
-import { LeadForm } from './components/LeadForm';
+import React from "react";
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { LeadForm } from "./components/LeadForm";
 ```
 
 ### **Error Handling**
+
 ```typescript
 try {
   // Operación
 } catch (error) {
-  console.error('Error context:', error);
-  toast.error('Mensaje de error para usuario');
+  console.error("Error context:", error);
+  toast.error("Mensaje de error para usuario");
   // Fallback o estado de error
 }
 ```
@@ -162,11 +181,13 @@ try {
 ## 🔒 **SEGURIDAD Y VALIDACIÓN**
 
 ### **Autenticación**
+
 - **Supabase Auth** con JWT
 - **Middleware** para protección de rutas
 - **RLS** en base de datos
 
 ### **Validación**
+
 - **Zod** para schemas de validación
 - **React Hook Form** para formularios
 - **Validación** tanto cliente como servidor
@@ -174,11 +195,13 @@ try {
 ## 🧪 **TESTING Y CALIDAD**
 
 ### **Linting**
+
 - **ESLint** con configuración Next.js
 - **TypeScript** strict mode
 - **Prettier** para formato (si está configurado)
 
 ### **Performance**
+
 - **Dynamic imports** para code splitting
 - **Image optimization** con Next.js Image
 - **Prisma** queries optimizadas
@@ -186,22 +209,26 @@ try {
 ## 📦 **DEPENDENCIAS PRINCIPALES**
 
 ### **Core**
+
 - `next@15.5.2` - Framework
 - `react@19.1.0` - UI Library
 - `typescript@5` - Type Safety
 
 ### **UI/UX**
+
 - `@radix-ui/*` - Componentes primitivos
 - `tailwindcss@4` - Styling
 - `lucide-react` - Iconos
 - `sonner` - Notificaciones
 
 ### **Backend**
+
 - `@prisma/client@6.15.0` - ORM
 - `@supabase/supabase-js@2.57.4` - Backend
 - `stripe@18.5.0` - Pagos
 
 ### **Utilities**
+
 - `@dnd-kit/*` - Drag & Drop
 - `react-hook-form` - Formularios
 - `zod` - Validación
@@ -210,18 +237,21 @@ try {
 ## 🎯 **MEJORES PRÁCTICAS**
 
 ### **Componentes**
+
 - **Reutilizables** y modulares
 - **Props** bien tipadas
 - **Estados** locales cuando sea posible
 - **Loading states** y error boundaries
 
 ### **Performance**
+
 - **useCallback** para funciones en dependencias
 - **useMemo** para cálculos costosos
 - **Dynamic imports** para componentes pesados
 - **Optimistic updates** cuando sea apropiado
 
 ### **Accesibilidad**
+
 - **Semantic HTML** correcto
 - **ARIA labels** cuando sea necesario
 - **Keyboard navigation** funcional
@@ -230,6 +260,7 @@ try {
 ## 🚨 **ANTI-PATRONES A EVITAR**
 
 ### **❌ No hacer**
+
 - Usar `any` type en TypeScript
 - Mutar props directamente
 - Usar `useEffect` sin dependencias correctas
@@ -238,6 +269,7 @@ try {
 - Usar Prisma en client-side components
 
 ### **✅ Sí hacer**
+
 - Tipado fuerte en TypeScript
 - Inmutabilidad en estados
 - Dependencias correctas en hooks
@@ -248,6 +280,7 @@ try {
 ## 🔄 **FLUJO DE DESARROLLO**
 
 ### **Nuevas Features**
+
 1. **Diseñar** la estructura de datos en Prisma
 2. **Crear** API routes necesarias
 3. **Implementar** componentes UI
@@ -256,6 +289,7 @@ try {
 6. **Optimizar** performance si es necesario
 
 ### **Debugging**
+
 - **Console.log** para debugging temporal
 - **React DevTools** para inspeccionar estados
 - **Prisma Studio** para ver datos
@@ -264,12 +298,14 @@ try {
 ## 📚 **RECURSOS Y DOCUMENTACIÓN**
 
 ### **Documentación Oficial**
+
 - [Next.js 15 Docs](https://nextjs.org/docs)
 - [Prisma Docs](https://www.prisma.io/docs)
 - [Supabase Docs](https://supabase.com/docs)
 - [Tailwind CSS](https://tailwindcss.com/docs)
 
 ### **Componentes**
+
 - [Shadcn/ui](https://ui.shadcn.com/)
 - [Radix UI](https://www.radix-ui.com/)
 - [Lucide Icons](https://lucide.dev/)
@@ -279,6 +315,7 @@ try {
 ## 🎯 **INSTRUCCIONES ESPECÍFICAS PARA CURSOR**
 
 ### **Al crear componentes:**
+
 1. **Usar** el tema oscuro zinc consistente
 2. **Implementar** estados de loading y error
 3. **Tipar** todas las props e interfaces
@@ -286,6 +323,7 @@ try {
 5. **Optimizar** para performance desde el inicio
 
 ### **Al modificar APIs:**
+
 1. **Mantener** compatibilidad con frontend existente
 2. **Validar** inputs con Zod
 3. **Manejar** errores apropiadamente
@@ -293,6 +331,7 @@ try {
 5. **Testear** endpoints manualmente
 
 ### **Al trabajar con base de datos:**
+
 1. **Usar** Prisma Client correctamente
 2. **Optimizar** queries con includes selectivos
 3. **Manejar** transacciones cuando sea necesario
@@ -300,6 +339,7 @@ try {
 5. **Migrar** schema cuando sea necesario
 
 ### **Al implementar nuevas features:**
+
 1. **Seguir** la arquitectura multi-tenant
 2. **Implementar** permisos por rol
 3. **Mantener** consistencia con el diseño

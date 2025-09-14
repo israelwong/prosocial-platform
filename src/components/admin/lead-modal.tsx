@@ -391,13 +391,13 @@ export function LeadModal({ isOpen, onClose, onSuccess, lead }: LeadModalProps) 
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="agentId">Asesor Asignado</Label>
+                            <Label htmlFor="agentId">Agente Asignado</Label>
                             <Select
                                 value={formData.agentId || ''}
                                 onValueChange={(value) => setFormData(prev => ({ ...prev, agentId: value }))}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Selecciona un asesor" />
+                                    <SelectValue placeholder="Selecciona un agente" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {agents.map((agent) => (
