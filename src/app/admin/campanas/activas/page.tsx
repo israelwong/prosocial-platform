@@ -115,12 +115,22 @@ export default function CampanasActivasPage() {
         try {
             const response = await fetch('/api/plataformas');
             if (!response.ok) {
+                // Si es error 500, probablemente no hay datos, no mostrar error
+                if (response.status === 500) {
+                    setPlataformas([]);
+                    return;
+                }
                 throw new Error('Error al cargar las plataformas');
             }
             const data = await response.json();
-            setPlataformas(data);
+            setPlataformas(data || []);
         } catch (error) {
             console.error('Error fetching plataformas:', error);
+            // Solo mostrar error si no es por falta de datos
+            if (error instanceof Error && !error.message.includes('fetch')) {
+                toast.error('Error al cargar las plataformas');
+            }
+            setPlataformas([]);
         }
     };
 
