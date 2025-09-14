@@ -90,13 +90,22 @@ export default function CampanasActivasPage() {
             setLoading(true);
             const response = await fetch('/api/campanas?isActive=true');
             if (!response.ok) {
+                // Si es error 500, probablemente no hay datos, no mostrar error
+                if (response.status === 500) {
+                    setCampanas([]);
+                    return;
+                }
                 throw new Error('Error al cargar las campañas');
             }
             const data = await response.json();
-            setCampanas(data);
+            setCampanas(data || []);
         } catch (error) {
             console.error('Error fetching campanas:', error);
-            toast.error('Error al cargar las campañas');
+            // Solo mostrar error si no es por falta de datos
+            if (error instanceof Error && !error.message.includes('fetch')) {
+                toast.error('Error al cargar las campañas');
+            }
+            setCampanas([]);
         } finally {
             setLoading(false);
         }
@@ -534,8 +543,15 @@ export default function CampanasActivasPage() {
             {filteredCampanas.length === 0 && (
                 <div className="text-center py-12">
                     <Target className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-zinc-400 mb-2">No se encontraron campañas</h3>
-                    <p className="text-zinc-500">Crea tu primera campaña para comenzar</p>
+                    <h3 className="text-lg font-medium text-zinc-400 mb-2">
+                        {campanas.length === 0 ? 'No hay campañas activas' : 'No se encontraron campañas'}
+                    </h3>
+                    <p className="text-zinc-500">
+                        {campanas.length === 0 
+                            ? 'Crea tu primera campaña para comenzar'
+                            : 'Ajusta los filtros para ver más resultados'
+                        }
+                    </p>
                 </div>
             )}
         </div>

@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Search, Filter, BarChart3, TrendingUp, TrendingDown, DollarSign, Users, Target, Calendar, Eye, Download } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Search, Filter, BarChart3, TrendingUp, TrendingDown, DollarSign, Users, Target, Calendar, Eye, Download, Archive, Trash2, Copy, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Forzar renderizado dinámico
@@ -83,13 +84,22 @@ export default function CampanasHistorialPage() {
             setLoading(true);
             const response = await fetch('/api/campanas?isActive=false');
             if (!response.ok) {
+                // Si es error 500, probablemente no hay datos, no mostrar error
+                if (response.status === 500) {
+                    setCampanas([]);
+                    return;
+                }
                 throw new Error('Error al cargar las campañas');
             }
             const data = await response.json();
-            setCampanas(data);
+            setCampanas(data || []);
         } catch (error) {
             console.error('Error fetching campanas:', error);
-            toast.error('Error al cargar las campañas');
+            // Solo mostrar error si no es por falta de datos
+            if (error instanceof Error && !error.message.includes('fetch')) {
+                toast.error('Error al cargar las campañas');
+            }
+            setCampanas([]);
         } finally {
             setLoading(false);
         }
@@ -98,6 +108,89 @@ export default function CampanasHistorialPage() {
     const handleViewDetails = (campaña: Campaña) => {
         setSelectedCampaña(campaña);
         setIsDetailModalOpen(true);
+    };
+
+    const handleArchive = async (id: string) => {
+        if (!confirm('¿Estás seguro de que quieres archivar esta campaña?')) return;
+
+        try {
+            const response = await fetch(`/api/campanas/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ isActive: false, status: 'finalizada' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al archivar la campaña');
+            }
+            toast.success('Campaña archivada exitosamente');
+            fetchCampanas();
+        } catch (error) {
+            console.error('Error archiving campaña:', error);
+            toast.error('Error al archivar la campaña');
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('¿Estás seguro de que quieres eliminar permanentemente esta campaña? Esta acción no se puede deshacer.')) return;
+
+        try {
+            const response = await fetch(`/api/campanas/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al eliminar la campaña');
+            }
+            toast.success('Campaña eliminada exitosamente');
+            fetchCampanas();
+        } catch (error) {
+            console.error('Error deleting campaña:', error);
+            toast.error('Error al eliminar la campaña');
+        }
+    };
+
+    const handleDuplicate = async (campaña: Campaña) => {
+        try {
+            const campañaDuplicada = {
+                nombre: `${campaña.nombre} (Copia)`,
+                descripcion: campaña.descripcion,
+                presupuestoTotal: campaña.presupuestoTotal,
+                fechaInicio: new Date(),
+                fechaFin: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 días desde ahora
+                status: 'planificada',
+                isActive: true,
+                leadsGenerados: 0,
+                leadsSuscritos: 0,
+                gastoReal: 0,
+                plataformas: campaña.plataformas.map(p => ({
+                    plataformaId: p.plataforma.id,
+                    presupuesto: p.presupuesto,
+                    gastoReal: 0,
+                    leads: 0,
+                    conversiones: 0
+                }))
+            };
+
+            const response = await fetch('/api/campanas', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(campañaDuplicada),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al duplicar la campaña');
+            }
+            toast.success('Campaña duplicada exitosamente');
+            fetchCampanas();
+        } catch (error) {
+            console.error('Error duplicating campaña:', error);
+            toast.error('Error al duplicar la campaña');
+        }
     };
 
     const getStatusBadge = (status: string) => {
@@ -381,6 +474,33 @@ export default function CampanasHistorialPage() {
                                             <Eye className="h-4 w-4 mr-2" />
                                             Ver Detalles
                                         </Button>
+                                        
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" size="sm">
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => handleDuplicate(campaña)}>
+                                                    <Copy className="h-4 w-4 mr-2" />
+                                                    Duplicar
+                                                </DropdownMenuItem>
+                                                {campaña.status !== 'finalizada' && (
+                                                    <DropdownMenuItem onClick={() => handleArchive(campaña.id)}>
+                                                        <Archive className="h-4 w-4 mr-2" />
+                                                        Archivar
+                                                    </DropdownMenuItem>
+                                                )}
+                                                <DropdownMenuItem 
+                                                    onClick={() => handleDelete(campaña.id)}
+                                                    className="text-red-400 focus:text-red-300"
+                                                >
+                                                    <Trash2 className="h-4 w-4 mr-2" />
+                                                    Eliminar
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </div>
                                 </div>
                             </CardContent>
@@ -392,8 +512,15 @@ export default function CampanasHistorialPage() {
             {filteredCampanas.length === 0 && (
                 <div className="text-center py-12">
                     <BarChart3 className="h-12 w-12 text-zinc-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-zinc-400 mb-2">No se encontraron campañas</h3>
-                    <p className="text-zinc-500">Ajusta los filtros para ver más resultados</p>
+                    <h3 className="text-lg font-medium text-zinc-400 mb-2">
+                        {campanas.length === 0 ? 'No hay campañas en el historial' : 'No se encontraron campañas'}
+                    </h3>
+                    <p className="text-zinc-500">
+                        {campanas.length === 0 
+                            ? 'Las campañas finalizadas, pausadas y planificadas aparecerán aquí'
+                            : 'Ajusta los filtros para ver más resultados'
+                        }
+                    </p>
                 </div>
             )}
 
