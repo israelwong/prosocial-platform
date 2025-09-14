@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, Eye, EyeOff, Target, Search, Filter } from 'lucide-react';
-import { PrismaClient } from '@prisma/client';
 import { toast } from 'sonner';
 
 // Forzar renderizado dinámico
@@ -64,8 +63,6 @@ export default function CanalesPage() {
         orden: 0
     });
 
-    const prisma = new PrismaClient();
-
     useEffect(() => {
         fetchCanales();
     }, []);
@@ -73,12 +70,11 @@ export default function CanalesPage() {
     const fetchCanales = async () => {
         try {
             setLoading(true);
-            const data = await prisma.proSocialCanalAdquisicion.findMany({
-                orderBy: [
-                    { categoria: 'asc' },
-                    { orden: 'asc' }
-                ]
-            });
+            const response = await fetch('/api/canales');
+            if (!response.ok) {
+                throw new Error('Error al cargar los canales');
+            }
+            const data = await response.json();
             setCanales(data);
         } catch (error) {
             console.error('Error fetching canales:', error);
@@ -93,16 +89,31 @@ export default function CanalesPage() {
         try {
             if (editingCanal) {
                 // Actualizar canal existente
-                await prisma.proSocialCanalAdquisicion.update({
-                    where: { id: editingCanal.id },
-                    data: formData
+                const response = await fetch(`/api/canales/${editingCanal.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
                 });
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar el canal');
+                }
                 toast.success('Canal actualizado exitosamente');
             } else {
                 // Crear nuevo canal
-                await prisma.proSocialCanalAdquisicion.create({
-                    data: formData
+                const response = await fetch('/api/canales', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData),
                 });
+
+                if (!response.ok) {
+                    throw new Error('Error al crear el canal');
+                }
                 toast.success('Canal creado exitosamente');
             }
 
@@ -135,9 +146,13 @@ export default function CanalesPage() {
         if (!confirm('¿Estás seguro de que quieres eliminar este canal?')) return;
 
         try {
-            await prisma.proSocialCanalAdquisicion.delete({
-                where: { id }
+            const response = await fetch(`/api/canales/${id}`, {
+                method: 'DELETE',
             });
+
+            if (!response.ok) {
+                throw new Error('Error al eliminar el canal');
+            }
             toast.success('Canal eliminado exitosamente');
             fetchCanales();
         } catch (error) {
