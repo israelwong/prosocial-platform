@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User, Mail, Phone, Calendar } from 'lucide-react';
+import { LeadAssignmentStatus } from '@/components/shared/LeadAssignmentStatus';
 
 interface Lead {
     id: string;
@@ -66,6 +67,11 @@ export default function LeadItem({ lead, onViewDetails }: LeadItemProps) {
                         <Badge className={getEstadoColor(lead.estado)}>
                             {getEstadoLabel(lead.estado)}
                         </Badge>
+                        <LeadAssignmentStatus
+                            agentId={lead.agente ? 'assigned' : null}
+                            agentName={lead.agente}
+                            variant="badge"
+                        />
                     </div>
                     <div className="flex items-center gap-4 text-sm text-zinc-400">
                         <div className="flex items-center gap-1">
@@ -86,16 +92,21 @@ export default function LeadItem({ lead, onViewDetails }: LeadItemProps) {
 
             <div className="flex items-center space-x-4">
                 <div className="text-right space-y-1">
-                    <div className="text-sm font-medium text-white">
-                        {lead.agente || 'Sin asignar'}
-                    </div>
-                    <div className="text-xs text-zinc-500">
-                        Agente asignado
-                    </div>
+                    <LeadAssignmentStatus
+                        agentId={lead.agente ? 'assigned' : null}
+                        agentName={lead.agente}
+                        variant="full"
+                        size="md"
+                    />
+                    {!lead.agente && (
+                        <div className="text-xs text-amber-600">
+                            Disponible para asignación
+                        </div>
+                    )}
                 </div>
-                <Button 
-                    variant="outline" 
-                    size="sm" 
+                <Button
+                    variant="outline"
+                    size="sm"
                     className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700"
                     onClick={() => onViewDetails(lead)}
                 >

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 
 // Schema de validación para actualizar agente
@@ -111,6 +112,35 @@ export async function PUT(
             }
         });
 
+        // Si se está actualizando el estado activo, actualizar también en Supabase Auth
+        if (validatedData.activo !== undefined) {
+            try {
+                if (validatedData.activo) {
+                    // Reactivar usuario en Supabase Auth
+                    await supabaseAdmin.auth.admin.updateUserById(id, {
+                        ban_duration: 'none'
+                    });
+                } else {
+                    // Desactivar usuario en Supabase Auth (ban temporal muy largo)
+                    await supabaseAdmin.auth.admin.updateUserById(id, {
+                        ban_duration: '876600h' // 100 años
+                    });
+                }
+
+                // Actualizar también el perfil de usuario
+                await prisma.userProfile.update({
+                    where: { id },
+                    data: {
+                        isActive: validatedData.activo,
+                        ...(validatedData.nombre && { fullName: validatedData.nombre })
+                    }
+                });
+            } catch (authError) {
+                console.error('Error updating auth user status:', authError);
+                // No fallar la operación completa si solo falla la actualización en Auth
+            }
+        }
+
         return NextResponse.json(agent);
     } catch (error) {
         console.error('Error updating agent:', error);
@@ -155,12 +185,53 @@ export async function DELETE(
             );
         }
 
-        // Verificar si tiene leads asignados
+        // Si tiene leads asignados, desasignarlos y crear entradas en bitácora
+        let leadsReassigned = 0;
         if (existingAgent._count.leads > 0) {
-            return NextResponse.json(
-                { error: 'No se puede eliminar un agente que tiene leads asignados' },
-                { status: 400 }
-            );
+            // Obtener los leads asignados al agente
+            const assignedLeads = await prisma.proSocialLead.findMany({
+                where: { agentId: id },
+                select: { id: true, nombre: true }
+            });
+
+            // Desasignar leads y crear entradas en bitácora
+            for (const lead of assignedLeads) {
+                // Desasignar el lead
+                await prisma.proSocialLead.update({
+                    where: { id: lead.id },
+                    data: { agentId: null }
+                });
+
+                // Crear entrada en bitácora
+                await prisma.proSocialLeadBitacora.create({
+                    data: {
+                        leadId: lead.id,
+                        tipo: 'DESASIGNACION_AGENTE',
+                        descripcion: `Lead anteriormente gestionado por ${existingAgent.nombre} y ahora está disponible para seguimiento`,
+                        usuarioId: null // TODO: Obtener ID del usuario que está eliminando
+                    }
+                });
+            }
+
+            leadsReassigned = assignedLeads.length;
+        }
+
+        // Eliminar perfil de usuario
+        try {
+            await prisma.userProfile.delete({
+                where: { id }
+            });
+        } catch (error) {
+            console.error('Error deleting user profile:', error);
+            // No fallar si no existe el perfil
+        }
+
+        // Eliminar usuario de Supabase Auth
+        try {
+            await supabaseAdmin.auth.admin.deleteUser(id);
+        } catch (authError) {
+            console.error('Error deleting auth user:', authError);
+            // No fallar si no existe el usuario en Auth
         }
 
         // Eliminar agente
@@ -168,7 +239,10 @@ export async function DELETE(
             where: { id }
         });
 
-        return NextResponse.json({ message: 'Agente eliminado exitosamente' });
+        return NextResponse.json({
+            message: 'Agente eliminado exitosamente',
+            leadsReassigned
+        });
     } catch (error) {
         console.error('Error deleting agent:', error);
         return NextResponse.json(

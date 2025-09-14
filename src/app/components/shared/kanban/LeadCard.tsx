@@ -17,6 +17,7 @@ import {
     DollarSign
 } from 'lucide-react';
 import { Lead } from '@/types/lead';
+import { LeadAssignmentStatus } from '@/components/shared/LeadAssignmentStatus';
 
 interface LeadCardProps {
     lead: Lead;
@@ -88,9 +89,16 @@ export function LeadCard({
                                     {lead.nombreEstudio || 'Sin estudio'}
                                 </p>
                             </div>
-                            <Badge className={`text-xs ${getPriorityColor(lead.prioridad)}`}>
-                                {lead.prioridad}
-                            </Badge>
+                            <div className="flex flex-col gap-1">
+                                <Badge className={`text-xs ${getPriorityColor(lead.prioridad)}`}>
+                                    {lead.prioridad}
+                                </Badge>
+                                <LeadAssignmentStatus
+                                    agentId={lead.agentId}
+                                    agentName={lead.agent?.nombre}
+                                    variant="dot"
+                                />
+                            </div>
                         </div>
 
                         {/* Contact Info */}

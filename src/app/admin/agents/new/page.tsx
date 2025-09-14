@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 export default function NewAgentPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [createdAgent, setCreatedAgent] = useState<any>(null);
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
@@ -40,9 +41,14 @@ export default function NewAgentPage() {
                 throw new Error('Error al crear el agente');
             }
 
-            await response.json();
+            const data = await response.json();
+            setCreatedAgent(data);
             toast.success('Agente creado exitosamente');
-            router.push('/admin/agents');
+
+            // Mostrar las credenciales temporales
+            if (data.authUser?.tempPassword) {
+                toast.info(`Credenciales generadas para ${data.authUser.email}`);
+            }
         } catch (error) {
             console.error('Error creating agent:', error);
             toast.error('Error al crear el agente');
@@ -57,6 +63,70 @@ export default function NewAgentPage() {
             [field]: value
         }));
     };
+
+    // Si el agente fue creado, mostrar las credenciales
+    if (createdAgent) {
+        return (
+            <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="sm" asChild>
+                        <Link href="/admin/agents">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Volver a Agentes
+                        </Link>
+                    </Button>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-tight">Agente Creado Exitosamente</h1>
+                        <p className="text-muted-foreground">
+                            Credenciales de acceso generadas
+                        </p>
+                    </div>
+                </div>
+
+                {/* Credenciales */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <User className="h-5 w-5" />
+                            Credenciales de Acceso
+                        </CardTitle>
+                        <CardDescription>
+                            Comparte estas credenciales con el agente para que pueda acceder al sistema
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <Label>Email</Label>
+                                <div className="p-3 bg-muted rounded-md font-mono">
+                                    {createdAgent.authUser.email}
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Contraseña Temporal</Label>
+                                <div className="p-3 bg-muted rounded-md font-mono">
+                                    {createdAgent.authUser.tempPassword}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>URL de Acceso</Label>
+                            <div className="p-3 bg-muted rounded-md font-mono">
+                                {typeof window !== 'undefined' ? window.location.origin : ''}/agente
+                            </div>
+                        </div>
+                        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p className="text-sm text-yellow-800">
+                                <strong>Importante:</strong> Estas credenciales son temporales.
+                                El agente debe cambiar su contraseña en el primer inicio de sesión.
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">

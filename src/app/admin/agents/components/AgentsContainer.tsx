@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,14 +24,21 @@ interface Agent {
 
 interface AgentsContainerProps {
     agents: Agent[];
+    onAgentDelete?: (agentId: string) => void;
 }
 
-export function AgentsContainer({ agents }: AgentsContainerProps) {
+export function AgentsContainer({ agents, onAgentDelete }: AgentsContainerProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'inactive'>('all');
+    const [localAgents, setLocalAgents] = useState<Agent[]>(agents);
+
+    // Sincronizar localAgents cuando cambien los agents del servidor
+    useEffect(() => {
+        setLocalAgents(agents);
+    }, [agents]);
 
     const filteredAgents = useMemo(() => {
-        let filtered = agents;
+        let filtered = localAgents;
 
         // Filtrar por estado
         if (activeFilter === 'active') {
@@ -51,7 +58,7 @@ export function AgentsContainer({ agents }: AgentsContainerProps) {
         }
 
         return filtered;
-    }, [agents, searchTerm, activeFilter]);
+    }, [localAgents, searchTerm, activeFilter]);
 
     const handleSearch = (value: string) => {
         setSearchTerm(value);
@@ -66,8 +73,12 @@ export function AgentsContainer({ agents }: AgentsContainerProps) {
     };
 
     const handleDelete = (agentId: string) => {
-        // TODO: Implementar eliminación de agente
-        console.log('Eliminar agente:', agentId);
+        // Actualizar la lista local eliminando el agente
+        setLocalAgents(prevAgents => prevAgents.filter(agent => agent.id !== agentId));
+        // Notificar al componente padre
+        if (onAgentDelete) {
+            onAgentDelete(agentId);
+        }
     };
 
     return (

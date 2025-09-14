@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 
 // Schema de validación para crear agente
@@ -58,26 +59,77 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Crear agente
-        const agent = await prisma.proSocialAgent.create({
-            data: {
-                nombre: validatedData.nombre,
-                email: validatedData.email,
-                telefono: validatedData.telefono,
-                activo: validatedData.activo,
-                metaMensualLeads: validatedData.metaMensualLeads,
-                comisionConversion: validatedData.comisionConversion
-            },
-            include: {
-                _count: {
-                    select: {
-                        leads: true
-                    }
-                }
+        // Generar contraseña temporal
+        const tempPassword = `Agente${Math.random().toString(36).slice(-8)}!`;
+
+        // 1. Crear usuario en Supabase Auth
+        const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+            email: validatedData.email,
+            password: tempPassword,
+            email_confirm: true, // Auto-confirmar email
+            user_metadata: {
+                full_name: validatedData.nombre,
+                role: 'agente'
             }
         });
 
-        return NextResponse.json(agent, { status: 201 });
+        if (authError) {
+            console.error('Error creating auth user:', authError);
+            return NextResponse.json(
+                { error: 'Error al crear usuario en el sistema de autenticación' },
+                { status: 500 }
+            );
+        }
+
+        try {
+            // 2. Crear agente en la base de datos
+            const agent = await prisma.proSocialAgent.create({
+                data: {
+                    id: authUser.user.id, // Usar el mismo ID de Supabase Auth
+                    nombre: validatedData.nombre,
+                    email: validatedData.email,
+                    telefono: validatedData.telefono,
+                    activo: validatedData.activo,
+                    metaMensualLeads: validatedData.metaMensualLeads,
+                    comisionConversion: validatedData.comisionConversion
+                },
+                include: {
+                    _count: {
+                        select: {
+                            leads: true
+                        }
+                    }
+                }
+            });
+
+            // 3. Crear perfil de usuario
+            await prisma.userProfile.create({
+                data: {
+                    id: authUser.user.id,
+                    email: validatedData.email,
+                    fullName: validatedData.nombre,
+                    role: 'agente',
+                    isActive: validatedData.activo
+                }
+            });
+
+            // 4. Enviar email de invitación con credenciales
+            // TODO: Implementar envío de email con credenciales temporales
+
+            return NextResponse.json({
+                agent,
+                authUser: {
+                    id: authUser.user.id,
+                    email: authUser.user.email,
+                    tempPassword // En producción, esto se enviaría por email
+                }
+            }, { status: 201 });
+
+        } catch (dbError) {
+            // Si falla la creación en BD, eliminar el usuario de Auth
+            await supabaseAdmin.auth.admin.deleteUser(authUser.user.id);
+            throw dbError;
+        }
     } catch (error) {
         console.error('Error creating agent:', error);
 

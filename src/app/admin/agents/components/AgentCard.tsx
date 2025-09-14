@@ -1,4 +1,6 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -6,6 +8,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import {
     MoreHorizontal,
@@ -13,9 +16,12 @@ import {
     Trash2,
     User,
     Phone,
-    Mail
+    Mail,
+    Key
 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'sonner';
+import { DeleteAgentModal } from './DeleteAgentModal';
 
 interface Agent {
     id: string;
@@ -31,16 +37,98 @@ interface Agent {
     };
 }
 
+interface AuthStatus {
+    exists: boolean;
+    user?: {
+        id: string;
+        email: string;
+        last_sign_in_at: string | null;
+        is_active: boolean;
+    };
+    error?: string;
+}
+
 interface AgentCardProps {
     agent: Agent;
     onDelete?: (agentId: string) => void;
 }
 
 export function AgentCard({ agent, onDelete }: AgentCardProps) {
+    const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null);
+    const [loadingAuth, setLoadingAuth] = useState(true);
+    const [resendingCredentials, setResendingCredentials] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+    const fetchAuthStatus = useCallback(async () => {
+        try {
+            const response = await fetch(`/api/admin/agents/${agent.id}/auth-status`);
+            const data = await response.json();
+            setAuthStatus(data);
+        } catch (error) {
+            console.error('Error fetching auth status:', error);
+        } finally {
+            setLoadingAuth(false);
+        }
+    }, [agent.id]);
+
+    useEffect(() => {
+        fetchAuthStatus();
+    }, [fetchAuthStatus]);
+
     const handleDelete = () => {
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteSuccess = () => {
         if (onDelete) {
             onDelete(agent.id);
         }
+    };
+
+    const handleResendCredentials = async () => {
+        setResendingCredentials(true);
+        try {
+            const response = await fetch(`/api/admin/agents/${agent.id}/resend-credentials`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al reenviar credenciales');
+            }
+
+            const data = await response.json();
+            toast.success(`Credenciales enviadas a ${agent.email}`);
+
+            // En desarrollo, mostrar las credenciales
+            if (data.agent?.tempPassword) {
+                toast.info(`Contraseña temporal: ${data.agent.tempPassword}`);
+            }
+        } catch (error) {
+            console.error('Error resending credentials:', error);
+            toast.error('Error al reenviar credenciales');
+        } finally {
+            setResendingCredentials(false);
+        }
+    };
+
+    const getAuthStatusBadge = () => {
+        if (loadingAuth) {
+            return <Badge variant="secondary">Verificando...</Badge>;
+        }
+
+        if (!authStatus?.exists) {
+            return <Badge variant="destructive">Sin acceso</Badge>;
+        }
+
+        if (!authStatus.user?.is_active) {
+            return <Badge variant="destructive">Bloqueado</Badge>;
+        }
+
+        if (authStatus.user?.last_sign_in_at) {
+            return <Badge variant="default">Con acceso</Badge>;
+        }
+
+        return <Badge variant="outline">Pendiente login</Badge>;
     };
 
     return (
@@ -55,6 +143,7 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
                         <Badge variant={agent.activo ? "default" : "secondary"}>
                             {agent.activo ? "Activo" : "Inactivo"}
                         </Badge>
+                        {getAuthStatusBadge()}
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
@@ -101,6 +190,15 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
                                 Ver Detalles
                             </Link>
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={handleResendCredentials}
+                            disabled={resendingCredentials}
+                        >
+                            <Key className="mr-2 h-4 w-4" />
+                            {resendingCredentials ? 'Enviando...' : 'Reenviar Credenciales'}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem
                             className="text-destructive"
                             onClick={handleDelete}
@@ -111,6 +209,13 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+
+            <DeleteAgentModal
+                agent={agent}
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onSuccess={handleDeleteSuccess}
+            />
         </div>
     );
 }

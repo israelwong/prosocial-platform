@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import { Stats, AgentsContainer } from './components';
+import { AgentsPageClient } from './components';
 
 interface Agent {
     id: string;
@@ -69,11 +69,8 @@ export default async function AgentsPage() {
                 </Button>
             </div>
 
-            {/* Stats Cards */}
-            <Stats agents={agents} />
-
-            {/* Filters and Agents List */}
-            <AgentsContainer agents={agents} />
+            {/* Client Components with State Management */}
+            <AgentsPageClient initialAgents={agents} />
         </div>
     );
 }
