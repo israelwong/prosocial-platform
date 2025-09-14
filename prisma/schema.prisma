@@ -77,6 +77,10 @@ model ProSocialLead {
   // Canal de adquisición
   canalAdquisicionId String?
   canalAdquisicion   ProSocialCanalAdquisicion? @relation(fields: [canalAdquisicionId], references: [id])
+  
+  // Campaña
+  campañaId String?
+  campaña   ProSocialCampaña? @relation(fields: [campañaId], references: [id])
 
   // Conversión
   fechaConversion DateTime? // Cuando se convirtió en Studio
@@ -95,6 +99,7 @@ model ProSocialLead {
   @@index([etapaId, prioridad])
   @@index([agentId])
   @@index([canalAdquisicionId])
+  @@index([campañaId])
   @@map("prosocial_leads")
 }
 
@@ -149,6 +154,92 @@ model ProSocialCanalAdquisicion {
   @@index([isActive])
   @@index([isVisible])
   @@map("prosocial_canales_adquisicion")
+}
+
+model ProSocialCampaña {
+  id          String   @id @default(cuid())
+  nombre      String   // "Q1 2024 - Fotografía Profesional"
+  descripcion String?  // Descripción de la campaña
+  
+  // Presupuesto
+  presupuestoTotal Decimal // Presupuesto total de la campaña
+  
+  // Período
+  fechaInicio DateTime
+  fechaFin    DateTime
+  
+  // Estados
+  isActive    Boolean  @default(true)
+  status      String   @default("planificada") // planificada, activa, pausada, finalizada
+  
+  // Métricas básicas (entrada manual)
+  leadsGenerados    Int @default(0) // Leads nuevos generados
+  leadsSuscritos    Int @default(0) // Leads que se suscribieron
+  gastoReal         Decimal @default(0) // Gasto real ejecutado
+  
+  // Metadatos
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relaciones
+  plataformas ProSocialCampañaPlataforma[]
+  leads       ProSocialLead[]
+  
+  @@index([fechaInicio, fechaFin])
+  @@index([status])
+  @@index([isActive])
+  @@map("prosocial_campanas")
+}
+
+model ProSocialPlataformaPublicidad {
+  id          String   @id @default(cuid())
+  nombre      String   @unique // "Facebook Ads", "Google Ads", "TikTok Ads"
+  descripcion String?  // Descripción de la plataforma
+  tipo        String   // "Redes Sociales", "Búsqueda", "Display", "Video"
+  color       String?  // Color para UI
+  icono       String?  // Icono para UI
+  
+  // Configuración
+  isActive    Boolean  @default(true)
+  orden       Int      @default(0)
+  
+  // Metadatos
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relaciones
+  campañas    ProSocialCampañaPlataforma[]
+  
+  @@index([tipo])
+  @@index([isActive])
+  @@map("prosocial_plataformas_publicidad")
+}
+
+model ProSocialCampañaPlataforma {
+  id           String   @id @default(cuid())
+  campañaId    String
+  plataformaId String
+  
+  // Presupuesto específico por plataforma
+  presupuesto  Decimal  // Presupuesto asignado a esta plataforma
+  gastoReal    Decimal  @default(0) // Gasto real ejecutado
+  
+  // Métricas básicas (entrada manual)
+  leads        Int      @default(0)
+  conversiones Int      @default(0)
+  
+  // Metadatos
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relaciones
+  campaña      ProSocialCampaña @relation(fields: [campañaId], references: [id], onDelete: Cascade)
+  plataforma   ProSocialPlataformaPublicidad @relation(fields: [plataformaId], references: [id])
+  
+  @@unique([campañaId, plataformaId])
+  @@index([campañaId])
+  @@index([plataformaId])
+  @@map("prosocial_campana_plataformas")
 }
 
 model ProSocialAgent {
