@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, Eye, EyeOff, Target, Search, Filter } from 'lucide-react';
-import { createClientSupabase } from '@/lib/supabase';
+import { PrismaClient } from '@prisma/client';
 import { toast } from 'sonner';
 
 // Forzar renderizado dinámico
@@ -64,7 +64,7 @@ export default function CanalesPage() {
         orden: 0
     });
 
-    const supabase = createClientSupabase();
+    const prisma = new PrismaClient();
 
     useEffect(() => {
         fetchCanales();
@@ -73,14 +73,13 @@ export default function CanalesPage() {
     const fetchCanales = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
-                .from('prosocial_canales_adquisicion')
-                .select('*')
-                .order('categoria', { ascending: true })
-                .order('orden', { ascending: true });
-
-            if (error) throw error;
-            setCanales(data || []);
+            const data = await prisma.proSocialCanalAdquisicion.findMany({
+                orderBy: [
+                    { categoria: 'asc' },
+                    { orden: 'asc' }
+                ]
+            });
+            setCanales(data);
         } catch (error) {
             console.error('Error fetching canales:', error);
             toast.error('Error al cargar los canales');
@@ -94,20 +93,16 @@ export default function CanalesPage() {
         try {
             if (editingCanal) {
                 // Actualizar canal existente
-                const { error } = await supabase
-                    .from('prosocial_canales_adquisicion')
-                    .update(formData)
-                    .eq('id', editingCanal.id);
-
-                if (error) throw error;
+                await prisma.proSocialCanalAdquisicion.update({
+                    where: { id: editingCanal.id },
+                    data: formData
+                });
                 toast.success('Canal actualizado exitosamente');
             } else {
                 // Crear nuevo canal
-                const { error } = await supabase
-                    .from('prosocial_canales_adquisicion')
-                    .insert([formData]);
-
-                if (error) throw error;
+                await prisma.proSocialCanalAdquisicion.create({
+                    data: formData
+                });
                 toast.success('Canal creado exitosamente');
             }
 
@@ -140,12 +135,9 @@ export default function CanalesPage() {
         if (!confirm('¿Estás seguro de que quieres eliminar este canal?')) return;
 
         try {
-            const { error } = await supabase
-                .from('prosocial_canales_adquisicion')
-                .delete()
-                .eq('id', id);
-
-            if (error) throw error;
+            await prisma.proSocialCanalAdquisicion.delete({
+                where: { id }
+            });
             toast.success('Canal eliminado exitosamente');
             fetchCanales();
         } catch (error) {
