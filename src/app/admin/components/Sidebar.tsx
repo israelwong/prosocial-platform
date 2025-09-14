@@ -17,7 +17,8 @@ import {
     User,
     Columns3,
     ChevronDown,
-    ChevronRight
+    ChevronRight,
+    Target
 } from 'lucide-react';
 import { createClientSupabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
@@ -34,15 +35,16 @@ const navigation = [
         ]
     },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-    {
-        name: 'Configuración',
-        icon: Settings,
-        children: [
-            { name: 'Planes', href: '/admin/plans', icon: CreditCard },
-            { name: 'Agentes', href: '/admin/agents', icon: Users },
-            { name: 'Pipeline', href: '/admin/pipeline', icon: Columns3 },
-        ]
-    },
+                {
+                    name: 'Configuración',
+                    icon: Settings,
+                    children: [
+                        { name: 'Planes', href: '/admin/plans', icon: CreditCard },
+                        { name: 'Agentes', href: '/admin/agents', icon: Users },
+                        { name: 'Pipeline', href: '/admin/pipeline', icon: Columns3 },
+                        { name: 'Canales', href: '/admin/canales', icon: Target },
+                    ]
+                },
 ];
 
 interface SidebarProps {
