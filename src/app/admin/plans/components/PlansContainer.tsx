@@ -1,6 +1,21 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    rectSortingStrategy,
+} from '@dnd-kit/sortable';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -12,7 +27,7 @@ import {
     SortAsc,
     SortDesc
 } from 'lucide-react';
-import { PlanCard } from './PlanCard';
+import { PlanCardWrapper } from './PlanCardWrapper';
 import { Plan } from '../types';
 import { toast } from 'sonner';
 
@@ -20,6 +35,7 @@ interface PlansContainerProps {
     plans: Plan[];
     onPlanDelete: (planId: string) => void;
     onPlanUpdate: (updatedPlan: Plan) => void;
+    onPlansReorder?: (reorderedPlans: Plan[]) => void;
 }
 
 type FilterType = 'all' | 'active' | 'inactive' | 'popular';
@@ -28,12 +44,22 @@ type SortType = 'name' | 'price' | 'studios' | 'orden';
 export function PlansContainer({
     plans,
     onPlanDelete,
-    onPlanUpdate
+    onPlanUpdate,
+    onPlansReorder
 }: PlansContainerProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState<FilterType>('all');
     const [sortBy, setSortBy] = useState<SortType>('orden');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+
+    // Drag and Drop sensors
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     // Filtrar y ordenar planes
     const filteredAndSortedPlans = useMemo(() => {
@@ -91,6 +117,71 @@ export function PlansContainer({
 
         return filtered;
     }, [plans, searchTerm, filter, sortBy, sortOrder]);
+
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            // Usar todos los planes activos, no solo los filtrados
+            const activePlans = plans.filter(plan => plan.active).sort((a, b) => a.orden - b.orden);
+
+            const oldIndex = activePlans.findIndex((item) => item.id === active.id);
+            const newIndex = activePlans.findIndex((item) => item.id === over.id);
+
+            if (oldIndex === -1 || newIndex === -1) {
+                toast.error('Error: No se pudo encontrar el plan en la lista');
+                return;
+            }
+
+            const reorderedPlans = arrayMove(activePlans, oldIndex, newIndex);
+
+            // ACTUALIZACIÓN OPTIMISTA: Actualizar el estado local inmediatamente
+            const optimisticallyUpdatedPlans = reorderedPlans.map((plan, index) => ({
+                ...plan,
+                orden: index + 1
+            }));
+
+            // Actualizar el estado local inmediatamente para una experiencia fluida
+            if (onPlansReorder) {
+                onPlansReorder(optimisticallyUpdatedPlans);
+            }
+
+            // Mostrar indicador de actualización
+            setIsUpdatingOrder(true);
+
+            try {
+                // Actualizar el orden en la base de datos en segundo plano
+                const updatePromises = reorderedPlans.map((plan, index) =>
+                    fetch(`/api/plans/${plan.id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            orden: index + 1
+                        }),
+                    })
+                );
+
+                await Promise.all(updatePromises);
+
+                // Mostrar mensaje de éxito
+                toast.success('Orden de planes actualizado exitosamente');
+            } catch (error) {
+                console.error('Error updating plan order:', error);
+
+                // REVERTIR CAMBIOS: Si falla la API, revertir al estado anterior
+                if (onPlansReorder) {
+                    onPlansReorder(plans); // Revertir al estado original
+                }
+
+                toast.error('Error al actualizar el orden de los planes. Se revirtieron los cambios.');
+            } finally {
+                // Ocultar indicador de actualización
+                setIsUpdatingOrder(false);
+            }
+        }
+    };
 
     const handleEdit = (plan: Plan) => {
         // TODO: Abrir modal de edición
@@ -283,7 +374,16 @@ export function PlansContainer({
                         <div>
                             <CardTitle>Lista de Planes</CardTitle>
                             <CardDescription>
-                                Gestiona todos los planes de la plataforma
+                                Gestiona todos los planes de la plataforma. Arrastra las tarjetas para cambiar el orden en que se muestran a los prospectos.
+                                {isUpdatingOrder && (
+                                    <span className="ml-2 inline-flex items-center text-blue-500">
+                                        <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Actualizando orden...
+                                    </span>
+                                )}
                             </CardDescription>
                         </div>
                         <Badge variant="outline">
@@ -308,18 +408,30 @@ export function PlansContainer({
                             )}
                         </div>
                     ) : (
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {filteredAndSortedPlans.map((plan) => (
-                                <PlanCard
-                                    key={plan.id}
-                                    plan={plan}
-                                    onEdit={handleEdit}
-                                    onDelete={handleDelete}
-                                    onToggleActive={handleToggleActive}
-                                    onTogglePopular={handleTogglePopular}
-                                />
-                            ))}
-                        </div>
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <SortableContext
+                                items={filteredAndSortedPlans.map(plan => plan.id)}
+                                strategy={rectSortingStrategy}
+                                disabled={isUpdatingOrder}
+                            >
+                                <div className={`grid gap-6 md:grid-cols-2 lg:grid-cols-3 ${isUpdatingOrder ? 'opacity-75 pointer-events-none' : ''}`}>
+                                    {filteredAndSortedPlans.map((plan) => (
+                                        <PlanCardWrapper
+                                            key={plan.id}
+                                            plan={plan}
+                                            onEdit={handleEdit}
+                                            onDelete={handleDelete}
+                                            onToggleActive={handleToggleActive}
+                                            onTogglePopular={handleTogglePopular}
+                                        />
+                                    ))}
+                                </div>
+                            </SortableContext>
+                        </DndContext>
                     )}
                 </CardContent>
             </Card>

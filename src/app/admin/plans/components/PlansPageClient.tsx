@@ -32,6 +32,10 @@ export function PlansPageClient({ initialPlans }: PlansPageClientProps) {
         setPlans(prevPlans => [newPlan, ...prevPlans]);
     };
 
+    const handlePlansReorder = (reorderedPlans: Plan[]) => {
+        setPlans(reorderedPlans);
+    };
+
     return (
         <>
             {/* Stats Cards */}
@@ -42,6 +46,7 @@ export function PlansPageClient({ initialPlans }: PlansPageClientProps) {
                 plans={plans}
                 onPlanDelete={handlePlanDelete}
                 onPlanUpdate={handlePlanUpdate}
+                onPlansReorder={handlePlansReorder}
             />
         </>
     );

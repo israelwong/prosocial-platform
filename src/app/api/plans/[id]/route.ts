@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         const plan = await prisma.plans.findUnique({
             where: { id },
@@ -46,11 +46,11 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const body = await request.json();
-        const { id } = params;
+        const { id } = await params;
 
         // Verificar que el plan existe
         const existingPlan = await prisma.plans.findUnique({
@@ -64,14 +64,22 @@ export async function PUT(
             );
         }
 
-        // Parsear JSON fields si vienen como strings
-        const planData = {
-            ...body,
-            features: typeof body.features === 'string' ?
-                JSON.parse(body.features || '[]') : body.features,
-            limits: typeof body.limits === 'string' ?
-                JSON.parse(body.limits || '{}') : body.limits
-        };
+        // Parsear JSON fields si vienen como strings y filtrar campos no actualizables
+        const { _count, createdAt, ...updateableFields } = body;
+
+        const planData: any = { ...updateableFields };
+
+        // Solo procesar features si está presente en el body
+        if ('features' in body) {
+            planData.features = typeof body.features === 'string' ?
+                JSON.parse(body.features || '[]') : body.features;
+        }
+
+        // Solo procesar limits si está presente en el body
+        if ('limits' in body) {
+            planData.limits = typeof body.limits === 'string' ?
+                JSON.parse(body.limits || '{}') : body.limits;
+        }
 
         const plan = await prisma.plans.update({
             where: { id },
@@ -85,6 +93,27 @@ export async function PUT(
                 }
             }
         });
+
+        // Si se actualizó el orden, normalizar todos los planes activos
+        if ('orden' in planData) {
+            const activePlans = await prisma.plans.findMany({
+                where: { active: true },
+                orderBy: [
+                    { orden: 'asc' },
+                    { createdAt: 'asc' }
+                ]
+            });
+
+            // Normalizar el orden
+            const normalizePromises = activePlans.map((p, index) =>
+                prisma.plans.update({
+                    where: { id: p.id },
+                    data: { orden: index + 1 }
+                })
+            );
+
+            await Promise.all(normalizePromises);
+        }
 
         // Convertir Decimal a number para el frontend
         const planFormatted = {
@@ -116,10 +145,10 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // Verificar que el plan existe
         const existingPlan = await prisma.plans.findUnique({

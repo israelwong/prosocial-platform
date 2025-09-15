@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,9 +15,11 @@ import {
     Building2,
     Users,
     DollarSign,
-    Crown
+    Crown,
+    GripVertical
 } from 'lucide-react';
 import { Plan } from '../types';
+import { useIsClient } from '@/hooks/useIsClient';
 
 interface PlanCardProps {
     plan: Plan;
@@ -32,6 +36,29 @@ export function PlanCard({
     onToggleActive,
     onTogglePopular
 }: PlanCardProps) {
+    const isClient = useIsClient();
+    
+    // Solo ejecutar useSortable en el cliente
+    const sortableProps = useSortable({ 
+        id: plan.id,
+        disabled: !isClient // Deshabilitar si no estamos en el cliente
+    });
+
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = sortableProps;
+
+    const style = isClient ? {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.8 : 1,
+    } : {};
+
     const formatPrice = (price: number | null) => {
         if (!price) return 'Gratis';
         return `$${price.toLocaleString()}`;
@@ -53,8 +80,12 @@ export function PlanCard({
     const planFeatures = formatFeatures(plan.features);
 
     return (
-        <Card className={`relative transition-all duration-200 hover:shadow-lg ${plan.popular ? 'ring-2 ring-yellow-500 shadow-yellow-500/20' : ''
-            }`}>
+        <Card
+            ref={isClient ? setNodeRef : undefined}
+            style={style}
+            className={`relative transition-all duration-200 hover:shadow-lg ${plan.popular ? 'ring-2 ring-yellow-500 shadow-yellow-500/20' : ''
+                } ${isClient && isDragging ? 'shadow-2xl z-50' : ''}`}
+        >
             {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <Badge className="bg-yellow-500 text-yellow-900 hover:bg-yellow-600">
@@ -66,7 +97,18 @@ export function PlanCard({
 
             <CardHeader className="pb-4">
                 <div className="flex items-start justify-between">
-                    <div className="space-y-1">
+                    {/* Drag Handle - Solo visible después de hidratación */}
+                    {isClient && (
+                        <div 
+                            className="cursor-grab active:cursor-grabbing p-1 -ml-1 mr-2 text-gray-400 hover:text-gray-600 transition-colors"
+                            {...(isClient ? attributes : {})}
+                            {...(isClient ? listeners : {})}
+                            title="Arrastra para reordenar"
+                        >
+                            <GripVertical className="h-4 w-4" />
+                        </div>
+                    )}
+                    <div className={`space-y-1 ${isClient ? 'flex-1' : ''}`}>
                         <CardTitle className="text-xl flex items-center gap-2">
                             {plan.name}
                             {!plan.active && (
