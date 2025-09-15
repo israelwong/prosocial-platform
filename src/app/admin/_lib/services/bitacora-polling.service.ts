@@ -77,7 +77,7 @@ export class BitacoraPollingService {
 
     private log(message: string) {
         if (this.config.enableLogs) {
-            console.log(`[BitacoraPolling] ${message}`)
+            // Log de bitácora polling deshabilitado
         }
     }
 }

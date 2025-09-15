@@ -69,17 +69,17 @@ export default function LeadsPage() {
 
     const handleFilterClick = () => {
         // TODO: Implementar modal de filtros avanzados
-        console.log('Abrir filtros avanzados');
+        // TODO: Implementar filtros avanzados
     };
 
     const handleNewLeadsClick = () => {
         // TODO: Implementar filtro por leads nuevos
-        console.log('Filtrar leads nuevos');
+        // Filtrar por leads nuevos
     };
 
     const handleUnassignedClick = () => {
         // TODO: Implementar filtro por leads sin asignar
-        console.log('Filtrar leads sin asignar');
+        // Filtrar por leads sin asignar
     };
 
     return (

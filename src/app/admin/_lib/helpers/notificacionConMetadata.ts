@@ -44,7 +44,7 @@ export async function crearNotificacionConMetadata(data: NotificacionConMetadata
             )
         `
 
-        console.log('🔔 Notificación creada usando SQL raw')
+        // Notificación creada usando SQL raw
         return { success: true, result }
 
     } catch (error) {
