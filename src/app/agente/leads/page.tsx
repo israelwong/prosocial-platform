@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { createClient as createAdminClient } from '@/lib/supabase/admin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,6 +44,7 @@ interface Lead {
 }
 
 
+
 export default function LeadsPage() {
     const router = useRouter();
     const [leads, setLeads] = useState<Lead[]>([]);
@@ -52,53 +52,30 @@ export default function LeadsPage() {
     const [filterStage, setFilterStage] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
     const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState<{ id: string; email: string } | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const fetchLeads = useCallback(async (agentId?: string) => {
+    const fetchLeads = useCallback(async () => {
         const supabase = createClient();
 
-        if (!agentId && !user?.id) {
-            console.log('No hay agentId para obtener leads');
-            setLoading(false);
-            return;
-        }
-
-        const targetAgentId = agentId || user?.id;
-
         try {
-            console.log('🔍 Consultando leads para agentId:', targetAgentId);
-            console.log('🔍 Usuario actual:', user);
+            setError(null); // Limpiar errores previos
+            console.log('🔍 Consultando todos los leads...');
 
-            // Primero verificar si el usuario está autenticado
+            // Verificar estado de autenticación
             const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
-            console.log('🔍 Usuario autenticado actual:', currentUser);
+            console.log('🔍 Usuario autenticado:', currentUser?.id);
             console.log('🔍 Error de autenticación:', authError);
-            console.log('🔍 ID del usuario autenticado:', currentUser?.id);
-            console.log('🔍 Email del usuario autenticado:', currentUser?.email);
-            console.log('🔍 User metadata:', currentUser?.user_metadata);
 
-            // Primero hacer una consulta simple para verificar acceso
-            console.log('🔍 Probando consulta simple...');
-            const { data: testData, error: testError } = await supabase
-                .from('prosocial_leads')
-                .select('id, nombre')
-                .limit(1);
+            if (authError || !currentUser) {
+                console.error('❌ Usuario no autenticado');
+                setError('Usuario no autenticado. Por favor, inicia sesión nuevamente.');
+                setLoading(false);
+                return;
+            }
 
-            console.log('🔍 Test query - data:', testData);
-            console.log('🔍 Test query - error:', testError);
+            console.log('✅ Acceso confirmado. Obteniendo datos...');
 
-            // Probar con cliente de administrador para verificar si los datos están ahí
-            console.log('🔍 Probando con cliente de administrador...');
-            const adminSupabase = createAdminClient();
-            const { data: adminData, error: adminError } = await adminSupabase
-                .from('prosocial_leads')
-                .select('id, nombre, email, "agentId"')
-                .eq('agentId', targetAgentId);
-
-            console.log('🔍 Admin query - data:', adminData);
-            console.log('🔍 Admin query - error:', adminError);
-
-            // Consultar leads reales desde la base de datos (consulta simplificada)
+            // Consulta básica primero - obtener todos los leads
             const { data, error } = await supabase
                 .from('prosocial_leads')
                 .select(`
@@ -113,64 +90,19 @@ export default function LeadsPage() {
                     puntaje,
                     prioridad,
                     createdAt,
-                    etapaId
+                    etapaId,
+                    canalAdquisicionId,
+                    agentId
                 `)
-                .eq('agentId', targetAgentId)
                 .order('createdAt', { ascending: false });
 
-            console.log('🔍 Resultado de consulta - data:', data);
-            console.log('🔍 Resultado de consulta - error:', error);
-
             if (error) {
-                console.error('Error fetching leads:', error);
-                console.error('Error details:', JSON.stringify(error, null, 2));
-
-                // Si hay error con el cliente normal, usar el cliente de administrador como fallback
-                console.log('🔍 Usando cliente de administrador como fallback...');
-                const adminSupabase = createAdminClient();
-                const { data: adminData, error: adminError } = await adminSupabase
-                    .from('prosocial_leads')
-                    .select(`
-                        id,
-                        nombre,
-                        email,
-                        telefono,
-                        nombreEstudio,
-                        fechaUltimoContacto,
-                        planInteres,
-                        presupuestoMensual,
-                        puntaje,
-                        prioridad,
-                        createdAt,
-                        etapaId
-                    `)
-                    .eq('agentId', targetAgentId)
-                    .order('createdAt', { ascending: false });
-
-                if (adminError) {
-                    console.error('Error con cliente de administrador:', adminError);
-                    setLeads([]);
-                } else {
-                    console.log('🔍 Datos obtenidos con cliente de administrador:', adminData?.length || 0);
-                    const mappedLeads: Lead[] = (adminData || []).map(lead => ({
-                        id: lead.id,
-                        name: lead.nombre,
-                        email: lead.email,
-                        phone: lead.telefono,
-                        studio: lead.nombreEstudio || 'Sin estudio',
-                        stage: lead.etapaId || 'Nuevo',
-                        value: lead.presupuestoMensual ? Number(lead.presupuestoMensual) : 0,
-                        priority: lead.prioridad === 'alta' ? 'high' : lead.prioridad === 'media' ? 'medium' : 'low',
-                        lastActivity: lead.fechaUltimoContacto ? new Date(lead.fechaUltimoContacto).toLocaleDateString() : 'Sin actividad',
-                        assignedAgent: 'Agente',
-                        source: 'Sin canal',
-                        notes: `Lead asignado a agente`,
-                        createdAt: new Date(lead.createdAt).toLocaleDateString()
-                    }));
-                    setLeads(mappedLeads);
-                }
+                console.error('❌ Error en consulta completa:', error);
+                console.error('❌ Error details:', JSON.stringify(error, null, 2));
+                setError('Error al cargar los leads completos. Usando datos básicos.');
+                setLeads([]);
             } else {
-                // Mapear datos reales al formato esperado
+                // Mapear datos básicos
                 const mappedLeads: Lead[] = (data || []).map(lead => ({
                     id: lead.id,
                     name: lead.nombre,
@@ -181,22 +113,23 @@ export default function LeadsPage() {
                     value: lead.presupuestoMensual ? Number(lead.presupuestoMensual) : 0,
                     priority: lead.prioridad === 'alta' ? 'high' : lead.prioridad === 'media' ? 'medium' : 'low',
                     lastActivity: lead.fechaUltimoContacto ? new Date(lead.fechaUltimoContacto).toLocaleDateString() : 'Sin actividad',
-                    assignedAgent: 'Agente',
-                    source: 'Sin canal',
-                    notes: `Lead asignado a agente`,
+                    assignedAgent: lead.agentId ? 'Agente asignado' : 'Sin asignar',
+                    source: lead.canalAdquisicionId ? 'Canal asignado' : 'Sin canal',
+                    notes: lead.agentId ? `Lead asignado a agente` : 'Lead disponible para asignar',
                     createdAt: new Date(lead.createdAt).toLocaleDateString()
                 }));
 
-                console.log('Leads reales obtenidos:', mappedLeads.length);
+                console.log('✅ Leads obtenidos exitosamente:', mappedLeads.length);
                 setLeads(mappedLeads);
             }
         } catch (error) {
-            console.error('Error inesperado:', error);
+            console.error('❌ Error inesperado:', error);
+            setError('Error inesperado al cargar los leads');
             setLeads([]);
         } finally {
             setLoading(false);
         }
-    }, [user]);
+    }, []);
 
     const checkAuthAndFetchData = useCallback(async () => {
         const supabase = createClient();
@@ -210,7 +143,7 @@ export default function LeadsPage() {
             return;
         }
 
-        setUser({ id: user.id, email: user.email || '' });
+        // Usuario autenticado y con rol de agente
 
         // Obtener el rol del usuario desde user_metadata
         const userRole = user.user_metadata?.role;
@@ -230,8 +163,8 @@ export default function LeadsPage() {
 
         // Usuario autenticado y con rol de agente
 
-        // Ahora obtener los leads asignados a este agente
-        fetchLeads(user.id);
+        // Ahora obtener todos los leads
+        fetchLeads();
     }, [router, fetchLeads]);
 
     useEffect(() => {
@@ -298,8 +231,47 @@ export default function LeadsPage() {
                     </div>
                 </div>
                 <div className="flex items-center justify-center h-64">
-                    <div className="animate-pulse text-muted-foreground">Cargando leads...</div>
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <div className="text-muted-foreground">Cargando leads...</div>
+                    </div>
                 </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold">Gestión de Leads</h1>
+                        <p className="text-muted-foreground">Administra y sigue el progreso de tus leads</p>
+                    </div>
+                </div>
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="flex flex-col items-center gap-4 text-center">
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <span className="text-red-600 text-xl">⚠️</span>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-red-600">Error al cargar leads</h3>
+                                <p className="text-muted-foreground mt-2">{error}</p>
+                            </div>
+                            <Button
+                                onClick={() => {
+                                    setError(null);
+                                    setLoading(true);
+                                    checkAuthAndFetchData();
+                                }}
+                                variant="outline"
+                            >
+                                Reintentar
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         );
     }
