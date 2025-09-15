@@ -24,6 +24,15 @@ export interface EmailOptions {
 // Función helper para enviar emails
 export async function sendEmail(options: EmailOptions) {
     try {
+        console.log('📧 Enviando email con configuración:', {
+            from: EMAIL_CONFIG.from,
+            to: options.to,
+            subject: options.subject,
+            hasHtml: !!options.html,
+            hasText: !!options.text,
+            replyTo: options.replyTo || EMAIL_CONFIG.replyTo,
+        });
+
         const result = await resend.emails.send({
             from: EMAIL_CONFIG.from,
             to: options.to,
@@ -33,7 +42,9 @@ export async function sendEmail(options: EmailOptions) {
             replyTo: options.replyTo || EMAIL_CONFIG.replyTo,
         });
 
+        console.log('📧 Resultado completo de Resend:', JSON.stringify(result, null, 2));
         console.log('✅ Email sent successfully:', result.data?.id);
+
         return { success: true, id: result.data?.id };
     } catch (error) {
         console.error('❌ Error sending email:', error);

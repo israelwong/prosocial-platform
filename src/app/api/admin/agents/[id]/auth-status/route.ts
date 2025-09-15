@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { isValidSupabaseAuthId } from '@/lib/uuid-utils';
 
+// Interfaz para el usuario de Supabase Auth con propiedades extendidas
+interface SupabaseAuthUser {
+    id: string;
+    email?: string;
+    email_confirmed_at?: string;
+    last_sign_in_at?: string;
+    created_at?: string;
+    ban_duration?: string;
+}
+
 // GET /api/admin/agents/[id]/auth-status - Obtener estado de autenticación del agente
 export async function GET(
     request: NextRequest,
@@ -29,7 +39,7 @@ export async function GET(
         }
 
         // Verificar si el usuario está baneado usando ban_duration
-        const user = authUser.user as any; // Type assertion para acceder a ban_duration
+        const user = authUser.user as SupabaseAuthUser;
         const isBanned = user.ban_duration && user.ban_duration !== 'none';
 
         return NextResponse.json({

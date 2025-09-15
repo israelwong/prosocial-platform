@@ -63,19 +63,71 @@ export default function AgenteDashboard() {
 
         const targetAgentId = agentId || user?.id
 
-        const { data, error } = await supabase
-            .from('prosocial_leads')
-            .select('*')
-            .eq('agentId', targetAgentId)
-            .order('createdAt', { ascending: false })
+        try {
+            // Consultar leads reales desde la base de datos
+            const { data, error } = await supabase
+                .from('prosocial_leads')
+                .select(`
+                    id,
+                    nombre,
+                    email,
+                    telefono,
+                    nombreEstudio,
+                    slugEstudio,
+                    fechaUltimoContacto,
+                    planInteres,
+                    presupuestoMensual,
+                    fechaProbableInicio,
+                    puntaje,
+                    prioridad,
+                    fechaConversion,
+                    createdAt,
+                    updatedAt,
+                    etapaId,
+                    canalAdquisicionId,
+                    campa_aId,
+                    prosocial_agents!prosocial_leads_agentId_fkey (
+                        id,
+                        nombre,
+                        email
+                    ),
+                    prosocial_canales_adquisicion (
+                        id,
+                        nombre,
+                        categoria,
+                        color
+                    )
+                `)
+                .eq('agentId', targetAgentId)
+                .order('createdAt', { ascending: false })
 
-        if (error) {
-            console.error('Error fetching leads:', error)
-        } else {
-            console.log('Leads obtenidos:', data?.length || 0)
-            setLeads(data || [])
+            if (error) {
+                console.error('Error fetching leads:', error)
+                setLeads([])
+            } else {
+                // Mapear datos reales al formato esperado
+                const mappedLeads: Lead[] = (data || []).map(lead => ({
+                    id: lead.id,
+                    nombre: lead.nombre,
+                    email: lead.email,
+                    telefono: lead.telefono,
+                    etapa: lead.etapaId || 'nuevo',
+                    puntaje: lead.puntaje || 0,
+                    prioridad: lead.prioridad || 'media',
+                    planInteres: lead.planInteres || 'Sin especificar',
+                    presupuestoMensual: lead.presupuestoMensual ? Number(lead.presupuestoMensual) : 0,
+                    fechaUltimoContacto: lead.fechaUltimoContacto,
+                    notasConversacion: `Lead asignado a agente`
+                }))
+
+                console.log('Leads reales obtenidos:', mappedLeads.length)
+                setLeads(mappedLeads)
+            }
+        } catch (error) {
+            console.error('Error inesperado:', error)
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }, [user])
 
     const checkAuthAndFetchData = useCallback(async () => {
@@ -92,40 +144,33 @@ export default function AgenteDashboard() {
 
         setUser({ id: user.id, email: user.email || '' })
 
-        // Obtener el perfil del agente
-        const { data: profile, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
+        // Obtener el rol del usuario desde user_metadata
+        const userRole = user.user_metadata?.role
 
-        if (profileError || !profile) {
-            console.error('Error obteniendo perfil:', profileError)
-            router.push('/auth/complete-profile')
-            return
-        }
-
-        // Verificar que el usuario tenga rol de agente
-        if (profile.role !== 'agente') {
-            console.error('Usuario no tiene rol de agente:', profile.role)
+        if (!userRole) {
+            console.error('No se encontró rol en metadata')
             router.push('/auth/login')
             return
         }
 
-        setAgentProfile(profile)
-
-        // Obtener información del agente desde la tabla prosocial_agents
-        const { data: agentData, error: agentError } = await supabase
-            .from('prosocial_agents')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-
-        if (agentError) {
-            console.error('Error obteniendo datos del agente:', agentError)
-        } else {
-            console.log('Datos del agente:', agentData)
+        // Verificar que el usuario tenga rol de agente
+        if (userRole !== 'agente') {
+            console.error('Usuario no tiene rol de agente:', userRole)
+            router.push('/auth/login')
+            return
         }
+
+        // Crear un perfil simulado basado en user_metadata
+        const simulatedProfile = {
+            id: user.id,
+            email: user.email || '',
+            fullName: user.user_metadata?.full_name || '',
+            role: userRole,
+            studioId: null,
+            isActive: true
+        }
+
+        setAgentProfile(simulatedProfile)
 
         // Ahora obtener los leads asignados a este agente
         fetchLeads(user.id)

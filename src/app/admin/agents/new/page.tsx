@@ -47,7 +47,9 @@ export default function NewAgentPage() {
             });
 
             if (!response.ok) {
-                throw new Error('Error al crear el agente');
+                const errorData = await response.json();
+                console.error('Error response:', errorData);
+                throw new Error(errorData.error || 'Error al crear el agente');
             }
 
             const data = await response.json();

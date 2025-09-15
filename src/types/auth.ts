@@ -113,15 +113,29 @@ export function canAccessRoute(userRole: UserRole, pathname: string): boolean {
     }
 }
 
-export function getDefaultRoute(userRole: UserRole, studioSlug?: string): string {
-    switch (userRole) {
+export function getDefaultRoute(userRole: UserRole | string, studioSlug?: string): string {
+    // Normalizar el rol a string para comparación
+    const role = typeof userRole === 'string' ? userRole : userRole.toString();
+
+    console.log('🔍 getDefaultRoute - userRole recibido:', userRole)
+    console.log('🔍 getDefaultRoute - role normalizado:', role)
+    console.log('🔍 getDefaultRoute - studioSlug:', studioSlug)
+
+    switch (role) {
         case UserRole.SUPER_ADMIN:
+        case 'super_admin':
+            console.log('🔍 getDefaultRoute - Redirigiendo a /admin')
             return "/admin"
         case UserRole.AGENTE:
+        case 'agente':
+            console.log('🔍 getDefaultRoute - Redirigiendo a /agente')
             return "/agente"
         case UserRole.SUSCRIPTOR:
+        case 'suscriptor':
+            console.log('🔍 getDefaultRoute - Redirigiendo a /studio')
             return studioSlug ? `/studio/${studioSlug}` : "/unauthorized"
         default:
+            console.log('🔍 getDefaultRoute - Redirigiendo a /unauthorized (default)')
             return "/unauthorized"
     }
 }

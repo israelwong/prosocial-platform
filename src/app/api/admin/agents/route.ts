@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
-import { sendAgentCredentialsEmail } from '@/lib/email/agent-email-service';
+import { sendAgentCredentialsEmail, validateEmailConfig } from '@/lib/email/agent-email-service';
 
 // Schema de validación para crear agente
 const createAgentSchema = z.object({
@@ -21,7 +21,7 @@ export async function GET() {
             include: {
                 _count: {
                     select: {
-                        leads: true
+                        prosocial_leads: true
                     }
                 }
             },
@@ -43,10 +43,30 @@ export async function GET() {
 // POST /api/admin/agents - Crear nuevo agente
 export async function POST(request: NextRequest) {
     try {
+        // Validar configuración de email
+        const emailConfig = validateEmailConfig();
+        if (!emailConfig.isValid) {
+            console.warn('⚠️ Configuración de email incompleta:', emailConfig.errors);
+        }
+
         const body = await request.json();
+        console.log('Datos recibidos:', body);
 
         // Validar datos
-        const validatedData = createAgentSchema.parse(body);
+        let validatedData;
+        try {
+            validatedData = createAgentSchema.parse(body);
+            console.log('Datos validados:', validatedData);
+        } catch (validationError) {
+            console.error('Error de validación:', validationError);
+            if (validationError instanceof z.ZodError) {
+                return NextResponse.json(
+                    { error: 'Datos inválidos', details: validationError.issues },
+                    { status: 400 }
+                );
+            }
+            throw validationError;
+        }
 
         // Verificar si el email ya existe
         const existingAgent = await prisma.prosocial_agents.findUnique({
@@ -92,27 +112,33 @@ export async function POST(request: NextRequest) {
                     telefono: validatedData.telefono,
                     activo: validatedData.activo,
                     metaMensualLeads: validatedData.metaMensualLeads,
-                    comisionConversion: validatedData.comisionConversion
+                    comisionConversion: validatedData.comisionConversion,
+                    updatedAt: new Date()
                 },
                 include: {
                     _count: {
                         select: {
-                            leads: true
+                            prosocial_leads: true
                         }
                     }
                 }
             });
 
             // 3. Crear perfil de usuario
-            await prisma.userProfile.create({
+            const userProfile = await prisma.user_profiles.create({
                 data: {
                     id: authUser.user.id,
                     email: validatedData.email,
                     fullName: validatedData.nombre,
                     role: 'agente',
-                    isActive: validatedData.activo
+                    isActive: validatedData.activo,
+                    updatedAt: new Date()
                 }
             });
+
+            console.log('🔍 Perfil de usuario creado:', userProfile);
+            console.log('🔍 Rol guardado en BD:', userProfile.role);
+            console.log('🔍 Tipo de rol:', typeof userProfile.role);
 
             // 4. Enviar email de invitación con credenciales
             // TODO: Implementar envío de email con credenciales temporales
@@ -143,7 +169,8 @@ export async function POST(request: NextRequest) {
         }
     } catch (error) {
         console.error('Error creating agent:', error);
-        console.error('Error stack:', error.stack);
+        const errorMessage = error instanceof Error ? error.stack : 'No stack trace available';
+        console.error('Error stack:', errorMessage);
         console.error('Error details:', JSON.stringify(error, null, 2));
 
         if (error instanceof z.ZodError) {

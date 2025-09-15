@@ -15,7 +15,6 @@ import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { getDefaultRoute, UserRole } from '@/types/auth'
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -31,27 +30,15 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
       if (error) throw error
 
-      // Obtener el perfil del usuario para determinar la redirección
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('email', email)
-        .single()
-
-      if (profile) {
-        // Redirigir según el rol del usuario
-        const redirectPath = getDefaultRoute(profile.role as UserRole, profile.studioId)
-        router.push(redirectPath)
-      } else {
-        // Si no tiene perfil, redirigir a completar registro
-        router.push('/auth/complete-profile')
-      }
+      // Redirigir a la página de redirección que manejará el rol en el servidor
+      console.log('🔍 Usuario autenticado exitosamente, redirigiendo a /auth/redirect')
+      router.push('/auth/redirect')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

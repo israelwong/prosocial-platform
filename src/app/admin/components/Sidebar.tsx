@@ -24,21 +24,12 @@ import {
 
 const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'CRM', href: '/admin/crm/kanban', icon: Columns3 },
-    {
-        name: 'Gestión',
-        icon: Building2,
-        children: [
-            { name: 'Leads', href: '/admin/leads', icon: UserCheck },
-            { name: 'Estudios', href: '/admin/studios', icon: Building2 },
-        ]
-    },
     { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     {
-        name: 'Campañas',
-        icon: Megaphone,
+        name: 'Marketing',
+        icon: Target,
         children: [
-            { name: 'Activas', href: '/admin/campanas/activas', icon: Play },
+            { name: 'Campañas Activas', href: '/admin/campanas/activas', icon: Play },
             { name: 'Historial', href: '/admin/campanas/historial', icon: History },
         ]
     },

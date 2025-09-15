@@ -23,12 +23,12 @@ export async function GET(
         const agent = await prisma.prosocial_agents.findUnique({
             where: { id },
             include: {
-                leads: {
+                prosocial_leads: {
                     select: {
                         id: true,
                         nombre: true,
                         email: true,
-                        etapa: true,
+                        etapaId: true,
                         prioridad: true,
                         createdAt: true
                     },
@@ -38,7 +38,7 @@ export async function GET(
                 },
                 _count: {
                     select: {
-                        leads: true
+                        prosocial_leads: true
                     }
                 }
             }
@@ -106,7 +106,7 @@ export async function PUT(
             include: {
                 _count: {
                     select: {
-                        leads: true
+                        prosocial_leads: true
                     }
                 }
             }
@@ -128,7 +128,7 @@ export async function PUT(
                 }
 
                 // Actualizar también el perfil de usuario
-                await prisma.userProfile.update({
+                await prisma.user_profiles.update({
                     where: { id },
                     data: {
                         isActive: validatedData.activo,
@@ -172,7 +172,7 @@ export async function DELETE(
             include: {
                 _count: {
                     select: {
-                        leads: true
+                        prosocial_leads: true
                     }
                 }
             }
@@ -187,7 +187,7 @@ export async function DELETE(
 
         // Si tiene leads asignados, desasignarlos y crear entradas en bitácora
         let leadsReassigned = 0;
-        if (existingAgent._count.leads > 0) {
+        if (existingAgent._count.prosocial_leads > 0) {
             // Obtener los leads asignados al agente
             const assignedLeads = await prisma.prosocial_leads.findMany({
                 where: { agentId: id },
@@ -205,10 +205,12 @@ export async function DELETE(
                 // Crear entrada en bitácora
                 await prisma.prosocial_lead_bitacora.create({
                     data: {
+                        id: `bitacora-${Date.now()}-${lead.id}`,
                         leadId: lead.id,
                         tipo: 'DESASIGNACION_AGENTE',
                         descripcion: `Lead anteriormente gestionado por ${existingAgent.nombre} y ahora está disponible para seguimiento`,
-                        usuarioId: null // TODO: Obtener ID del usuario que está eliminando
+                        usuarioId: null, // TODO: Obtener ID del usuario que está eliminando
+                        updatedAt: new Date()
                     }
                 });
             }
@@ -218,7 +220,7 @@ export async function DELETE(
 
         // Eliminar perfil de usuario
         try {
-            await prisma.userProfile.delete({
+            await prisma.user_profiles.delete({
                 where: { id }
             });
         } catch (error) {

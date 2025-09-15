@@ -18,8 +18,14 @@ export default function AgenteLayout({
                                 <Link href="/agente" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
                                     Dashboard
                                 </Link>
+                                <Link href="/agente/crm/kanban" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
+                                    CRM Kanban
+                                </Link>
                                 <Link href="/agente/leads" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Mis Leads
+                                    Gestión de Leads
+                                </Link>
+                                <Link href="/agente/studios" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
+                                    Gestión de Estudios
                                 </Link>
                                 <Link href="/agente/actividades" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
                                     Actividades

@@ -146,7 +146,7 @@ export function isSuperAdmin(profile: UserProfile): boolean {
 }
 
 export function isAsesor(profile: UserProfile): boolean {
-    return profile.role === UserRole.ASESOR
+    return profile.role === UserRole.AGENTE
 }
 
 export function isSuscriptor(profile: UserProfile): boolean {
