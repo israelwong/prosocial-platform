@@ -7,7 +7,7 @@ function getStripeInstance() {
     }
 
     return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-        apiVersion: "2023-10-16",
+        apiVersion: "2025-02-24.acacia",
         typescript: true,
     });
 }
@@ -24,23 +24,23 @@ export const stripe = {
         }
     },
     products: {
-        create: async (params: any) => {
+        create: async (params: Stripe.ProductCreateParams) => {
             const stripeInstance = getStripeInstance();
             return stripeInstance.products.create(params);
         }
     },
     prices: {
-        create: async (params: any) => {
+        create: async (params: Stripe.PriceCreateParams) => {
             const stripeInstance = getStripeInstance();
             return stripeInstance.prices.create(params);
         },
-        list: async (params: any) => {
+        list: async (params?: Stripe.PriceListParams) => {
             const stripeInstance = getStripeInstance();
             return stripeInstance.prices.list(params);
         }
     },
     subscriptions: {
-        create: async (params: any) => {
+        create: async (params: Stripe.SubscriptionCreateParams) => {
             const stripeInstance = getStripeInstance();
             return stripeInstance.subscriptions.create(params);
         },
@@ -48,7 +48,7 @@ export const stripe = {
             const stripeInstance = getStripeInstance();
             return stripeInstance.subscriptions.retrieve(id);
         },
-        update: async (id: string, params: any) => {
+        update: async (id: string, params: Stripe.SubscriptionUpdateParams) => {
             const stripeInstance = getStripeInstance();
             return stripeInstance.subscriptions.update(id, params);
         },
@@ -59,13 +59,13 @@ export const stripe = {
     }
 };
 
-// Configuración de planes de suscripción
+// Configuración de planes de suscripción (precios en MXN)
 export const SUBSCRIPTION_PLANS = {
     basic: {
         name: "Plan Básico",
         description: "Perfecto para estudios pequeños que están comenzando",
-        price_monthly: 29.99,
-        price_yearly: 299.99, // 2 meses gratis
+        price_monthly: 599.00,
+        price_yearly: 5990.00, // 2 meses gratis
         features: [
             "5 eventos por mes",
             "Hasta 100 clientes",
@@ -83,8 +83,8 @@ export const SUBSCRIPTION_PLANS = {
     pro: {
         name: "Plan Pro",
         description: "Ideal para estudios en crecimiento",
-        price_monthly: 59.99,
-        price_yearly: 599.99, // 2 meses gratis
+        price_monthly: 1199.00,
+        price_yearly: 11990.00, // 2 meses gratis
         features: [
             "Eventos ilimitados",
             "Hasta 500 clientes",
@@ -103,8 +103,8 @@ export const SUBSCRIPTION_PLANS = {
     enterprise: {
         name: "Plan Enterprise",
         description: "Para estudios grandes con necesidades avanzadas",
-        price_monthly: 99.99,
-        price_yearly: 999.99, // 2 meses gratis
+        price_monthly: 1999.00,
+        price_yearly: 19990.00, // 2 meses gratis
         features: [
             "Todo lo anterior",
             "Clientes ilimitados",
@@ -145,7 +145,7 @@ export async function createStripeProducts() {
             const monthlyPrice = await stripeInstance.prices.create({
                 product: product.id,
                 unit_amount: Math.round(plan.price_monthly * 100), // Convertir a centavos
-                currency: "usd",
+                currency: "mxn", // Cambiar a MXN
                 recurring: { interval: "month" },
                 metadata: {
                     plan_type: planKey,
@@ -157,7 +157,7 @@ export async function createStripeProducts() {
             const yearlyPrice = await stripeInstance.prices.create({
                 product: product.id,
                 unit_amount: Math.round(plan.price_yearly * 100), // Convertir a centavos
-                currency: "usd",
+                currency: "mxn", // Cambiar a MXN
                 recurring: { interval: "year" },
                 metadata: {
                     plan_type: planKey,
@@ -186,14 +186,14 @@ export async function getPlanPrices(planType: PlanType) {
     const stripeInstance = getStripeInstance();
     const prices = await stripeInstance.prices.list({
         active: true,
-        metadata: {
-            plan_type: planType,
-        },
     });
 
+    // Filtrar por metadata después de obtener los precios
+    const filteredPrices = prices.data.filter(p => p.metadata?.plan_type === planType);
+
     return {
-        monthly: prices.data.find(p => p.metadata.billing_interval === "month"),
-        yearly: prices.data.find(p => p.metadata.billing_interval === "year"),
+        monthly: filteredPrices.find(p => p.metadata?.billing_interval === "month"),
+        yearly: filteredPrices.find(p => p.metadata?.billing_interval === "year"),
     };
 }
 

@@ -3,8 +3,8 @@ export interface Plan {
     name: string;
     slug: string;
     description?: string | null;
-    features?: any | null; // JSON field
-    limits?: any | null; // JSON field
+    features?: string[] | null; // JSON field
+    limits?: Record<string, unknown> | null; // JSON field
     price_monthly?: number | null;
     price_yearly?: number | null;
     popular: boolean;

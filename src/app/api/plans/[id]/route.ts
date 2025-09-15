@@ -1,5 +1,78 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getStripe } from "@/lib/stripe";
+
+// Función para crear precio en Stripe automáticamente
+async function createStripePrice(plan: { id: string; name: string; description?: string | null; slug: string; price_monthly?: number | null; price_yearly?: number | null; stripe_product_id?: string | null }) {
+    try {
+        const stripe = getStripe();
+
+        // Crear producto si no existe
+        let product;
+        if (plan.stripe_product_id) {
+            try {
+                product = await stripe.products.retrieve(plan.stripe_product_id);
+            } catch {
+                console.log("Producto no encontrado, creando uno nuevo");
+                product = null;
+            }
+        }
+
+        if (!product) {
+            product = await stripe.products.create({
+                name: plan.name,
+                description: plan.description || `Plan ${plan.name}`,
+                metadata: {
+                    plan_id: plan.id,
+                    plan_slug: plan.slug,
+                },
+            });
+        }
+
+        // Crear precio mensual si existe
+        let monthlyPriceId = null;
+        if (plan.price_monthly && plan.price_monthly > 0) {
+            const monthlyPrice = await stripe.prices.create({
+                product: product.id,
+                unit_amount: Math.round(plan.price_monthly * 100), // Convertir a centavos
+                currency: "mxn", // Cambiar a MXN
+                recurring: { interval: "month" },
+                metadata: {
+                    plan_id: plan.id,
+                    plan_slug: plan.slug,
+                    billing_interval: "month",
+                },
+            });
+            monthlyPriceId = monthlyPrice.id;
+        }
+
+        // Crear precio anual si existe
+        let yearlyPriceId = null;
+        if (plan.price_yearly && plan.price_yearly > 0) {
+            const yearlyPrice = await stripe.prices.create({
+                product: product.id,
+                unit_amount: Math.round(plan.price_yearly * 100), // Convertir a centavos
+                currency: "mxn", // Cambiar a MXN
+                recurring: { interval: "year" },
+                metadata: {
+                    plan_id: plan.id,
+                    plan_slug: plan.slug,
+                    billing_interval: "year",
+                },
+            });
+            yearlyPriceId = yearlyPrice.id;
+        }
+
+        return {
+            productId: product.id,
+            monthlyPriceId,
+            yearlyPriceId,
+        };
+    } catch (error) {
+        console.error("Error creando precio en Stripe:", error);
+        throw new Error("Error al crear precio en Stripe");
+    }
+}
 
 export async function GET(
     request: NextRequest,
@@ -65,9 +138,10 @@ export async function PUT(
         }
 
         // Parsear JSON fields si vienen como strings y filtrar campos no actualizables
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { _count, createdAt, ...updateableFields } = body;
 
-        const planData: any = { ...updateableFields };
+        const planData: Record<string, unknown> = { ...updateableFields };
 
         // Solo procesar features si está presente en el body
         if ('features' in body) {
@@ -79,6 +153,45 @@ export async function PUT(
         if ('limits' in body) {
             planData.limits = typeof body.limits === 'string' ?
                 JSON.parse(body.limits || '{}') : body.limits;
+        }
+
+        // Validar stripe_price_id
+        const stripePriceId = planData.stripe_price_id as string | null | undefined;
+        if (stripePriceId && typeof stripePriceId === 'string' && stripePriceId.trim() !== '') {
+            // Verificar que no esté duplicado
+            const existingPlanWithStripeId = await prisma.plans.findFirst({
+                where: {
+                    stripe_price_id: stripePriceId,
+                    id: { not: id } // Excluir el plan actual
+                }
+            });
+
+            if (existingPlanWithStripeId) {
+                return NextResponse.json(
+                    { error: "Ya existe un plan con ese Stripe Price ID. Deja el campo vacío para generar uno automáticamente." },
+                    { status: 409 }
+                );
+            }
+        } else if (stripePriceId === '' || stripePriceId === null) {
+            // Si está vacío, establecer como null para que se genere automáticamente
+            planData.stripe_price_id = null;
+        }
+
+        // Validar que slug no esté duplicado (si se está actualizando)
+        if (planData.slug) {
+            const existingPlanWithSlug = await prisma.plans.findFirst({
+                where: {
+                    slug: planData.slug,
+                    id: { not: id } // Excluir el plan actual
+                }
+            });
+
+            if (existingPlanWithSlug) {
+                return NextResponse.json(
+                    { error: "Ya existe un plan con ese slug" },
+                    { status: 409 }
+                );
+            }
         }
 
         const plan = await prisma.plans.update({
@@ -93,6 +206,55 @@ export async function PUT(
                 }
             }
         });
+
+        // Si no hay stripe_price_id pero hay precios, crear automáticamente en Stripe
+        if (!plan.stripe_price_id && (plan.price_monthly || plan.price_yearly)) {
+            try {
+                const stripeData = await createStripePrice({
+                    id: plan.id,
+                    name: plan.name,
+                    description: plan.description,
+                    slug: plan.slug,
+                    price_monthly: plan.price_monthly ? Number(plan.price_monthly) : null,
+                    price_yearly: plan.price_yearly ? Number(plan.price_yearly) : null,
+                    stripe_product_id: plan.stripe_product_id
+                });
+
+                // Actualizar el plan con los IDs de Stripe
+                await prisma.plans.update({
+                    where: { id },
+                    data: {
+                        stripe_product_id: stripeData.productId,
+                        stripe_price_id: stripeData.monthlyPriceId || stripeData.yearlyPriceId,
+                    }
+                });
+
+                // Actualizar el objeto plan para la respuesta
+                plan.stripe_product_id = stripeData.productId;
+                plan.stripe_price_id = stripeData.monthlyPriceId || stripeData.yearlyPriceId;
+
+                console.log(`✅ Precio creado automáticamente en Stripe para plan: ${plan.name}`);
+            } catch (error) {
+                console.error("Error creando precio automáticamente:", error);
+
+                // Manejar error específico de configuración de Stripe
+                if (error instanceof Error && error.message.includes("STRIPE_SECRET_KEY is not set")) {
+                    return NextResponse.json(
+                        { error: "Stripe no está configurado. Por favor, configura las claves de Stripe en el archivo .env.local. Ver docs/STRIPE_SETUP.md para instrucciones." },
+                        { status: 500 }
+                    );
+                }
+
+                // Si falla la creación en Stripe, devolver error específico
+                return NextResponse.json(
+                    { error: "Error al crear precio en Stripe. Verifica la configuración de Stripe o intenta nuevamente." },
+                    { status: 500 }
+                );
+            }
+        } else if (!plan.stripe_price_id && !plan.price_monthly && !plan.price_yearly) {
+            // Si no hay precios ni stripe_price_id, es un plan gratuito
+            console.log(`ℹ️ Plan gratuito sin precios: ${plan.name}`);
+        }
 
         // Si se actualizó el orden, normalizar todos los planes activos
         if ('orden' in planData) {
@@ -129,10 +291,22 @@ export async function PUT(
         // Manejo de errores específicos
         if (error instanceof Error) {
             if (error.message.includes('Unique constraint')) {
-                return NextResponse.json(
-                    { error: "Ya existe un plan con ese slug" },
-                    { status: 409 }
-                );
+                if (error.message.includes('stripe_price_id')) {
+                    return NextResponse.json(
+                        { error: "Ya existe un plan con ese Stripe Price ID" },
+                        { status: 409 }
+                    );
+                } else if (error.message.includes('slug')) {
+                    return NextResponse.json(
+                        { error: "Ya existe un plan con ese slug" },
+                        { status: 409 }
+                    );
+                } else {
+                    return NextResponse.json(
+                        { error: "Ya existe un plan con esos datos únicos" },
+                        { status: 409 }
+                    );
+                }
             }
         }
 

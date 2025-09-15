@@ -63,7 +63,7 @@ export function PlansContainer({
 
     // Filtrar y ordenar planes
     const filteredAndSortedPlans = useMemo(() => {
-        let filtered = plans.filter(plan => {
+        const filtered = plans.filter(plan => {
             // Filtro de búsqueda
             const matchesSearch = plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 plan.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -86,7 +86,7 @@ export function PlansContainer({
 
         // Ordenar
         filtered.sort((a, b) => {
-            let aValue: any, bValue: any;
+            let aValue: string | number, bValue: string | number;
 
             switch (sortBy) {
                 case 'name':
@@ -184,8 +184,8 @@ export function PlansContainer({
     };
 
     const handleEdit = (plan: Plan) => {
-        // TODO: Abrir modal de edición
-        toast.info('Función de edición próximamente disponible');
+        // Navegar a la página de edición
+        window.location.href = `/admin/plans/${plan.id}/edit`;
     };
 
     const handleDelete = async (planId: string) => {
@@ -222,7 +222,6 @@ export function PlansContainer({
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ...plan,
                     active: !plan.active
                 }),
             });
@@ -252,7 +251,6 @@ export function PlansContainer({
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ...plan,
                     popular: !plan.popular
                 }),
             });

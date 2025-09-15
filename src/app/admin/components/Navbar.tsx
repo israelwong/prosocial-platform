@@ -1,17 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { User, Bell } from 'lucide-react';
+import { User, Bell, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { createClientSupabase } from '@/lib/supabase';
 
 interface NavbarProps {
     onMenuClick: () => void;
 }
 
 export function Navbar({ onMenuClick }: NavbarProps) {
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        const supabase = createClientSupabase();
+        await supabase.auth.signOut();
+        router.push('/auth/signin');
+    };
+
     return (
-        <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-zinc-800 bg-zinc-900 px-6 shadow-sm">
+        <div className="sticky top-0 z-[999] flex h-16 shrink-0 items-center gap-x-4 border-b border-zinc-800 bg-zinc-900 px-6 shadow-sm">
             <Button
                 variant="ghost"
                 size="sm"
@@ -40,7 +51,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                 </div>
                 <div className="flex items-center gap-x-4 lg:gap-x-6">
                     <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-zinc-700" />
-                    
+
                     {/* Notificaciones - Temporal */}
                     <Button
                         variant="ghost"
@@ -54,16 +65,69 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                         </span>
                     </Button>
 
-                    <div className="flex items-center gap-x-3">
-                        <div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center">
-                            <User className="h-4 w-4 text-zinc-300" />
-                        </div>
-                        <span className="hidden lg:block text-sm font-medium text-white">
-                            Admin User
-                        </span>
+                    {/* Menú de Usuario */}
+                    <div className="relative">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                            className="flex items-center gap-x-2 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                        >
+                            <div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center">
+                                <User className="h-4 w-4 text-zinc-300" />
+                            </div>
+                            <span className="hidden lg:block text-sm font-medium text-white">
+                                Admin User
+                            </span>
+                            <ChevronDown className="h-4 w-4" />
+                        </Button>
+
+                        {/* Menú Desplegable */}
+                        {isUserMenuOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg z-50">
+                                <div className="py-1">
+                                    <div className="px-4 py-2 border-b border-zinc-700">
+                                        <p className="text-sm font-medium text-white">Admin User</p>
+                                        <p className="text-xs text-zinc-400">Super Administrador</p>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-none"
+                                        onClick={() => {
+                                            setIsUserMenuOpen(false);
+                                            // TODO: Implementar configuración de usuario
+                                        }}
+                                    >
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        Configurar
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-none"
+                                        onClick={() => {
+                                            setIsUserMenuOpen(false);
+                                            handleLogout();
+                                        }}
+                                    >
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        Cerrar Sesión
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+
+            {/* Overlay para cerrar el menú al hacer click fuera */}
+            {isUserMenuOpen && (
+                <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsUserMenuOpen(false)}
+                />
+            )}
         </div>
     );
 }

@@ -14,7 +14,6 @@ import {
     Star,
     Building2,
     Users,
-    DollarSign,
     Crown,
     GripVertical
 } from 'lucide-react';
@@ -37,9 +36,9 @@ export function PlanCard({
     onTogglePopular
 }: PlanCardProps) {
     const isClient = useIsClient();
-    
+
     // Solo ejecutar useSortable en el cliente
-    const sortableProps = useSortable({ 
+    const sortableProps = useSortable({
         id: plan.id,
         disabled: !isClient // Deshabilitar si no estamos en el cliente
     });
@@ -64,7 +63,7 @@ export function PlanCard({
         return `$${price.toLocaleString()}`;
     };
 
-    const formatFeatures = (features: any) => {
+    const formatFeatures = (features: unknown) => {
         if (!features) return [];
         if (Array.isArray(features)) return features;
         if (typeof features === 'string') {
@@ -99,7 +98,7 @@ export function PlanCard({
                 <div className="flex items-start justify-between">
                     {/* Drag Handle - Solo visible después de hidratación */}
                     {isClient && (
-                        <div 
+                        <div
                             className="cursor-grab active:cursor-grabbing p-1 -ml-1 mr-2 text-gray-400 hover:text-gray-600 transition-colors"
                             {...(isClient ? attributes : {})}
                             {...(isClient ? listeners : {})}
@@ -133,7 +132,7 @@ export function PlanCard({
                     <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Precio Mensual:</span>
                         <span className="text-lg font-bold text-green-600">
-                            {formatPrice(plan.price_monthly)}
+                            {formatPrice(plan.price_monthly ?? null)}
                         </span>
                     </div>
                     {plan.price_yearly && (
@@ -173,10 +172,10 @@ export function PlanCard({
                     <div className="space-y-2">
                         <h4 className="text-sm font-medium">Características:</h4>
                         <div className="space-y-1">
-                            {planFeatures.slice(0, 3).map((feature: any, index: number) => (
+                            {planFeatures.slice(0, 3).map((feature: unknown, index: number) => (
                                 <div key={index} className="text-xs text-muted-foreground flex items-center">
                                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2" />
-                                    {typeof feature === 'string' ? feature : feature.name || 'Característica'}
+                                    {typeof feature === 'string' ? feature : (feature as { name?: string })?.name || 'Característica'}
                                 </div>
                             ))}
                             {planFeatures.length > 3 && (

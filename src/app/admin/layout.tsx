@@ -17,12 +17,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
 
     return (
-        <div className="h-screen flex flex-col relative">
+        <div className="min-h-screen flex flex-col relative">
             {/* Navbar superior */}
-            <Navbar onMenuClick={() => setSidebarOpen(true)} />
+            <div>
+                <Navbar onMenuClick={() => setSidebarOpen(true)} />
+            </div>
 
             {/* Contenido principal con sidebar */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 min-h-0">
                 <Sidebar
                     isOpen={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
@@ -31,7 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 />
 
                 {/* Main content */}
-                <main className="flex-1 overflow-auto bg-zinc-950">
+                <main className="flex-1 bg-zinc-950">
                     <div className="p-4 lg:p-6">
                         {children}
                     </div>

@@ -13,8 +13,6 @@ import {
     CreditCard,
     BarChart3,
     Settings,
-    LogOut,
-    User,
     Columns3,
     ChevronDown,
     ChevronRight,
@@ -23,8 +21,6 @@ import {
     Play,
     History
 } from 'lucide-react';
-import { createClientSupabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 
 const navigation = [
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
@@ -67,13 +63,6 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose, expandedMenus, onToggleMenu }: SidebarProps) {
     const pathname = usePathname();
-    const router = useRouter();
-
-    const handleLogout = async () => {
-        const supabase = createClientSupabase();
-        await supabase.auth.signOut();
-        router.push('/auth/signin');
-    };
 
     const isMenuExpanded = (menuName: string) => expandedMenus.includes(menuName);
 
@@ -192,31 +181,6 @@ export function Sidebar({ isOpen, onClose, expandedMenus, onToggleMenu }: Sideba
                     </div>
                 </nav>
 
-                {/* User section at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 border-t-2 border-zinc-700 bg-zinc-900">
-                    <div className="flex items-center space-x-3 mb-3">
-                        <div className="w-8 h-8 bg-zinc-700 rounded-full flex items-center justify-center">
-                            <User className="h-4 w-4 text-zinc-300" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-white truncate">
-                                Admin User
-                            </p>
-                            <p className="text-xs text-zinc-400 truncate">
-                                Super Administrador
-                            </p>
-                        </div>
-                    </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleLogout}
-                        className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800"
-                    >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Cerrar Sesión
-                    </Button>
-                </div>
             </div>
         </>
     );
