@@ -14,20 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Users, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface Agent {
-    id: string;
-    nombre: string;
-    email: string;
-    telefono: string;
-    activo: boolean;
-    metaMensualLeads: number;
-    comisionConversion: number;
-    createdAt: Date;
-    _count: {
-        leads: number;
-    };
-}
+import { Agent } from '../types';
 
 interface DeleteAgentModalProps {
     agent: Agent | null;
@@ -72,7 +59,7 @@ export function DeleteAgentModal({ agent, isOpen, onClose, onSuccess }: DeleteAg
         }
     };
 
-    const hasLeads = agent._count.leads > 0;
+    const hasLeads = agent._count.prosocial_leads > 0;
 
     return (
         <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -96,11 +83,11 @@ export function DeleteAgentModal({ agent, isOpen, onClose, onSuccess }: DeleteAg
                                         Leads Asociados
                                     </span>
                                     <Badge variant="outline" className="text-yellow-700">
-                                        {agent._count.leads} leads
+                                        {agent._count.prosocial_leads} leads
                                     </Badge>
                                 </div>
                                 <p className="text-sm text-yellow-700">
-                                    Los <strong>{agent._count.leads} leads</strong> actualmente
+                                    Los <strong>{agent._count.prosocial_leads} leads</strong> actualmente
                                     asignados a este agente serán <strong>liberados</strong> y
                                     quedarán disponibles para reasignación a otros agentes.
                                 </p>

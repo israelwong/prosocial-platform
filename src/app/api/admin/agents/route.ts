@@ -17,7 +17,7 @@ const createAgentSchema = z.object({
 // GET /api/admin/agents - Listar todos los agentes
 export async function GET() {
     try {
-        const agents = await prisma.proSocialAgent.findMany({
+        const agents = await prisma.prosocial_agents.findMany({
             include: {
                 _count: {
                     select: {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         const validatedData = createAgentSchema.parse(body);
 
         // Verificar si el email ya existe
-        const existingAgent = await prisma.proSocialAgent.findUnique({
+        const existingAgent = await prisma.prosocial_agents.findUnique({
             where: { email: validatedData.email }
         });
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
         try {
             // 2. Crear agente en la base de datos
-            const agent = await prisma.proSocialAgent.create({
+            const agent = await prisma.prosocial_agents.create({
                 data: {
                     id: authUser.user.id, // Usar el mismo ID de Supabase Auth
                     nombre: validatedData.nombre,
@@ -143,6 +143,8 @@ export async function POST(request: NextRequest) {
         }
     } catch (error) {
         console.error('Error creating agent:', error);
+        console.error('Error stack:', error.stack);
+        console.error('Error details:', JSON.stringify(error, null, 2));
 
         if (error instanceof z.ZodError) {
             return NextResponse.json(

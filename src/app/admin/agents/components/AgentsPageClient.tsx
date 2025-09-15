@@ -3,23 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Stats } from './Stats';
 import { AgentsContainer } from './AgentsContainer';
-
-interface Agent {
-    id: string;
-    nombre: string;
-    email: string;
-    telefono: string;
-    activo: boolean;
-    metaMensualLeads: number;
-    comisionConversion: number;
-    createdAt: Date;
-    _count: {
-        leads: number;
-    };
-}
+import { Agent } from '../types';
 
 interface AgentsPageClientProps {
     initialAgents: Agent[];
+    loading?: boolean;
 }
 
 export function AgentsPageClient({ initialAgents }: AgentsPageClientProps) {

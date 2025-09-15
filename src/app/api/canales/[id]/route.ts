@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function PUT(
     request: NextRequest,
@@ -10,8 +8,8 @@ export async function PUT(
     try {
         const body = await request.json();
         const { id } = params;
-        
-        const canal = await prisma.proSocialCanalAdquisicion.update({
+
+        const canal = await prisma.prosocial_canales_adquisicion.update({
             where: { id },
             data: body
         });
@@ -32,8 +30,8 @@ export async function DELETE(
 ) {
     try {
         const { id } = params;
-        
-        await prisma.proSocialCanalAdquisicion.delete({
+
+        await prisma.prosocial_canales_adquisicion.delete({
             where: { id }
         });
 

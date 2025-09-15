@@ -7,20 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Plus, User, Search, Filter, X } from 'lucide-react';
 import Link from 'next/link';
 import { AgentCard } from './AgentCard';
-
-interface Agent {
-    id: string;
-    nombre: string;
-    email: string;
-    telefono: string;
-    activo: boolean;
-    metaMensualLeads: number;
-    comisionConversion: number;
-    createdAt: Date;
-    _count: {
-        leads: number;
-    };
-}
+import { Agent } from '../types';
 
 interface AgentsContainerProps {
     agents: Agent[];

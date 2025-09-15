@@ -18,7 +18,7 @@ import {
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-interface Agent {
+interface AgentDetail {
     id: string;
     nombre: string;
     email: string;
@@ -28,7 +28,7 @@ interface Agent {
     comisionConversion: number;
     createdAt: Date;
     updatedAt: Date;
-    leads: {
+    prosocial_leads: {
         id: string;
         nombre: string;
         email: string;
@@ -37,16 +37,16 @@ interface Agent {
         createdAt: Date;
     }[];
     _count: {
-        leads: number;
+        prosocial_leads: number;
     };
 }
 
-async function getAgent(id: string): Promise<Agent | null> {
+async function getAgent(id: string): Promise<AgentDetail | null> {
     try {
-        const agent = await prisma.proSocialAgent.findUnique({
+        const agent = await prisma.prosocial_agents.findUnique({
             where: { id },
             include: {
-                leads: {
+                prosocial_leads: {
                     select: {
                         id: true,
                         nombre: true,
@@ -62,7 +62,7 @@ async function getAgent(id: string): Promise<Agent | null> {
                 },
                 _count: {
                     select: {
-                        leads: true
+                        prosocial_leads: true
                     }
                 }
             }
@@ -86,17 +86,17 @@ export default async function AgentDetailPage({ params }: { params: { id: string
     }
 
     // Calcular estadísticas
-    const leadsPorEtapa = agent.leads.reduce((acc, lead) => {
+    const leadsPorEtapa = agent.prosocial_leads.reduce((acc, lead) => {
         acc[lead.etapa] = (acc[lead.etapa] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
 
-    const leadsPorPrioridad = agent.leads.reduce((acc, lead) => {
+    const leadsPorPrioridad = agent.prosocial_leads.reduce((acc, lead) => {
         acc[lead.prioridad] = (acc[lead.prioridad] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
 
-    const progresoMeta = Math.round((agent._count.leads / agent.metaMensualLeads) * 100);
+    const progresoMeta = Math.round((agent._count.prosocial_leads / agent.metaMensualLeads) * 100);
 
     return (
         <div className="space-y-6">
@@ -132,7 +132,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{agent._count.leads}</div>
+                        <div className="text-2xl font-bold">{agent._count.prosocial_leads}</div>
                         <p className="text-xs text-muted-foreground">
                             Meta: {agent.metaMensualLeads}/mes
                         </p>
@@ -147,7 +147,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
                     <CardContent>
                         <div className="text-2xl font-bold">{progresoMeta}%</div>
                         <p className="text-xs text-muted-foreground">
-                            {agent._count.leads} de {agent.metaMensualLeads} leads
+                            {agent._count.prosocial_leads} de {agent.metaMensualLeads} leads
                         </p>
                     </CardContent>
                 </Card>
@@ -276,7 +276,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {agent.leads.length === 0 ? (
+                    {agent.prosocial_leads.length === 0 ? (
                         <div className="text-center py-8">
                             <Users className="mx-auto h-12 w-12 text-muted-foreground" />
                             <h3 className="mt-2 text-sm font-semibold">No hay leads asignados</h3>
@@ -286,7 +286,7 @@ export default async function AgentDetailPage({ params }: { params: { id: string
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {agent.leads.map((lead) => (
+                            {agent.prosocial_leads.map((lead) => (
                                 <div
                                     key={lead.id}
                                     className="flex items-center justify-between p-4 border rounded-lg"

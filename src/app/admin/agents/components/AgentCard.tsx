@@ -22,20 +22,7 @@ import {
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { DeleteAgentModal } from './DeleteAgentModal';
-
-interface Agent {
-    id: string;
-    nombre: string;
-    email: string;
-    telefono: string;
-    activo: boolean;
-    metaMensualLeads: number;
-    comisionConversion: number;
-    createdAt: Date;
-    _count: {
-        leads: number;
-    };
-}
+import { Agent } from '../types';
 
 interface AuthStatus {
     exists: boolean;
@@ -161,7 +148,7 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
             <div className="flex items-center space-x-4">
                 <div className="text-right space-y-1">
                     <div className="text-sm font-medium">
-                        {agent._count.leads} leads asignados
+                        {agent._count.prosocial_leads} leads asignados
                     </div>
                     <div className="text-xs text-muted-foreground">
                         Meta: {agent.metaMensualLeads}/mes

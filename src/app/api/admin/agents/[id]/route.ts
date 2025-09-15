@@ -20,7 +20,7 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const agent = await prisma.proSocialAgent.findUnique({
+        const agent = await prisma.prosocial_agents.findUnique({
             where: { id },
             include: {
                 leads: {
@@ -74,7 +74,7 @@ export async function PUT(
         const validatedData = updateAgentSchema.parse(body);
 
         // Verificar si el agente existe
-        const existingAgent = await prisma.proSocialAgent.findUnique({
+        const existingAgent = await prisma.prosocial_agents.findUnique({
             where: { id }
         });
 
@@ -87,7 +87,7 @@ export async function PUT(
 
         // Si se está actualizando el email, verificar que no exista otro agente con ese email
         if (validatedData.email && validatedData.email !== existingAgent.email) {
-            const emailExists = await prisma.proSocialAgent.findUnique({
+            const emailExists = await prisma.prosocial_agents.findUnique({
                 where: { email: validatedData.email }
             });
 
@@ -100,7 +100,7 @@ export async function PUT(
         }
 
         // Actualizar agente
-        const agent = await prisma.proSocialAgent.update({
+        const agent = await prisma.prosocial_agents.update({
             where: { id },
             data: validatedData,
             include: {
@@ -167,7 +167,7 @@ export async function DELETE(
     try {
         const { id } = await params;
         // Verificar si el agente existe
-        const existingAgent = await prisma.proSocialAgent.findUnique({
+        const existingAgent = await prisma.prosocial_agents.findUnique({
             where: { id },
             include: {
                 _count: {
@@ -189,7 +189,7 @@ export async function DELETE(
         let leadsReassigned = 0;
         if (existingAgent._count.leads > 0) {
             // Obtener los leads asignados al agente
-            const assignedLeads = await prisma.proSocialLead.findMany({
+            const assignedLeads = await prisma.prosocial_leads.findMany({
                 where: { agentId: id },
                 select: { id: true, nombre: true }
             });
@@ -197,13 +197,13 @@ export async function DELETE(
             // Desasignar leads y crear entradas en bitácora
             for (const lead of assignedLeads) {
                 // Desasignar el lead
-                await prisma.proSocialLead.update({
+                await prisma.prosocial_leads.update({
                     where: { id: lead.id },
                     data: { agentId: null }
                 });
 
                 // Crear entrada en bitácora
-                await prisma.proSocialLeadBitacora.create({
+                await prisma.prosocial_lead_bitacora.create({
                     data: {
                         leadId: lead.id,
                         tipo: 'DESASIGNACION_AGENTE',
@@ -235,7 +235,7 @@ export async function DELETE(
         }
 
         // Eliminar agente
-        await prisma.proSocialAgent.delete({
+        await prisma.prosocial_agents.delete({
             where: { id }
         });
 

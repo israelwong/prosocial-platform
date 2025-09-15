@@ -1,20 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Target, TrendingUp } from 'lucide-react';
-
-interface Agent {
-    id: string;
-    nombre: string;
-    email: string;
-    telefono: string;
-    activo: boolean;
-    metaMensualLeads: number;
-    comisionConversion: number;
-    createdAt: Date;
-    _count: {
-        leads: number;
-    };
-}
+import { Agent } from '../types';
 
 interface StatsProps {
     agents: Agent[];
@@ -23,7 +10,7 @@ interface StatsProps {
 export function Stats({ agents }: StatsProps) {
     const totalAgents = agents.length;
     const activeAgents = agents.filter(a => a.activo).length;
-    const totalLeads = agents.reduce((sum, agent) => sum + agent._count.leads, 0);
+    const totalLeads = agents.reduce((sum, agent) => sum + agent._count.prosocial_leads, 0);
     const averageGoal = agents.length > 0
         ? Math.round(agents.reduce((sum, agent) => sum + agent.metaMensualLeads, 0) / agents.length)
         : 0;

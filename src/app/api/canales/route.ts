@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
-        const canales = await prisma.proSocialCanalAdquisicion.findMany({
+        const canales = await prisma.prosocial_canales_adquisicion.findMany({
             orderBy: [
                 { categoria: 'asc' },
                 { orden: 'asc' }
@@ -25,8 +23,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        
-        const canal = await prisma.proSocialCanalAdquisicion.create({
+
+        const canal = await prisma.prosocial_canales_adquisicion.create({
             data: body
         });
 
