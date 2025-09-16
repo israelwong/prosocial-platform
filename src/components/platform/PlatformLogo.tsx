@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import NextImage from 'next/image';
 import { usePlatformConfig } from '@/hooks/usePlatformConfig';
 import { PlatformIsotipo } from './PlatformIsotipo';
 import { PlatformLogotipo } from './PlatformLogotipo';
@@ -24,14 +25,35 @@ export function PlatformLogo({
     fallbackSrc = "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
     type = 'auto'
 }: PlatformLogoProps) {
-    const { loading } = usePlatformConfig();
+    const { config, loading, error } = usePlatformConfig();
 
-    if (loading) {
+    // Mostrar skeleton solo si está cargando Y no tenemos configuración
+    if (loading && !config) {
         return (
             <div className={`flex items-center space-x-3 ${className}`}>
                 <div className={`bg-zinc-700 animate-pulse rounded`} style={{ width, height }} />
                 {showText && (
                     <div className="bg-zinc-700 animate-pulse rounded h-6 w-32" />
+                )}
+            </div>
+        );
+    }
+
+    // Si hay error, mostrar fallback
+    if (error && !config) {
+        return (
+            <div className={`flex items-center space-x-3 ${className}`}>
+                <NextImage
+                    src={fallbackSrc}
+                    alt="ProSocial Platform"
+                    width={width}
+                    height={height}
+                    className="h-auto"
+                />
+                {showText && (
+                    <h1 className={textClassName}>
+                        ProSocial Platform
+                    </h1>
                 )}
             </div>
         );

@@ -36,60 +36,81 @@ interface UsePlatformConfigReturn {
     refetch: () => Promise<void>;
 }
 
-// Cache global para evitar múltiples requests
+// Cache global simple para evitar múltiples requests
 let globalConfig: PlatformConfig | null = null;
-let globalLoading = false;
-let globalError: string | null = null;
+let globalPromise: Promise<PlatformConfig | null> | null = null;
 
 export function usePlatformConfig(): UsePlatformConfigReturn {
     const [config, setConfig] = useState<PlatformConfig | null>(globalConfig);
-    const [loading, setLoading] = useState(globalLoading);
-    const [error, setError] = useState<string | null>(globalError);
+    const [loading, setLoading] = useState(!globalConfig);
+    const [error, setError] = useState<string | null>(null);
 
-    const fetchConfig = async () => {
+    const fetchConfig = async (): Promise<PlatformConfig | null> => {
         // Si ya tenemos la configuración en cache, la devolvemos
-        if (globalConfig && !globalLoading) {
+        if (globalConfig) {
             setConfig(globalConfig);
             setLoading(false);
             setError(null);
-            return;
+            return globalConfig;
         }
 
-        // Si ya hay una request en progreso, esperamos
-        if (globalLoading) {
-            setLoading(true);
-            return;
+        // Si ya hay una request en progreso, esperamos a que termine
+        if (globalPromise) {
+            try {
+                const result = await globalPromise;
+                setConfig(result);
+                setLoading(false);
+                setError(null);
+                return result;
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+                setError(errorMessage);
+                setLoading(false);
+                return null;
+            }
         }
 
-        globalLoading = true;
+        // Crear nueva request
         setLoading(true);
         setError(null);
 
-        try {
-            const response = await fetch('/api/platform-config');
-            
-            if (!response.ok) {
-                throw new Error('Error al cargar la configuración');
-            }
+        globalPromise = (async () => {
+            try {
+                const response = await fetch('/api/platform-config');
+                
+                if (!response.ok) {
+                    throw new Error('Error al cargar la configuración');
+                }
 
-            const data = await response.json();
-            globalConfig = data;
-            setConfig(data);
-            globalError = null;
+                const data = await response.json();
+                globalConfig = data;
+                return data;
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+                console.error('Error fetching platform config:', err);
+                throw new Error(errorMessage);
+            }
+        })();
+
+        try {
+            const result = await globalPromise;
+            setConfig(result);
+            setLoading(false);
             setError(null);
+            return result;
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-            globalError = errorMessage;
             setError(errorMessage);
-            console.error('Error fetching platform config:', err);
-        } finally {
-            globalLoading = false;
             setLoading(false);
+            return null;
+        } finally {
+            globalPromise = null;
         }
     };
 
     const refetch = async () => {
         globalConfig = null; // Limpiar cache
+        globalPromise = null; // Limpiar promise
         await fetchConfig();
     };
 

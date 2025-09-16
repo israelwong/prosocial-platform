@@ -30,6 +30,13 @@ export function PlatformIsotipo({
             height={height}
             className={`h-auto ${className}`}
             priority
+            onError={(e) => {
+                // Si falla la imagen, usar fallback
+                const target = e.target as HTMLImageElement;
+                if (target.src !== fallbackSrc) {
+                    target.src = fallbackSrc;
+                }
+            }}
         />
     );
 }

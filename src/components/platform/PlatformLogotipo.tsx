@@ -35,6 +35,13 @@ export function PlatformLogotipo({
                 height={height}
                 className="h-auto"
                 priority
+                onError={(e) => {
+                    // Si falla la imagen, usar fallback
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== fallbackSrc) {
+                        target.src = fallbackSrc;
+                    }
+                }}
             />
             {showText && (
                 <h1 className={textClassName}>
