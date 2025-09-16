@@ -64,14 +64,6 @@ model campanias {
   @@index([studioId])
 }
 
-model canales {
-  id        String     @id
-  nombre    String
-  posicion  Int        @default(0)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime
-  clientes  project_clientes[]
-}
 
 model project_clientes {
   id            String         @id @default(cuid())
@@ -81,7 +73,6 @@ model project_clientes {
   telefono      String
   direccion     String?
   status        String         @default("activo")
-  canalId       String?
   userId        String?
   passwordHash  String?
   emailVerified Boolean        @default(false)
@@ -89,11 +80,9 @@ model project_clientes {
   lastLogin     DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime
-  canales       canales?       @relation(fields: [canalId], references: [id])
   projects      projects        @relation(fields: [projectId], references: [id])
   eventos       project_eventos[]
   pagos         project_pagos[]
-  suscripciones suscripciones?
 
   @@index([projectId, email])
   @@index([projectId, status])
@@ -354,63 +343,8 @@ model project_metodos_pago {
   @@index([projectId])
 }
 
-model negocio_horarios {
-  id            String    @id
-  negocioId     String
-  diaSemana     Int
-  horaInicio    String?
-  horaFin       String?
-  cerrado       Boolean   @default(false)
-  fechaEspecial DateTime?
-  notas         String?
-  activo        Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime
-  negocios      negocios  @relation(fields: [negocioId], references: [id], onDelete: Cascade)
 
-  @@unique([negocioId, diaSemana])
-  @@index([negocioId, activo])
-}
 
-model negocio_rrss {
-  id         String   @id
-  negocioId  String
-  plataforma String
-  username   String?
-  url        String
-  activo     Boolean  @default(true)
-  orden      Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime
-  negocios   negocios @relation(fields: [negocioId], references: [id], onDelete: Cascade)
-
-  @@unique([negocioId, plataforma])
-  @@index([negocioId, activo])
-}
-
-model negocios {
-  id               String             @id
-  studioId         String
-  nombre           String
-  descripcion      String?
-  direccion        String?
-  telefono         String?
-  email            String?
-  sitioWeb         String?
-  logoUrl          String?
-  isotipoUrl       String?
-  moneda           String             @default("MXN")
-  timezone         String             @default("America/Mexico_City")
-  idioma           String             @default("es")
-  status           String             @default("active")
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime
-  negocio_horarios negocio_horarios[]
-  negocio_rrss     negocio_rrss[]
-  studios          projects            @relation(fields: [studioId], references: [id])
-
-  @@index([studioId])
-}
 
 model project_nomina_servicios {
   id                   String                @id @default(cuid())
@@ -464,18 +398,6 @@ model project_nominas {
   @@index([projectId])
 }
 
-model notificaciones {
-  id           String   @id
-  userId       String?
-  titulo       String
-  mensaje      String
-  tipo         String   @default("general")
-  metadata     Json?
-  status       String   @default("active")
-  cotizacionId String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime
-}
 
 model project_pagos {
   id                                  String                               @id @default(cuid())
@@ -960,7 +882,6 @@ model projects {
   eventos                  project_eventos[]
   gastos                   project_gastos[]
   metodos_pago             project_metodos_pago[]
-  negocios                 negocios[]
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
   platform_leads           platform_leads?
@@ -997,19 +918,6 @@ model subscriptions {
   @@index([studio_id])
 }
 
-model suscripciones {
-  id               String    @id
-  clienteId        String    @unique
-  tipo             String    @default("evento")
-  status           String    @default("activa")
-  fechaInicio      DateTime  @default(now())
-  fechaVencimiento DateTime?
-  precio           Float?
-  descripcion      String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime
-  clientes         project_clientes  @relation(fields: [clienteId], references: [id])
-}
 
 model project_user_profiles {
   id                      String                    @id @default(cuid())
