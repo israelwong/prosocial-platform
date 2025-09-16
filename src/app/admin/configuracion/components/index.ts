@@ -1,0 +1,1 @@
+export { ConfiguracionPageClient } from './ConfiguracionPageClient';

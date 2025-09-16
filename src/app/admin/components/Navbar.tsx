@@ -96,7 +96,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                                         className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-none"
                                         onClick={() => {
                                             setIsUserMenuOpen(false);
-                                            // TODO: Implementar configuración de usuario
+                                            router.push('/admin/configuracion');
                                         }}
                                     >
                                         <Settings className="mr-2 h-4 w-4" />
