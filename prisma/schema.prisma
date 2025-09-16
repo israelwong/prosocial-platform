@@ -641,7 +641,7 @@ model platform_canales_adquisicion {
 model platform_lead_bitacora {
   id              String           @id
   leadId          String
-  tipo            LeadBitacoraTipo
+  tipo            PlatformLeadBitacoraTipo
   titulo          String?
   descripcion     String
   metadata        Json?
@@ -999,7 +999,7 @@ model project_user_profiles {
   @@index([projectId])
 }
 
-enum LeadBitacoraTipo {
+enum PlatformLeadBitacoraTipo {
   NOTA_PERSONALIZADA
   CAMBIO_ETAPA
   ASIGNACION_AGENTE
