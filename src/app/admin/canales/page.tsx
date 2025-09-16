@@ -205,18 +205,29 @@ export default function CanalesPage() {
             // Actualizar el orden en el estado local primero
             setCanales(reorderedCanales);
 
-            // Enviar actualizaciones al servidor - solo el campo orden
+            // Enviar actualizaciones al servidor con el orden correcto (0-based)
             const updatePromises = reorderedCanales.map((canal, index) =>
                 fetch(`/api/canales/${canal.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ orden: index }),
+                    body: JSON.stringify({ 
+                        ...canal, 
+                        orden: index // Usar índice 0-based correctamente
+                    }),
                 })
             );
 
-            await Promise.all(updatePromises);
+            const results = await Promise.allSettled(updatePromises);
+            
+            // Verificar si alguna actualización falló
+            const failedUpdates = results.filter(result => result.status === 'rejected');
+            if (failedUpdates.length > 0) {
+                console.error('Algunas actualizaciones fallaron:', failedUpdates);
+                throw new Error('Error al actualizar el orden de algunos canales');
+            }
+
             toast.success('Orden actualizado correctamente');
         } catch (error) {
             console.error('Error reordering canales:', error);

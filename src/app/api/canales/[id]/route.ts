@@ -51,7 +51,11 @@ export async function PUT(
         }
 
         // Manejar errores de conexión específicos
-        if (error instanceof Error && error.message.includes('Can\'t reach database server')) {
+        if (error instanceof Error && (
+            error.message.includes('Can\'t reach database server') ||
+            error.message.includes('P1001') ||
+            error.message.includes('connection')
+        )) {
             return NextResponse.json(
                 { error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' },
                 { status: 503 }

@@ -32,6 +32,14 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Obtener el último orden para asignar el siguiente
+        const lastCanal = await prisma.platform_canales_adquisicion.findFirst({
+            orderBy: { orden: 'desc' },
+            select: { orden: true }
+        });
+        
+        const nextOrden = lastCanal ? lastCanal.orden + 1 : 0;
+
         // Preparar datos para crear
         const canalData = {
             nombre: body.nombre.trim(),
@@ -40,7 +48,7 @@ export async function POST(request: NextRequest) {
             icono: body.icono || null,
             isActive: body.isActive ?? true,
             isVisible: body.isVisible ?? true,
-            orden: body.orden || 0,
+            orden: body.orden ?? nextOrden, // Usar el orden proporcionado o el siguiente disponible
             updatedAt: new Date()
         };
 
