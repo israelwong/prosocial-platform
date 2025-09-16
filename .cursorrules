@@ -10,6 +10,7 @@ ProSocial Platform es una plataforma SaaS multi-tenant para gestión de estudios
 - **Arquitectura Multi-tenant** con roles: Super Admin, Asesor, Suscriptor
 
 ### **Estado de Versiones**
+
 - ✅ **Next.js 15.5.2** - Última versión estable (26 agosto 2024)
 - ✅ **React 19.1.0** - Última versión estable con nuevas características
 - ✅ **TypeScript 5** - Última versión estable con mejoras de rendimiento

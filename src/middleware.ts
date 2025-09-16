@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
 
     if (authError || !user) {
       console.log('🔒 Usuario no autenticado, redirigiendo a login');
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+      return NextResponse.redirect(new URL('/login', request.url));
     }
 
     console.log('🔒 Usuario autenticado:', user.email);
@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
 
     if (!userRole) {
       console.log('🔒 No se encontró rol en metadata, redirigiendo a login');
-      return NextResponse.redirect(new URL('/auth/login', request.url));
+      return NextResponse.redirect(new URL('/login', request.url));
     }
 
     console.log('🔒 Rol del usuario:', userRole);
@@ -51,7 +51,17 @@ export async function middleware(request: NextRequest) {
     '/contact',
     '/features',
     '/blog',
-    '/auth',
+    '/login',
+    '/sign-up',
+    '/signin',
+    '/signup',
+    '/forgot-password',
+    '/update-password',
+    '/error',
+    '/redirect',
+    '/sign-up-success',
+    '/complete-profile',
+    '/confirm',
     '/unauthorized'
   ];
 
@@ -62,7 +72,7 @@ export async function middleware(request: NextRequest) {
 
   // Si es /[slug] y no es una ruta reservada, redirigir a /studio/[slug]
   // Excluir rutas de autenticación y administración
-  const reservedPaths = ['/admin', '/agente', '/auth', '/unauthorized'];
+  const reservedPaths = ['/admin', '/agente', '/login', '/sign-up', '/signin', '/signup', '/forgot-password', '/update-password', '/error', '/redirect', '/sign-up-success', '/complete-profile', '/confirm', '/unauthorized'];
   if (pathname.match(/^\/[a-zA-Z0-9-]+$/) && pathname !== '/' && !reservedPaths.some(path => pathname.startsWith(path))) {
     const slug = pathname.slice(1);
     return NextResponse.redirect(new URL(`/studio/${slug}`, request.url));

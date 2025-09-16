@@ -76,8 +76,8 @@ export default function AboutPage() {
                         <div>
                             <h4 className="font-semibold mb-4">Acceso</h4>
                             <ul className="space-y-2 text-gray-400">
-                                <li><a href="/auth/login" className="hover:text-white transition-colors">Iniciar Sesión</a></li>
-                                <li><a href="/auth/sign-up" className="hover:text-white transition-colors">Registrarse</a></li>
+                                <li><a href="/login" className="hover:text-white transition-colors">Iniciar Sesión</a></li>
+                                <li><a href="/sign-up" className="hover:text-white transition-colors">Registrarse</a></li>
                                 <li><a href="/admin" className="hover:text-white transition-colors">Admin</a></li>
                             </ul>
                         </div>

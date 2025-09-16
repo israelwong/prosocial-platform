@@ -9,7 +9,7 @@ export default async function RedirectPage() {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
-        redirect('/auth/login')
+        redirect('/login')
     }
 
     console.log('🔍 Redirect - Usuario ID:', user.id)

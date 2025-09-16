@@ -139,7 +139,7 @@ export default function LeadsPage() {
 
         if (authError || !user) {
             console.log('Usuario no autenticado, redirigiendo a login');
-            router.push('/auth/login');
+            router.push('/login');
             return;
         }
 
@@ -150,14 +150,14 @@ export default function LeadsPage() {
 
         if (!userRole) {
             console.error('No se encontró rol en metadata');
-            router.push('/auth/login');
+            router.push('/login');
             return;
         }
 
         // Verificar que el usuario tenga rol de agente
         if (userRole !== 'agente') {
             console.error('Usuario no tiene rol de agente:', userRole);
-            router.push('/auth/login');
+            router.push('/login');
             return;
         }
 

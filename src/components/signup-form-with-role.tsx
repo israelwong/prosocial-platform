@@ -108,7 +108,7 @@ export function SignupFormWithRole({ className, ...props }: React.ComponentProps
                         <p className="text-sm text-gray-600 mb-4">
                             Te hemos enviado un enlace de confirmación a tu email.
                         </p>
-                        <Button onClick={() => router.push('/auth/login')} className="w-full">
+                        <Button onClick={() => router.push('/login')} className="w-full">
                             Ir a Iniciar Sesión
                         </Button>
                     </CardContent>
@@ -203,7 +203,7 @@ export function SignupFormWithRole({ className, ...props }: React.ComponentProps
                         </div>
                         <div className="mt-4 text-center text-sm">
                             ¿Ya tienes cuenta?{' '}
-                            <Link href="/auth/login" className="underline underline-offset-4">
+                            <Link href="/login" className="underline underline-offset-4">
                                 Inicia sesión aquí
                             </Link>
                         </div>

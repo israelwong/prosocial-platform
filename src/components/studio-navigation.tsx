@@ -42,7 +42,7 @@ export function StudioNavigation() {
 
     const handleSignOut = async () => {
         await supabase.auth.signOut()
-        router.push('/auth/login')
+        router.push('/login')
     }
 
     const getUserInitials = (email: string) => {

@@ -17,7 +17,7 @@ export default function HomePage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <a
-                            href="/auth/sign-up"
+                            href="/sign-up"
                             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
                         >
                             Comenzar Gratis
@@ -91,7 +91,7 @@ export default function HomePage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <a
-                            href="/auth/sign-up"
+                            href="/sign-up"
                             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
                         >
                             Crear Cuenta Gratis
@@ -127,8 +127,8 @@ export default function HomePage() {
                         <div>
                             <h4 className="font-semibold mb-4">Acceso</h4>
                             <ul className="space-y-2 text-gray-400">
-                                <li><a href="/auth/login" className="hover:text-white transition-colors">Iniciar Sesión</a></li>
-                                <li><a href="/auth/sign-up" className="hover:text-white transition-colors">Registrarse</a></li>
+                                <li><a href="/login" className="hover:text-white transition-colors">Iniciar Sesión</a></li>
+                                <li><a href="/sign-up" className="hover:text-white transition-colors">Registrarse</a></li>
                                 <li><a href="/admin" className="hover:text-white transition-colors">Admin</a></li>
                             </ul>
                         </div>

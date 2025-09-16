@@ -37,8 +37,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       if (error) throw error
 
       // Redirigir a la página de redirección que manejará el rol en el servidor
-      console.log('🔍 Usuario autenticado exitosamente, redirigiendo a /auth/redirect')
-      router.push('/auth/redirect')
+      console.log('🔍 Usuario autenticado exitosamente, redirigiendo a /redirect')
+      router.push('/redirect')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -71,7 +71,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                   <Link
-                    href="/auth/forgot-password"
+                    href="/forgot-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     ¿Olvidaste tu contraseña?
