@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { CanalFormModal, CanalesList } from './components';
+import { CanalFormModal, CanalesList, CanalModal } from './components';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
@@ -25,6 +25,7 @@ export default function CanalesPage() {
     const [canales, setCanales] = useState<CanalAdquisicion[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingCanal, setEditingCanal] = useState<CanalAdquisicion | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         fetchCanales();
@@ -72,9 +73,21 @@ export default function CanalesPage() {
                 throw new Error(errorMessage);
             }
 
-            toast.success(editingCanal ? 'Canal actualizado correctamente' : 'Canal creado correctamente');
-            fetchCanales();
-            setEditingCanal(null);
+            if (editingCanal) {
+                // Actualización optimista para edición
+                setCanales(prevCanales => 
+                    prevCanales.map(c => 
+                        c.id === editingCanal.id ? { ...c, ...canalData } : c
+                    )
+                );
+                setEditingCanal(null);
+                setIsEditModalOpen(false);
+                toast.success('Canal actualizado correctamente');
+            } else {
+                // Para creación, recargar la lista
+                fetchCanales();
+                toast.success('Canal creado correctamente');
+            }
         } catch (error) {
             console.error('Error saving canal:', error);
             const errorMessage = error instanceof Error ? error.message : 'Error al guardar el canal';
@@ -85,6 +98,7 @@ export default function CanalesPage() {
 
     const handleEdit = (canal: CanalAdquisicion) => {
         setEditingCanal(canal);
+        setIsEditModalOpen(true);
     };
 
     const handleDelete = async (id: string) => {
@@ -210,6 +224,7 @@ export default function CanalesPage() {
 
     const handleCancel = () => {
         setEditingCanal(null);
+        setIsEditModalOpen(false);
     };
 
     return (
@@ -246,6 +261,14 @@ export default function CanalesPage() {
                     />
                 </CardContent>
             </Card>
+
+            {/* Modal de edición */}
+            <CanalModal
+                isOpen={isEditModalOpen}
+                onClose={handleCancel}
+                canal={editingCanal}
+                onSave={handleCanalSubmit}
+            />
         </div>
     );
 }
