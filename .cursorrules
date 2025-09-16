@@ -297,6 +297,21 @@ try {
 
 ## 📚 **RECURSOS Y DOCUMENTACIÓN**
 
+### **Documentación del Proyecto (docs/)**
+
+**ESTRUCTURA ORGANIZADA:**
+- `docs/01-architecture/` - Arquitectura y diseño del sistema
+- `docs/02-implementation/` - Guías de implementación paso a paso
+- `docs/03-troubleshooting/` - Solución de problemas conocidos
+- `docs/04-best-practices/` - Mejores prácticas y estándares
+- `docs/05-legacy/` - Código legacy y migración
+- `docs/06-reference/` - Referencias y configuraciones
+
+**CONSULTAR SIEMPRE:**
+- `docs/README.md` - Índice principal de documentación
+- `docs/04-best-practices/TYPESCRIPT_BEST_PRACTICES.md` - Reglas de TypeScript
+- `docs/02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md` - Guía del Kanban
+
 ### **Documentación Oficial**
 
 - [Next.js 15 Docs](https://nextjs.org/docs)
@@ -314,11 +329,51 @@ try {
 
 ## 🎯 **INSTRUCCIONES ESPECÍFICAS PARA CURSOR**
 
+### **🔍 CONSULTA DE DOCUMENTACIÓN (OBLIGATORIO)**
+
+**ANTES de resolver cualquier problema, SIEMPRE:**
+
+1. **Consultar** la documentación en `/docs/` para soluciones existentes
+2. **Revisar** especialmente:
+   - `docs/03-troubleshooting/` - Para problemas conocidos
+   - `docs/04-best-practices/` - Para patrones establecidos
+   - `docs/02-implementation/` - Para guías de implementación
+3. **Buscar** en archivos de documentación antes de proponer nuevas soluciones
+4. **Verificar** si el problema ya fue documentado y resuelto
+
+### **📝 DOCUMENTACIÓN DE SOLUCIONES (CRÍTICO)**
+
+**NUNCA documentar automáticamente. SIEMPRE preguntar:**
+
+1. **Después de resolver un problema**, preguntar al usuario:
+   > "¿Estás listo para que documente esta solución?"
+2. **Esperar confirmación** antes de crear/actualizar documentación
+3. **Validar** que la solución sea definitiva y no temporal
+4. **Confirmar** que el usuario está satisfecho con la implementación
+
+**Razón**: Las soluciones pueden ser prematuras o no definitivas. El usuario debe validar antes de documentar.
+
+### **🔄 FLUJO DE TRABAJO CON DOCUMENTACIÓN**
+
+**PROCESO OBLIGATORIO:**
+
+1. **Problema identificado** → Consultar `docs/03-troubleshooting/`
+2. **Solución encontrada** → Implementar y probar
+3. **Solución validada** → Preguntar al usuario si documentar
+4. **Confirmación recibida** → Documentar en categoría apropiada
+5. **Documentación actualizada** → Actualizar índice en `docs/README.md`
+
+**CATEGORÍAS DE DOCUMENTACIÓN:**
+- **Problemas técnicos** → `docs/03-troubleshooting/`
+- **Patrones de código** → `docs/04-best-practices/`
+- **Guías de implementación** → `docs/02-implementation/`
+- **Decisiones arquitectónicas** → `docs/01-architecture/`
+
 ### **Al crear componentes:**
 
 1. **Usar** el tema oscuro zinc consistente
 2. **Implementar** estados de loading y error
-3. **Tipar** todas las props e interfaces
+3. **Tipar** todas las props e interfaces (NUNCA usar `any`)
 4. **Seguir** los patrones de diseño establecidos
 5. **Optimizar** para performance desde el inicio
 
@@ -344,7 +399,7 @@ try {
 2. **Implementar** permisos por rol
 3. **Mantener** consistencia con el diseño
 4. **Optimizar** para mobile y desktop
-5. **Documentar** funcionalidades complejas
+5. **Documentar** funcionalidades complejas (solo después de confirmación)
 
 ---
 
