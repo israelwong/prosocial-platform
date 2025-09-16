@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 // GET - Obtener configuración de la plataforma
 export async function GET() {
@@ -45,6 +43,19 @@ export async function GET() {
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error fetching platform config:', error)
+    
+    // Manejar errores de conexión específicos
+    if (error instanceof Error && (
+      error.message.includes('Can\'t reach database server') ||
+      error.message.includes('P1001') ||
+      error.message.includes('connection')
+    )) {
+      return NextResponse.json(
+        { error: 'Error de conexión con la base de datos. Usando configuración por defecto.' },
+        { status: 503 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Error al obtener la configuración de la plataforma' },
       { status: 500 }
@@ -95,6 +106,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error saving platform config:', error)
+    
+    // Manejar errores de conexión específicos
+    if (error instanceof Error && (
+      error.message.includes('Can\'t reach database server') ||
+      error.message.includes('P1001') ||
+      error.message.includes('connection')
+    )) {
+      return NextResponse.json(
+        { error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' },
+        { status: 503 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Error al guardar la configuración de la plataforma' },
       { status: 500 }
@@ -126,6 +150,19 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error updating platform config:', error)
+    
+    // Manejar errores de conexión específicos
+    if (error instanceof Error && (
+      error.message.includes('Can\'t reach database server') ||
+      error.message.includes('P1001') ||
+      error.message.includes('connection')
+    )) {
+      return NextResponse.json(
+        { error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' },
+        { status: 503 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Error al actualizar la configuración de la plataforma' },
       { status: 500 }
@@ -153,6 +190,19 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: 'Configuración eliminada exitosamente' })
   } catch (error) {
     console.error('Error deleting platform config:', error)
+    
+    // Manejar errores de conexión específicos
+    if (error instanceof Error && (
+      error.message.includes('Can\'t reach database server') ||
+      error.message.includes('P1001') ||
+      error.message.includes('connection')
+    )) {
+      return NextResponse.json(
+        { error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' },
+        { status: 503 }
+      )
+    }
+    
     return NextResponse.json(
       { error: 'Error al eliminar la configuración de la plataforma' },
       { status: 500 }

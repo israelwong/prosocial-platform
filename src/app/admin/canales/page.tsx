@@ -212,15 +212,15 @@ export default function CanalesPage() {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ 
-                        ...canal, 
+                    body: JSON.stringify({
+                        ...canal,
                         orden: index // Usar índice 0-based correctamente
                     }),
                 })
             );
 
             const results = await Promise.allSettled(updatePromises);
-            
+
             // Verificar si alguna actualización falló
             const failedUpdates = results.filter(result => result.status === 'rejected');
             if (failedUpdates.length > 0) {
