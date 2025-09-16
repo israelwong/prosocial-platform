@@ -38,17 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className="dark" style={{ backgroundColor: '#18181b', color: '#ffffff' }}>
-      <body
-        className={inter.className}
-        style={{
-          backgroundColor: '#18181b',
-          color: '#ffffff',
-          margin: 0,
-          padding: 0,
-          minHeight: '100vh'
-        }}
-      >
+    <html lang="es" className="dark">
+      <body className={inter.className}>
         <ThemeProvider>
           <AuthProvider>
             <DynamicMetadata />
