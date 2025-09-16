@@ -81,7 +81,7 @@ export async function GET(
     try {
         const { id } = await params;
 
-        const plan = await prisma.plans.findUnique({
+        const plan = await prisma.platform_plans.findUnique({
             where: { id },
             include: {
                 _count: {
@@ -126,7 +126,7 @@ export async function PUT(
         const { id } = await params;
 
         // Verificar que el plan existe
-        const existingPlan = await prisma.plans.findUnique({
+        const existingPlan = await prisma.platform_plans.findUnique({
             where: { id }
         });
 
@@ -159,7 +159,7 @@ export async function PUT(
         const stripePriceId = planData.stripe_price_id as string | null | undefined;
         if (stripePriceId && typeof stripePriceId === 'string' && stripePriceId.trim() !== '') {
             // Verificar que no esté duplicado
-            const existingPlanWithStripeId = await prisma.plans.findFirst({
+            const existingPlanWithStripeId = await prisma.platform_plans.findFirst({
                 where: {
                     stripe_price_id: stripePriceId,
                     id: { not: id } // Excluir el plan actual
@@ -179,7 +179,7 @@ export async function PUT(
 
         // Validar que slug no esté duplicado (si se está actualizando)
         if (planData.slug) {
-            const existingPlanWithSlug = await prisma.plans.findFirst({
+            const existingPlanWithSlug = await prisma.platform_plans.findFirst({
                 where: {
                     slug: planData.slug,
                     id: { not: id } // Excluir el plan actual
@@ -194,7 +194,7 @@ export async function PUT(
             }
         }
 
-        const plan = await prisma.plans.update({
+        const plan = await prisma.platform_plans.update({
             where: { id },
             data: planData,
             include: {
@@ -221,7 +221,7 @@ export async function PUT(
                 });
 
                 // Actualizar el plan con los IDs de Stripe
-                await prisma.plans.update({
+                await prisma.platform_plans.update({
                     where: { id },
                     data: {
                         stripe_product_id: stripeData.productId,
@@ -258,7 +258,7 @@ export async function PUT(
 
         // Si se actualizó el orden, normalizar todos los planes activos
         if ('orden' in planData) {
-            const activePlans = await prisma.plans.findMany({
+            const activePlans = await prisma.platform_plans.findMany({
                 where: { active: true },
                 orderBy: [
                     { orden: 'asc' },
@@ -268,7 +268,7 @@ export async function PUT(
 
             // Normalizar el orden
             const normalizePromises = activePlans.map((p, index) =>
-                prisma.plans.update({
+                prisma.platform_plans.update({
                     where: { id: p.id },
                     data: { orden: index + 1 }
                 })
@@ -325,7 +325,7 @@ export async function DELETE(
         const { id } = await params;
 
         // Verificar que el plan existe
-        const existingPlan = await prisma.plans.findUnique({
+        const existingPlan = await prisma.platform_plans.findUnique({
             where: { id },
             include: {
                 _count: {
@@ -352,7 +352,7 @@ export async function DELETE(
             );
         }
 
-        await prisma.plans.delete({
+        await prisma.platform_plans.delete({
             where: { id }
         });
 

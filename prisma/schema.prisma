@@ -36,7 +36,7 @@ model agenda_tipos {
   updatedAt DateTime
 }
 
-model billing_cycles {
+model platform_billing_cycles {
   id                String        @id
   subscription_id   String
   period_start      DateTime
@@ -541,7 +541,7 @@ model paquetes {
   @@index([studioId, status])
 }
 
-model plans {
+model platform_plans {
   id                String          @id
   name              String
   slug              String          @unique
@@ -968,7 +968,7 @@ model studios {
   servicios                servicios[]
   studio_revenue_products  studio_revenue_products[]
   studio_users             studio_users[]
-  plans                    plans?                    @relation(fields: [planId], references: [id])
+  plans                    platform_plans?           @relation(fields: [planId], references: [id])
   subscriptions            subscriptions[]
   user_profiles            user_profiles[]
 
@@ -988,8 +988,8 @@ model subscriptions {
   billing_cycle_anchor   DateTime
   created_at             DateTime         @default(now())
   updated_at             DateTime
-  billing_cycles         billing_cycles[]
-  plans                  plans            @relation(fields: [plan_id], references: [id])
+  billing_cycles         platform_billing_cycles[]
+  plans                  platform_plans   @relation(fields: [plan_id], references: [id])
   studios                studios          @relation(fields: [studio_id], references: [id], onDelete: Cascade)
 
   @@index([status])

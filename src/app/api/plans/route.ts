@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
     try {
-        const plans = await prisma.plans.findMany({
+        const plans = await prisma.platform_plans.findMany({
             include: {
                 _count: {
                     select: {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
                 JSON.parse(body.limits || '{}') : body.limits
         };
 
-        const plan = await prisma.plans.create({
+        const plan = await prisma.platform_plans.create({
             data: planData,
             include: {
                 _count: {

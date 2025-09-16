@@ -6,7 +6,7 @@ async function seedPlans() {
     console.log('🌱 Seeding plans...');
 
     // Plan Básico
-    const planBasico = await prisma.plan.upsert({
+    const planBasico = await prisma.platform_plans.upsert({
         where: { slug: 'basic' },
         update: {},
         create: {
@@ -40,7 +40,7 @@ async function seedPlans() {
     });
 
     // Plan Pro
-    const planPro = await prisma.plan.upsert({
+    const planPro = await prisma.platform_plans.upsert({
         where: { slug: 'pro' },
         update: {},
         create: {
@@ -74,7 +74,7 @@ async function seedPlans() {
     });
 
     // Plan Enterprise
-    const planEnterprise = await prisma.plan.upsert({
+    const planEnterprise = await prisma.platform_plans.upsert({
         where: { slug: 'enterprise' },
         update: {},
         create: {
@@ -116,7 +116,7 @@ async function seedPlans() {
     console.log(`  - ${planEnterprise.name} (${planEnterprise.slug})`);
 
     // Crear también los precios anuales como planes separados
-    const planBasicoAnual = await prisma.plan.upsert({
+    const planBasicoAnual = await prisma.platform_plans.upsert({
         where: { slug: 'basic-yearly' },
         update: {},
         create: {
@@ -150,7 +150,7 @@ async function seedPlans() {
         }
     });
 
-    const planProAnual = await prisma.plan.upsert({
+    const planProAnual = await prisma.platform_plans.upsert({
         where: { slug: 'pro-yearly' },
         update: {},
         create: {
@@ -184,7 +184,7 @@ async function seedPlans() {
         }
     });
 
-    const planEnterpriseAnual = await prisma.plan.upsert({
+    const planEnterpriseAnual = await prisma.platform_plans.upsert({
         where: { slug: 'enterprise-yearly' },
         update: {},
         create: {

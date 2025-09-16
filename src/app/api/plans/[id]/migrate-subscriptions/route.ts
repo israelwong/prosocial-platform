@@ -12,7 +12,7 @@ export async function POST(
         const { newPlanId, notifyUsers = true } = body;
 
         // Obtener el plan actual
-        const currentPlan = await prisma.plans.findUnique({
+        const currentPlan = await prisma.platform_plans.findUnique({
             where: { id },
             include: {
                 subscriptions: {
@@ -39,7 +39,7 @@ export async function POST(
         }
 
         // Obtener el nuevo plan
-        const newPlan = await prisma.plans.findUnique({
+        const newPlan = await prisma.platform_plans.findUnique({
             where: { id: newPlanId }
         });
 
@@ -139,7 +139,7 @@ export async function POST(
         // Archivar el plan anterior si todas las migraciones fueron exitosas
         const hasErrors = migrationResults.some(result => result.status === 'error');
         if (!hasErrors && migrationResults.length > 0) {
-            await prisma.plans.update({
+            await prisma.platform_plans.update({
                 where: { id },
                 data: { active: false }
             });
@@ -169,7 +169,7 @@ export async function GET(
     try {
         const { id } = await params;
 
-        const plan = await prisma.plans.findUnique({
+        const plan = await prisma.platform_plans.findUnique({
             where: { id },
             include: {
                 subscriptions: {

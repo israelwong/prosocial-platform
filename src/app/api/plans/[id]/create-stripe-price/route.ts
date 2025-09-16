@@ -82,7 +82,7 @@ export async function POST(
         const { id } = await params;
 
         // Obtener el plan
-        const plan = await prisma.plans.findUnique({
+        const plan = await prisma.platform_plans.findUnique({
             where: { id }
         });
 
@@ -113,7 +113,7 @@ export async function POST(
         });
 
         // Actualizar el plan con los IDs de Stripe
-        const updatedPlan = await prisma.plans.update({
+        const updatedPlan = await prisma.platform_plans.update({
             where: { id },
             data: {
                 stripe_product_id: stripeData.productId,
