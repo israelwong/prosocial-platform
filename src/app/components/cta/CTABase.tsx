@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { WhatsAppIcon } from '@/app/components/ui/WhatsAppIcon'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Phone } from 'lucide-react'
 
 // Types

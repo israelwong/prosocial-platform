@@ -16,9 +16,9 @@ interface PlatformLogoProps {
     type?: 'isotipo' | 'logotipo' | 'auto';
 }
 
-export function PlatformLogo({ 
-    width = 32, 
-    height = 32, 
+export function PlatformLogo({
+    width = 32,
+    height = 32,
     className = "",
     showText = false,
     textClassName = "text-lg font-semibold text-white",

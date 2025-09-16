@@ -104,8 +104,8 @@ export function LeadsByPeriodChart({ data, loading = false }: LeadsByPeriodChart
                                 {trend === 'down' && <TrendingDown className="h-4 w-4 text-red-500" />}
                                 {trend === 'stable' && <Minus className="h-4 w-4 text-gray-500" />}
                                 <span className={`text-sm font-medium ${trend === 'up' ? 'text-green-500' :
-                                        trend === 'down' ? 'text-red-500' :
-                                            'text-gray-500'
+                                    trend === 'down' ? 'text-red-500' :
+                                        'text-gray-500'
                                     }`}>
                                     {trendPercentage.toFixed(1)}%
                                 </span>
@@ -149,8 +149,8 @@ export function LeadsByPeriodChart({ data, loading = false }: LeadsByPeriodChart
                                 <div
                                     key={period.period}
                                     className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${period.period === selectedPeriod
-                                            ? 'bg-blue-500/10 border-blue-500/30'
-                                            : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'
+                                        ? 'bg-blue-500/10 border-blue-500/30'
+                                        : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'
                                         }`}
                                     onClick={() => setSelectedPeriod(period.period)}
                                 >
