@@ -143,9 +143,9 @@ export default function CanalesList({
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => handleToggleActive(canal.id, !canal.isActive)}
+                                        onClick={() => handleToggleVisible(canal.id, !canal.isVisible)}
                                     >
-                                        {canal.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        {canal.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                                     </Button>
                                     <Button
                                         variant="ghost"

@@ -111,6 +111,13 @@ export default function CanalesPage() {
             const canal = canales.find(c => c.id === id);
             if (!canal) return;
 
+            // Actualización optimista en el estado local
+            setCanales(prevCanales => 
+                prevCanales.map(c => 
+                    c.id === id ? { ...c, isActive } : c
+                )
+            );
+
             const response = await fetch(`/api/canales/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -120,12 +127,19 @@ export default function CanalesPage() {
             });
 
             if (!response.ok) {
+                // Revertir cambio en caso de error
+                setCanales(prevCanales => 
+                    prevCanales.map(c => 
+                        c.id === id ? { ...c, isActive: !isActive } : c
+                    )
+                );
                 throw new Error('Error al actualizar el canal');
             }
 
-            fetchCanales();
+            toast.success(`Canal ${isActive ? 'activado' : 'desactivado'} correctamente`);
         } catch (error) {
             console.error('Error updating canal:', error);
+            toast.error('Error al actualizar el canal');
             throw error;
         }
     };
@@ -134,6 +148,13 @@ export default function CanalesPage() {
         try {
             const canal = canales.find(c => c.id === id);
             if (!canal) return;
+
+            // Actualización optimista en el estado local
+            setCanales(prevCanales => 
+                prevCanales.map(c => 
+                    c.id === id ? { ...c, isVisible } : c
+                )
+            );
 
             const response = await fetch(`/api/canales/${id}`, {
                 method: 'PUT',
@@ -144,12 +165,19 @@ export default function CanalesPage() {
             });
 
             if (!response.ok) {
+                // Revertir cambio en caso de error
+                setCanales(prevCanales => 
+                    prevCanales.map(c => 
+                        c.id === id ? { ...c, isVisible: !isVisible } : c
+                    )
+                );
                 throw new Error('Error al actualizar el canal');
             }
 
-            fetchCanales();
+            toast.success(`Canal ${isVisible ? 'visible' : 'oculto'} para clientes`);
         } catch (error) {
             console.error('Error updating canal:', error);
+            toast.error('Error al actualizar el canal');
             throw error;
         }
     };
