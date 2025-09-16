@@ -37,7 +37,7 @@ model project_agenda_tipos {
 }
 
 model platform_billing_cycles {
-  id                String        @id
+  id                String        @id @default(cuid())
   subscription_id   String
   period_start      DateTime
   period_end        DateTime
@@ -520,7 +520,7 @@ model project_paquetes {
 }
 
 model platform_plans {
-  id                String          @id
+  id                String          @id @default(cuid())
   name              String
   slug              String          @unique
   features          Json?
@@ -543,7 +543,7 @@ model platform_plans {
 }
 
 model platform_activities {
-  id                 String          @id
+  id                 String          @id @default(cuid())
   leadId             String
   tipo               String
   descripcion        String
@@ -560,7 +560,7 @@ model platform_activities {
 }
 
 model platform_agents {
-  id                      String                    @id
+  id                      String                    @id @default(cuid())
   nombre                  String
   email                   String                    @unique
   telefono                String
@@ -637,7 +637,7 @@ model platform_canales_adquisicion {
 }
 
 model platform_lead_bitacora {
-  id              String           @id
+  id              String           @id @default(cuid())
   leadId          String
   tipo            PlatformLeadBitacoraTipo
   titulo          String?
@@ -655,7 +655,7 @@ model platform_lead_bitacora {
 }
 
 model platform_leads {
-  id                            String                         @id
+  id                            String                         @id @default(cuid())
   nombre                        String
   email                         String                         @unique
   telefono                      String
@@ -691,7 +691,7 @@ model platform_leads {
 }
 
 model platform_notifications {
-  id               String            @id
+  id               String            @id @default(cuid())
   userId           String
   titulo           String
   mensaje          String
@@ -719,7 +719,7 @@ model platform_notifications {
 }
 
 model platform_pipeline_stages {
-  id              String            @id
+  id              String            @id @default(cuid())
   nombre          String
   descripcion     String?
   color           String            @default("#3B82F6")
@@ -734,7 +734,7 @@ model platform_pipeline_stages {
 }
 
 model platform_plataformas_publicidad {
-  id                            String                          @id
+  id                            String                          @id @default(cuid())
   nombre                        String                          @unique
   descripcion                   String?
   tipo                          String
@@ -956,7 +956,7 @@ model projects {
 }
 
 model subscriptions {
-  id                     String           @id
+  id                     String           @id @default(cuid())
   studio_id              String
   stripe_subscription_id String           @unique
   stripe_customer_id     String
