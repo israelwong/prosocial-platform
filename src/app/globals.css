@@ -45,188 +45,83 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 5.9% 10%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --sidebar: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 240 5.9% 90%;
+  --sidebar-ring: 240 5.9% 10%;
 }
 
 .dark {
-  /* Zinc Dark Theme - Following project style guide */
-  --background: oklch(0.09 0 0); /* zinc-950 - fondo principal */
-  --foreground: oklch(1 0 0); /* white - texto principal */
-  --card: oklch(0.16 0 0); /* zinc-800 - tarjetas */
-  --card-foreground: oklch(1 0 0); /* white */
-  --popover: oklch(0.16 0 0); /* zinc-800 */
-  --popover-foreground: oklch(1 0 0); /* white */
-  --primary: oklch(0.7 0.15 286); /* purple-500 - acento principal */
-  --primary-foreground: oklch(1 0 0); /* white */
-  --secondary: oklch(0.25 0 0); /* zinc-700 */
-  --secondary-foreground: oklch(0.8 0 0); /* zinc-200 */
-  --muted: oklch(0.25 0 0); /* zinc-700 */
-  --muted-foreground: oklch(0.64 0 0); /* zinc-400 */
-  --accent: oklch(0.25 0 0); /* zinc-700 */
-  --accent-foreground: oklch(1 0 0); /* white */
-  --destructive: oklch(0.62 0.25 29); /* red-500 */
-  --border: oklch(0.25 0 0); /* zinc-700 */
-  --input: oklch(0.16 0 0); /* zinc-800 */
-  --ring: oklch(0.7 0.15 286); /* purple-500 */
-  --chart-1: oklch(0.59 0.22 142); /* emerald-500 */
-  --chart-2: oklch(0.59 0.22 264); /* blue-500 */
-  --chart-3: oklch(0.59 0.22 24); /* orange-500 */
-  --chart-4: oklch(0.59 0.22 316); /* purple-500 */
-  --chart-5: oklch(0.59 0.22 142); /* emerald-500 */
-  --sidebar: oklch(0.16 0 0); /* zinc-800 */
-  --sidebar-foreground: oklch(1 0 0); /* white */
-  --sidebar-primary: oklch(0.7 0.15 286); /* purple-500 */
-  --sidebar-primary-foreground: oklch(1 0 0); /* white */
-  --sidebar-accent: oklch(0.25 0 0); /* zinc-700 */
-  --sidebar-accent-foreground: oklch(1 0 0); /* white */
-  --sidebar-border: oklch(0.25 0 0); /* zinc-700 */
-  --sidebar-ring: oklch(0.7 0.15 286); /* purple-500 */
+  /* Zinc Dark Theme - Suave y profesional */
+  --background: 240 10% 3.9%; /* zinc-950 - fondo principal */
+  --foreground: 0 0% 98%; /* white - texto principal */
+  --card: 240 10% 3.9%; /* zinc-950 - tarjetas */
+  --card-foreground: 0 0% 98%; /* white */
+  --popover: 240 10% 3.9%; /* zinc-950 */
+  --popover-foreground: 0 0% 98%; /* white */
+  --primary: 0 0% 98%; /* white - acento principal */
+  --primary-foreground: 240 10% 3.9%; /* zinc-950 */
+  --secondary: 240 3.7% 15.9%; /* zinc-800 */
+  --secondary-foreground: 0 0% 98%; /* white */
+  --muted: 240 3.7% 15.9%; /* zinc-800 */
+  --muted-foreground: 240 5% 64.9%; /* zinc-400 */
+  --accent: 240 3.7% 15.9%; /* zinc-800 */
+  --accent-foreground: 0 0% 98%; /* white */
+  --destructive: 0 62.8% 30.6%; /* red-600 */
+  --destructive-foreground: 0 0% 98%; /* white */
+  --border: 240 3.7% 15.9%; /* zinc-800 */
+  --input: 240 3.7% 15.9%; /* zinc-800 */
+  --ring: 240 4.9% 83.9%; /* zinc-200 */
+  --chart-1: 220 70% 50%; /* blue-500 */
+  --chart-2: 160 60% 45%; /* emerald-500 */
+  --chart-3: 30 80% 55%; /* orange-500 */
+  --chart-4: 280 65% 60%; /* purple-500 */
+  --chart-5: 340 75% 55%; /* pink-500 */
+  --sidebar: 240 5.9% 10%; /* zinc-900 */
+  --sidebar-foreground: 240 4.8% 95.9%; /* zinc-100 */
+  --sidebar-primary: 0 0% 98%; /* white */
+  --sidebar-primary-foreground: 240 5.9% 10%; /* zinc-900 */
+  --sidebar-accent: 240 3.7% 15.9%; /* zinc-800 */
+  --sidebar-accent-foreground: 240 4.8% 95.9%; /* zinc-100 */
+  --sidebar-border: 240 3.7% 15.9%; /* zinc-800 */
+  --sidebar-ring: 240 4.9% 83.9%; /* zinc-200 */
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
 
-  /* Force dark theme globally */
-  html.dark {
-    background-color: #18181b !important; /* zinc-900 */
-    color: #ffffff !important; /* white */
-  }
-
-  html.dark body {
-    background-color: #18181b !important; /* zinc-900 */
-    color: #ffffff !important; /* white */
-  }
-
-  /* Override any white backgrounds */
-  html.dark * {
-    background-color: inherit !important;
-  }
-
-  /* Specific overrides for common elements */
-  html.dark div {
-    background-color: transparent !important;
-  }
-
-  html.dark .bg-white {
-    background-color: #27272a !important; /* zinc-800 */
-  }
-
-  html.dark .bg-gray-50 {
-    background-color: #27272a !important; /* zinc-800 */
-  }
-
-  html.dark .bg-gray-100 {
-    background-color: #3f3f46 !important; /* zinc-700 */
-  }
-
-  /* Zinc Dark Theme Enhancements */
-  html.dark {
-    /* Smooth transitions for theme changes */
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  /* Ensure all containers use dark background */
-  html.dark .min-h-svh {
-    background-color: #18181b !important; /* zinc-900 */
-  }
-
-  html.dark .container {
-    background-color: transparent !important;
-  }
-
-  /* Override any remaining white backgrounds */
-  html.dark [class*="bg-"] {
-    background-color: #27272a !important; /* zinc-800 */
-  }
-
-  html.dark [class*="bg-white"] {
-    background-color: #27272a !important; /* zinc-800 */
-  }
-
-  html.dark [class*="bg-gray"] {
-    background-color: #3f3f46 !important; /* zinc-700 */
-  }
-
-  /* Force dark background on all divs */
-  html.dark div {
-    background-color: transparent !important;
-  }
-
-  /* Specific overrides for layout containers */
-  html.dark .flex {
-    background-color: transparent !important;
-  }
-
-  html.dark .w-full {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-sm {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-md {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-lg {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-xl {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-2xl {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-4xl {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-6xl {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-7xl {
-    background-color: transparent !important;
-  }
-
-  html.dark .max-w-full {
-    background-color: transparent !important;
+  body {
+    @apply bg-background text-foreground;
   }
 
   /* Custom scrollbar for dark theme */
@@ -236,44 +131,22 @@
   }
 
   .dark ::-webkit-scrollbar-track {
-    background: oklch(0.16 0 0); /* zinc-800 */
+    @apply bg-zinc-800;
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: oklch(0.24 0 0); /* zinc-700 */
-    border-radius: 4px;
+    @apply bg-zinc-700 rounded;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.32 0 0); /* zinc-600 */
+    @apply bg-zinc-600;
   }
 
-  /* Enhanced focus states for dark theme */
-  html.dark input:focus,
-  html.dark textarea:focus,
-  html.dark select:focus {
-    @apply ring-2 ring-purple-500/70;
-    border-color: #a855f7 !important; /* purple-500 */
-  }
-
-  /* Better input contrast */
-  html.dark input,
-  html.dark textarea,
-  html.dark select {
-    border-color: #3f3f46 !important; /* zinc-700 */
-    background-color: #27272a !important; /* zinc-800 */
-    color: #ffffff !important; /* white */
-  }
-
-  /* Better border contrast for cards */
-  html.dark .border {
-    border-color: #3f3f46 !important; /* zinc-700 */
-  }
-
-  /* Let shadcn/ui handle button styles - just ensure visibility */
-  html.dark button {
-    opacity: 1 !important;
-    visibility: visible !important;
+  /* Enhanced focus states */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply ring-2 ring-ring;
   }
 
   /* Card shadows for dark theme */
@@ -282,12 +155,14 @@
   }
 
   .dark .shadow {
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4),
+    box-shadow:
+      0 1px 3px 0 rgba(0, 0, 0, 0.4),
       0 1px 2px -1px rgba(0, 0, 0, 0.4);
   }
 
   .dark .shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5),
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.5),
       0 4px 6px -4px rgba(0, 0, 0, 0.5);
   }
 }
