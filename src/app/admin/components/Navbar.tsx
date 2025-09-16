@@ -18,7 +18,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
     const handleLogout = async () => {
         const supabase = createClientSupabase();
         await supabase.auth.signOut();
-        router.push('/signin');
+        router.push('/login');
     };
 
     return (

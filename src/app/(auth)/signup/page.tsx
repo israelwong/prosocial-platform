@@ -66,7 +66,7 @@ export default function SignUpPage() {
                             <p className="text-sm text-gray-600 mb-4">
                                 Te hemos enviado un enlace de confirmación a tu email.
                             </p>
-                            <Button onClick={() => router.push('/auth/signin')} className="w-full">
+                            <Button onClick={() => router.push('/login')} className="w-full">
                                 Ir a Iniciar Sesión
                             </Button>
                         </CardContent>
@@ -152,7 +152,7 @@ export default function SignUpPage() {
                         <div className="mt-6 text-center">
                             <p className="text-sm text-gray-600">
                                 ¿Ya tienes cuenta?{' '}
-                                <Link href="/auth/signin" className="font-medium text-blue-600 hover:text-blue-500">
+                                <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
                                     Inicia sesión aquí
                                 </Link>
                             </p>
