@@ -441,6 +441,7 @@ try {
 4. **ESPERAR** confirmación antes de continuar
 
 **Ejemplo de solicitud:**
+
 ```
 "Necesito que agregues la variable de entorno:
 NOMBRE_VARIABLE=valor_requerido

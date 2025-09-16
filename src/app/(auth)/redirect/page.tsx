@@ -21,10 +21,10 @@ export default async function RedirectPage() {
     // Si no hay rol, intentar detectar por email (fallback para super admin)
     if (!userRole) {
         console.log('🔍 Redirect - No se encontró rol en metadata, verificando por email...')
-        
+
         // Lista de emails de super admin (fallback)
         const superAdminEmails = ['admin@prosocial.mx']
-        
+
         if (superAdminEmails.includes(user.email || '')) {
             console.log('🔍 Redirect - Detectado super admin por email:', user.email)
             userRole = 'super_admin'
