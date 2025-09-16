@@ -169,7 +169,40 @@ export async function obtenerEventoDetalleCompleto(
         ]);
 
         // Procesar y calcular datos adicionales
-        const cotizacion = (evento as any).Cotizacion?.[0] || null;
+        const eventoWithRelations = evento as typeof evento & {
+            Cotizacion?: Array<{
+                id: string;
+                status: string;
+                total: number;
+                Servicio?: Array<{
+                    id: string;
+                    nombre: string;
+                    cantidad: number;
+                    precioUnitario: number;
+                }>;
+            }>;
+            Agenda?: Array<{
+                id: string;
+                fecha: Date;
+                hora: string;
+                descripcion: string;
+                usuarioId: string;
+            }>;
+            Cliente?: {
+                id: string;
+                nombre: string;
+                email: string;
+            };
+            EventoTipo?: {
+                id: string;
+                nombre: string;
+            };
+            EventoEtapa?: {
+                id: string;
+                nombre: string;
+            };
+        };
+        const cotizacion = eventoWithRelations.Cotizacion?.[0] || null;
 
         // 🔍 DEBUG: Veamos qué cotizaciones encontramos
         // console.log('🔍 DEBUG Cotizaciones encontradas:', {
@@ -189,7 +222,7 @@ export async function obtenerEventoDetalleCompleto(
         const resumenFinanciero = calcularResumenFinanciero(cotizacion, pagos);
 
         // Procesar evento extendido
-        const eventoExtendido = procesarEventoExtendido(evento as any);
+        const eventoExtendido = procesarEventoExtendido(eventoWithRelations);
 
         // Procesar servicios con detalles
         const serviciosDetalle = procesarServiciosDetalle(cotizacion?.Servicio || [], usuarios);
@@ -222,7 +255,7 @@ export async function obtenerEventoDetalleCompleto(
         // });
 
         // Procesar agenda con detalles - simplificado
-        const agendaDetalle = (evento as any).Agenda.map((item: any) => ({
+        const agendaDetalle = eventoWithRelations.Agenda?.map((item) => ({
             ...item,
             tipoNombre: item.agendaTipo || 'Sin tipo',
             responsableNombre: item.User?.username || 'Sin asignar',
@@ -240,11 +273,11 @@ export async function obtenerEventoDetalleCompleto(
         const resultado: EventoDetalleCompleto = {
             // Información básica
             evento: eventoExtendido,
-            cliente: (evento as any).Cliente,
-            tipoEvento: (evento as any).EventoTipo,
+            cliente: eventoWithRelations.Cliente,
+            tipoEvento: eventoWithRelations.EventoTipo,
 
             // Gestión de etapas
-            etapaActual: (evento as any).EventoEtapa,
+            etapaActual: eventoWithRelations.EventoEtapa,
             etapasDisponibles,
 
             // Información financiera
@@ -522,7 +555,11 @@ function calcularResumenFinanciero(cotizacion: any, pagos: any[]): ResumenFinanc
 /**
  * Procesar evento con datos extendidos
  */
-function procesarEventoExtendido(evento: any): EventoExtendido {
+function procesarEventoExtendido(evento: typeof evento & {
+    Cliente?: { nombre: string };
+    EventoTipo?: { nombre: string };
+    EventoEtapa?: { nombre: string };
+}): EventoExtendido {
     const hoy = new Date();
     const fechaEvento = new Date(evento.fecha_evento);
     const diasHastaEvento = Math.ceil((fechaEvento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));

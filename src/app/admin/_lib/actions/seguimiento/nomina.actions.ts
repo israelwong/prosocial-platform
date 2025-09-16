@@ -68,7 +68,8 @@ export async function crearNominaIndividual(
             `;
 
             // Obtener el ID de la nómina creada
-            const nominaId = (nomina as any)[0]?.id;
+            const nominaResult = nomina as Array<{ id: string }>;
+            const nominaId = nominaResult[0]?.id;
 
             if (nominaId) {
                 // Crear la relación en NominaServicio

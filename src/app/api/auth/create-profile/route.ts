@@ -45,11 +45,12 @@ export async function POST(request: NextRequest) {
                 success: true,
                 data: profile,
             })
-        } catch (dbError: any) {
+        } catch (dbError: unknown) {
+            const error = dbError as { code?: string; message?: string }
             await prisma.$disconnect()
 
             // Si el usuario ya existe, actualizar en lugar de crear
-            if (dbError.code === 'P2002') {
+            if (error.code === 'P2002') {
                 const updatedProfile = await prisma.userProfile.update({
                     where: { id },
                     data: {
@@ -68,10 +69,11 @@ export async function POST(request: NextRequest) {
             throw dbError
         }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating user profile:', error)
+        const errorMessage = error instanceof Error ? error.message : 'Error interno del servidor'
         return NextResponse.json(
-            { error: error.message || 'Error interno del servidor' },
+            { error: errorMessage },
             { status: 500 }
         )
     }

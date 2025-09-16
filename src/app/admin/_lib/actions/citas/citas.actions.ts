@@ -54,11 +54,11 @@ export async function createCita(data: CitaFormData): Promise<{ success: boolean
                 descripcion: data.descripcion,
                 fecha: fecha,
                 hora: hora,
-                tipo: data.tipo as any, // Temporal fix for enum
-                modalidad: data.modalidad as any, // Temporal fix for enum
+                tipo: data.tipo as string,
+                modalidad: data.modalidad as string,
                 ubicacion: data.ubicacion,
                 urlVirtual: data.urlVirtual,
-                status: 'PROGRAMADA' as any // Temporal fix for enum
+                status: 'PROGRAMADA' as string
             }
         })
 
@@ -86,7 +86,7 @@ export async function updateCitaStatus(
     try {
         await prisma.cita.update({
             where: { id: citaId },
-            data: { status: status as any } // Temporal fix for enum
+            data: { status: status as string }
         })
 
         revalidatePath(`/admin/dashboard/eventos/${eventoId}`)

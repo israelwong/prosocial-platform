@@ -97,8 +97,9 @@ export function StudioDetailsModal({
 
             if (error) throw error
             setStudio(data)
-        } catch (error: any) {
-            setError(error.message || 'Error al cargar los detalles del estudio')
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Error al cargar los detalles del estudio'
+            setError(errorMessage)
         } finally {
             setLoading(false)
         }

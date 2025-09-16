@@ -178,8 +178,9 @@ export function StudioModal({ isOpen, onClose, onSuccess, studio }: StudioModalP
             onSuccess()
             onClose()
             resetForm()
-        } catch (error: any) {
-            setError(error.message || 'Error al guardar el estudio')
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Error desconocido'
+            setError(errorMessage)
         } finally {
             setLoading(false)
         }

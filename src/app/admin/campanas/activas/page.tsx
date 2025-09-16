@@ -77,7 +77,17 @@ export default function CampanasActivasPage() {
         leadsGenerados: 0,
         leadsSuscritos: 0,
         gastoReal: 0,
-        plataformas: [] as any[]
+        plataformas: [] as Array<{
+            id: string;
+            plataforma: {
+                id: string;
+                nombre: string;
+            };
+            presupuesto: number;
+            gastoReal: number;
+            leads: number;
+            conversiones: number;
+        }>
     });
 
     useEffect(() => {
