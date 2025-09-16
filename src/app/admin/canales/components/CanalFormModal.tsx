@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface CanalAdquisicion {
     id: string;
@@ -68,6 +69,18 @@ export default function CanalFormModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Validación del lado del cliente
+        if (!formData.nombre.trim()) {
+            toast.error('El nombre del canal es requerido');
+            return;
+        }
+        
+        if (!formData.categoria.trim()) {
+            toast.error('La categoría del canal es requerida');
+            return;
+        }
+
         try {
             await onCanalSubmit({
                 ...formData,
@@ -78,6 +91,7 @@ export default function CanalFormModal({
             setIsModalOpen(false);
         } catch (error) {
             console.error('Error submitting canal:', error);
+            // El error ya se maneja en la función padre
         }
     };
 

@@ -50,6 +50,17 @@ export default function CanalesPage() {
 
     const handleCanalSubmit = async (canalData: Omit<CanalAdquisicion, 'id' | 'createdAt' | 'updatedAt'>) => {
         try {
+            // Validar datos requeridos
+            if (!canalData.nombre.trim()) {
+                toast.error('El nombre del canal es requerido');
+                throw new Error('Nombre requerido');
+            }
+            
+            if (!canalData.categoria.trim()) {
+                toast.error('La categoría del canal es requerida');
+                throw new Error('Categoría requerida');
+            }
+
             const url = editingCanal ? `/api/canales/${editingCanal.id}` : '/api/canales';
             const method = editingCanal ? 'PUT' : 'POST';
             
@@ -62,7 +73,9 @@ export default function CanalesPage() {
             });
 
             if (!response.ok) {
-                throw new Error('Error al guardar el canal');
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.error || errorData.message || 'Error al guardar el canal';
+                throw new Error(errorMessage);
             }
 
             toast.success(editingCanal ? 'Canal actualizado correctamente' : 'Canal creado correctamente');
@@ -70,7 +83,8 @@ export default function CanalesPage() {
             setEditingCanal(null);
         } catch (error) {
             console.error('Error saving canal:', error);
-            toast.error('Error al guardar el canal');
+            const errorMessage = error instanceof Error ? error.message : 'Error al guardar el canal';
+            toast.error(errorMessage);
             throw error;
         }
     };
@@ -150,9 +164,9 @@ export default function CanalesPage() {
         try {
             // Actualizar el orden en el estado local primero
             setCanales(reorderedCanales);
-            
+
             // Enviar actualizaciones al servidor
-            const updatePromises = reorderedCanales.map((canal, index) => 
+            const updatePromises = reorderedCanales.map((canal, index) =>
                 fetch(`/api/canales/${canal.id}`, {
                     method: 'PUT',
                     headers: {
