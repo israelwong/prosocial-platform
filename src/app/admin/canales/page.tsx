@@ -112,8 +112,8 @@ export default function CanalesPage() {
             if (!canal) return;
 
             // Actualización optimista en el estado local
-            setCanales(prevCanales => 
-                prevCanales.map(c => 
+            setCanales(prevCanales =>
+                prevCanales.map(c =>
                     c.id === id ? { ...c, isActive } : c
                 )
             );
@@ -128,8 +128,8 @@ export default function CanalesPage() {
 
             if (!response.ok) {
                 // Revertir cambio en caso de error
-                setCanales(prevCanales => 
-                    prevCanales.map(c => 
+                setCanales(prevCanales =>
+                    prevCanales.map(c =>
                         c.id === id ? { ...c, isActive: !isActive } : c
                     )
                 );
@@ -150,8 +150,8 @@ export default function CanalesPage() {
             if (!canal) return;
 
             // Actualización optimista en el estado local
-            setCanales(prevCanales => 
-                prevCanales.map(c => 
+            setCanales(prevCanales =>
+                prevCanales.map(c =>
                     c.id === id ? { ...c, isVisible } : c
                 )
             );
@@ -166,8 +166,8 @@ export default function CanalesPage() {
 
             if (!response.ok) {
                 // Revertir cambio en caso de error
-                setCanales(prevCanales => 
-                    prevCanales.map(c => 
+                setCanales(prevCanales =>
+                    prevCanales.map(c =>
                         c.id === id ? { ...c, isVisible: !isVisible } : c
                     )
                 );
