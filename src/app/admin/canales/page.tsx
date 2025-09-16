@@ -75,8 +75,8 @@ export default function CanalesPage() {
 
             if (editingCanal) {
                 // Actualización optimista para edición
-                setCanales(prevCanales => 
-                    prevCanales.map(c => 
+                setCanales(prevCanales =>
+                    prevCanales.map(c =>
                         c.id === editingCanal.id ? { ...c, ...canalData } : c
                     )
                 );

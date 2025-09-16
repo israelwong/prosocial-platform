@@ -4,6 +4,21 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import CanalItem from './CanalItem';
 
 interface CanalAdquisicion {
@@ -40,6 +55,25 @@ export default function CanalesList({
     onReorder
 }: CanalesListProps) {
     const [searchTerm, setSearchTerm] = useState('');
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            const oldIndex = canales.findIndex((canal) => canal.id === active.id);
+            const newIndex = canales.findIndex((canal) => canal.id === over.id);
+
+            const reorderedCanales = arrayMove(canales, oldIndex, newIndex);
+            onReorder(reorderedCanales);
+        }
+    };
 
     const filteredCanales = canales.filter(canal => {
         const matchesSearch = canal.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -78,19 +112,30 @@ export default function CanalesList({
                 </div>
             </div>
 
-            {/* Lista de canales */}
-            <div className="space-y-2">
-                {filteredCanales.map((canal) => (
-                    <CanalItem
-                        key={canal.id}
-                        canal={canal}
-                        onEdit={onEdit}
-                        onDelete={onDelete}
-                        onToggleActive={onToggleActive}
-                        onToggleVisible={onToggleVisible}
-                    />
-                ))}
-            </div>
+            {/* Lista de canales con drag and drop */}
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+            >
+                <SortableContext
+                    items={filteredCanales.map(canal => canal.id)}
+                    strategy={verticalListSortingStrategy}
+                >
+                    <div className="space-y-2">
+                        {filteredCanales.map((canal) => (
+                            <CanalItem
+                                key={canal.id}
+                                canal={canal}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                                onToggleActive={onToggleActive}
+                                onToggleVisible={onToggleVisible}
+                            />
+                        ))}
+                    </div>
+                </SortableContext>
+            </DndContext>
 
             {filteredCanales.length === 0 && (
                 <div className="text-center py-8">

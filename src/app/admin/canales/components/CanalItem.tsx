@@ -6,6 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Eye, EyeOff, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface CanalAdquisicion {
     id: string;
@@ -36,6 +40,21 @@ export default function CanalItem({
     onToggleVisible
 }: CanalItemProps) {
     const [isUpdating, setIsUpdating] = useState(false);
+
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: canal.id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
 
     const handleDelete = async (id: string) => {
         if (confirm('¿Estás seguro de que quieres eliminar este canal?')) {
@@ -75,11 +94,21 @@ export default function CanalItem({
     };
 
     return (
-        <Card className="bg-card border-border">
+        <Card 
+            ref={setNodeRef}
+            style={style}
+            className={`bg-card border-border ${isDragging ? 'shadow-lg' : ''}`}
+        >
             <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <GripVertical className="h-4 w-4 text-zinc-400 cursor-grab" />
+                        <div
+                            {...attributes}
+                            {...listeners}
+                            className="cursor-grab active:cursor-grabbing"
+                        >
+                            <GripVertical className="h-4 w-4 text-zinc-400" />
+                        </div>
                         <div 
                             className="w-3 h-3 rounded-full" 
                             style={{ backgroundColor: canal.color || '#3B82F6' }}
