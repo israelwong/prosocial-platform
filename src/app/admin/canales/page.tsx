@@ -201,18 +201,18 @@ export default function CanalesPage() {
     const handleReorder = async (reorderedCanales: CanalAdquisicion[]) => {
         try {
             setIsReordering(true);
-            
+
             // Actualizar el orden en el estado local primero
             setCanales(reorderedCanales);
 
-            // Enviar actualizaciones al servidor
+            // Enviar actualizaciones al servidor - solo el campo orden
             const updatePromises = reorderedCanales.map((canal, index) =>
                 fetch(`/api/canales/${canal.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ ...canal, orden: index }),
+                    body: JSON.stringify({ orden: index }),
                 })
             );
 

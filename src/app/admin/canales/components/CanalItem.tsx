@@ -68,7 +68,7 @@ export default function CanalItem({
 
     const handleToggleVisible = async (id: string, isVisible: boolean) => {
         if (isUpdating) return;
-        
+
         setIsUpdating(true);
         try {
             await onToggleVisible(id, isVisible);
@@ -80,7 +80,7 @@ export default function CanalItem({
     };
 
     return (
-        <Card 
+        <Card
             ref={setNodeRef}
             style={style}
             className={`bg-card border-border ${isDragging ? 'shadow-lg' : ''}`}
@@ -95,8 +95,8 @@ export default function CanalItem({
                         >
                             <GripVertical className="h-4 w-4 text-zinc-400" />
                         </div>
-                        <div 
-                            className="w-3 h-3 rounded-full" 
+                        <div
+                            className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: canal.color || '#3B82F6' }}
                         />
                         <div>
@@ -107,13 +107,13 @@ export default function CanalItem({
                         </div>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Badge 
+                        <Badge
                             variant={canal.isActive ? "default" : "secondary"}
                             className={canal.isActive ? "bg-green-600" : "bg-zinc-600"}
                         >
                             {canal.isActive ? 'Activo' : 'Inactivo'}
                         </Badge>
-                        <Badge 
+                        <Badge
                             variant={canal.isVisible ? "default" : "secondary"}
                             className={canal.isVisible ? "bg-blue-600" : "bg-zinc-600"}
                         >
