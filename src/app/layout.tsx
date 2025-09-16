@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "sonner";
+import { DynamicMetadata } from "@/components/platform/DynamicMetadata";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -48,7 +49,10 @@ export default function RootLayout({
         }}
       >
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <DynamicMetadata />
+            {children}
+          </AuthProvider>
           <Toaster
             position="top-right"
             expand={false}

@@ -1,125 +1,108 @@
-import React from 'react'
-import { useCompanyInfo, useCommercialContact, useSupportContact } from '@/hooks/usePlatformConfig'
-import { ContactInfo } from './ContactInfo'
-import { SocialMediaLinks } from './SocialMediaLinks'
-import { MapPin, Clock, Phone, Mail } from 'lucide-react'
+"use client";
+
+import React from 'react';
+import { usePlatformConfig } from '@/hooks/usePlatformConfig';
+import { PlatformLogo } from './PlatformLogo';
+import { ContactInfo } from './ContactInfo';
+import { SocialMediaLinks } from './SocialMediaLinks';
 
 interface PlatformFooterProps {
-  className?: string
+    className?: string;
+    showContact?: boolean;
+    showSocial?: boolean;
+    showLegal?: boolean;
 }
 
-export function PlatformFooter({ className = '' }: PlatformFooterProps) {
-  const company = useCompanyInfo()
-  const commercial = useCommercialContact()
-  const support = useSupportContact()
+export function PlatformFooter({ 
+    className = "",
+    showContact = true,
+    showSocial = true,
+    showLegal = true
+}: PlatformFooterProps) {
+    const { config } = usePlatformConfig();
 
-  return (
-    <footer className={`bg-zinc-900 border-t border-zinc-800 ${className}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Información de la empresa */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">{company.nombre}</h3>
-            <p className="text-zinc-400 text-sm">
-              Plataforma integral para la gestión de estudios de fotografía
-            </p>
-            
-            {company.direccion && (
-              <div className="flex items-start space-x-2 text-zinc-400 text-sm">
-                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span>{company.direccion}</span>
-              </div>
-            )}
-            
-            {company.horarios && (
-              <div className="flex items-start space-x-2 text-zinc-400 text-sm">
-                <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span>{company.horarios}</span>
-              </div>
-            )}
-          </div>
+    const currentYear = new Date().getFullYear();
+    const companyName = config?.nombre_empresa || 'ProSocial Platform';
 
-          {/* Contacto comercial */}
-          <div className="space-y-4">
-            <h4 className="text-md font-semibold text-white">Contacto Comercial</h4>
-            
-            {commercial.telefono && (
-              <div className="flex items-center space-x-2 text-zinc-400 text-sm">
-                <Phone className="h-4 w-4" />
-                <span>{commercial.telefono}</span>
-              </div>
-            )}
-            
-            {commercial.email && (
-              <div className="flex items-center space-x-2 text-zinc-400 text-sm">
-                <Mail className="h-4 w-4" />
-                <a 
-                  href={`mailto:${commercial.email}`}
-                  className="hover:text-white transition-colors"
-                >
-                  {commercial.email}
-                </a>
-              </div>
-            )}
-          </div>
+    return (
+        <footer className={`bg-zinc-900 border-t border-zinc-800 ${className}`}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    {/* Logo y Descripción */}
+                    <div className="col-span-1 md:col-span-2">
+                        <PlatformLogo showText={true} />
+                        <p className="mt-4 text-sm text-zinc-400 max-w-md">
+                            {config?.meta_description || 'Plataforma SaaS multi-tenant para gestión de estudios de fotografía con sistema de leads, campañas y agentes comerciales.'}
+                        </p>
+                        {showSocial && (
+                            <div className="mt-6">
+                                <SocialMediaLinks />
+                            </div>
+                        )}
+                    </div>
 
-          {/* Soporte técnico */}
-          <div className="space-y-4">
-            <h4 className="text-md font-semibold text-white">Soporte Técnico</h4>
-            
-            {support.telefono && (
-              <div className="flex items-center space-x-2 text-zinc-400 text-sm">
-                <Phone className="h-4 w-4" />
-                <span>{support.telefono}</span>
-              </div>
-            )}
-            
-            {support.email && (
-              <div className="flex items-center space-x-2 text-zinc-400 text-sm">
-                <Mail className="h-4 w-4" />
-                <a 
-                  href={`mailto:${support.email}`}
-                  className="hover:text-white transition-colors"
-                >
-                  {support.email}
-                </a>
-              </div>
-            )}
-          </div>
+                    {/* Contacto */}
+                    {showContact && (
+                        <div>
+                            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
+                                Contacto
+                            </h3>
+                            <div className="mt-4">
+                                <ContactInfo type="both" />
+                            </div>
+                        </div>
+                    )}
 
-          {/* Redes sociales */}
-          <div className="space-y-4">
-            <h4 className="text-md font-semibold text-white">Síguenos</h4>
-            <SocialMediaLinks showLabels={true} />
-          </div>
-        </div>
+                    {/* Enlaces Legales */}
+                    {showLegal && (
+                        <div>
+                            <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
+                                Legal
+                            </h3>
+                            <div className="mt-4 space-y-2">
+                                {config?.terminos_condiciones && (
+                                    <a 
+                                        href={config.terminos_condiciones}
+                                        className="block text-sm text-zinc-400 hover:text-white transition-colors"
+                                    >
+                                        Términos y Condiciones
+                                    </a>
+                                )}
+                                {config?.politica_privacidad && (
+                                    <a 
+                                        href={config.politica_privacidad}
+                                        className="block text-sm text-zinc-400 hover:text-white transition-colors"
+                                    >
+                                        Política de Privacidad
+                                    </a>
+                                )}
+                                {config?.aviso_legal && (
+                                    <a 
+                                        href={config.aviso_legal}
+                                        className="block text-sm text-zinc-400 hover:text-white transition-colors"
+                                    >
+                                        Aviso Legal
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
 
-        {/* Línea divisoria y copyright */}
-        <div className="mt-8 pt-8 border-t border-zinc-800">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-zinc-400 text-sm">
-              © {new Date().getFullYear()} {company.nombre}. Todos los derechos reservados.
-            </p>
-            
-            <div className="flex space-x-6 text-sm">
-              <a 
-                href="/terms" 
-                className="text-zinc-400 hover:text-white transition-colors"
-              >
-                Términos y Condiciones
-              </a>
-              <a 
-                href="/privacy" 
-                className="text-zinc-400 hover:text-white transition-colors"
-              >
-                Política de Privacidad
-              </a>
+                {/* Copyright */}
+                <div className="mt-8 pt-8 border-t border-zinc-800">
+                    <div className="flex flex-col md:flex-row justify-between items-center">
+                        <p className="text-sm text-zinc-400">
+                            © {currentYear} {companyName}. Todos los derechos reservados.
+                        </p>
+                        {config?.direccion && (
+                            <p className="text-sm text-zinc-500 mt-2 md:mt-0">
+                                {config.direccion}
+                            </p>
+                        )}
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-  )
+        </footer>
+    );
 }
-
-export default PlatformFooter

@@ -1,110 +1,85 @@
-import React from 'react'
-import { useCommercialContact, useSupportContact, useCompanyInfo } from '@/hooks/usePlatformConfig'
-import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react'
+"use client";
+
+import React from 'react';
+import { usePlatformContact } from '@/hooks/usePlatformConfig';
+import { Phone, Mail, MessageCircle } from 'lucide-react';
 
 interface ContactInfoProps {
-  type?: 'commercial' | 'support' | 'both'
-  className?: string
+    type?: 'comercial' | 'soporte' | 'both';
+    className?: string;
+    showIcons?: boolean;
 }
 
-export function ContactInfo({ type = 'both', className = '' }: ContactInfoProps) {
-  const commercial = useCommercialContact()
-  const support = useSupportContact()
-  const company = useCompanyInfo()
+export function ContactInfo({ 
+    type = 'both', 
+    className = "",
+    showIcons = true 
+}: ContactInfoProps) {
+    const contact = usePlatformContact();
 
-  if (type === 'commercial') {
+    if (type === 'comercial') {
+        return (
+            <div className={className}>
+                {contact.comercial.telefono && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                        {showIcons && <Phone className="w-4 h-4" />}
+                        <span>{contact.comercial.telefono}</span>
+                    </div>
+                )}
+                {contact.comercial.email && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                        {showIcons && <Mail className="w-4 h-4" />}
+                        <span>{contact.comercial.email}</span>
+                    </div>
+                )}
+                {contact.comercial.whatsapp && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                        {showIcons && <MessageCircle className="w-4 h-4" />}
+                        <span>{contact.comercial.whatsapp}</span>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    if (type === 'soporte') {
+        return (
+            <div className={className}>
+                {contact.soporte.telefono && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                        {showIcons && <Phone className="w-4 h-4" />}
+                        <span>{contact.soporte.telefono}</span>
+                    </div>
+                )}
+                {contact.soporte.email && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                        {showIcons && <Mail className="w-4 h-4" />}
+                        <span>{contact.soporte.email}</span>
+                    </div>
+                )}
+                {contact.soporte.chat_url && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-400">
+                        {showIcons && <MessageCircle className="w-4 h-4" />}
+                        <a href={contact.soporte.chat_url} className="hover:text-white transition-colors">
+                            Chat de Soporte
+                        </a>
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    // type === 'both'
     return (
-      <div className={`space-y-3 ${className}`}>
-        <h3 className="text-lg font-semibold text-white">Contacto Comercial</h3>
-        
-        {commercial.telefono && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <Phone className="h-4 w-4" />
-            <span>{commercial.telefono}</span>
-          </div>
-        )}
-        
-        {commercial.email && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <Mail className="h-4 w-4" />
-            <span>{commercial.email}</span>
-          </div>
-        )}
-        
-        {commercial.whatsapp && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <MessageCircle className="h-4 w-4" />
-            <span>{commercial.whatsapp}</span>
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  if (type === 'support') {
-    return (
-      <div className={`space-y-3 ${className}`}>
-        <h3 className="text-lg font-semibold text-white">Soporte Técnico</h3>
-        
-        {support.telefono && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <Phone className="h-4 w-4" />
-            <span>{support.telefono}</span>
-          </div>
-        )}
-        
-        {support.email && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <Mail className="h-4 w-4" />
-            <span>{support.email}</span>
-          </div>
-        )}
-        
-        {support.chat_url && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <MessageCircle className="h-4 w-4" />
-            <a 
-              href={support.chat_url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-blue-400 hover:text-blue-300"
-            >
-              Chat en vivo
-            </a>
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  return (
-    <div className={`space-y-6 ${className}`}>
-      {/* Información de la empresa */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-white">{company.nombre}</h3>
-        
-        {company.direccion && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <MapPin className="h-4 w-4" />
-            <span>{company.direccion}</span>
-          </div>
-        )}
-        
-        {company.horarios && (
-          <div className="flex items-center space-x-2 text-zinc-300">
-            <Clock className="h-4 w-4" />
-            <span>{company.horarios}</span>
-          </div>
-        )}
-      </div>
-
-      {/* Contacto comercial */}
-      <ContactInfo type="commercial" />
-
-      {/* Contacto de soporte */}
-      <ContactInfo type="support" />
-    </div>
-  )
+        <div className={className}>
+            <div className="space-y-2">
+                <h4 className="text-sm font-medium text-white">Comercial</h4>
+                <ContactInfo type="comercial" showIcons={showIcons} />
+            </div>
+            <div className="space-y-2">
+                <h4 className="text-sm font-medium text-white">Soporte</h4>
+                <ContactInfo type="soporte" showIcons={showIcons} />
+            </div>
+        </div>
+    );
 }
-
-export default ContactInfo

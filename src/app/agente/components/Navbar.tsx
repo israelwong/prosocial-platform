@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { User, Bell, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { PlatformLogo } from '@/components/platform';
 
 interface NavbarProps {
     onMenuClick: () => void;
@@ -37,16 +37,12 @@ export function Navbar({ onMenuClick }: NavbarProps) {
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                 <div className="flex flex-1 items-center">
                     <div className="flex items-center space-x-3">
-                        <Image
-                            src="https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg"
-                            alt="ProSocial Platform"
-                            width={32}
-                            height={32}
-                            className="h-8 w-8"
+                        <PlatformLogo 
+                            width={32} 
+                            height={32} 
+                            showText={true}
+                            textClassName="text-lg font-semibold text-white"
                         />
-                        <h1 className="text-lg font-semibold text-white">
-                            ProSocial Platform
-                        </h1>
                         <span className="text-sm text-zinc-400 bg-zinc-800 px-2 py-1 rounded">
                             Agente
                         </span>
