@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model agenda {
+model project_agenda {
   id            String        @id
   studioId      String
   userId        String?
@@ -22,14 +22,14 @@ model agenda {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime
   agendaTipo    String?
-  eventos       eventos       @relation(fields: [eventoId], references: [id])
-  studios       studios       @relation(fields: [studioId], references: [id])
-  studio_users  studio_users? @relation(fields: [userId], references: [id])
+  eventos       project_eventos       @relation(fields: [eventoId], references: [id])
+  studios       projects       @relation(fields: [studioId], references: [id])
+  studio_users  project_users? @relation(fields: [userId], references: [id])
 
   @@index([studioId])
 }
 
-model agenda_tipos {
+model project_agenda_tipos {
   id        String   @id
   nombre    String   @unique
   createdAt DateTime @default(now())
@@ -73,7 +73,7 @@ model canales {
   clientes  clientes[]
 }
 
-model clientes {
+model project_clientes {
   id            String         @id
   studioId      String
   nombre        String
@@ -90,9 +90,9 @@ model clientes {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime
   canales       canales?       @relation(fields: [canalId], references: [id])
-  studios       studios        @relation(fields: [studioId], references: [id])
-  eventos       eventos[]
-  pagos         pagos[]
+  studios       projects        @relation(fields: [studioId], references: [id])
+  eventos       project_eventos[]
+  pagos         project_pagos[]
   suscripciones suscripciones?
 
   @@index([studioId, email])
@@ -100,7 +100,7 @@ model clientes {
   @@index([studioId, telefono])
 }
 
-model condiciones_comerciales {
+model project_condiciones_comerciales {
   id                                  String                                @id
   studioId                            String
   nombre                              String
@@ -111,15 +111,15 @@ model condiciones_comerciales {
   orden                               Int?                                  @default(0)
   createdAt                           DateTime                              @default(now())
   updatedAt                           DateTime
-  studios                             studios                               @relation(fields: [studioId], references: [id])
-  condiciones_comerciales_metodo_pago condiciones_comerciales_metodo_pago[]
-  cotizaciones                        cotizaciones[]
-  pagos                               pagos[]
+  studios                             projects                               @relation(fields: [studioId], references: [id])
+  condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago[]
+  cotizaciones                        project_cotizaciones[]
+  pagos                               project_pagos[]
 
   @@index([studioId])
 }
 
-model condiciones_comerciales_metodo_pago {
+model project_condiciones_comerciales_metodo_pago {
   id                       String                  @id
   condicionesComercialesId String
   metodoPagoId             String
@@ -127,10 +127,10 @@ model condiciones_comerciales_metodo_pago {
   status                   String                  @default("active")
   createdAt                DateTime                @default(now())
   updatedAt                DateTime
-  condiciones_comerciales  condiciones_comerciales @relation(fields: [condicionesComercialesId], references: [id], onDelete: Cascade)
-  metodos_pago             metodos_pago            @relation(fields: [metodoPagoId], references: [id])
-  pagos                    pagos[]
-  cotizaciones             cotizaciones[]          @relation("CondicionesComercialesMetodoPagoToCotizacion")
+  condiciones_comerciales  project_condiciones_comerciales @relation(fields: [condicionesComercialesId], references: [id], onDelete: Cascade)
+  metodos_pago             project_metodos_pago            @relation(fields: [metodoPagoId], references: [id])
+  pagos                    project_pagos[]
+  cotizaciones             project_cotizaciones[]          @relation("CondicionesComercialesMetodoPagoToCotizacion")
 }
 
 model configuraciones {
@@ -702,7 +702,7 @@ model platform_leads {
   platform_campanas             platform_campanas?             @relation(fields: [campa_aId], references: [id])
   platform_canales_adquisicion  platform_canales_adquisicion?  @relation(fields: [canalAdquisicionId], references: [id])
   platform_pipeline_stages      platform_pipeline_stages?      @relation(fields: [etapaId], references: [id])
-  studios                       studios?                       @relation(fields: [studioId], references: [id])
+  studios                       projects?                      @relation(fields: [studioId], references: [id])
   platform_notifications        platform_notifications[]
 
   @@index([agentId])
@@ -930,7 +930,7 @@ model studio_users {
   @@index([studioId, status])
 }
 
-model studios {
+model projects {
   id                       String                    @id
   name                     String
   slug                     String                    @unique
@@ -951,26 +951,26 @@ model studios {
   active                   Boolean                   @default(true)
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime
-  agenda                   agenda[]
+  agenda                   project_agenda[]
   campanias                campanias[]
-  clientes                 clientes[]
-  condiciones_comerciales  condiciones_comerciales[]
-  configuraciones          configuraciones[]
-  cotizaciones             cotizaciones[]
-  eventos                  eventos[]
-  gastos                   gastos[]
-  metodos_pago             metodos_pago[]
+  clientes                 project_clientes[]
+  condiciones_comerciales  project_condiciones_comerciales[]
+  configuraciones          project_configuraciones[]
+  cotizaciones             project_cotizaciones[]
+  eventos                  project_eventos[]
+  gastos                   project_gastos[]
+  metodos_pago             project_metodos_pago[]
   negocios                 negocios[]
-  nominas                  nominas[]
-  paquetes                 paquetes[]
+  nominas                  project_nominas[]
+  paquetes                 project_paquetes[]
   platform_leads           platform_leads?
-  revenue_transactions     revenue_transactions[]
-  servicios                servicios[]
-  studio_revenue_products  studio_revenue_products[]
-  studio_users             studio_users[]
+  revenue_transactions     project_revenue_transactions[]
+  servicios                project_servicios[]
+  studio_revenue_products  project_revenue_products[]
+  studio_users             project_users[]
   plans                    platform_plans?           @relation(fields: [planId], references: [id])
   subscriptions            subscriptions[]
-  user_profiles            user_profiles[]
+  user_profiles            project_user_profiles[]
 
   @@index([planId])
   @@index([slug])
@@ -990,7 +990,7 @@ model subscriptions {
   updated_at             DateTime
   billing_cycles         platform_billing_cycles[]
   plans                  platform_plans   @relation(fields: [plan_id], references: [id])
-  studios                studios          @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  studios                projects         @relation(fields: [studio_id], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([stripe_subscription_id])
