@@ -424,6 +424,32 @@ try {
 4. **Optimizar** para mobile y desktop
 5. **Documentar** funcionalidades complejas (solo después de confirmación)
 
+### **🚨 PROTECCIÓN DE ARCHIVOS DE ENTORNO (CRÍTICO):**
+
+**NUNCA modificar archivos `.env` o `.env.local`:**
+
+1. **PROHIBIDO** editar, crear o modificar archivos `.env*`
+2. **PROHIBIDO** sobrescribir variables de entorno existentes
+3. **PROHIBIDO** agregar valores de ejemplo o placeholder
+4. **PROHIBIDO** hardcodear URLs, keys o secrets
+
+**Si necesitas una nueva variable de entorno:**
+
+1. **SOLICITAR** al usuario que la agregue manualmente
+2. **PROPORCIONAR** el nombre exacto de la variable
+3. **EXPLICAR** el propósito y formato requerido
+4. **ESPERAR** confirmación antes de continuar
+
+**Ejemplo de solicitud:**
+```
+"Necesito que agregues la variable de entorno:
+NOMBRE_VARIABLE=valor_requerido
+Propósito: [explicación]
+Formato: [tipo de dato esperado]"
+```
+
+**Razón**: Los archivos `.env` contienen configuraciones críticas y secretos que no deben ser modificados automáticamente.
+
 ---
 
 **¡Mantén el código limpio, tipado y siguiendo estas convenciones para un desarrollo eficiente! 🚀**
