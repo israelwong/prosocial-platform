@@ -1,5 +1,5 @@
 import Navbar from "@/app/components/main/Navbar";
-import { FooterMarketing } from "@/app/components/shared";
+import { PlatformFooter } from "@/components/platform";
 import { GoogleTagManager } from '@next/third-parties/google';
 import type { Metadata } from "next";
 import "../globals.css";
@@ -39,7 +39,7 @@ export default function MarketingLayout({
             <main className="flex-grow">
                 {children}
             </main>
-            <FooterMarketing />
+            <PlatformFooter />
             <GoogleTagManager gtmId="GTM-WCG8X7J" />
         </div>
     );

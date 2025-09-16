@@ -97,7 +97,7 @@ export function ConfiguracionPageClient({ initialConfig }: ConfiguracionPageClie
 
     if (!config) {
         return (
-            <Card className="border border-zinc-800 bg-zinc-900">
+            <Card className="border border-border bg-card">
                 <CardContent className="p-6">
                     <div className="text-center">
                         <p className="text-zinc-400">No se encontró configuración de la plataforma</p>
@@ -112,7 +112,7 @@ export function ConfiguracionPageClient({ initialConfig }: ConfiguracionPageClie
 
     return (
         <div className="space-y-6">
-            <Card className="border border-zinc-800 bg-zinc-900">
+            <Card className="border border-border bg-card">
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
@@ -124,8 +124,8 @@ export function ConfiguracionPageClient({ initialConfig }: ConfiguracionPageClie
                                 Gestiona la configuración general de la plataforma
                             </CardDescription>
                         </div>
-                        <Button 
-                            onClick={handleSave} 
+                        <Button
+                            onClick={handleSave}
                             disabled={loading}
                             className="bg-blue-600 hover:bg-blue-700"
                         >

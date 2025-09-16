@@ -93,7 +93,7 @@ export function PipelineStageModal({ isOpen, onClose, stage, onSuccess }: Pipeli
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[425px] bg-zinc-900 border-zinc-800">
+            <DialogContent className="sm:max-w-[425px] bg-card border-border">
                 <DialogHeader>
                     <DialogTitle className="text-white">
                         {stage ? 'Editar Etapa' : 'Nueva Etapa'}

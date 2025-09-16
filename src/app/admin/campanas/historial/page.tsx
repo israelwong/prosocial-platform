@@ -207,14 +207,14 @@ export default function CampanasHistorialPage() {
         const costoConversion = campaña.leadsSuscritos > 0 ? campaña.gastoReal / campaña.leadsSuscritos : 0;
         const tasaConversion = campaña.leadsGenerados > 0 ? (campaña.leadsSuscritos / campaña.leadsGenerados) * 100 : 0;
         const roi = campaña.presupuestoTotal > 0 ? ((campaña.gastoReal / campaña.presupuestoTotal) * 100) : 0;
-        
+
         return { costoAdquisicion, costoConversion, tasaConversion, roi };
     };
 
     const getPerformanceIndicator = (campaña: Campaña) => {
         const metrics = calculateMetrics(campaña);
         const tasaConversion = metrics.tasaConversion;
-        
+
         if (tasaConversion >= 20) {
             return { icon: TrendingUp, color: 'text-green-500', label: 'Excelente' };
         } else if (tasaConversion >= 10) {
@@ -231,7 +231,7 @@ export default function CampanasHistorialPage() {
 
         // Filtro por búsqueda
         if (searchTerm) {
-            filtered = filtered.filter(campaña => 
+            filtered = filtered.filter(campaña =>
                 campaña.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 campaña.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -264,7 +264,7 @@ export default function CampanasHistorialPage() {
                     startDate = new Date(0);
             }
 
-            filtered = filtered.filter(campaña => 
+            filtered = filtered.filter(campaña =>
                 new Date(campaña.fechaInicio) >= startDate
             );
         }
@@ -306,7 +306,7 @@ export default function CampanasHistorialPage() {
 
             {/* Estadísticas Generales */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-zinc-900 border-zinc-700">
+                <Card className="bg-card border-border">
                     <CardContent className="p-4">
                         <div className="flex items-center space-x-2">
                             <BarChart3 className="h-5 w-5 text-blue-500" />
@@ -318,7 +318,7 @@ export default function CampanasHistorialPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-zinc-900 border-zinc-700">
+                <Card className="bg-card border-border">
                     <CardContent className="p-4">
                         <div className="flex items-center space-x-2">
                             <DollarSign className="h-5 w-5 text-green-500" />
@@ -330,7 +330,7 @@ export default function CampanasHistorialPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-zinc-900 border-zinc-700">
+                <Card className="bg-card border-border">
                     <CardContent className="p-4">
                         <div className="flex items-center space-x-2">
                             <Users className="h-5 w-5 text-purple-500" />
@@ -342,7 +342,7 @@ export default function CampanasHistorialPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-zinc-900 border-zinc-700">
+                <Card className="bg-card border-border">
                     <CardContent className="p-4">
                         <div className="flex items-center space-x-2">
                             <Target className="h-5 w-5 text-orange-500" />
@@ -401,7 +401,7 @@ export default function CampanasHistorialPage() {
                     const PerformanceIcon = performance.icon;
 
                     return (
-                        <Card key={campaña.id} className="bg-zinc-900 border-zinc-700">
+                        <Card key={campaña.id} className="bg-card border-border">
                             <CardContent className="p-6">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
@@ -413,7 +413,7 @@ export default function CampanasHistorialPage() {
                                                 <span className="text-sm font-medium">{performance.label}</span>
                                             </div>
                                         </div>
-                                        
+
                                         {campaña.descripcion && (
                                             <p className="text-zinc-400 text-sm mb-4">{campaña.descripcion}</p>
                                         )}
@@ -474,7 +474,7 @@ export default function CampanasHistorialPage() {
                                             <Eye className="h-4 w-4 mr-2" />
                                             Ver Detalles
                                         </Button>
-                                        
+
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="outline" size="sm">
@@ -492,7 +492,7 @@ export default function CampanasHistorialPage() {
                                                         Archivar
                                                     </DropdownMenuItem>
                                                 )}
-                                                <DropdownMenuItem 
+                                                <DropdownMenuItem
                                                     onClick={() => handleDelete(campaña.id)}
                                                     className="text-red-400 focus:text-red-300"
                                                 >
@@ -516,7 +516,7 @@ export default function CampanasHistorialPage() {
                         {campanas.length === 0 ? 'No hay campañas en el historial' : 'No se encontraron campañas'}
                     </h3>
                     <p className="text-zinc-500">
-                        {campanas.length === 0 
+                        {campanas.length === 0
                             ? 'Las campañas finalizadas, pausadas y planificadas aparecerán aquí'
                             : 'Ajusta los filtros para ver más resultados'
                         }
@@ -533,7 +533,7 @@ export default function CampanasHistorialPage() {
                             Análisis completo de la campaña seleccionada
                         </DialogDescription>
                     </DialogHeader>
-                    
+
                     {selectedCampaña && (
                         <div className="space-y-6">
                             {/* Información General */}

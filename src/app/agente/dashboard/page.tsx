@@ -347,7 +347,7 @@ export default function AgentDashboardPage() {
                     <CardContent>
                         <div className="space-y-4">
                             {data.recentLeads.map((lead) => (
-                                <div key={lead.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                                <div key={lead.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-zinc-800">
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                                             <span className="text-sm font-medium text-blue-600">

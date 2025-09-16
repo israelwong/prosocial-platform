@@ -1,5 +1,7 @@
+import animate from "tailwindcss-animate";
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+const config = {
   darkMode: ["class"],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,11 +11,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Zinc-based color system for dark theme
-        background: "rgb(24 24 27)", // zinc-900
+        // ÚNICA FUENTE DE VERDAD PARA TODOS LOS COLORES
+        // Colores base del tema oscuro
+        background: "rgb(24 24 27 / 0.9)", // zinc-900/90 - Fondo con opacidad simulada
         foreground: "rgb(255 255 255)", // white
+
+        // Colores de componentes
         card: {
-          DEFAULT: "rgb(24 24 27)", // zinc-900
+          DEFAULT: "rgb(24 24 27)", // zinc-900 - Cards más claras
           foreground: "rgb(255 255 255)", // white
         },
         popover: {
@@ -22,7 +27,7 @@ module.exports = {
         },
         primary: {
           DEFAULT: "rgb(255 255 255)", // white
-          foreground: "rgb(24 24 27)", // zinc-900
+          foreground: "rgb(9 9 11)", // zinc-950
         },
         secondary: {
           DEFAULT: "rgb(39 39 42)", // zinc-800
@@ -40,9 +45,13 @@ module.exports = {
           DEFAULT: "rgb(239 68 68)", // red-500
           foreground: "rgb(255 255 255)", // white
         },
-        border: "rgb(39 39 42)", // zinc-800
+
+        // Colores de bordes y elementos
+        border: "rgb(39 39 42)", // zinc-800 - Bordes consistentes
         input: "rgb(39 39 42)", // zinc-800
         ring: "rgb(228 228 231)", // zinc-200
+
+        // Colores para gráficos
         chart: {
           1: "rgb(59 130 246)", // blue-500
           2: "rgb(16 185 129)", // emerald-500
@@ -50,11 +59,13 @@ module.exports = {
           4: "rgb(168 85 247)", // purple-500
           5: "rgb(236 72 153)", // pink-500
         },
+
+        // Colores específicos para sidebar
         sidebar: {
-          DEFAULT: "rgb(24 24 27)", // zinc-900
+          DEFAULT: "rgb(9 9 11)", // zinc-950 - Fondo más oscuro
           foreground: "rgb(244 244 245)", // zinc-100
           primary: "rgb(255 255 255)", // white
-          "primary-foreground": "rgb(24 24 27)", // zinc-900
+          "primary-foreground": "rgb(9 9 11)", // zinc-950
           accent: "rgb(39 39 42)", // zinc-800
           "accent-foreground": "rgb(244 244 245)", // zinc-100
           border: "rgb(39 39 42)", // zinc-800
@@ -68,5 +79,7 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 };
+
+export default config;

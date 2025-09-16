@@ -38,7 +38,7 @@ export default function StudioLandingPage() {
                             <Zap className="mr-2 h-5 w-5" />
                             Empezar Gratis
                         </Button>
-                        <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-zinc-900 px-8 py-4 text-lg">
+                        <Button size="lg" variant="outline" className="border-white text-white hover:bg-zinc-800 hover:text-white px-8 py-4 text-lg">
                             <Users className="mr-2 h-5 w-5" />
                             Ver Demo
                         </Button>
@@ -162,11 +162,11 @@ export default function StudioLandingPage() {
                         Únete a cientos de estudios que ya están creciendo con ProSocial Platform
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg">
+                        <Button size="lg" className="bg-white text-blue-600 hover:bg-zinc-100 px-8 py-4 text-lg">
                             <ArrowRight className="mr-2 h-5 w-5" />
                             Comenzar Ahora
                         </Button>
-                        <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg">
+                        <Button size="lg" variant="outline" className="border-white text-white hover:bg-zinc-800 hover:text-white px-8 py-4 text-lg">
                             <Users className="mr-2 h-5 w-5" />
                             Hablar con un Experto
                         </Button>

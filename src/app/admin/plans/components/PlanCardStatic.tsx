@@ -51,9 +51,8 @@ export function PlanCardStatic({
 
     return (
         <Card
-            className={`relative transition-all duration-200 hover:shadow-lg ${
-                plan.popular ? 'ring-2 ring-yellow-500 shadow-yellow-500/20' : ''
-            }`}
+            className={`relative transition-all duration-200 hover:shadow-lg ${plan.popular ? 'ring-2 ring-yellow-500 shadow-yellow-500/20' : ''
+                }`}
         >
             {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -158,7 +157,7 @@ export function PlanCardStatic({
                         variant="outline"
                         size="sm"
                         onClick={() => onTogglePopular(plan.id)}
-                        className={plan.popular ? "text-yellow-500 border-yellow-500 hover:bg-yellow-900/20" : "text-zinc-500 border-zinc-500 hover:bg-zinc-900/20"}
+                        className={plan.popular ? "text-yellow-500 border-yellow-500 hover:bg-yellow-500/10" : "text-zinc-500 border-zinc-500 hover:bg-zinc-500/10"}
                     >
                         <Star className="h-4 w-4 mr-2" />
                         {plan.popular ? 'Popular' : 'Marcar Popular'}

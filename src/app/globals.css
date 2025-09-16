@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @layer base {
   * {
@@ -7,48 +6,24 @@
   }
 
   body {
-    @apply bg-zinc-900 text-white;
+    @apply bg-zinc-950 text-white;
   }
 
   /* Custom scrollbar for dark theme */
-  .dark ::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  .dark ::-webkit-scrollbar-track {
+  ::-webkit-scrollbar-track {
     @apply bg-zinc-800;
   }
 
-  .dark ::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     @apply bg-zinc-700 rounded;
   }
 
-  .dark ::-webkit-scrollbar-thumb:hover {
+  ::-webkit-scrollbar-thumb:hover {
     @apply bg-zinc-600;
-  }
-
-  /* Enhanced focus states */
-  input:focus,
-  textarea:focus,
-  select:focus {
-    @apply ring-2 ring-zinc-200;
-  }
-
-  /* Card shadows for dark theme */
-  .dark .shadow-sm {
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  }
-
-  .dark .shadow {
-    box-shadow:
-      0 1px 3px 0 rgba(0, 0, 0, 0.4),
-      0 1px 2px -1px rgba(0, 0, 0, 0.4);
-  }
-
-  .dark .shadow-lg {
-    box-shadow:
-      0 10px 15px -3px rgba(0, 0, 0, 0.5),
-      0 4px 6px -4px rgba(0, 0, 0, 0.5);
   }
 }

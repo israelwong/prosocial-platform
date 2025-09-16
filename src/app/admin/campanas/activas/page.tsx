@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Edit, Trash2, Play, Pause, Square, Search, DollarSign, Users, Target, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, Play, Pause, Search, DollarSign, Users, Target, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
 // Forzar renderizado dinámico
@@ -61,7 +61,7 @@ const statusOptions = [
 
 export default function CampanasActivasPage() {
     const [campanas, setCampanas] = useState<Campaña[]>([]);
-    const [plataformas, setPlataformas] = useState<Plataforma[]>([]);
+    const [, setPlataformas] = useState<Plataforma[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -209,7 +209,11 @@ export default function CampanasActivasPage() {
             leadsSuscritos: campaña.leadsSuscritos,
             gastoReal: campaña.gastoReal,
             plataformas: campaña.plataformas.map(p => ({
-                plataformaId: p.plataforma.id,
+                id: p.plataforma.id,
+                plataforma: {
+                    id: p.plataforma.id,
+                    nombre: p.plataforma.nombre
+                },
                 presupuesto: p.presupuesto,
                 gastoReal: p.gastoReal,
                 leads: p.leads,
@@ -254,7 +258,7 @@ export default function CampanasActivasPage() {
         });
     };
 
-    const filteredCampanas = campanas.filter(campaña => 
+    const filteredCampanas = campanas.filter(campaña =>
         campaña.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
         campaña.descripcion?.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -272,7 +276,7 @@ export default function CampanasActivasPage() {
         const costoAdquisicion = campaña.leadsGenerados > 0 ? campaña.gastoReal / campaña.leadsGenerados : 0;
         const costoConversion = campaña.leadsSuscritos > 0 ? campaña.gastoReal / campaña.leadsSuscritos : 0;
         const tasaConversion = campaña.leadsGenerados > 0 ? (campaña.leadsSuscritos / campaña.leadsGenerados) * 100 : 0;
-        
+
         return { costoAdquisicion, costoConversion, tasaConversion };
     };
 
@@ -442,7 +446,7 @@ export default function CampanasActivasPage() {
                 {filteredCampanas.map(campaña => {
                     const metrics = calculateMetrics(campaña);
                     return (
-                        <Card key={campaña.id} className="bg-zinc-900 border-zinc-700">
+                        <Card key={campaña.id} className="bg-card border-border">
                             <CardHeader className="pb-3">
                                 <div className="flex items-center justify-between">
                                     <CardTitle className="text-white text-lg">
@@ -567,7 +571,7 @@ export default function CampanasActivasPage() {
                         {campanas.length === 0 ? 'No hay campañas activas' : 'No se encontraron campañas'}
                     </h3>
                     <p className="text-zinc-500">
-                        {campanas.length === 0 
+                        {campanas.length === 0
                             ? 'Crea tu primera campaña para comenzar'
                             : 'Ajusta los filtros para ver más resultados'
                         }

@@ -91,7 +91,7 @@ export function PipelineStagesChart({ data, loading = false }: PipelineStagesCha
                                     {data.map((stage, index) => {
                                         const valuePerLead = stage.count > 0 ? stage.financialValue / stage.count : 0;
                                         return (
-                                            <tr key={stage.stage} className="border-b hover:bg-gray-50">
+                                            <tr key={stage.stage} className="border-b hover:bg-zinc-800">
                                                 <td className="py-3 px-4">
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-3 h-3 rounded-full bg-blue-500" />

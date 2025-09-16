@@ -165,7 +165,7 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
     };
 
     return (
-        <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+        <Card className="border border-border bg-card shadow-sm">
             <CardHeader className="border-b border-zinc-800">
                 <CardTitle className="text-lg font-semibold text-white">Etapas del Pipeline</CardTitle>
                 <p className="text-sm text-zinc-400">

@@ -358,7 +358,7 @@ export function ExpensesManager({
                                     const RecurrenceIcon = recurrenceInfo.icon;
 
                                     return (
-                                        <div key={expense.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                                        <div key={expense.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-zinc-800">
                                             <div className="flex items-center gap-4">
                                                 <div className="p-2 bg-gray-100 rounded-lg">
                                                     <IconComponent className="h-5 w-5 text-gray-600" />

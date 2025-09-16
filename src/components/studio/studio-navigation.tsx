@@ -120,7 +120,7 @@ export function StudioNavigation() {
                         <Button
                             variant="ghost"
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                            className="inline-flex items-center justify-center p-2 rounded-md text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800"
                         >
                             <Menu className="h-6 w-6" />
                         </Button>
@@ -139,13 +139,13 @@ export function StudioNavigation() {
                         </Link>
                         <Link
                             href={`/${studioUser.studioSlug}/projects`}
-                            className="border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                            className="border-transparent text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800 hover:border-zinc-600 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
                         >
                             Proyectos
                         </Link>
                         <Link
                             href={`/${studioUser.studioSlug}/clients`}
-                            className="border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                            className="border-transparent text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800 hover:border-zinc-600 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
                         >
                             Clientes
                         </Link>
@@ -167,7 +167,7 @@ export function StudioNavigation() {
                             <Button
                                 variant="ghost"
                                 onClick={handleSignOut}
-                                className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100 w-full text-left"
+                                className="block px-4 py-2 text-base font-medium text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 w-full text-left"
                             >
                                 Cerrar sesión
                             </Button>

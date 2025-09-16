@@ -100,7 +100,7 @@ export function CampaignPerformanceTable({ data, loading = false }: CampaignPerf
                                 </thead>
                                 <tbody>
                                     {data.map((campaign) => (
-                                        <tr key={campaign.campaignId} className="border-b hover:bg-gray-50">
+                                        <tr key={campaign.campaignId} className="border-b hover:bg-zinc-800">
                                             <td className="py-3 px-4">
                                                 <div className="font-medium">{campaign.campaignName}</div>
                                                 <div className="text-sm text-muted-foreground">

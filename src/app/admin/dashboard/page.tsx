@@ -23,7 +23,7 @@ export default function AdminDashboard() {
 
             {/* Stats Cards */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="border border-border bg-card shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                         <CardTitle className="text-sm font-medium text-zinc-400">Total Agentes</CardTitle>
                         <Users className="h-5 w-5 text-blue-500" />
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="border border-border bg-card shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                         <CardTitle className="text-sm font-medium text-zinc-400">Leads Activos</CardTitle>
                         <UserCheck className="h-5 w-5 text-green-500" />
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="border border-border bg-card shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                         <CardTitle className="text-sm font-medium text-zinc-400">Estudios Activos</CardTitle>
                         <Building2 className="h-5 w-5 text-purple-500" />
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="border border-border bg-card shadow-sm">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                         <CardTitle className="text-sm font-medium text-zinc-400">Ingresos Mensuales</CardTitle>
                         <DollarSign className="h-5 w-5 text-emerald-500" />
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
 
             {/* Recent Activity */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="col-span-4 border border-border bg-card shadow-sm">
                     <CardHeader className="border-b border-zinc-800">
                         <CardTitle className="text-lg font-semibold text-white">Actividad Reciente</CardTitle>
                     </CardHeader>
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
                     </CardContent>
                 </Card>
 
-                <Card className="col-span-3 border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="col-span-3 border border-border bg-card shadow-sm">
                     <CardHeader className="border-b border-zinc-800">
                         <CardTitle className="text-lg font-semibold text-white">Rendimiento de Agentes</CardTitle>
                     </CardHeader>

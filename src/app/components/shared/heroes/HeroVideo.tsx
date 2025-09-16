@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
-import { Button } from '../ui'
-import type { ButtonVariant, ButtonSize } from '../ui'
+import { Button } from '@/components/ui/button'
+import type { ButtonVariant, ButtonSize } from '@/components/ui/button'
 
 /**
  * Componente HeroVideo - Refactorizado siguiendo ESTILO_MAESTRO_MAIN.md

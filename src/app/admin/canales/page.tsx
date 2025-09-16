@@ -176,7 +176,7 @@ export default function CanalesPage() {
 
     const filteredCanales = canales.filter(canal => {
         const matchesSearch = canal.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            canal.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
+            canal.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategoria = selectedCategoria === 'all' || canal.categoria === selectedCategoria;
         return matchesSearch && matchesCategoria;
     });
@@ -370,7 +370,7 @@ export default function CanalesPage() {
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {canalesCategoria.map(canal => (
-                                    <Card key={canal.id} className="bg-zinc-900 border-zinc-700">
+                                    <Card key={canal.id} className="bg-card border-border">
                                         <CardHeader className="pb-3">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-2">

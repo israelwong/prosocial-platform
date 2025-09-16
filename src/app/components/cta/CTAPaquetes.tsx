@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { ArrowRight } from 'lucide-react'
-import { Button } from '../shared/ui'
+import { Button } from '@/components/ui/button'
 
 /**
  * Componente CTA Paquetes siguiendo el Estilo Maestro v1.9

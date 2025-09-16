@@ -73,7 +73,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
 
             {/* Stats Cards */}
             <div className="grid gap-4 md:grid-cols-3">
-                <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="border border-border bg-card shadow-sm">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
@@ -87,7 +87,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
                     </CardContent>
                 </Card>
 
-                <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="border border-border bg-card shadow-sm">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
@@ -103,7 +103,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
                     </CardContent>
                 </Card>
 
-                <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+                <Card className="border border-border bg-card shadow-sm">
                     <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                             <div>
@@ -127,7 +127,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
             />
 
             {/* Instructions */}
-            <Card className="border border-zinc-800 bg-zinc-900 shadow-sm">
+            <Card className="border border-border bg-card shadow-sm">
                 <CardContent className="p-4">
                     <h3 className="font-medium text-white mb-2">Instrucciones</h3>
                     <ul className="text-sm text-zinc-400 space-y-1">

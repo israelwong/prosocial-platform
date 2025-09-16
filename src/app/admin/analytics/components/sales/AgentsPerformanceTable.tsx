@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Users, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Target, 
+import {
+  Users,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Target,
   Clock,
   Award,
   AlertTriangle
@@ -23,23 +23,23 @@ interface AgentsPerformanceTableProps {
   loading?: boolean;
 }
 
-export function AgentsPerformanceTable({ 
-  data, 
-  totalAgents, 
-  loading = false 
+export function AgentsPerformanceTable({
+  data,
+  totalAgents,
+  loading = false
 }: AgentsPerformanceTableProps) {
   // Calcular totales
   const totalLeadsManaged = data.reduce((sum, agent) => sum + agent.leadsManaged, 0);
   const totalMoneyInPlay = data.reduce((sum, agent) => sum + agent.moneyInPlay, 0);
   const totalConverted = data.reduce((sum, agent) => sum + agent.converted, 0);
   const totalPending = data.reduce((sum, agent) => sum + agent.pending, 0);
-  const averageConversionRate = data.length > 0 
-    ? data.reduce((sum, agent) => sum + agent.conversionRate, 0) / data.length 
+  const averageConversionRate = data.length > 0
+    ? data.reduce((sum, agent) => sum + agent.conversionRate, 0) / data.length
     : 0;
 
   // Ordenar agentes por performance
   const topPerformers = [...data].sort((a, b) => b.conversionRate - a.conversionRate);
-  const needsAttention = [...data].filter(agent => 
+  const needsAttention = [...data].filter(agent =>
     agent.conversionRate < 10 || agent.pending > agent.converted * 2
   );
 
@@ -129,7 +129,7 @@ export function AgentsPerformanceTable({
                 </thead>
                 <tbody>
                   {data.map((agent, index) => (
-                    <tr key={agent.agentId} className="border-b hover:bg-gray-50">
+                    <tr key={agent.agentId} className="border-b hover:bg-zinc-800">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <Avatar className="h-8 w-8">
@@ -177,28 +177,28 @@ export function AgentsPerformanceTable({
                         </div>
                       </td>
                       <td className="text-right py-3 px-4">
-                        <Badge 
+                        <Badge
                           variant={agent.conversionRate > 15 ? "default" : agent.conversionRate > 10 ? "secondary" : "destructive"}
                           className={
-                            agent.conversionRate > 15 ? "bg-green-100 text-green-800" : 
-                            agent.conversionRate > 10 ? "bg-yellow-100 text-yellow-800" : 
-                            "bg-red-100 text-red-800"
+                            agent.conversionRate > 15 ? "bg-green-100 text-green-800" :
+                              agent.conversionRate > 10 ? "bg-yellow-100 text-yellow-800" :
+                                "bg-red-100 text-red-800"
                           }
                         >
                           {agent.conversionRate.toFixed(1)}%
                         </Badge>
                       </td>
                       <td className="text-center py-3 px-4">
-                        <Badge 
+                        <Badge
                           variant={agent.conversionRate > 15 ? "default" : agent.conversionRate > 10 ? "secondary" : "destructive"}
                           className={
-                            agent.conversionRate > 15 ? "bg-green-100 text-green-800" : 
-                            agent.conversionRate > 10 ? "bg-yellow-100 text-yellow-800" : 
-                            "bg-red-100 text-red-800"
+                            agent.conversionRate > 15 ? "bg-green-100 text-green-800" :
+                              agent.conversionRate > 10 ? "bg-yellow-100 text-yellow-800" :
+                                "bg-red-100 text-red-800"
                           }
                         >
-                          {agent.conversionRate > 15 ? 'Excelente' : 
-                           agent.conversionRate > 10 ? 'Bueno' : 'Necesita Atención'}
+                          {agent.conversionRate > 15 ? 'Excelente' :
+                            agent.conversionRate > 10 ? 'Bueno' : 'Necesita Atención'}
                         </Badge>
                       </td>
                     </tr>

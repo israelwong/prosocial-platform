@@ -22,7 +22,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
     };
 
     return (
-        <div className="sticky top-0 z-[999] flex h-16 shrink-0 items-center gap-x-4 border-b border-zinc-800 bg-zinc-900 px-6 shadow-sm">
+        <div className="sticky top-0 z-[999] flex h-16 shrink-0 items-center gap-x-4 border-b border-zinc-900 bg-zinc-900/70 px-6 shadow-sm">
             <Button
                 variant="ghost"
                 size="sm"
@@ -36,9 +36,9 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                 <div className="flex flex-1 items-center">
-                    <PlatformLogo 
-                        width={32} 
-                        height={32} 
+                    <PlatformLogo
+                        width={32}
+                        height={32}
                         showText={true}
                         textClassName="text-lg font-semibold text-white"
                     />

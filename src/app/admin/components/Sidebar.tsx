@@ -77,7 +77,7 @@ export function Sidebar({ isOpen, onClose, expandedMenus, onToggleMenu }: Sideba
 
             {/* Sidebar */}
             <div className={cn(
-                "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-zinc-950 border-r-2 border-zinc-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+                "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-zinc-950 border-r-2 border-zinc-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
                 isOpen ? "translate-x-0" : "-translate-x-full"
             )}>
                 <nav className="mt-6 px-3">

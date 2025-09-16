@@ -4,11 +4,11 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Target, 
-  Clock, 
-  TrendingUp, 
-  TrendingDown, 
+import {
+  Target,
+  Clock,
+  TrendingUp,
+  TrendingDown,
   AlertTriangle,
   CheckCircle,
   Users,
@@ -21,9 +21,9 @@ interface ConversionsAndPendingCardProps {
   loading?: boolean;
 }
 
-export function ConversionsAndPendingCard({ 
-  data, 
-  loading = false 
+export function ConversionsAndPendingCard({
+  data,
+  loading = false
 }: ConversionsAndPendingCardProps) {
   // Calcular totales
   const totalConverted = data.reduce((sum, agent) => sum + agent.converted, 0);
@@ -33,10 +33,10 @@ export function ConversionsAndPendingCard({
   const pendingRatio = totalConverted > 0 ? totalPending / totalConverted : 0;
 
   // Identificar agentes con problemas
-  const agentsWithHighPending = data.filter(agent => 
+  const agentsWithHighPending = data.filter(agent =>
     agent.pending > agent.converted * 2
   );
-  const agentsWithLowConversion = data.filter(agent => 
+  const agentsWithLowConversion = data.filter(agent =>
     agent.conversionRate < 10
   );
 
@@ -231,9 +231,9 @@ export function ConversionsAndPendingCard({
                     const ratio = agent.converted > 0 ? agent.pending / agent.converted : agent.pending;
                     const isHealthy = agent.conversionRate > 10 && ratio < 2;
                     const needsAttention = agent.conversionRate < 10 || ratio > 2;
-                    
+
                     return (
-                      <tr key={agent.agentId} className="border-b hover:bg-gray-50">
+                      <tr key={agent.agentId} className="border-b hover:bg-zinc-800">
                         <td className="py-2 px-3">
                           <div className="font-medium">{agent.name}</div>
                         </td>
@@ -247,24 +247,24 @@ export function ConversionsAndPendingCard({
                           <span className="text-muted-foreground">{ratio.toFixed(1)}x</span>
                         </td>
                         <td className="text-right py-2 px-3">
-                          <Badge 
+                          <Badge
                             variant={agent.conversionRate > 15 ? "default" : agent.conversionRate > 10 ? "secondary" : "destructive"}
                             className={
-                              agent.conversionRate > 15 ? "bg-green-100 text-green-800" : 
-                              agent.conversionRate > 10 ? "bg-yellow-100 text-yellow-800" : 
-                              "bg-red-100 text-red-800"
+                              agent.conversionRate > 15 ? "bg-green-100 text-green-800" :
+                                agent.conversionRate > 10 ? "bg-yellow-100 text-yellow-800" :
+                                  "bg-red-100 text-red-800"
                             }
                           >
                             {agent.conversionRate.toFixed(1)}%
                           </Badge>
                         </td>
                         <td className="text-center py-2 px-3">
-                          <Badge 
+                          <Badge
                             variant={isHealthy ? "default" : needsAttention ? "destructive" : "secondary"}
                             className={
-                              isHealthy ? "bg-green-100 text-green-800" : 
-                              needsAttention ? "bg-red-100 text-red-800" : 
-                              "bg-yellow-100 text-yellow-800"
+                              isHealthy ? "bg-green-100 text-green-800" :
+                                needsAttention ? "bg-red-100 text-red-800" :
+                                  "bg-yellow-100 text-yellow-800"
                             }
                           >
                             {isHealthy ? 'Saludable' : needsAttention ? 'Atención' : 'Regular'}
