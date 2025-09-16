@@ -16,11 +16,22 @@ export default async function RedirectPage() {
     console.log('🔍 Redirect - User metadata:', user.user_metadata)
 
     // Obtener el rol del usuario desde user_metadata
-    const userRole = user.user_metadata?.role
+    let userRole = user.user_metadata?.role
 
+    // Si no hay rol, intentar detectar por email (fallback para super admin)
     if (!userRole) {
-        console.log('🔍 Redirect - No se encontró rol en metadata, redirigiendo a login')
-        redirect('/login?error=no-role')
+        console.log('🔍 Redirect - No se encontró rol en metadata, verificando por email...')
+        
+        // Lista de emails de super admin (fallback)
+        const superAdminEmails = ['admin@prosocial.mx']
+        
+        if (superAdminEmails.includes(user.email || '')) {
+            console.log('🔍 Redirect - Detectado super admin por email:', user.email)
+            userRole = 'super_admin'
+        } else {
+            console.log('🔍 Redirect - No se pudo determinar el rol, redirigiendo a login')
+            redirect('/login?error=no-role')
+        }
     }
 
     console.log('🔍 Redirect - Rol encontrado:', userRole)
