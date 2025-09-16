@@ -7,7 +7,7 @@ export async function GET(
 ) {
     try {
         const { id } = params;
-        
+
         const campaña = await prisma.platform_campanas.findUnique({
             where: { id },
             include: {
@@ -53,9 +53,9 @@ export async function PUT(
     try {
         const body = await request.json();
         const { id } = params;
-        
+
         const { plataformas, ...campañaData } = body;
-        
+
         const campaña = await prisma.platform_campanas.update({
             where: { id },
             data: {
@@ -96,7 +96,7 @@ export async function DELETE(
 ) {
     try {
         const { id } = params;
-        
+
         await prisma.platform_campanas.delete({
             where: { id }
         });
