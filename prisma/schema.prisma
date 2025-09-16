@@ -564,7 +564,7 @@ model platform_plans {
   @@index([stripe_price_id])
 }
 
-model prosocial_activities {
+model platform_activities {
   id                 String          @id
   leadId             String
   tipo               String
@@ -574,14 +574,14 @@ model prosocial_activities {
   fechaProximaAccion DateTime?
   createdAt          DateTime        @default(now())
   userId             String?
-  prosocial_leads    prosocial_leads @relation(fields: [leadId], references: [id])
+  platform_leads     platform_leads  @relation(fields: [leadId], references: [id])
   user_profiles      user_profiles?  @relation(fields: [userId], references: [id])
 
   @@index([leadId, createdAt])
   @@index([userId, createdAt])
 }
 
-model prosocial_agents {
+model platform_agents {
   id                      String                    @id
   nombre                  String
   email                   String                    @unique
@@ -591,13 +591,13 @@ model prosocial_agents {
   comisionConversion      Decimal                   @default(0.05)
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime
-  prosocial_leads         prosocial_leads[]
-  prosocial_notifications prosocial_notifications[]
+  platform_leads          platform_leads[]
+  platform_notifications  platform_notifications[]
 
   @@index([activo])
 }
 
-model prosocial_campana_plataformas {
+model platform_campana_plataformas {
   id                               String                           @id
   campa_aId                        String                           @map("campañaId")
   plataformaId                     String
@@ -607,15 +607,15 @@ model prosocial_campana_plataformas {
   conversiones                     Int                              @default(0)
   createdAt                        DateTime                         @default(now())
   updatedAt                        DateTime
-  prosocial_campanas               prosocial_campanas               @relation(fields: [campa_aId], references: [id], onDelete: Cascade)
-  prosocial_plataformas_publicidad prosocial_plataformas_publicidad @relation(fields: [plataformaId], references: [id])
+  platform_campanas                platform_campanas                @relation(fields: [campa_aId], references: [id], onDelete: Cascade)
+  platform_plataformas_publicidad  platform_plataformas_publicidad  @relation(fields: [plataformaId], references: [id])
 
   @@unique([campa_aId, plataformaId])
   @@index([campa_aId])
   @@index([plataformaId])
 }
 
-model prosocial_campanas {
+model platform_campanas {
   id                            String                          @id
   nombre                        String
   descripcion                   String?
@@ -629,8 +629,8 @@ model prosocial_campanas {
   gastoReal                     Decimal                         @default(0)
   createdAt                     DateTime                        @default(now())
   updatedAt                     DateTime
-  prosocial_campana_plataformas prosocial_campana_plataformas[]
-  prosocial_leads               prosocial_leads[]
+  platform_campana_plataformas  platform_campana_plataformas[]
+  platform_leads                platform_leads[]
 
   @@index([fechaInicio, fechaFin])
   @@index([isActive])
@@ -638,7 +638,7 @@ model prosocial_campanas {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model prosocial_canales_adquisicion {
+model platform_canales_adquisicion {
   id              String            @id
   nombre          String            @unique
   descripcion     String?
@@ -650,14 +650,14 @@ model prosocial_canales_adquisicion {
   orden           Int               @default(0)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime
-  prosocial_leads prosocial_leads[]
+  platform_leads  platform_leads[]
 
   @@index([categoria])
   @@index([isActive])
   @@index([isVisible])
 }
 
-model prosocial_lead_bitacora {
+model platform_lead_bitacora {
   id              String           @id
   leadId          String
   tipo            LeadBitacoraTipo
@@ -667,7 +667,7 @@ model prosocial_lead_bitacora {
   usuarioId       String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime
-  prosocial_leads prosocial_leads  @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  platform_leads  platform_leads   @relation(fields: [leadId], references: [id], onDelete: Cascade)
   user_profiles   user_profiles?   @relation(fields: [usuarioId], references: [id])
 
   @@index([createdAt])
@@ -675,7 +675,7 @@ model prosocial_lead_bitacora {
   @@index([tipo])
 }
 
-model prosocial_leads {
+model platform_leads {
   id                            String                         @id
   nombre                        String
   email                         String                         @unique
@@ -696,14 +696,14 @@ model prosocial_leads {
   etapaId                       String?
   canalAdquisicionId            String?
   campa_aId                     String?                        @map("campañaId")
-  prosocial_activities          prosocial_activities[]
-  prosocial_lead_bitacora       prosocial_lead_bitacora[]
-  prosocial_agents              prosocial_agents?              @relation(fields: [agentId], references: [id])
-  prosocial_campanas            prosocial_campanas?            @relation(fields: [campa_aId], references: [id])
-  prosocial_canales_adquisicion prosocial_canales_adquisicion? @relation(fields: [canalAdquisicionId], references: [id])
-  prosocial_pipeline_stages     prosocial_pipeline_stages?     @relation(fields: [etapaId], references: [id])
+  platform_activities           platform_activities[]
+  platform_lead_bitacora        platform_lead_bitacora[]
+  platform_agents               platform_agents?               @relation(fields: [agentId], references: [id])
+  platform_campanas             platform_campanas?             @relation(fields: [campa_aId], references: [id])
+  platform_canales_adquisicion  platform_canales_adquisicion?  @relation(fields: [canalAdquisicionId], references: [id])
+  platform_pipeline_stages      platform_pipeline_stages?      @relation(fields: [etapaId], references: [id])
   studios                       studios?                       @relation(fields: [studioId], references: [id])
-  prosocial_notifications       prosocial_notifications[]
+  platform_notifications        platform_notifications[]
 
   @@index([agentId])
   @@index([campa_aId])
@@ -711,7 +711,7 @@ model prosocial_leads {
   @@index([etapaId, prioridad])
 }
 
-model prosocial_notifications {
+model platform_notifications {
   id               String            @id
   userId           String
   titulo           String
@@ -728,8 +728,8 @@ model prosocial_notifications {
   expiresAt        DateTime?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime
-  prosocial_agents prosocial_agents? @relation(fields: [agentId], references: [id])
-  prosocial_leads  prosocial_leads?  @relation(fields: [leadId], references: [id])
+  platform_agents  platform_agents?  @relation(fields: [agentId], references: [id])
+  platform_leads   platform_leads?   @relation(fields: [leadId], references: [id])
   user_profiles    user_profiles     @relation(fields: [userId], references: [id])
 
   @@index([createdAt])
@@ -739,7 +739,7 @@ model prosocial_notifications {
   @@index([userId, isRead])
 }
 
-model prosocial_pipeline_stages {
+model platform_pipeline_stages {
   id              String            @id
   nombre          String
   descripcion     String?
@@ -748,13 +748,13 @@ model prosocial_pipeline_stages {
   isActive        Boolean           @default(true)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime
-  prosocial_leads prosocial_leads[]
+  platform_leads  platform_leads[]
 
   @@index([isActive])
   @@index([orden])
 }
 
-model prosocial_plataformas_publicidad {
+model platform_plataformas_publicidad {
   id                            String                          @id
   nombre                        String                          @unique
   descripcion                   String?
@@ -765,7 +765,7 @@ model prosocial_plataformas_publicidad {
   orden                         Int                             @default(0)
   createdAt                     DateTime                        @default(now())
   updatedAt                     DateTime
-  prosocial_campana_plataformas prosocial_campana_plataformas[]
+  platform_campana_plataformas  platform_campana_plataformas[]
 
   @@index([isActive])
   @@index([tipo])
@@ -963,7 +963,7 @@ model studios {
   negocios                 negocios[]
   nominas                  nominas[]
   paquetes                 paquetes[]
-  prosocial_leads          prosocial_leads?
+  platform_leads           platform_leads?
   revenue_transactions     revenue_transactions[]
   servicios                servicios[]
   studio_revenue_products  studio_revenue_products[]
@@ -1021,9 +1021,9 @@ model user_profiles {
   isActive                Boolean                   @default(true)
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime
-  prosocial_activities    prosocial_activities[]
-  prosocial_lead_bitacora prosocial_lead_bitacora[]
-  prosocial_notifications prosocial_notifications[]
+  platform_activities     platform_activities[]
+  platform_lead_bitacora  platform_lead_bitacora[]
+  platform_notifications  platform_notifications[]
   studios                 studios?                  @relation(fields: [studioId], references: [id])
 
   @@index([email])
