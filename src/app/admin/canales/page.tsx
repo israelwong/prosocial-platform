@@ -12,7 +12,6 @@ interface CanalAdquisicion {
     id: string;
     nombre: string;
     descripcion: string | null;
-    categoria: string;
     color: string | null;
     icono: string | null;
     isActive: boolean;
@@ -54,11 +53,6 @@ export default function CanalesPage() {
             if (!canalData.nombre.trim()) {
                 toast.error('El nombre del canal es requerido');
                 throw new Error('Nombre requerido');
-            }
-
-            if (!canalData.categoria.trim()) {
-                toast.error('La categoría del canal es requerida');
-                throw new Error('Categoría requerida');
             }
 
             const url = editingCanal ? `/api/canales/${editingCanal.id}` : '/api/canales';

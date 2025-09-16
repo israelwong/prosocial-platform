@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit, Trash2, Eye, EyeOff, Search, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -13,7 +12,6 @@ interface CanalAdquisicion {
     id: string;
     nombre: string;
     descripcion: string | null;
-    categoria: string;
     color: string | null;
     icono: string | null;
     isActive: boolean;
@@ -33,13 +31,6 @@ interface CanalesListProps {
     onReorder: (canales: CanalAdquisicion[]) => void;
 }
 
-const categorias = [
-    'Redes Sociales',
-    'Pago',
-    'Orgánico',
-    'Referidos',
-    'Otros'
-];
 
 export default function CanalesList({
     canales,
@@ -51,19 +42,12 @@ export default function CanalesList({
     onReorder
 }: CanalesListProps) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategoria, setSelectedCategoria] = useState<string>('all');
 
     const filteredCanales = canales.filter(canal => {
         const matchesSearch = canal.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            canal.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategoria = selectedCategoria === 'all' || canal.categoria === selectedCategoria;
-        return matchesSearch && matchesCategoria;
+            canal.descripcion?.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesSearch;
     });
-
-    const canalesPorCategoria = categorias.reduce((acc, categoria) => {
-        acc[categoria] = filteredCanales.filter(canal => canal.categoria === categoria);
-        return acc;
-    }, {} as Record<string, CanalAdquisicion[]>);
 
     const handleDelete = async (id: string) => {
         if (confirm('¿Estás seguro de que quieres eliminar este canal?')) {
@@ -122,100 +106,68 @@ export default function CanalesList({
                         className="pl-10"
                     />
                 </div>
-                <Select value={selectedCategoria} onValueChange={setSelectedCategoria}>
-                    <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Todas las categorías" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">Todas las categorías</SelectItem>
-                        {categorias.map(categoria => (
-                            <SelectItem key={categoria} value={categoria}>
-                                {categoria}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
             </div>
 
-            {/* Lista de canales por categoría */}
-            {categorias.map(categoria => {
-                const canalesCategoria = canalesPorCategoria[categoria];
-                if (canalesCategoria.length === 0) return null;
-
-                return (
-                    <div key={categoria} className="space-y-3">
-                        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                            <div 
-                                className="w-3 h-3 rounded-full" 
-                                style={{ backgroundColor: canalesCategoria[0]?.color || '#3B82F6' }}
-                            />
-                            {categoria}
-                            <Badge variant="secondary" className="ml-2">
-                                {canalesCategoria.length}
-                            </Badge>
-                        </h3>
-                        <div className="space-y-2">
-                            {canalesCategoria.map((canal, index) => (
-                                <Card key={canal.id} className="bg-card border-border">
-                                    <CardContent className="p-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-3">
-                                                <GripVertical className="h-4 w-4 text-zinc-400 cursor-grab" />
-                                                <div 
-                                                    className="w-3 h-3 rounded-full" 
-                                                    style={{ backgroundColor: canal.color || '#3B82F6' }}
-                                                />
-                                                <div>
-                                                    <h4 className="font-medium text-white">{canal.nombre}</h4>
-                                                    {canal.descripcion && (
-                                                        <p className="text-sm text-zinc-400">{canal.descripcion}</p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <Badge 
-                                                    variant={canal.isActive ? "default" : "secondary"}
-                                                    className={canal.isActive ? "bg-green-600" : "bg-zinc-600"}
-                                                >
-                                                    {canal.isActive ? 'Activo' : 'Inactivo'}
-                                                </Badge>
-                                                <Badge 
-                                                    variant={canal.isVisible ? "default" : "secondary"}
-                                                    className={canal.isVisible ? "bg-blue-600" : "bg-zinc-600"}
-                                                >
-                                                    {canal.isVisible ? 'Visible' : 'Oculto'}
-                                                </Badge>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleToggleActive(canal.id, !canal.isActive)}
-                                                >
-                                                    {canal.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => onEdit(canal)}
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleDelete(canal.id)}
-                                                    className="text-red-400 hover:text-red-300"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-                );
-            })}
+            {/* Lista de canales */}
+            <div className="space-y-2">
+                {filteredCanales.map((canal) => (
+                    <Card key={canal.id} className="bg-card border-border">
+                        <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <GripVertical className="h-4 w-4 text-zinc-400 cursor-grab" />
+                                    <div
+                                        className="w-3 h-3 rounded-full"
+                                        style={{ backgroundColor: canal.color || '#3B82F6' }}
+                                    />
+                                    <div>
+                                        <h4 className="font-medium text-white">{canal.nombre}</h4>
+                                        {canal.descripcion && (
+                                            <p className="text-sm text-zinc-400">{canal.descripcion}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Badge
+                                        variant={canal.isActive ? "default" : "secondary"}
+                                        className={canal.isActive ? "bg-green-600" : "bg-zinc-600"}
+                                    >
+                                        {canal.isActive ? 'Activo' : 'Inactivo'}
+                                    </Badge>
+                                    <Badge
+                                        variant={canal.isVisible ? "default" : "secondary"}
+                                        className={canal.isVisible ? "bg-blue-600" : "bg-zinc-600"}
+                                    >
+                                        {canal.isVisible ? 'Visible' : 'Oculto'}
+                                    </Badge>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleToggleActive(canal.id, !canal.isActive)}
+                                    >
+                                        {canal.isActive ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onEdit(canal)}
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleDelete(canal.id)}
+                                        className="text-red-400 hover:text-red-300"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
 
             {filteredCanales.length === 0 && (
                 <div className="text-center py-8">

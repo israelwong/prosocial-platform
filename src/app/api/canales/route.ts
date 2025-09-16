@@ -5,8 +5,8 @@ export async function GET() {
     try {
         const canales = await prisma.platform_canales_adquisicion.findMany({
             orderBy: [
-                { categoria: 'asc' },
-                { orden: 'asc' }
+                { orden: 'asc' },
+                { nombre: 'asc' }
             ]
         });
 
@@ -32,18 +32,10 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!body.categoria || !body.categoria.trim()) {
-            return NextResponse.json(
-                { error: 'La categoría del canal es requerida' },
-                { status: 400 }
-            );
-        }
-
         // Preparar datos para crear
         const canalData = {
             nombre: body.nombre.trim(),
             descripcion: body.descripcion?.trim() || null,
-            categoria: body.categoria.trim(),
             color: body.color || '#3B82F6',
             icono: body.icono || null,
             isActive: body.isActive ?? true,
@@ -59,11 +51,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(canal, { status: 201 });
     } catch (error) {
         console.error('Error creating canal:', error);
-        
+
         // Manejar errores específicos de Prisma
         if (error instanceof Error) {
             console.error('Error details:', error.message);
-            
+
             if (error.message.includes('Unique constraint') || error.message.includes('duplicate key')) {
                 return NextResponse.json(
                     { error: 'Ya existe un canal con este nombre' },

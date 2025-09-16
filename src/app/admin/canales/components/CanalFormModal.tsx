@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
@@ -15,7 +14,6 @@ interface CanalAdquisicion {
     id: string;
     nombre: string;
     descripcion: string | null;
-    categoria: string;
     color: string | null;
     icono: string | null;
     isActive: boolean;
@@ -32,25 +30,17 @@ interface CanalFormModalProps {
     onCancel?: () => void;
 }
 
-const categorias = [
-    'Redes Sociales',
-    'Pago',
-    'Orgánico',
-    'Referidos',
-    'Otros'
-];
 
-export default function CanalFormModal({ 
-    onCanalSubmit, 
-    editingCanal, 
-    onEdit, 
-    onCancel 
+export default function CanalFormModal({
+    onCanalSubmit,
+    editingCanal,
+    onEdit,
+    onCancel
 }: CanalFormModalProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
-        categoria: '',
         color: '#3B82F6',
         isActive: true,
         isVisible: true
@@ -60,7 +50,6 @@ export default function CanalFormModal({
         setFormData({
             nombre: '',
             descripcion: '',
-            categoria: '',
             color: '#3B82F6',
             isActive: true,
             isVisible: true
@@ -69,15 +58,10 @@ export default function CanalFormModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Validación del lado del cliente
         if (!formData.nombre.trim()) {
             toast.error('El nombre del canal es requerido');
-            return;
-        }
-        
-        if (!formData.categoria.trim()) {
-            toast.error('La categoría del canal es requerida');
             return;
         }
 
@@ -99,7 +83,6 @@ export default function CanalFormModal({
         setFormData({
             nombre: canal.nombre,
             descripcion: canal.descripcion || '',
-            categoria: canal.categoria,
             color: canal.color || '#3B82F6',
             isActive: canal.isActive,
             isVisible: canal.isVisible
@@ -132,31 +115,14 @@ export default function CanalFormModal({
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="nombre">Nombre *</Label>
-                            <Input
-                                id="nombre"
-                                value={formData.nombre}
-                                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="categoria">Categoría *</Label>
-                            <Select value={formData.categoria} onValueChange={(value) => setFormData({ ...formData, categoria: value })}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Seleccionar categoría" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {categorias.map(categoria => (
-                                        <SelectItem key={categoria} value={categoria}>
-                                            {categoria}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                    <div>
+                        <Label htmlFor="nombre">Nombre *</Label>
+                        <Input
+                            id="nombre"
+                            value={formData.nombre}
+                            onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                            required
+                        />
                     </div>
 
                     <div>
