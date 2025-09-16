@@ -23,9 +23,10 @@ ProSocial Platform es una plataforma SaaS multi-tenant para gestión de estudios
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── (marketing)/       # Marketing público
+│   ├── (auth)/            # Autenticación (route group)
+│   ├── (marketing)/       # Marketing público (route group)
 │   ├── admin/             # Panel de administración
-│   ├── asesor/            # Panel de asesores
+│   ├── agente/            # Panel de asesores
 │   ├── api/               # API Routes
 │   └── studio/            # Landing pages de estudios
 ├── components/            # Componentes reutilizables
@@ -39,6 +40,18 @@ src/
 - `/asesor/*` - Panel de asesores
 - `/studio/[slug]` - Landing page de estudios
 - `/api/*` - API endpoints
+
+### **Rutas de Autenticación**
+
+- `/login` - Inicio de sesión
+- `/sign-up` - Registro de usuarios
+- `/forgot-password` - Recuperación de contraseña
+- `/update-password` - Actualización de contraseña
+- `/error` - Página de error de autenticación
+- `/redirect` - Redirección post-autenticación
+- `/sign-up-success` - Confirmación de registro
+- `/complete-profile` - Completar perfil
+- `/confirm` - Confirmación de email
 
 ## 🎨 **DISEÑO Y UI/UX**
 
