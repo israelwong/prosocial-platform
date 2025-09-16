@@ -15,33 +15,33 @@ export async function middleware(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.log('🔒 Usuario no autenticado, redirigiendo a login');
+      // console.log('🔒 Usuario no autenticado, redirigiendo a login');
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    console.log('🔒 Usuario autenticado:', user.email);
-    console.log('🔒 User metadata:', user.user_metadata);
+    // console.log('🔒 Usuario autenticado:', user.email);
+    // console.log('🔒 User metadata:', user.user_metadata);
 
     // Obtener el rol del usuario desde user_metadata
     const userRole = user.user_metadata?.role;
 
     if (!userRole) {
-      console.log('🔒 No se encontró rol en metadata, redirigiendo a login');
+      // console.log('🔒 No se encontró rol en metadata, redirigiendo a login');
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    console.log('🔒 Rol del usuario:', userRole);
-    console.log('🔒 Ruta solicitada:', pathname);
+    // console.log('🔒 Rol del usuario:', userRole);
+    // console.log('🔒 Ruta solicitada:', pathname);
 
     // Verificar permisos según el rol
     const hasAccess = checkRouteAccess(userRole, pathname);
 
     if (!hasAccess) {
-      console.log('🔒 Acceso denegado para rol:', userRole, 'a ruta:', pathname);
+      // console.log('🔒 Acceso denegado para rol:', userRole, 'a ruta:', pathname);
       return NextResponse.redirect(new URL('/unauthorized', request.url));
     }
 
-    console.log('🔒 Acceso permitido para rol:', userRole, 'a ruta:', pathname);
+    // console.log('🔒 Acceso permitido para rol:', userRole, 'a ruta:', pathname);
   }
 
   // Rutas reservadas para marketing (no redirigir)
@@ -82,7 +82,7 @@ export async function middleware(request: NextRequest) {
 }
 
 function checkRouteAccess(userRole: string, pathname: string): boolean {
-  console.log('🔍 Verificando acceso - Rol:', userRole, 'Ruta:', pathname);
+  // console.log('🔍 Verificando acceso - Rol:', userRole, 'Ruta:', pathname);
 
   switch (userRole) {
     case 'super_admin':
@@ -98,7 +98,7 @@ function checkRouteAccess(userRole: string, pathname: string): boolean {
       return pathname.startsWith('/studio/');
 
     default:
-      console.log('🔍 Rol no reconocido:', userRole);
+      // console.log('🔍 Rol no reconocido:', userRole);
       return false;
   }
 }
