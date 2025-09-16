@@ -1,51 +1,32 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import {
+    DndContext,
+    DragEndEvent,
+    DragOverlay,
+    DragStartEvent,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    closestCorners,
+    pointerWithin,
+    getFirstCollision,
+    CollisionDetection,
+} from '@dnd-kit/core';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DraggableLeadCard } from './components/DraggableLeadCard';
+import { DroppableColumn } from './components/DroppableColumn';
+import { Lead, KanbanColumn } from './types';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
     Plus,
     Search,
-    Filter,
-    Users,
-    Phone,
-    Mail,
-    MessageSquare,
-    Calendar,
-    DollarSign,
-    Star,
-    MoreVertical,
-    Eye,
-    Edit,
-    Trash2
 } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-
-interface Lead {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    studio: string;
-    stage: string;
-    value: number;
-    priority: 'high' | 'medium' | 'low';
-    lastActivity: string;
-    assignedAgent: string;
-    source: string;
-    notes: string;
-    nextFollowUp?: string;
-}
-
-interface KanbanColumn {
-    id: string;
-    title: string;
-    leads: Lead[];
-    color: string;
-}
 
 export default function AgentKanbanPage() {
     const [columns, setColumns] = useState<KanbanColumn[]>([]);
@@ -53,150 +34,350 @@ export default function AgentKanbanPage() {
     const [filterStudio, setFilterStudio] = useState('all');
     const [filterPriority, setFilterPriority] = useState('all');
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [activeLead, setActiveLead] = useState<Lead | null>(null);
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    useEffect(() => {
-        // Simular carga de datos
-        const loadKanbanData = async () => {
+    // Configuración de sensores para drag and drop
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        })
+    );
+
+    // Estrategia de colisiones personalizada para soportar columnas vacías
+    const collisionDetection: CollisionDetection = (args) => {
+        const pointerIntersections = pointerWithin(args);
+
+        if (pointerIntersections.length > 0) {
+            const overId = getFirstCollision(pointerIntersections, 'id');
+            if (overId != null) {
+                return [{ id: overId }];
+            }
+        }
+        // Fallback a closestCorners (más estable que closestCenter para layouts irregulares)
+        return closestCorners(args);
+    };
+
+    const fetchKanbanData = useCallback(async () => {
+        const supabase = createClient();
+
+        try {
+            setError(null);
             setLoading(true);
+            console.log('🔍 Cargando datos del Kanban...');
 
-            // Simular delay de API
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Verificar autenticación (temporalmente opcional ya que RLS está deshabilitado)
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            console.log('🔍 Estado de autenticación:', { user: user?.email, authError });
 
-            const mockLeads: Lead[] = [
-                {
-                    id: 'lead-1',
-                    name: 'María González',
-                    email: 'maria@estudiofoto.com',
-                    phone: '+52 55 1234 5678',
-                    studio: 'Estudio Fotográfico Luna',
-                    stage: 'Nuevo',
-                    value: 15000,
-                    priority: 'high',
-                    lastActivity: 'Hace 2 horas',
-                    assignedAgent: 'Agente Actual',
-                    source: 'Google Ads',
-                    notes: 'Interesada en plan Pro, necesita demo',
-                    nextFollowUp: '2024-01-15T10:00:00Z'
-                },
-                {
-                    id: 'lead-2',
-                    name: 'Carlos Rodríguez',
-                    email: 'carlos@fotografiapro.com',
-                    phone: '+52 55 9876 5432',
-                    studio: 'Fotografía Profesional',
-                    stage: 'Calificado',
-                    value: 25000,
-                    priority: 'medium',
-                    lastActivity: 'Hace 4 horas',
-                    assignedAgent: 'Agente Actual',
-                    source: 'Referido',
-                    notes: 'Estudio grande, presupuesto aprobado',
-                    nextFollowUp: '2024-01-16T14:00:00Z'
-                },
-                {
-                    id: 'lead-3',
-                    name: 'Ana Martínez',
-                    email: 'ana@retratos.com',
-                    phone: '+52 55 5555 1234',
-                    studio: 'Retratos & Más',
-                    stage: 'Propuesta',
-                    value: 8000,
-                    priority: 'low',
-                    lastActivity: 'Ayer',
-                    assignedAgent: 'Agente Actual',
-                    source: 'Facebook',
-                    notes: 'Esperando respuesta sobre propuesta',
-                    nextFollowUp: '2024-01-17T09:00:00Z'
-                },
-                {
-                    id: 'lead-4',
-                    name: 'Luis Fernández',
-                    email: 'luis@eventos.com',
-                    phone: '+52 55 7777 8888',
-                    studio: 'Eventos Fotográficos',
-                    stage: 'Negociación',
-                    value: 12000,
-                    priority: 'high',
-                    lastActivity: 'Hace 1 día',
-                    assignedAgent: 'Agente Actual',
-                    source: 'LinkedIn',
-                    notes: 'Negociando precio, muy interesado',
-                    nextFollowUp: '2024-01-15T16:00:00Z'
-                },
-                {
-                    id: 'lead-5',
-                    name: 'Sofia López',
-                    email: 'sofia@fotografia.com',
-                    phone: '+52 55 3333 4444',
-                    studio: 'Fotografía Creativa',
-                    stage: 'Convertido',
-                    value: 18000,
-                    priority: 'medium',
-                    lastActivity: 'Hace 3 días',
-                    assignedAgent: 'Agente Actual',
-                    source: 'Website',
-                    notes: 'Cliente satisfecho, posible referido',
-                    nextFollowUp: '2024-01-20T10:00:00Z'
-                }
-            ];
+            if (authError) {
+                console.warn('⚠️ Error de autenticación (continuando sin autenticación):', authError);
+            }
 
-            const mockColumns: KanbanColumn[] = [
-                {
-                    id: 'nuevo',
-                    title: 'Nuevo',
-                    color: 'bg-blue-500',
-                    leads: mockLeads.filter(lead => lead.stage === 'Nuevo')
-                },
-                {
-                    id: 'calificado',
-                    title: 'Calificado',
-                    color: 'bg-green-500',
-                    leads: mockLeads.filter(lead => lead.stage === 'Calificado')
-                },
-                {
-                    id: 'propuesta',
-                    title: 'Propuesta',
-                    color: 'bg-yellow-500',
-                    leads: mockLeads.filter(lead => lead.stage === 'Propuesta')
-                },
-                {
-                    id: 'negociacion',
-                    title: 'Negociación',
-                    color: 'bg-orange-500',
-                    leads: mockLeads.filter(lead => lead.stage === 'Negociación')
-                },
-                {
-                    id: 'convertido',
-                    title: 'Convertido',
-                    color: 'bg-purple-500',
-                    leads: mockLeads.filter(lead => lead.stage === 'Convertido')
-                }
-            ];
+            if (!user) {
+                console.warn('⚠️ Usuario no autenticado (continuando sin autenticación)');
+            }
 
-            setColumns(mockColumns);
+            // Obtener pipeline stages
+            console.log('📋 Obteniendo pipeline stages...');
+            const { data: stages, error: stagesError } = await supabase
+                .from('prosocial_pipeline_stages')
+                .select('*')
+                .eq('isActive', true)
+                .order('orden', { ascending: true });
+
+            if (stagesError) {
+                console.error('❌ Error obteniendo stages:', stagesError);
+                setError('Error al cargar las etapas del pipeline');
+                setLoading(false);
+                return;
+            }
+
+            console.log('✅ Pipeline stages obtenidos:', stages?.length || 0);
+
+            // Obtener leads con sus etapas
+            console.log('📋 Obteniendo leads...');
+            const { data: leads, error: leadsError } = await supabase
+                .from('prosocial_leads')
+                .select(`
+                    id,
+                    nombre,
+                    email,
+                    telefono,
+                    nombreEstudio,
+                    fechaUltimoContacto,
+                    planInteres,
+                    presupuestoMensual,
+                    puntaje,
+                    prioridad,
+                    createdAt,
+                    etapaId,
+                    canalAdquisicionId,
+                    agentId,
+                    prosocial_canales_adquisicion (
+                        id,
+                        nombre
+                    ),
+                    prosocial_agents (
+                        id,
+                        nombre
+                    )
+                `)
+                .order('createdAt', { ascending: false });
+
+            if (leadsError) {
+                console.error('❌ Error obteniendo leads:', leadsError);
+                setError('Error al cargar los leads');
+                setLoading(false);
+                return;
+            }
+
+            console.log('✅ Leads obtenidos:', leads?.length || 0);
+
+            // Mapear leads al formato esperado
+            const mappedLeads: Lead[] = (leads || []).map(lead => ({
+                id: lead.id,
+                name: lead.nombre,
+                email: lead.email,
+                phone: lead.telefono,
+                studio: lead.nombreEstudio || 'Sin estudio',
+                stage: lead.etapaId || 'Sin etapa',
+                value: lead.presupuestoMensual ? Number(lead.presupuestoMensual) : 0,
+                priority: lead.prioridad === 'alta' ? 'high' : lead.prioridad === 'media' ? 'medium' : 'low',
+                lastActivity: lead.fechaUltimoContacto ? new Date(lead.fechaUltimoContacto).toLocaleDateString() : 'Sin actividad',
+                assignedAgent: (lead.prosocial_agents as unknown as { nombre: string } | null)?.nombre || (lead.agentId ? 'Agente asignado' : 'Sin asignar'),
+                source: (lead.prosocial_canales_adquisicion as unknown as { nombre: string } | null)?.nombre || 'Sin canal',
+                notes: `Lead con ${lead.planInteres || 'plan no especificado'}`,
+                etapaId: lead.etapaId
+            }));
+
+            // Crear columnas del Kanban
+            const kanbanColumns: KanbanColumn[] = (stages || []).map(stage => ({
+                id: stage.id,
+                title: stage.nombre,
+                color: stage.color || '#3B82F6',
+                stage: stage,
+                leads: mappedLeads.filter(lead => lead.etapaId === stage.id)
+            }));
+
+            // Agregar columna para leads sin etapa asignada
+            const leadsWithoutStage = mappedLeads.filter(lead => !lead.etapaId);
+            if (leadsWithoutStage.length > 0) {
+                kanbanColumns.unshift({
+                    id: 'sin-etapa',
+                    title: 'Sin Etapa',
+                    color: '#6B7280',
+                    stage: {
+                        id: 'sin-etapa',
+                        nombre: 'Sin Etapa',
+                        descripcion: 'Leads sin etapa asignada',
+                        color: '#6B7280',
+                        orden: -1,
+                        isActive: true
+                    },
+                    leads: leadsWithoutStage
+                });
+            }
+
+            setColumns(kanbanColumns);
+            console.log('✅ Kanban configurado con', kanbanColumns.length, 'columnas');
+
+        } catch (error) {
+            console.error('❌ Error inesperado:', error);
+            setError('Error inesperado al cargar los datos del Kanban');
+        } finally {
             setLoading(false);
-        };
-
-        loadKanbanData();
+        }
     }, []);
 
-    const getPriorityColor = (priority: string) => {
-        switch (priority) {
-            case 'high': return 'bg-red-100 text-red-800';
-            case 'medium': return 'bg-yellow-100 text-yellow-800';
-            case 'low': return 'bg-green-100 text-green-800';
-            default: return 'bg-gray-100 text-gray-800';
+    // Función para actualizar la etapa de un lead usando API route
+    const updateLeadStage = useCallback(async (leadId: string, newStageId: string | undefined, oldStageId?: string) => {
+        try {
+            setIsUpdating(true);
+            console.log(`🔄 Actualizando lead ${leadId} de etapa ${oldStageId} a etapa ${newStageId}`);
+
+            // Llamar a la API route
+            const response = await fetch(`/api/leads/${leadId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    etapaId: newStageId || null,
+                    oldStageId: oldStageId
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Error al actualizar el lead');
+            }
+
+            const updatedLead = await response.json();
+            console.log('✅ Lead actualizado exitosamente:', updatedLead);
+
+        } catch (error) {
+            console.error('❌ Error actualizando lead:', error);
+            throw error;
+        } finally {
+            setIsUpdating(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchKanbanData();
+    }, [fetchKanbanData]);
+
+    // Función para manejar el inicio del drag
+    const handleDragStart = (event: DragStartEvent) => {
+        const { active } = event;
+        const lead = columns
+            .flatMap(col => col.leads)
+            .find(lead => lead.id === active.id);
+
+        if (lead) {
+            setActiveLead(lead);
         }
     };
 
-    const getPriorityLabel = (priority: string) => {
-        switch (priority) {
-            case 'high': return 'Alta';
-            case 'medium': return 'Media';
-            case 'low': return 'Baja';
-            default: return 'Sin prioridad';
+    // Función para manejar el final del drag
+    const handleDragEnd = async (event: DragEndEvent) => {
+        setActiveLead(null);
+        const { active, over } = event;
+
+        if (!over) return;
+
+        const activeId = active.id as string;
+        const overId = over.id as string;
+
+        if (activeId === overId) return;
+
+        const findContainer = (id: string) => {
+            // Primero verificar si el ID es directamente una etapa/columna
+            const columnExists = columns.find(col => col.id === id);
+            if (columnExists) {
+                return id;
+            }
+
+            // Finalmente, buscar en qué columna está el lead
+            for (const column of columns) {
+                if (column.leads.some(lead => lead.id === id)) {
+                    return column.id;
+                }
+            }
+            return null;
+        };
+
+        const activeContainer = findContainer(activeId);
+        let overContainer: string | null = null;
+
+        // Determinar el contenedor de destino usando la información de data si está disponible
+        if (over.data?.current?.type === 'column') {
+            overContainer = over.data.current.etapaId;
+        } else {
+            overContainer = findContainer(overId);
+        }
+
+        // Si no se encontró contenedor, verificar si overId es directamente una etapa
+        if (!overContainer) {
+            const esEtapaValida = columns.some(col => col.id === overId);
+            if (esEtapaValida) {
+                overContainer = overId;
+            }
+        }
+
+        console.log('🔍 Drag End Debug:');
+        console.log('activeId:', activeId);
+        console.log('overId:', overId);
+        console.log('activeContainer:', activeContainer);
+        console.log('overContainer:', overContainer);
+
+        if (!activeContainer || !overContainer) {
+            console.log('❌ No se encontraron contenedores válidos');
+            return;
+        }
+
+        // Si el lead se mueve a la misma columna, no hacer nada
+        if (activeContainer === overContainer) return;
+
+        try {
+            // ACTUALIZACIÓN OPTIMISTA: Actualizar el estado local inmediatamente
+            setColumns(prevColumns => {
+                const newColumns = [...prevColumns];
+
+                // Encontrar las columnas de origen y destino
+                const sourceColumnIndex = newColumns.findIndex(col => col.id === activeContainer);
+                const targetColumnIndex = newColumns.findIndex(col => col.id === overContainer);
+
+                if (sourceColumnIndex === -1 || targetColumnIndex === -1) return prevColumns;
+
+                const sourceColumn = newColumns[sourceColumnIndex];
+                const targetColumn = newColumns[targetColumnIndex];
+
+                // Remover el lead de la columna de origen
+                const leadToMove = sourceColumn.leads.find(lead => lead.id === activeId);
+                if (!leadToMove) return prevColumns;
+
+                newColumns[sourceColumnIndex] = {
+                    ...sourceColumn,
+                    leads: sourceColumn.leads.filter(lead => lead.id !== activeId)
+                };
+
+                // Agregar el lead a la columna de destino
+                newColumns[targetColumnIndex] = {
+                    ...targetColumn,
+                    leads: [...targetColumn.leads, { ...leadToMove, etapaId: overContainer }]
+                };
+
+                return newColumns;
+            });
+
+            // Actualizar en la base de datos (sin actualización optimista adicional)
+            await updateLeadStage(
+                activeId,
+                overContainer === 'sin-etapa' ? undefined : overContainer,
+                activeContainer === 'sin-etapa' ? undefined : activeContainer
+            );
+
+        } catch (error) {
+            console.error('❌ Error moviendo lead:', error);
+
+            // REVERTIR CAMBIOS: Si falla la API, revertir al estado anterior
+            setColumns(prevColumns => {
+                const newColumns = [...prevColumns];
+
+                // Encontrar las columnas de origen y destino
+                const sourceColumnIndex = newColumns.findIndex(col => col.id === overContainer);
+                const targetColumnIndex = newColumns.findIndex(col => col.id === activeContainer);
+
+                if (sourceColumnIndex === -1 || targetColumnIndex === -1) return prevColumns;
+
+                const sourceColumn = newColumns[sourceColumnIndex];
+                const targetColumn = newColumns[targetColumnIndex];
+
+                // Remover el lead de la columna de destino (donde se movió optimísticamente)
+                const leadToRevert = sourceColumn.leads.find(lead => lead.id === activeId);
+                if (!leadToRevert) return prevColumns;
+
+                newColumns[sourceColumnIndex] = {
+                    ...sourceColumn,
+                    leads: sourceColumn.leads.filter(lead => lead.id !== activeId)
+                };
+
+                // Devolver el lead a la columna de origen
+                newColumns[targetColumnIndex] = {
+                    ...targetColumn,
+                    leads: [...targetColumn.leads, { ...leadToRevert, etapaId: activeContainer }]
+                };
+
+                return newColumns;
+            });
         }
     };
+
 
     const filteredColumns = columns.map(column => ({
         ...column,
@@ -224,8 +405,47 @@ export default function AgentKanbanPage() {
                     </div>
                 </div>
                 <div className="flex items-center justify-center h-64">
-                    <div className="animate-pulse text-muted-foreground">Cargando CRM...</div>
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <div className="text-muted-foreground">Cargando CRM...</div>
+                    </div>
                 </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold">CRM Kanban</h1>
+                        <p className="text-muted-foreground">Gestiona tus leads de manera visual</p>
+                    </div>
+                </div>
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="flex flex-col items-center gap-4 text-center">
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                                <span className="text-red-600 text-xl">⚠️</span>
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-semibold text-red-600">Error al cargar CRM</h3>
+                                <p className="text-muted-foreground mt-2">{error}</p>
+                            </div>
+                            <Button
+                                onClick={() => {
+                                    setError(null);
+                                    setLoading(true);
+                                    fetchKanbanData();
+                                }}
+                                variant="outline"
+                            >
+                                Reintentar
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         );
     }
@@ -286,128 +506,28 @@ export default function AgentKanbanPage() {
             </Card>
 
             {/* Kanban Board */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                {filteredColumns.map((column) => (
-                    <Card key={column.id} className="min-h-[600px]">
-                        <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className={`w-3 h-3 rounded-full ${column.color}`} />
-                                    <CardTitle className="text-sm font-medium">{column.title}</CardTitle>
-                                </div>
-                                <Badge variant="secondary" className="text-xs">
-                                    {column.leads.length}
-                                </Badge>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            {column.leads.length === 0 ? (
-                                <div className="text-center py-8 text-muted-foreground">
-                                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                    <p className="text-sm">No hay leads en esta etapa</p>
-                                </div>
-                            ) : (
-                                column.leads.map((lead) => (
-                                    <Card key={lead.id} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-                                        <div className="space-y-3">
-                                            {/* Header del lead */}
-                                            <div className="flex items-start justify-between">
-                                                <div className="flex-1">
-                                                    <h4 className="font-medium text-sm">{lead.name}</h4>
-                                                    <p className="text-xs text-muted-foreground">{lead.studio}</p>
-                                                </div>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                            <MoreVertical className="h-3 w-3" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>
-                                                            <Eye className="h-4 w-4 mr-2" />
-                                                            Ver detalles
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem>
-                                                            <Edit className="h-4 w-4 mr-2" />
-                                                            Editar
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600">
-                                                            <Trash2 className="h-4 w-4 mr-2" />
-                                                            Eliminar
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={collisionDetection}
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+            >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    {filteredColumns.map((column) => (
+                        <DroppableColumn
+                            key={column.id}
+                            column={column}
+                            isUpdating={isUpdating}
+                        />
+                    ))}
+                </div>
 
-                                            {/* Información del lead */}
-                                            <div className="space-y-2">
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    <Mail className="h-3 w-3" />
-                                                    <span className="truncate">{lead.email}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    <Phone className="h-3 w-3" />
-                                                    <span>{lead.phone}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    <DollarSign className="h-3 w-3" />
-                                                    <span className="font-medium text-green-600">${lead.value.toLocaleString()}</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Prioridad y fuente */}
-                                            <div className="flex items-center justify-between">
-                                                <Badge variant="outline" className={getPriorityColor(lead.priority)}>
-                                                    {getPriorityLabel(lead.priority)}
-                                                </Badge>
-                                                <span className="text-xs text-muted-foreground">{lead.source}</span>
-                                            </div>
-
-                                            {/* Notas */}
-                                            {lead.notes && (
-                                                <div className="text-xs text-muted-foreground bg-gray-50 p-2 rounded">
-                                                    {lead.notes}
-                                                </div>
-                                            )}
-
-                                            {/* Próximo seguimiento */}
-                                            {lead.nextFollowUp && (
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    <Calendar className="h-3 w-3" />
-                                                    <span>
-                                                        Próximo: {new Date(lead.nextFollowUp).toLocaleDateString()}
-                                                    </span>
-                                                </div>
-                                            )}
-
-                                            {/* Última actividad */}
-                                            <div className="text-xs text-muted-foreground">
-                                                {lead.lastActivity}
-                                            </div>
-
-                                            {/* Acciones rápidas */}
-                                            <div className="flex gap-1 pt-2 border-t">
-                                                <Button variant="outline" size="sm" className="flex-1 text-xs">
-                                                    <Phone className="h-3 w-3 mr-1" />
-                                                    Llamar
-                                                </Button>
-                                                <Button variant="outline" size="sm" className="flex-1 text-xs">
-                                                    <Mail className="h-3 w-3 mr-1" />
-                                                    Email
-                                                </Button>
-                                                <Button variant="outline" size="sm" className="flex-1 text-xs">
-                                                    <MessageSquare className="h-3 w-3 mr-1" />
-                                                    Chat
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                ))
-                            )}
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+                <DragOverlay>
+                    {activeLead ? (
+                        <DraggableLeadCard lead={activeLead} isUpdating={false} />
+                    ) : null}
+                </DragOverlay>
+            </DndContext>
 
             {/* Resumen */}
             <Card>

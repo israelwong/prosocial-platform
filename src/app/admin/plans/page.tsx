@@ -28,8 +28,10 @@ async function getPlans(): Promise<Plan[]> {
         return plans.map(plan => ({
             ...plan,
             price_monthly: plan.price_monthly ? Number(plan.price_monthly) : null,
-            price_yearly: plan.price_yearly ? Number(plan.price_yearly) : null
-        }));
+            price_yearly: plan.price_yearly ? Number(plan.price_yearly) : null,
+            features: Array.isArray(plan.features) ? plan.features as string[] : null,
+            limits: plan.limits as Record<string, unknown> | null
+        })) as Plan[];
     } catch (error) {
         console.error('Error fetching plans:', error);
 
