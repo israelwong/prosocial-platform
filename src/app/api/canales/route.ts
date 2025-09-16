@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
 
         // Preparar datos para crear
         const canalData = {
+            id: crypto.randomUUID(), // Generar ID único
             nombre: body.nombre.trim(),
             descripcion: body.descripcion?.trim() || null,
             categoria: body.categoria.trim(),
@@ -48,7 +49,8 @@ export async function POST(request: NextRequest) {
             icono: body.icono || null,
             isActive: body.isActive ?? true,
             isVisible: body.isVisible ?? true,
-            orden: body.orden || 0
+            orden: body.orden || 0,
+            updatedAt: new Date()
         };
 
         const canal = await prisma.platform_canales_adquisicion.create({
@@ -61,15 +63,23 @@ export async function POST(request: NextRequest) {
         
         // Manejar errores específicos de Prisma
         if (error instanceof Error) {
-            if (error.message.includes('Unique constraint')) {
+            console.error('Error details:', error.message);
+            
+            if (error.message.includes('Unique constraint') || error.message.includes('duplicate key')) {
                 return NextResponse.json(
                     { error: 'Ya existe un canal con este nombre' },
                     { status: 409 }
                 );
             }
-            if (error.message.includes('Invalid value')) {
+            if (error.message.includes('Invalid value') || error.message.includes('Invalid input')) {
                 return NextResponse.json(
                     { error: 'Los datos proporcionados no son válidos' },
+                    { status: 400 }
+                );
+            }
+            if (error.message.includes('Required field')) {
+                return NextResponse.json(
+                    { error: 'Faltan campos requeridos' },
                     { status: 400 }
                 );
             }
