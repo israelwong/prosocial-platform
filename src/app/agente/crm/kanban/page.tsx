@@ -83,7 +83,7 @@ export default function AgentKanbanPage() {
             // Obtener pipeline stages
             console.log('📋 Obteniendo pipeline stages...');
             const { data: stages, error: stagesError } = await supabase
-                .from('prosocial_pipeline_stages')
+                .from('platform_pipeline_stages')
                 .select('*')
                 .eq('isActive', true)
                 .order('orden', { ascending: true });
@@ -100,7 +100,7 @@ export default function AgentKanbanPage() {
             // Obtener leads con sus etapas
             console.log('📋 Obteniendo leads...');
             const { data: leads, error: leadsError } = await supabase
-                .from('prosocial_leads')
+                .from('platform_leads')
                 .select(`
                     id,
                     nombre,
@@ -118,11 +118,11 @@ export default function AgentKanbanPage() {
                     etapaId,
                     canalAdquisicionId,
                     agentId,
-                    prosocial_canales_adquisicion (
+                    platform_canales_adquisicion (
                         id,
                         nombre
                     ),
-                    prosocial_agents (
+                    platform_agents (
                         id,
                         nombre
                     )
@@ -199,8 +199,8 @@ export default function AgentKanbanPage() {
                     value: lead.presupuestoMensual ? Number(lead.presupuestoMensual) : 0,
                     priority: lead.prioridad === 'alta' ? 'high' : lead.prioridad === 'media' ? 'medium' : 'low',
                     lastActivity: lead.fechaUltimoContacto ? new Date(lead.fechaUltimoContacto).toLocaleDateString() : 'Sin actividad',
-                    assignedAgent: (lead.prosocial_agents as unknown as { nombre: string } | null)?.nombre || (lead.agentId ? 'Agente asignado' : 'Sin asignar'),
-                    source: (lead.prosocial_canales_adquisicion as unknown as { nombre: string } | null)?.nombre || 'Sin canal',
+                    assignedAgent: (lead.platform_agents as unknown as { nombre: string } | null)?.nombre || (lead.agentId ? 'Agente asignado' : 'Sin asignar'),
+                    source: (lead.platform_canales_adquisicion as unknown as { nombre: string } | null)?.nombre || 'Sin canal',
                     notes: `Lead con ${lead.planInteres || 'plan no especificado'}`,
                     etapaId: lead.etapaId,
                     hasSubscription: subscriptionPrice !== null && subscriptionPrice > 0,

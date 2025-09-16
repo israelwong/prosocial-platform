@@ -18,7 +18,7 @@ export async function POST(
                 subscriptions: {
                     where: { status: 'active' },
                     include: {
-                        studios: {
+                        projects: {
                             select: {
                                 id: true,
                                 name: true,
@@ -113,7 +113,7 @@ export async function POST(
                 migrationResults.push({
                     subscriptionId: subscription.id,
                     studioId: subscription.studio_id,
-                    studioName: subscription.studios.name,
+                    studioName: subscription.projects.name,
                     status: 'success',
                     message: 'Migración exitosa',
                     newPrice: isYearly ? newPlan.price_yearly : newPlan.price_monthly
@@ -121,7 +121,7 @@ export async function POST(
 
                 // TODO: Enviar notificación por email al usuario
                 if (notifyUsers) {
-                    console.log(`📧 Notificación enviada a ${subscription.studios.email} sobre migración de plan`);
+                    console.log(`📧 Notificación enviada a ${subscription.projects.email} sobre migración de plan`);
                     // Aquí se implementaría el envío de email
                 }
 
@@ -175,7 +175,7 @@ export async function GET(
                 subscriptions: {
                     where: { status: 'active' },
                     include: {
-                        studios: {
+                        projects: {
                             select: {
                                 id: true,
                                 name: true,
@@ -207,8 +207,8 @@ export async function GET(
             subscriptions: plan.subscriptions.map(sub => ({
                 id: sub.id,
                 studioId: sub.studio_id,
-                studioName: sub.studios.name,
-                studioEmail: sub.studios.email,
+                studioName: sub.projects.name,
+                studioEmail: sub.projects.email,
                 currentPeriodEnd: sub.current_period_end
             }))
         });

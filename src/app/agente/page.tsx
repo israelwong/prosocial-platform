@@ -66,7 +66,7 @@ export default function AgenteDashboard() {
         try {
             // Consultar leads reales desde la base de datos
             const { data, error } = await supabase
-                .from('prosocial_leads')
+                .from('platform_leads')
                 .select(`
                     id,
                     nombre,
@@ -86,12 +86,12 @@ export default function AgenteDashboard() {
                     etapaId,
                     canalAdquisicionId,
                     campa_aId,
-                    prosocial_agents!prosocial_leads_agentId_fkey (
+                    platform_agents!platform_leads_agentId_fkey (
                         id,
                         nombre,
                         email
                     ),
-                    prosocial_canales_adquisicion (
+                    platform_canales_adquisicion (
                         id,
                         nombre,
                         categoria,

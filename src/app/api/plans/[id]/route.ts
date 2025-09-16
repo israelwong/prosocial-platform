@@ -86,7 +86,7 @@ export async function GET(
             include: {
                 _count: {
                     select: {
-                        studios: true,
+                        projects: true,
                         subscriptions: true
                     }
                 }
@@ -200,7 +200,7 @@ export async function PUT(
             include: {
                 _count: {
                     select: {
-                        studios: true,
+                        projects: true,
                         subscriptions: true
                     }
                 }
@@ -330,7 +330,7 @@ export async function DELETE(
             include: {
                 _count: {
                     select: {
-                        studios: true,
+                        projects: true,
                         subscriptions: true
                     }
                 }
@@ -345,7 +345,7 @@ export async function DELETE(
         }
 
         // Verificar si el plan tiene estudios o suscripciones activas
-        if (existingPlan._count.studios > 0 || existingPlan._count.subscriptions > 0) {
+        if (existingPlan._count.projects > 0 || existingPlan._count.subscriptions > 0) {
             return NextResponse.json(
                 { error: "No se puede eliminar un plan que tiene estudios o suscripciones activas. Desactívalo en su lugar." },
                 { status: 409 }

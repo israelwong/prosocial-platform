@@ -77,7 +77,7 @@ export default function LeadsPage() {
 
             // Consulta básica primero - obtener todos los leads
             const { data, error } = await supabase
-                .from('prosocial_leads')
+                .from('platform_leads')
                 .select(`
                     id,
                     nombre,

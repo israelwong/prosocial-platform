@@ -7,7 +7,7 @@ export async function GET() {
             include: {
                 _count: {
                     select: {
-                        studios: true,
+                        projects: true,
                         subscriptions: true
                     }
                 }
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
             include: {
                 _count: {
                     select: {
-                        studios: true,
+                        projects: true,
                         subscriptions: true
                     }
                 }
