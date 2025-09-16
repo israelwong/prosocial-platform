@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
 
         // Preparar datos para crear
         const canalData = {
-            id: crypto.randomUUID(), // Generar ID único
             nombre: body.nombre.trim(),
             descripcion: body.descripcion?.trim() || null,
             categoria: body.categoria.trim(),
