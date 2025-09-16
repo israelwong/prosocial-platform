@@ -20,7 +20,7 @@ export default async function RedirectPage() {
 
     if (!userRole) {
         console.log('🔍 Redirect - No se encontró rol en metadata, redirigiendo a login')
-        redirect('/auth/login?error=no-role')
+        redirect('/login?error=no-role')
     }
 
     console.log('🔍 Redirect - Rol encontrado:', userRole)
