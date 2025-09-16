@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
-        const canales = await prisma.prosocial_canales_adquisicion.findMany({
+        const canales = await prisma.platform_canales_adquisicion.findMany({
             orderBy: [
                 { categoria: 'asc' },
                 { orden: 'asc' }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
 
-        const canal = await prisma.prosocial_canales_adquisicion.create({
+        const canal = await prisma.platform_canales_adquisicion.create({
             data: body
         });
 

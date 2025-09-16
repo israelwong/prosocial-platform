@@ -21,7 +21,7 @@ export async function POST(
         }
 
         // Obtener datos del agente
-        const agent = await prisma.prosocial_agents.findUnique({
+        const agent = await prisma.platform_agents.findUnique({
             where: { id }
         });
 

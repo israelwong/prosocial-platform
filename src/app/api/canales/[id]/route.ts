@@ -9,7 +9,7 @@ export async function PUT(
         const body = await request.json();
         const { id } = params;
 
-        const canal = await prisma.prosocial_canales_adquisicion.update({
+        const canal = await prisma.platform_canales_adquisicion.update({
             where: { id },
             data: body
         });
@@ -31,7 +31,7 @@ export async function DELETE(
     try {
         const { id } = params;
 
-        await prisma.prosocial_canales_adquisicion.delete({
+        await prisma.platform_canales_adquisicion.delete({
             where: { id }
         });
 

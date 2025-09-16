@@ -17,11 +17,11 @@ const createAgentSchema = z.object({
 // GET /api/admin/agents - Listar todos los agentes
 export async function GET() {
     try {
-        const agents = await prisma.prosocial_agents.findMany({
+        const agents = await prisma.platform_agents.findMany({
             include: {
                 _count: {
                     select: {
-                        prosocial_leads: true
+                        platform_leads: true
                     }
                 }
             },
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verificar si el email ya existe
-        const existingAgent = await prisma.prosocial_agents.findUnique({
+        const existingAgent = await prisma.platform_agents.findUnique({
             where: { email: validatedData.email }
         });
 
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 
         try {
             // 2. Crear agente en la base de datos
-            const agent = await prisma.prosocial_agents.create({
+            const agent = await prisma.platform_agents.create({
                 data: {
                     id: authUser.user.id, // Usar el mismo ID de Supabase Auth
                     nombre: validatedData.nombre,
@@ -118,14 +118,14 @@ export async function POST(request: NextRequest) {
                 include: {
                     _count: {
                         select: {
-                            prosocial_leads: true
+                            platform_leads: true
                         }
                     }
                 }
             });
 
             // 3. Crear perfil de usuario
-            const userProfile = await prisma.user_profiles.create({
+            const userProfile = await prisma.project_user_profiles.create({
                 data: {
                     id: authUser.user.id,
                     email: validatedData.email,

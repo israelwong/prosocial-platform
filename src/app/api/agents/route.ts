@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
-        const agents = await prisma.prosocial_agents.findMany({
+        const agents = await prisma.platform_agents.findMany({
             where: {
                 activo: true
             },

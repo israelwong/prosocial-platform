@@ -8,26 +8,26 @@ export async function GET(request: NextRequest) {
         const isActive = searchParams.get('isActive');
 
         const where: any = {};
-        
+
         if (status) {
             where.status = status;
         }
-        
+
         if (isActive !== null) {
             where.isActive = isActive === 'true';
         }
 
-        const campanas = await prisma.prosocial_campanas.findMany({
+        const campanas = await prisma.platform_campanas.findMany({
             where,
             include: {
-                prosocial_campana_plataformas: {
+                platform_campana_plataformas: {
                     include: {
-                        prosocial_plataformas_publicidad: true
+                        platform_plataformas_publicidad: true
                     }
                 },
                 _count: {
                     select: {
-                        prosocial_leads: true
+                        platform_leads: true
                     }
                 }
             },
@@ -50,13 +50,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        
+
         const { plataformas, ...campañaData } = body;
-        
-        const campaña = await prisma.prosocial_campanas.create({
+
+        const campaña = await prisma.platform_campanas.create({
             data: {
                 ...campañaData,
-                prosocial_campana_plataformas: {
+                platform_campana_plataformas: {
                     create: plataformas?.map((p: any) => ({
                         plataformaId: p.plataformaId,
                         presupuesto: p.presupuesto,
@@ -67,9 +67,9 @@ export async function POST(request: NextRequest) {
                 }
             },
             include: {
-                prosocial_campana_plataformas: {
+                platform_campana_plataformas: {
                     include: {
-                        prosocial_plataformas_publicidad: true
+                        platform_plataformas_publicidad: true
                     }
                 }
             }
