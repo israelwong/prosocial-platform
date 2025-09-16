@@ -75,8 +75,8 @@ export default function CanalesPage() {
 
             if (editingCanal) {
                 // Actualización optimista para edición
-                setCanales(prevCanales =>
-                    prevCanales.map(c =>
+                setCanales(prevCanales => 
+                    prevCanales.map(c => 
                         c.id === editingCanal.id ? { ...c, ...canalData } : c
                     )
                 );
@@ -84,8 +84,9 @@ export default function CanalesPage() {
                 setIsEditModalOpen(false);
                 toast.success('Canal actualizado correctamente');
             } else {
-                // Para creación, recargar la lista
-                fetchCanales();
+                // Para creación, agregar el nuevo canal a la lista
+                const newCanal = await response.json();
+                setCanales(prevCanales => [...prevCanales, newCanal]);
                 toast.success('Canal creado correctamente');
             }
         } catch (error) {
