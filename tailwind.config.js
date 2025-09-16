@@ -9,61 +9,62 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // Zinc-based color system for dark theme
+        background: "rgb(24 24 27)", // zinc-900
+        foreground: "rgb(255 255 255)", // white
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "rgb(24 24 27)", // zinc-900
+          foreground: "rgb(255 255 255)", // white
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "rgb(24 24 27)", // zinc-900
+          foreground: "rgb(255 255 255)", // white
         },
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "rgb(255 255 255)", // white
+          foreground: "rgb(24 24 27)", // zinc-900
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "rgb(39 39 42)", // zinc-800
+          foreground: "rgb(255 255 255)", // white
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "rgb(39 39 42)", // zinc-800
+          foreground: "rgb(161 161 170)", // zinc-400
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "rgb(39 39 42)", // zinc-800
+          foreground: "rgb(255 255 255)", // white
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "rgb(239 68 68)", // red-500
+          foreground: "rgb(255 255 255)", // white
         },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
+        border: "rgb(39 39 42)", // zinc-800
+        input: "rgb(39 39 42)", // zinc-800
+        ring: "rgb(228 228 231)", // zinc-200
         chart: {
-          1: "hsl(var(--chart-1))",
-          2: "hsl(var(--chart-2))",
-          3: "hsl(var(--chart-3))",
-          4: "hsl(var(--chart-4))",
-          5: "hsl(var(--chart-5))",
+          1: "rgb(59 130 246)", // blue-500
+          2: "rgb(16 185 129)", // emerald-500
+          3: "rgb(245 158 11)", // amber-500
+          4: "rgb(168 85 247)", // purple-500
+          5: "rgb(236 72 153)", // pink-500
         },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+          DEFAULT: "rgb(24 24 27)", // zinc-900
+          foreground: "rgb(244 244 245)", // zinc-100
+          primary: "rgb(255 255 255)", // white
+          "primary-foreground": "rgb(24 24 27)", // zinc-900
+          accent: "rgb(39 39 42)", // zinc-800
+          "accent-foreground": "rgb(244 244 245)", // zinc-100
+          border: "rgb(39 39 42)", // zinc-800
+          ring: "rgb(228 228 231)", // zinc-200
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0.625rem",
+        md: "calc(0.625rem - 2px)",
+        sm: "calc(0.625rem - 4px)",
       },
     },
   },
