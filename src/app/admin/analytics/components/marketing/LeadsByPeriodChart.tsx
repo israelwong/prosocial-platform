@@ -129,9 +129,9 @@ export function LeadsByPeriodChart({ data, loading = false }: LeadsByPeriodChart
                                                 <Badge variant="secondary">{percentage.toFixed(1)}%</Badge>
                                             </div>
                                         </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                        <div className="w-full bg-zinc-700 rounded-full h-2">
                                             <div
-                                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                                 style={{ width: `${percentage}%` }}
                                             />
                                         </div>
@@ -149,8 +149,8 @@ export function LeadsByPeriodChart({ data, loading = false }: LeadsByPeriodChart
                                 <div
                                     key={period.period}
                                     className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-colors ${period.period === selectedPeriod
-                                            ? 'bg-blue-50 border-blue-200'
-                                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                            ? 'bg-blue-500/10 border-blue-500/30'
+                                            : 'bg-zinc-800 border-zinc-700 hover:bg-zinc-700'
                                         }`}
                                     onClick={() => setSelectedPeriod(period.period)}
                                 >

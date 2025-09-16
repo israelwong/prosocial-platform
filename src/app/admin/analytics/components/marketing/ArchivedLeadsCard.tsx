@@ -27,11 +27,11 @@ export function ArchivedLeadsCard({ data, loading = false }: ArchivedLeadsCardPr
     const getTrendColor = (trend: string) => {
         switch (trend) {
             case 'up':
-                return 'text-red-600 bg-red-50 border-red-200';
+                return 'text-red-400 bg-red-500/10 border-red-500/30';
             case 'down':
-                return 'text-green-600 bg-green-50 border-green-200';
+                return 'text-green-400 bg-green-500/10 border-green-500/30';
             default:
-                return 'text-gray-600 bg-gray-50 border-gray-200';
+                return 'text-zinc-400 bg-zinc-500/10 border-zinc-500/30';
         }
     };
 
@@ -101,11 +101,11 @@ export function ArchivedLeadsCard({ data, loading = false }: ArchivedLeadsCardPr
                         <h4 className="text-sm font-medium">Análisis de Tendencia</h4>
                         <div className="space-y-3">
                             {data.trend === 'up' && (
-                                <div className="flex items-start gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                    <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                                <div className="flex items-start gap-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                                    <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5" />
                                     <div>
-                                        <div className="font-medium text-red-900">Atención: Aumento en Archivados</div>
-                                        <div className="text-sm text-red-700">
+                                        <div className="font-medium text-red-300">Atención: Aumento en Archivados</div>
+                                        <div className="text-sm text-red-200">
                                             El número de leads archivados está aumentando. Revisa los criterios de archivado y
                                             considera optimizar el proceso de seguimiento.
                                         </div>
@@ -114,11 +114,11 @@ export function ArchivedLeadsCard({ data, loading = false }: ArchivedLeadsCardPr
                             )}
 
                             {data.trend === 'down' && (
-                                <div className="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                                <div className="flex items-start gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                                    <CheckCircle className="h-5 w-5 text-green-400 mt-0.5" />
                                     <div>
-                                        <div className="font-medium text-green-900">Excelente: Reducción en Archivados</div>
-                                        <div className="text-sm text-green-700">
+                                        <div className="font-medium text-green-300">Excelente: Reducción en Archivados</div>
+                                        <div className="text-sm text-green-200">
                                             El número de leads archivados está disminuyendo. Esto indica una mejora en la
                                             gestión y seguimiento de leads.
                                         </div>
@@ -127,11 +127,11 @@ export function ArchivedLeadsCard({ data, loading = false }: ArchivedLeadsCardPr
                             )}
 
                             {data.trend === 'stable' && (
-                                <div className="flex items-start gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                                    <Minus className="h-5 w-5 text-gray-500 mt-0.5" />
+                                <div className="flex items-start gap-3 p-3 bg-zinc-500/10 border border-zinc-500/30 rounded-lg">
+                                    <Minus className="h-5 w-5 text-zinc-400 mt-0.5" />
                                     <div>
-                                        <div className="font-medium text-gray-900">Estable: Archivados Constantes</div>
-                                        <div className="text-sm text-gray-700">
+                                        <div className="font-medium text-zinc-300">Estable: Archivados Constantes</div>
+                                        <div className="text-sm text-zinc-200">
                                             El número de leads archivados se mantiene estable. Monitorea regularmente
                                             para identificar oportunidades de mejora.
                                         </div>
