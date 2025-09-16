@@ -13,7 +13,7 @@ const config = {
       colors: {
         // ÚNICA FUENTE DE VERDAD PARA TODOS LOS COLORES
         // Colores base del tema oscuro
-        background: "rgb(24 24 27 / 0.9)", // zinc-900/90 - Fondo con opacidad simulada
+        background: "rgb(24 24 27)", // zinc-900 - Fondo sólido
         foreground: "rgb(255 255 255)", // white
 
         // Colores de componentes
