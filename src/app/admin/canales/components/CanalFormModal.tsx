@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,11 +31,11 @@ interface CanalFormModalProps {
 }
 
 
-export default function CanalFormModal({
-    onCanalSubmit,
-    editingCanal,
-    onEdit,
-    onCancel
+export default function CanalFormModal({ 
+    onCanalSubmit, 
+    editingCanal, 
+    onEdit, 
+    onCancel 
 }: CanalFormModalProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
@@ -45,6 +45,22 @@ export default function CanalFormModal({
         isActive: true,
         isVisible: true
     });
+
+    // Actualizar formData cuando editingCanal cambie
+    useEffect(() => {
+        if (editingCanal) {
+            setFormData({
+                nombre: editingCanal.nombre,
+                descripcion: editingCanal.descripcion || '',
+                color: editingCanal.color || '#3B82F6',
+                isActive: editingCanal.isActive,
+                isVisible: editingCanal.isVisible
+            });
+            setIsModalOpen(true);
+        } else {
+            resetForm();
+        }
+    }, [editingCanal]);
 
     const resetForm = () => {
         setFormData({
@@ -79,17 +95,6 @@ export default function CanalFormModal({
         }
     };
 
-    const handleEdit = (canal: CanalAdquisicion) => {
-        setFormData({
-            nombre: canal.nombre,
-            descripcion: canal.descripcion || '',
-            color: canal.color || '#3B82F6',
-            isActive: canal.isActive,
-            isVisible: canal.isVisible
-        });
-        setIsModalOpen(true);
-        onEdit?.(canal);
-    };
 
     const handleCancel = () => {
         resetForm();
