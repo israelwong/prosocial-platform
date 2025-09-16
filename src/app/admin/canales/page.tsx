@@ -26,6 +26,7 @@ export default function CanalesPage() {
     const [loading, setLoading] = useState(true);
     const [editingCanal, setEditingCanal] = useState<CanalAdquisicion | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isReordering, setIsReordering] = useState(false);
 
     useEffect(() => {
         fetchCanales();
@@ -199,6 +200,8 @@ export default function CanalesPage() {
 
     const handleReorder = async (reorderedCanales: CanalAdquisicion[]) => {
         try {
+            setIsReordering(true);
+            
             // Actualizar el orden en el estado local primero
             setCanales(reorderedCanales);
 
@@ -220,6 +223,8 @@ export default function CanalesPage() {
             toast.error('Error al actualizar el orden');
             // Revertir cambios en caso de error
             fetchCanales();
+        } finally {
+            setIsReordering(false);
         }
     };
 
@@ -254,6 +259,7 @@ export default function CanalesPage() {
                     <CanalesList
                         canales={canales}
                         loading={loading}
+                        isReordering={isReordering}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onToggleActive={handleToggleActive}

@@ -37,6 +37,7 @@ interface CanalAdquisicion {
 interface CanalesListProps {
     canales: CanalAdquisicion[];
     loading: boolean;
+    isReordering: boolean;
     onEdit: (canal: CanalAdquisicion) => void;
     onDelete: (id: string) => void;
     onToggleActive: (id: string, isActive: boolean) => void;
@@ -48,6 +49,7 @@ interface CanalesListProps {
 export default function CanalesList({
     canales,
     loading,
+    isReordering,
     onEdit,
     onDelete,
     onToggleActive,
@@ -111,6 +113,16 @@ export default function CanalesList({
                     />
                 </div>
             </div>
+
+            {/* Indicador de reordenamiento */}
+            {isReordering && (
+                <div className="flex items-center justify-center py-2">
+                    <div className="flex items-center space-x-2 text-zinc-400">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-zinc-400"></div>
+                        <span className="text-sm">Actualizando orden...</span>
+                    </div>
+                </div>
+            )}
 
             {/* Lista de canales con drag and drop */}
             <DndContext

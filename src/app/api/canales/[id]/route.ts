@@ -50,6 +50,14 @@ export async function PUT(
             }
         }
 
+        // Manejar errores de conexión específicos
+        if (error instanceof Error && error.message.includes('Can\'t reach database server')) {
+            return NextResponse.json(
+                { error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' },
+                { status: 503 }
+            );
+        }
+
         return NextResponse.json(
             { error: 'Error al actualizar el canal' },
             { status: 500 }

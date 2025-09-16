@@ -28,7 +28,6 @@ interface CanalItemProps {
     canal: CanalAdquisicion;
     onEdit: (canal: CanalAdquisicion) => void;
     onDelete: (id: string) => void;
-    onToggleActive: (id: string, isActive: boolean) => Promise<void>;
     onToggleVisible: (id: string, isVisible: boolean) => Promise<void>;
 }
 
@@ -36,7 +35,6 @@ export default function CanalItem({
     canal,
     onEdit,
     onDelete,
-    onToggleActive,
     onToggleVisible
 }: CanalItemProps) {
     const [isUpdating, setIsUpdating] = useState(false);
@@ -61,24 +59,12 @@ export default function CanalItem({
             try {
                 await onDelete(id);
                 toast.success('Canal eliminado correctamente');
-            } catch (error) {
+            } catch {
                 toast.error('Error al eliminar el canal');
             }
         }
     };
 
-    const handleToggleActive = async (id: string, isActive: boolean) => {
-        if (isUpdating) return;
-        
-        setIsUpdating(true);
-        try {
-            await onToggleActive(id, isActive);
-        } catch (error) {
-            // El error ya se maneja en la función padre
-        } finally {
-            setIsUpdating(false);
-        }
-    };
 
     const handleToggleVisible = async (id: string, isVisible: boolean) => {
         if (isUpdating) return;
@@ -86,7 +72,7 @@ export default function CanalItem({
         setIsUpdating(true);
         try {
             await onToggleVisible(id, isVisible);
-        } catch (error) {
+        } catch {
             // El error ya se maneja en la función padre
         } finally {
             setIsUpdating(false);
@@ -99,7 +85,7 @@ export default function CanalItem({
             style={style}
             className={`bg-card border-border ${isDragging ? 'shadow-lg' : ''}`}
         >
-            <CardContent className="p-4">
+            <CardContent className="p-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <div
@@ -114,9 +100,9 @@ export default function CanalItem({
                             style={{ backgroundColor: canal.color || '#3B82F6' }}
                         />
                         <div>
-                            <h4 className="font-medium text-white">{canal.nombre}</h4>
+                            <h4 className="font-medium text-white text-sm">{canal.nombre}</h4>
                             {canal.descripcion && (
-                                <p className="text-sm text-zinc-400">{canal.descripcion}</p>
+                                <p className="text-xs text-zinc-400">{canal.descripcion}</p>
                             )}
                         </div>
                     </div>
