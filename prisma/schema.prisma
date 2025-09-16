@@ -8,8 +8,8 @@ datasource db {
 }
 
 model project_agenda {
-  id            String        @id
-  studioId      String
+  id            String        @id @default(cuid())
+  projectId     String
   userId        String?
   eventoId      String
   concepto      String?
@@ -23,14 +23,14 @@ model project_agenda {
   updatedAt     DateTime
   agendaTipo    String?
   eventos       project_eventos       @relation(fields: [eventoId], references: [id])
-  studios       projects       @relation(fields: [studioId], references: [id])
-  studio_users  project_users? @relation(fields: [userId], references: [id])
+  projects      projects       @relation(fields: [projectId], references: [id])
+  project_users  project_users? @relation(fields: [userId], references: [id])
 
-  @@index([studioId])
+  @@index([projectId])
 }
 
 model project_agenda_tipos {
-  id        String   @id
+  id        String   @id @default(cuid())
   nombre    String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime
@@ -74,8 +74,8 @@ model canales {
 }
 
 model project_clientes {
-  id            String         @id
-  studioId      String
+  id            String         @id @default(cuid())
+  projectId     String
   nombre        String
   email         String
   telefono      String
@@ -90,19 +90,19 @@ model project_clientes {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime
   canales       canales?       @relation(fields: [canalId], references: [id])
-  studios       projects        @relation(fields: [studioId], references: [id])
+  projects      projects        @relation(fields: [projectId], references: [id])
   eventos       project_eventos[]
   pagos         project_pagos[]
   suscripciones suscripciones?
 
-  @@index([studioId, email])
-  @@index([studioId, status])
-  @@index([studioId, telefono])
+  @@index([projectId, email])
+  @@index([projectId, status])
+  @@index([projectId, telefono])
 }
 
 model project_condiciones_comerciales {
-  id                                  String                                @id
-  studioId                            String
+  id                                  String                                @id @default(cuid())
+  projectId                           String
   nombre                              String
   descripcion                         String?
   descuento                           Float?
@@ -111,16 +111,16 @@ model project_condiciones_comerciales {
   orden                               Int?                                  @default(0)
   createdAt                           DateTime                              @default(now())
   updatedAt                           DateTime
-  studios                             projects                               @relation(fields: [studioId], references: [id])
+  projects                            projects                               @relation(fields: [projectId], references: [id])
   condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago[]
   cotizaciones                        project_cotizaciones[]
   pagos                               project_pagos[]
 
-  @@index([studioId])
+  @@index([projectId])
 }
 
 model project_condiciones_comerciales_metodo_pago {
-  id                       String                  @id
+  id                       String                  @id @default(cuid())
   condicionesComercialesId String
   metodoPagoId             String
   orden                    Int?                    @default(0)
@@ -134,8 +134,8 @@ model project_condiciones_comerciales_metodo_pago {
 }
 
 model project_configuraciones {
-  id                          String   @id
-  studioId                    String
+  id                          String   @id @default(cuid())
+  projectId                   String
   nombre                      String
   utilidad_servicio           Float
   utilidad_producto           Float
@@ -146,13 +146,13 @@ model project_configuraciones {
   status                      String   @default("active")
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime
-  studios                     projects  @relation(fields: [studioId], references: [id])
+  projects                    projects  @relation(fields: [projectId], references: [id])
 
-  @@index([studioId])
+  @@index([projectId])
 }
 
 model project_cotizacion_costos {
-  id           String       @id
+  id           String       @id @default(cuid())
   cotizacionId String
   nombre       String
   descripcion  String?
@@ -165,7 +165,7 @@ model project_cotizacion_costos {
 }
 
 model project_cotizacion_servicios {
-  id                        String               @id
+  id                        String               @id @default(cuid())
   cotizacionId              String
   servicioId                String?
   servicioCategoriaId       String?
@@ -208,15 +208,15 @@ model project_cotizacion_servicios {
 }
 
 model project_cotizacion_visitas {
-  id           String       @id
+  id           String       @id @default(cuid())
   cotizacionId String
   createdAt    DateTime     @default(now())
   cotizaciones project_cotizaciones @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
 }
 
 model project_cotizaciones {
-  id                                  String                                @id
-  studioId                            String
+  id                                  String                                @id @default(cuid())
+  projectId                           String
   eventoTipoId                        String
   eventoId                            String
   nombre                              String
@@ -237,16 +237,16 @@ model project_cotizaciones {
   condiciones_comerciales             project_condiciones_comerciales?              @relation(fields: [condicionesComercialesId], references: [id])
   eventos                             project_eventos                               @relation(fields: [eventoId], references: [id])
   evento_tipos                        project_evento_tipos                          @relation(fields: [eventoTipoId], references: [id])
-  studios                             projects                               @relation(fields: [studioId], references: [id])
+  projects                            projects                               @relation(fields: [projectId], references: [id])
   pagos                               project_pagos[]
   condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago[] @relation("CondicionesComercialesMetodoPagoToCotizacion")
 
   @@index([eventoId])
-  @@index([studioId, status])
+  @@index([projectId, status])
 }
 
 model project_evento_bitacoras {
-  id          String   @id
+  id          String   @id @default(cuid())
   eventoId    String
   comentario  String
   importancia String   @default("1")
@@ -257,7 +257,7 @@ model project_evento_bitacoras {
 }
 
 model project_evento_etapas {
-  id        String    @id
+  id        String    @id @default(cuid())
   nombre    String
   posicion  Int       @default(0)
   createdAt DateTime  @default(now())
@@ -266,7 +266,7 @@ model project_evento_etapas {
 }
 
 model project_evento_tipos {
-  id           String         @id
+  id           String         @id @default(cuid())
   nombre       String
   posicion     Int            @default(0)
   createdAt    DateTime       @default(now())
@@ -277,8 +277,8 @@ model project_evento_tipos {
 }
 
 model project_eventos {
-  id               String             @id
-  studioId         String
+  id               String             @id @default(cuid())
+  projectId        String
   clienteId        String
   eventoTipoId     String?
   nombre           String?            @default("Pendiente")
@@ -296,19 +296,19 @@ model project_eventos {
   clientes         project_clientes           @relation(fields: [clienteId], references: [id])
   evento_etapas    project_evento_etapas?     @relation(fields: [eventoEtapaId], references: [id])
   evento_tipos     project_evento_tipos?      @relation(fields: [eventoTipoId], references: [id])
-  studios          projects            @relation(fields: [studioId], references: [id])
-  studio_users     project_users?      @relation(fields: [userId], references: [id])
+  projects         projects            @relation(fields: [projectId], references: [id])
+  project_users    project_users?      @relation(fields: [userId], references: [id])
   gastos           project_gastos[]
   nominas          project_nominas[]
 
   @@index([clienteId])
   @@index([fecha_evento])
-  @@index([studioId, status])
+  @@index([projectId, status])
 }
 
 model project_gastos {
-  id             String       @id
-  studioId       String
+  id             String       @id @default(cuid())
+  projectId      String
   concepto       String
   descripcion    String?
   monto          Float
@@ -326,17 +326,17 @@ model project_gastos {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime
   eventos        project_eventos?     @relation(fields: [eventoId], references: [id])
-  studios        projects      @relation(fields: [studioId], references: [id])
-  studio_users   project_users @relation(fields: [usuarioId], references: [id])
+  projects       projects      @relation(fields: [projectId], references: [id])
+  project_users  project_users @relation(fields: [usuarioId], references: [id])
 
   @@index([eventoId])
   @@index([fecha, categoria])
-  @@index([studioId])
+  @@index([projectId])
 }
 
 model project_metodos_pago {
-  id                                  String                                @id
-  studioId                            String
+  id                                  String                                @id @default(cuid())
+  projectId                           String
   metodo_pago                         String
   comision_porcentaje_base            Float?
   comision_fija_monto                 Float?
@@ -348,10 +348,10 @@ model project_metodos_pago {
   createdAt                           DateTime                              @default(now())
   updatedAt                           DateTime
   condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago[]
-  studios                             projects                               @relation(fields: [studioId], references: [id])
+  projects                            projects                               @relation(fields: [projectId], references: [id])
   pagos                               project_pagos[]
 
-  @@index([studioId])
+  @@index([projectId])
 }
 
 model negocio_horarios {
@@ -413,7 +413,7 @@ model negocios {
 }
 
 model project_nomina_servicios {
-  id                   String                @id
+  id                   String                @id @default(cuid())
   nominaId             String
   cotizacionServicioId String?
   servicio_nombre      String
@@ -429,8 +429,8 @@ model project_nomina_servicios {
 }
 
 model project_nominas {
-  id                                                String             @id
-  studioId                                          String
+  id                                                String             @id @default(cuid())
+  projectId                                        String
   userId                                            String
   eventoId                                          String?
   concepto                                          String
@@ -455,13 +455,13 @@ model project_nominas {
   createdAt                                         DateTime           @default(now())
   updatedAt                                         DateTime
   nomina_servicios                                  project_nomina_servicios[]
-  studio_users_nominas_autorizado_porTostudio_users project_users?      @relation("nominas_autorizado_porTostudio_users", fields: [autorizado_por], references: [id])
+  project_users_nominas_autorizado_porToproject_users project_users?      @relation("nominas_autorizado_porToproject_users", fields: [autorizado_por], references: [id])
   eventos                                           project_eventos?           @relation(fields: [eventoId], references: [id])
-  studio_users_nominas_pagado_porTostudio_users     project_users?      @relation("nominas_pagado_porTostudio_users", fields: [pagado_por], references: [id])
-  studios                                           projects            @relation(fields: [studioId], references: [id])
-  studio_users_nominas_userIdTostudio_users         project_users       @relation("nominas_userIdTostudio_users", fields: [userId], references: [id])
+  project_users_nominas_pagado_porToproject_users     project_users?      @relation("nominas_pagado_porToproject_users", fields: [pagado_por], references: [id])
+  projects                                          projects            @relation(fields: [projectId], references: [id])
+  project_users_nominas_userIdToproject_users         project_users       @relation("nominas_userIdToproject_users", fields: [userId], references: [id])
 
-  @@index([studioId])
+  @@index([projectId])
 }
 
 model notificaciones {
@@ -478,7 +478,7 @@ model notificaciones {
 }
 
 model project_pagos {
-  id                                  String                               @id
+  id                                  String                               @id @default(cuid())
   clienteId                           String?
   cotizacionId                        String?
   condicionesComercialesId            String?
@@ -506,7 +506,7 @@ model project_pagos {
 }
 
 model project_paquete_servicios {
-  id                  String              @id
+  id                  String              @id @default(cuid())
   paqueteId           String
   servicioId          String
   servicioCategoriaId String
@@ -522,8 +522,8 @@ model project_paquete_servicios {
 }
 
 model project_paquetes {
-  id                String              @id
-  studioId          String
+  id                String              @id @default(cuid())
+  projectId         String
   eventoTipoId      String
   nombre            String
   costo             Float?
@@ -536,9 +536,9 @@ model project_paquetes {
   updatedAt         DateTime
   paquete_servicios project_paquete_servicios[]
   evento_tipos      project_evento_tipos        @relation(fields: [eventoTipoId], references: [id])
-  studios           projects             @relation(fields: [studioId], references: [id])
+  projects          projects             @relation(fields: [projectId], references: [id])
 
-  @@index([studioId, status])
+  @@index([projectId, status])
 }
 
 model platform_plans {
@@ -772,7 +772,7 @@ model platform_plataformas_publicidad {
 }
 
 model project_revenue_products {
-  id                      String                    @id
+  id                      String                    @id @default(cuid())
   nombre                  String
   descripcion             String
   categoria               String
@@ -791,8 +791,8 @@ model project_revenue_products {
 }
 
 model project_revenue_transactions {
-  id                  String   @id
-  studioId            String
+  id                  String   @id @default(cuid())
+  projectId           String
   paymentId           String
   amountTotal         Decimal
   prosocialCommission Decimal
@@ -805,14 +805,14 @@ model project_revenue_transactions {
   stripeFee           Decimal?
   createdAt           DateTime @default(now())
   updatedAt           DateTime
-  studios             projects  @relation(fields: [studioId], references: [id])
+  projects            projects  @relation(fields: [projectId], references: [id])
 
   @@index([status])
-  @@index([studioId, transactionDate])
+  @@index([projectId, transactionDate])
 }
 
 model project_seccion_categorias {
-  id                  String              @id
+  id                  String              @id @default(cuid())
   seccionId           String
   categoriaId         String              @unique
   servicio_categorias project_servicio_categorias @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
@@ -820,7 +820,7 @@ model project_seccion_categorias {
 }
 
 model project_servicio_categorias {
-  id                   String                 @id
+  id                   String                 @id @default(cuid())
   nombre               String                 @unique
   posicion             Int                    @default(0)
   createdAt            DateTime               @default(now())
@@ -832,7 +832,7 @@ model project_servicio_categorias {
 }
 
 model project_servicio_gastos {
-  id         String    @id
+  id         String    @id @default(cuid())
   servicioId String
   nombre     String
   costo      Float
@@ -842,7 +842,7 @@ model project_servicio_gastos {
 }
 
 model project_servicio_secciones {
-  id                 String               @id
+  id                 String               @id @default(cuid())
   nombre             String               @unique
   descripcion        String?
   posicion           Int                  @default(0)
@@ -852,8 +852,8 @@ model project_servicio_secciones {
 }
 
 model project_servicios {
-  id                   String                 @id
-  studioId             String
+  id                   String                 @id @default(cuid())
+  projectId            String
   servicioCategoriaId  String
   nombre               String
   costo                Float                  @default(0)
@@ -870,13 +870,13 @@ model project_servicios {
   paquete_servicios    project_paquete_servicios[]
   servicio_gastos      project_servicio_gastos[]
   servicio_categorias  project_servicio_categorias    @relation(fields: [servicioCategoriaId], references: [id])
-  studios              projects                @relation(fields: [studioId], references: [id])
+  projects             projects                @relation(fields: [projectId], references: [id])
 
-  @@index([studioId, status])
+  @@index([projectId, status])
 }
 
 model project_sesiones {
-  id           String       @id
+  id           String       @id @default(cuid())
   userId       String
   token        String       @unique
   status       String       @default("active")
@@ -886,8 +886,8 @@ model project_sesiones {
 }
 
 model project_studio_revenue_products {
-  id                  String           @id
-  studioId            String
+  id                  String           @id @default(cuid())
+  projectId           String
   revenueProductId    String
   activo              Boolean          @default(false)
   precioCustom        Decimal?
@@ -898,40 +898,40 @@ model project_studio_revenue_products {
   createdAt           DateTime         @default(now())
   updatedAt           DateTime
   revenue_products    project_revenue_products @relation(fields: [revenueProductId], references: [id])
-  studios             projects          @relation(fields: [studioId], references: [id])
+  projects            projects          @relation(fields: [projectId], references: [id])
 
-  @@unique([studioId, revenueProductId])
-  @@index([studioId, activo])
+  @@unique([projectId, revenueProductId])
+  @@index([projectId, activo])
 }
 
 model project_users {
-  id                                           String                 @id
+  id                                           String                 @id @default(cuid())
   username                                     String?
   email                                        String                 @unique
   password                                     String
   role                                         String                 @default("user")
   telefono                                     String
   status                                       String                 @default("inactive")
-  studioId                                     String
+  projectId                                    String
   createdAt                                    DateTime               @default(now())
   updatedAt                                    DateTime
   agenda                                       project_agenda[]
   cotizacion_servicios                         project_cotizacion_servicios[]
   eventos                                      project_eventos[]
   gastos                                       project_gastos[]
-  nominas_nominas_autorizado_porTostudio_users project_nominas[]              @relation("nominas_autorizado_porTostudio_users")
-  nominas_nominas_pagado_porTostudio_users     project_nominas[]              @relation("nominas_pagado_porTostudio_users")
-  nominas_nominas_userIdTostudio_users         project_nominas[]              @relation("nominas_userIdTostudio_users")
+  nominas_nominas_autorizado_porToproject_users project_nominas[]              @relation("nominas_autorizado_porToproject_users")
+  nominas_nominas_pagado_porToproject_users     project_nominas[]              @relation("nominas_pagado_porToproject_users")
+  nominas_nominas_userIdToproject_users         project_nominas[]              @relation("nominas_userIdToproject_users")
   pagos                                        project_pagos[]
   sesiones                                     project_sesiones[]
-  studios                                      projects                @relation(fields: [studioId], references: [id])
+  projects                                     projects                @relation(fields: [projectId], references: [id])
 
   @@index([email])
-  @@index([studioId, status])
+  @@index([projectId, status])
 }
 
 model projects {
-  id                       String                    @id
+  id                       String                    @id @default(cuid())
   name                     String
   slug                     String                    @unique
   email                    String                    @unique
@@ -1012,23 +1012,23 @@ model suscripciones {
 }
 
 model project_user_profiles {
-  id                      String                    @id
+  id                      String                    @id @default(cuid())
   email                   String                    @unique
   fullName                String?
   avatarUrl               String?
   role                    String
-  studioId                String?
+  projectId               String?
   isActive                Boolean                   @default(true)
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime
   platform_activities     platform_activities[]
   platform_lead_bitacora  platform_lead_bitacora[]
   platform_notifications  platform_notifications[]
-  studios                 projects?                  @relation(fields: [studioId], references: [id])
+  projects                projects?                  @relation(fields: [projectId], references: [id])
 
   @@index([email])
   @@index([role])
-  @@index([studioId])
+  @@index([projectId])
 }
 
 enum LeadBitacoraTipo {
