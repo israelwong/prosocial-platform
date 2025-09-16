@@ -85,7 +85,7 @@ export default function AgenteDashboard() {
                     updatedAt,
                     etapaId,
                     canalAdquisicionId,
-                    campa_aId,
+                    campañaId,
                     prosocial_agents!prosocial_leads_agentId_fkey (
                         id,
                         nombre,
