@@ -35,7 +35,7 @@ async function getPipelineStages(): Promise<PipelineStage[]> {
             color: stage.color,
             order: stage.orden,
             isActive: stage.isActive,
-            leadCount: stage._count.prosocial_leads
+            leadCount: stage._count.platform_leads
         }));
     } catch (error) {
         console.error('Error fetching pipeline stages:', error);

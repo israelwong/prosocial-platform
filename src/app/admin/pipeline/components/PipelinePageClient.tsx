@@ -109,7 +109,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
                             <div>
                                 <p className="text-xs font-medium text-zinc-400">Total Leads</p>
                                 <p className="text-xl font-bold text-white">
-                                    {stages.reduce((sum, stage) => sum + stage.leadCount, 0)}
+                                    {stages.reduce((sum, stage) => sum + (stage.leadCount || 0), 0)}
                                 </p>
                             </div>
                             <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
