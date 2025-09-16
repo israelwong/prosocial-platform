@@ -15,18 +15,17 @@ import {
     getFirstCollision,
     CollisionDetection,
 } from '@dnd-kit/core';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DraggableLeadCard } from './components/DraggableLeadCard';
-import { DroppableColumn } from './components/DroppableColumn';
+import {
+    DraggableLeadCard,
+    DroppableColumn,
+    KanbanHeader,
+    KanbanFilters,
+    KanbanSummary,
+    LoadingState,
+    ErrorState
+} from './components';
 import { Lead, KanbanColumn } from './types';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-    Plus,
-    Search,
-} from 'lucide-react';
 
 export default function AgentKanbanPage() {
     const [columns, setColumns] = useState<KanbanColumn[]>([]);
@@ -108,12 +107,14 @@ export default function AgentKanbanPage() {
                     email,
                     telefono,
                     nombreEstudio,
+                    studioId,
                     fechaUltimoContacto,
                     planInteres,
                     presupuestoMensual,
                     puntaje,
                     prioridad,
                     createdAt,
+                    updatedAt,
                     etapaId,
                     canalAdquisicionId,
                     agentId,
@@ -137,35 +138,102 @@ export default function AgentKanbanPage() {
 
             console.log('✅ Leads obtenidos:', leads?.length || 0);
 
+            // Obtener información de suscripciones para los estudios
+            console.log('📋 Obteniendo información de suscripciones...');
+            const studioIds = [...new Set((leads || []).map(lead => lead.studioId).filter(Boolean))];
+
+            let subscriptionsData: Array<{
+                studio_id: string;
+                status: string;
+                plans: {
+                    id: string;
+                    name: string;
+                    price_monthly: number | null;
+                    price_yearly: number | null;
+                };
+            }> = [];
+            if (studioIds.length > 0) {
+                const { data: subscriptions, error: subscriptionsError } = await supabase
+                    .from('subscriptions')
+                    .select(`
+                        studio_id,
+                        status,
+                        plans (
+                            id,
+                            name,
+                            price_monthly,
+                            price_yearly
+                        )
+                    `)
+                    .in('studio_id', studioIds)
+                    .eq('status', 'active');
+
+                if (subscriptionsError) {
+                    console.warn('⚠️ Error obteniendo suscripciones:', subscriptionsError);
+                } else {
+                    subscriptionsData = (subscriptions || []) as unknown as typeof subscriptionsData;
+                    console.log('✅ Suscripciones obtenidas:', subscriptionsData.length);
+                }
+            }
+
+            // Crear un mapa de studio_id -> precio de suscripción
+            const subscriptionMap = new Map();
+            subscriptionsData.forEach(sub => {
+                if (sub.plans) {
+                    const price = sub.plans.price_monthly ? Number(sub.plans.price_monthly) :
+                        sub.plans.price_yearly ? Number(sub.plans.price_yearly) / 12 : 0;
+                    subscriptionMap.set(sub.studio_id, price);
+                }
+            });
+
             // Mapear leads al formato esperado
-            const mappedLeads: Lead[] = (leads || []).map(lead => ({
-                id: lead.id,
-                name: lead.nombre,
-                email: lead.email,
-                phone: lead.telefono,
-                studio: lead.nombreEstudio || 'Sin estudio',
-                stage: lead.etapaId || 'Sin etapa',
-                value: lead.presupuestoMensual ? Number(lead.presupuestoMensual) : 0,
-                priority: lead.prioridad === 'alta' ? 'high' : lead.prioridad === 'media' ? 'medium' : 'low',
-                lastActivity: lead.fechaUltimoContacto ? new Date(lead.fechaUltimoContacto).toLocaleDateString() : 'Sin actividad',
-                assignedAgent: (lead.prosocial_agents as unknown as { nombre: string } | null)?.nombre || (lead.agentId ? 'Agente asignado' : 'Sin asignar'),
-                source: (lead.prosocial_canales_adquisicion as unknown as { nombre: string } | null)?.nombre || 'Sin canal',
-                notes: `Lead con ${lead.planInteres || 'plan no especificado'}`,
-                etapaId: lead.etapaId
-            }));
+            const mappedLeads: Lead[] = (leads || []).map(lead => {
+                const subscriptionPrice = lead.studioId ? subscriptionMap.get(lead.studioId) : null;
+                return {
+                    id: lead.id,
+                    name: lead.nombre,
+                    email: lead.email,
+                    phone: lead.telefono,
+                    studio: lead.nombreEstudio || 'Sin estudio',
+                    stage: lead.etapaId || 'Sin etapa',
+                    value: lead.presupuestoMensual ? Number(lead.presupuestoMensual) : 0,
+                    priority: lead.prioridad === 'alta' ? 'high' : lead.prioridad === 'media' ? 'medium' : 'low',
+                    lastActivity: lead.fechaUltimoContacto ? new Date(lead.fechaUltimoContacto).toLocaleDateString() : 'Sin actividad',
+                    assignedAgent: (lead.prosocial_agents as unknown as { nombre: string } | null)?.nombre || (lead.agentId ? 'Agente asignado' : 'Sin asignar'),
+                    source: (lead.prosocial_canales_adquisicion as unknown as { nombre: string } | null)?.nombre || 'Sin canal',
+                    notes: `Lead con ${lead.planInteres || 'plan no especificado'}`,
+                    etapaId: lead.etapaId,
+                    hasSubscription: subscriptionPrice !== null && subscriptionPrice > 0,
+                    subscriptionPrice: subscriptionPrice,
+                    createdAt: lead.createdAt,
+                    updatedAt: lead.updatedAt
+                };
+            });
 
             // Crear columnas del Kanban
-            const kanbanColumns: KanbanColumn[] = (stages || []).map(stage => ({
-                id: stage.id,
-                title: stage.nombre,
-                color: stage.color || '#3B82F6',
-                stage: stage,
-                leads: mappedLeads.filter(lead => lead.etapaId === stage.id)
-            }));
+            const kanbanColumns: KanbanColumn[] = (stages || []).map(stage => {
+                const stageLeads = mappedLeads.filter(lead => lead.etapaId === stage.id);
+                const totalSubscriptionValue = stageLeads.reduce((sum, lead) => {
+                    return sum + (lead.subscriptionPrice || 0);
+                }, 0);
+
+                return {
+                    id: stage.id,
+                    title: stage.nombre,
+                    color: stage.color || '#3B82F6',
+                    stage: stage,
+                    leads: stageLeads,
+                    totalSubscriptionValue
+                };
+            });
 
             // Agregar columna para leads sin etapa asignada
             const leadsWithoutStage = mappedLeads.filter(lead => !lead.etapaId);
             if (leadsWithoutStage.length > 0) {
+                const totalSubscriptionValueWithoutStage = leadsWithoutStage.reduce((sum, lead) => {
+                    return sum + (lead.subscriptionPrice || 0);
+                }, 0);
+
                 kanbanColumns.unshift({
                     id: 'sin-etapa',
                     title: 'Sin Etapa',
@@ -178,7 +246,8 @@ export default function AgentKanbanPage() {
                         orden: -1,
                         isActive: true
                     },
-                    leads: leadsWithoutStage
+                    leads: leadsWithoutStage,
+                    totalSubscriptionValue: totalSubscriptionValueWithoutStage
                 });
             }
 
@@ -396,114 +465,40 @@ export default function AgentKanbanPage() {
     const studios = Array.from(new Set(columns.flatMap(col => col.leads.map(lead => lead.studio))));
 
     if (loading) {
-        return (
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold">CRM Kanban</h1>
-                        <p className="text-muted-foreground">Gestiona tus leads de manera visual</p>
-                    </div>
-                </div>
-                <div className="flex items-center justify-center h-64">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                        <div className="text-muted-foreground">Cargando CRM...</div>
-                    </div>
-                </div>
-            </div>
-        );
+        return <LoadingState />;
     }
 
     if (error) {
         return (
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold">CRM Kanban</h1>
-                        <p className="text-muted-foreground">Gestiona tus leads de manera visual</p>
-                    </div>
-                </div>
-                <Card>
-                    <CardContent className="pt-6">
-                        <div className="flex flex-col items-center gap-4 text-center">
-                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                <span className="text-red-600 text-xl">⚠️</span>
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-semibold text-red-600">Error al cargar CRM</h3>
-                                <p className="text-muted-foreground mt-2">{error}</p>
-                            </div>
-                            <Button
-                                onClick={() => {
-                                    setError(null);
-                                    setLoading(true);
-                                    fetchKanbanData();
-                                }}
-                                variant="outline"
-                            >
-                                Reintentar
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+            <ErrorState
+                error={error}
+                onRetry={() => {
+                    setError(null);
+                    setLoading(true);
+                    fetchKanbanData();
+                }}
+            />
         );
     }
 
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold">CRM Kanban</h1>
-                    <p className="text-muted-foreground">Gestiona tus leads de manera visual</p>
-                </div>
-                <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nuevo Lead
-                </Button>
-            </div>
+            <KanbanHeader onNewLead={() => {
+                // TODO: Implementar navegación a nuevo lead
+                console.log('Nuevo lead clicked');
+            }} />
 
             {/* Filtros */}
-            <Card>
-                <CardContent className="pt-6">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    placeholder="Buscar leads por nombre, estudio o email..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10"
-                                />
-                            </div>
-                        </div>
-                        <Select value={filterStudio} onValueChange={setFilterStudio}>
-                            <SelectTrigger className="w-full md:w-48">
-                                <SelectValue placeholder="Filtrar por estudio" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Todos los estudios</SelectItem>
-                                {studios.map(studio => (
-                                    <SelectItem key={studio} value={studio}>{studio}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <Select value={filterPriority} onValueChange={setFilterPriority}>
-                            <SelectTrigger className="w-full md:w-48">
-                                <SelectValue placeholder="Filtrar por prioridad" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">Todas las prioridades</SelectItem>
-                                <SelectItem value="high">Alta prioridad</SelectItem>
-                                <SelectItem value="medium">Media prioridad</SelectItem>
-                                <SelectItem value="low">Baja prioridad</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </CardContent>
-            </Card>
+            <KanbanFilters
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                filterStudio={filterStudio}
+                onStudioChange={setFilterStudio}
+                filterPriority={filterPriority}
+                onPriorityChange={setFilterPriority}
+                studios={studios}
+            />
 
             {/* Kanban Board */}
             <DndContext
@@ -530,27 +525,7 @@ export default function AgentKanbanPage() {
             </DndContext>
 
             {/* Resumen */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg">Resumen del Pipeline</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        {filteredColumns.map((column) => {
-                            const totalValue = column.leads.reduce((sum, lead) => sum + lead.value, 0);
-                            return (
-                                <div key={column.id} className="text-center">
-                                    <div className="text-2xl font-bold">{column.leads.length}</div>
-                                    <div className="text-sm text-muted-foreground">{column.title}</div>
-                                    <div className="text-xs text-green-600 font-medium">
-                                        ${totalValue.toLocaleString()}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </CardContent>
-            </Card>
+            <KanbanSummary columns={filteredColumns} />
         </div>
     );
 }

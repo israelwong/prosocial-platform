@@ -13,6 +13,10 @@ export interface Lead {
     notes: string;
     nextFollowUp?: string;
     etapaId?: string | null;
+    hasSubscription?: boolean;
+    subscriptionPrice?: number | null;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export interface PipelineStage {
@@ -30,4 +34,5 @@ export interface KanbanColumn {
     leads: Lead[];
     color: string;
     stage: PipelineStage;
+    totalSubscriptionValue?: number;
 }

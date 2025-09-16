@@ -37,9 +37,16 @@ export function DroppableColumn({ column, isUpdating }: DroppableColumnProps) {
                         />
                         <CardTitle className="text-sm font-medium">{column.title}</CardTitle>
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                        {column.leads.length}
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1">
+                        <Badge variant="secondary" className="text-xs">
+                            {column.leads.length}
+                        </Badge>
+                        {column.totalSubscriptionValue && column.totalSubscriptionValue > 0 && (
+                            <div className="text-xs text-green-600 font-medium">
+                                ${column.totalSubscriptionValue.toLocaleString()}/mes
+                            </div>
+                        )}
+                    </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-3">
