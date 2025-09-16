@@ -33,6 +33,19 @@ export async function createPipelineStage(formData: FormData) {
         return { success: true, stage };
     } catch (error) {
         console.error('Error creating pipeline stage:', error);
+        
+        // Manejar errores de conexión específicos
+        if (error instanceof Error && (
+            error.message.includes('Can\'t reach database server') ||
+            error.message.includes('P1001') ||
+            error.message.includes('connection')
+        )) {
+            return { 
+                success: false, 
+                error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' 
+            };
+        }
+        
         return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
     }
 }
@@ -60,6 +73,19 @@ export async function updatePipelineStage(id: string, formData: FormData) {
         return { success: true, stage };
     } catch (error) {
         console.error('Error updating pipeline stage:', error);
+        
+        // Manejar errores de conexión específicos
+        if (error instanceof Error && (
+            error.message.includes('Can\'t reach database server') ||
+            error.message.includes('P1001') ||
+            error.message.includes('connection')
+        )) {
+            return { 
+                success: false, 
+                error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' 
+            };
+        }
+        
         return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
     }
 }
@@ -83,6 +109,19 @@ export async function deletePipelineStage(id: string) {
         return { success: true };
     } catch (error) {
         console.error('Error deleting pipeline stage:', error);
+        
+        // Manejar errores de conexión específicos
+        if (error instanceof Error && (
+            error.message.includes('Can\'t reach database server') ||
+            error.message.includes('P1001') ||
+            error.message.includes('connection')
+        )) {
+            return { 
+                success: false, 
+                error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' 
+            };
+        }
+        
         return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
     }
 }
@@ -108,6 +147,19 @@ export async function togglePipelineStageStatus(id: string) {
         return { success: true, stage: updatedStage };
     } catch (error) {
         console.error('Error toggling pipeline stage status:', error);
+        
+        // Manejar errores de conexión específicos
+        if (error instanceof Error && (
+            error.message.includes('Can\'t reach database server') ||
+            error.message.includes('P1001') ||
+            error.message.includes('connection')
+        )) {
+            return { 
+                success: false, 
+                error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' 
+            };
+        }
+        
         return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
     }
 }
@@ -128,6 +180,19 @@ export async function reorderPipelineStages(stageIds: string[]) {
         return { success: true };
     } catch (error) {
         console.error('Error reordering pipeline stages:', error);
+        
+        // Manejar errores de conexión específicos
+        if (error instanceof Error && (
+            error.message.includes('Can\'t reach database server') ||
+            error.message.includes('P1001') ||
+            error.message.includes('connection')
+        )) {
+            return { 
+                success: false, 
+                error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.' 
+            };
+        }
+        
         return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
     }
 }
