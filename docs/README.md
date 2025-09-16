@@ -1,50 +1,106 @@
-# 📚 Documentación del Proyecto ProSocial Platform
+# 📚 ProSocial Platform - Documentación
 
-Esta carpeta contiene toda la documentación del proyecto organizada por categorías.
+## 🎯 **ÍNDICE DE DOCUMENTACIÓN**
 
-## 📁 Estructura de Documentación
+Esta documentación está organizada por categorías para facilitar la navegación y el mantenimiento iterativo del conocimiento.
 
-### 🔍 `analysis/`
+---
 
-Documentos de análisis técnico y arquitectura:
+## 📁 **ESTRUCTURA DE DOCUMENTACIÓN**
 
-- `RELACIONES_DIAGRAM.md` - Diagrama de relaciones de la base de datos
-- `SCHEMA_ANALYSIS.md` - Análisis del esquema de base de datos
+### 🏗️ **01-architecture/** - Arquitectura y Diseño
+- **ARQUITECTURA_ROLES.md** - Sistema de roles y permisos
+- **BRANDING_ASSETS.md** - Assets de marca y diseño
+- **RELACIONES_DIAGRAM.md** - Diagramas de relaciones de base de datos
+- **SCHEMA_ANALYSIS.md** - Análisis del esquema de Prisma
 
-### 🚀 `implementation/`
+### 🛠️ **02-implementation/** - Guías de Implementación
+- **KANBAN_IMPLEMENTATION_GUIDE.md** - Guía completa del Kanban
+- **IMPLEMENTATION_STATUS.md** - Estado actual de implementación
+- **LIMPIEZA_COMPLETADA.md** - Resumen de limpieza de código
+- **SUPABASE_TROUBLESHOOTING.md** - Guía de solución de problemas de Supabase
 
-Documentos de implementación y estado del proyecto:
+### 🔧 **03-troubleshooting/** - Solución de Problemas
+- **README.md** - Índice de troubleshooting
+- **supabase-common-errors.md** - Errores comunes de Supabase
+- **supabase-permissions-leads.md** - Problemas de permisos con leads
 
-- `IMPLEMENTATION_STATUS.md` - Estado actual de la implementación
-- `LIMPIEZA_COMPLETADA.md` - Resumen de la limpieza del proyecto
-- `PLAN_TRABAJO_SAAS.md` - Plan de trabajo completo del proyecto SAAS
-- `ROADMAP_IMPLEMENTACION.md` - Roadmap detallado de implementación
+### 📋 **04-best-practices/** - Mejores Prácticas
+- **MEJORES_PRACTICAS_COMPONENTES.md** - Mejores prácticas para componentes
+- **PATRON_CREACION_SECCIONES_ADMIN.md** - Patrón para crear secciones admin
 
-### 📖 `guides/`
+### 🗂️ **05-legacy/** - Código Legacy y Migración
+- **ANALISIS_LEGACY.md** - Análisis del código legacy
+- **COMPONENTES_A_COPIAR.md** - Componentes legacy a migrar
 
-Guías y tutoriales:
+### 📖 **06-reference/** - Referencias y APIs
+- **CREAR_USUARIOS_SUPABASE.md** - Guía para crear usuarios
+- **CREDENCIALES_ACCESO.md** - Credenciales de acceso
+- **EMAIL_SYSTEM.md** - Sistema de emails
+- **STRIPE_SETUP.md** - Configuración de Stripe
+- **SISTEMA_AGENTES_AUTH.md** - Sistema de autenticación de agentes
+- **SISTEMA_EMAILS_AGENTES.md** - Sistema de emails para agentes
+- **SISTEMA_SUSCRIPCIONES.md** - Sistema de suscripciones
+- **SOLUCION_MODELOS_PRISMA.md** - Solución de modelos de Prisma
 
-- `SUPABASE_TROUBLESHOOTING.md` - Guía de solución de problemas de Supabase
+---
 
-### 🏗️ `legacy/`
+## 📋 **DOCUMENTOS PRINCIPALES**
 
-Documentación del sistema legacy:
+### 🚀 **Para Desarrolladores**
+1. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
+2. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
+3. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
 
-- `ANALISIS_LEGACY.md` - Análisis del sistema legacy
-- `COMPONENTES_A_COPIAR.md` - Componentes a migrar del legacy
+### 🔧 **Para Troubleshooting**
+1. **[Errores Comunes de Supabase](./03-troubleshooting/supabase-common-errors.md)**
+2. **[Problemas de Permisos](./03-troubleshooting/supabase-permissions-leads.md)**
 
-## 📝 Cómo Contribuir a la Documentación
+### 📚 **Para Referencia**
+1. **[Configuración de Stripe](./06-reference/STRIPE_SETUP.md)**
+2. **[Sistema de Suscripciones](./06-reference/SISTEMA_SUSCRIPCIONES.md)**
 
-1. **Nuevos documentos**: Colócalos en la carpeta apropiada según su categoría
-2. **Actualizaciones**: Mantén los documentos actualizados con los cambios del proyecto
-3. **Formato**: Usa Markdown con estructura clara y enlaces internos
-4. **Índice**: Actualiza este README cuando agregues nuevos documentos
+---
 
-## 🔗 Enlaces Rápidos
+## 🎯 **PRINCIPIOS DE DOCUMENTACIÓN**
 
-- [Plan de Trabajo SAAS](./implementation/PLAN_TRABAJO_SAAS.md) ⭐ **PRINCIPAL**
-- [Roadmap de Implementación](./implementation/ROADMAP_IMPLEMENTACION.md)
-- [Estado de Implementación](./implementation/IMPLEMENTATION_STATUS.md)
-- [Análisis del Schema](./analysis/SCHEMA_ANALYSIS.md)
-- [Troubleshooting Supabase](./guides/SUPABASE_TROUBLESHOOTING.md)
-- [Análisis Legacy](./legacy/ANALISIS_LEGACY.md)
+### ✅ **Reglas de Calidad**
+1. **Nunca usar `any`** - Tipado fuerte en TypeScript
+2. **Documentación viva** - Actualizar con cada cambio
+3. **Ejemplos prácticos** - Incluir código de ejemplo
+4. **Navegación clara** - Enlaces entre documentos relacionados
+
+### 🔄 **Mantenimiento Iterativo**
+- **Actualizar** documentación con cada feature
+- **Revisar** mensualmente la relevancia
+- **Eliminar** documentación obsoleta
+- **Consolidar** información duplicada
+
+---
+
+## 📝 **CÓMO CONTRIBUIR**
+
+### 📖 **Al Agregar Nueva Documentación**
+1. **Categorizar** en la estructura apropiada
+2. **Actualizar** este README.md
+3. **Incluir** ejemplos de código
+4. **Validar** que la información sea precisa
+
+### 🔧 **Al Modificar Código**
+1. **Actualizar** documentación relacionada
+2. **Verificar** que los ejemplos funcionen
+3. **Mantener** consistencia con el estilo
+
+---
+
+## 🚨 **NOTAS IMPORTANTES**
+
+- **Este es un proyecto en desarrollo** - La documentación evoluciona constantemente
+- **Siempre verificar** la información antes de implementar
+- **Reportar** discrepancias entre código y documentación
+- **Mantener** este índice actualizado
+
+---
+
+**Última actualización**: $(date)
+**Versión**: 1.0.0
