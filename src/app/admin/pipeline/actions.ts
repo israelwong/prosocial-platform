@@ -14,12 +14,12 @@ export async function createPipelineStage(formData: FormData) {
         }
 
         // Obtener el siguiente orden
-        const lastStage = await prisma.proSocialPipelineStage.findFirst({
+        const lastStage = await prisma.platform_pipeline_stages.findFirst({
             orderBy: { orden: 'desc' }
         });
         const nextOrder = (lastStage?.orden || 0) + 1;
 
-        const stage = await prisma.proSocialPipelineStage.create({
+        const stage = await prisma.platform_pipeline_stages.create({
             data: {
                 nombre,
                 descripcion: descripcion || null,
@@ -47,7 +47,7 @@ export async function updatePipelineStage(id: string, formData: FormData) {
             throw new Error('El nombre es requerido');
         }
 
-        const stage = await prisma.proSocialPipelineStage.update({
+        const stage = await prisma.platform_pipeline_stages.update({
             where: { id },
             data: {
                 nombre,
@@ -67,7 +67,7 @@ export async function updatePipelineStage(id: string, formData: FormData) {
 export async function deletePipelineStage(id: string) {
     try {
         // Verificar si hay leads en esta etapa
-        const leadCount = await prisma.proSocialLead.count({
+        const leadCount = await prisma.platform_leads.count({
             where: { etapaId: id }
         });
 
@@ -75,7 +75,7 @@ export async function deletePipelineStage(id: string) {
             throw new Error(`No se puede eliminar la etapa porque tiene ${leadCount} leads asignados`);
         }
 
-        await prisma.proSocialPipelineStage.delete({
+        await prisma.platform_pipeline_stages.delete({
             where: { id }
         });
 
@@ -89,7 +89,7 @@ export async function deletePipelineStage(id: string) {
 
 export async function togglePipelineStageStatus(id: string) {
     try {
-        const stage = await prisma.proSocialPipelineStage.findUnique({
+        const stage = await prisma.platform_pipeline_stages.findUnique({
             where: { id }
         });
 
@@ -97,7 +97,7 @@ export async function togglePipelineStageStatus(id: string) {
             throw new Error('Etapa no encontrada');
         }
 
-        const updatedStage = await prisma.proSocialPipelineStage.update({
+        const updatedStage = await prisma.platform_pipeline_stages.update({
             where: { id },
             data: {
                 isActive: !stage.isActive
@@ -116,7 +116,7 @@ export async function reorderPipelineStages(stageIds: string[]) {
     try {
         // Actualizar el orden de todas las etapas
         const updatePromises = stageIds.map((id, index) =>
-            prisma.proSocialPipelineStage.update({
+            prisma.platform_pipeline_stages.update({
                 where: { id },
                 data: { orden: index + 1 }
             })
