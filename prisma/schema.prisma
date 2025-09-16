@@ -52,16 +52,72 @@ model platform_billing_cycles {
   @@index([subscription_id])
 }
 
-model campanias {
-  id        String   @id
-  studioId  String
-  nombre    String
-  status    String   @default("active")
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  studios   projects  @relation(fields: [studioId], references: [id])
+model platform_config {
+  id                    String   @id @default(cuid())
+  
+  // Información general
+  nombre_empresa        String
+  logo_url              String?
+  favicon_url           String?
+  
+  // Contacto comercial
+  comercial_telefono    String?
+  comercial_email       String?
+  comercial_whatsapp    String?
+  
+  // Contacto soporte
+  soporte_telefono      String?
+  soporte_email         String?
+  soporte_chat_url      String?
+  
+  // Información general
+  direccion             String?
+  horarios_atencion     String?
+  timezone              String   @default("America/Mexico_City")
+  
+  // Redes sociales
+  facebook_url          String?
+  instagram_url         String?
+  twitter_url           String?
+  linkedin_url          String?
+  
+  // Legal
+  terminos_condiciones  String?
+  politica_privacidad   String?
+  aviso_legal           String?
+  
+  // SEO
+  meta_description      String?
+  meta_keywords         String?
+  
+  // Configuración técnica
+  google_analytics_id   String?
+  google_tag_manager_id String?
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime
+}
 
-  @@index([studioId])
+model project_campanas {
+  id                    String   @id @default(cuid())
+  projectId             String
+  nombre                String
+  descripcion           String?
+  presupuestoTotal      Decimal?
+  fechaInicio           DateTime?
+  fechaFin              DateTime?
+  status                String   @default("activa")
+  plataforma            String?  // "facebook", "google", "instagram", etc.
+  url_campana           String?  // URL de la campaña en la plataforma
+  leadsGenerados        Int      @default(0)
+  gastoReal             Decimal  @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime
+  projects              projects @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+  @@index([status])
+  @@index([fechaInicio, fechaFin])
 }
 
 
@@ -520,7 +576,7 @@ model platform_agents {
 }
 
 model platform_campana_plataformas {
-  id                               String                           @id
+  id                               String                           @id @default(cuid())
   campa_aId                        String                           @map("campañaId")
   plataformaId                     String
   presupuesto                      Decimal
@@ -538,7 +594,7 @@ model platform_campana_plataformas {
 }
 
 model platform_campanas {
-  id                            String                          @id
+  id                            String                          @id @default(cuid())
   nombre                        String
   descripcion                   String?
   presupuestoTotal              Decimal
@@ -549,14 +605,17 @@ model platform_campanas {
   leadsGenerados                Int                             @default(0)
   leadsSuscritos                Int                             @default(0)
   gastoReal                     Decimal                         @default(0)
+  projectId                     String?                         // Opcional: para campañas dirigidas a un estudio específico
   createdAt                     DateTime                        @default(now())
   updatedAt                     DateTime
   platform_campana_plataformas  platform_campana_plataformas[]
   platform_leads                platform_leads[]
+  projects                      projects?                       @relation(fields: [projectId], references: [id])
 
   @@index([fechaInicio, fechaFin])
   @@index([isActive])
   @@index([status])
+  @@index([projectId])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -874,7 +933,7 @@ model projects {
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime
   agenda                   project_agenda[]
-  campanias                campanias[]
+  project_campanas         project_campanas[]
   clientes                 project_clientes[]
   condiciones_comerciales  project_condiciones_comerciales[]
   configuraciones          project_configuraciones[]
@@ -885,6 +944,7 @@ model projects {
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
   platform_leads           platform_leads?
+  platform_campanas        platform_campanas[]
   revenue_transactions     project_revenue_transactions[]
   servicios                project_servicios[]
   studio_revenue_products  project_studio_revenue_products[]
