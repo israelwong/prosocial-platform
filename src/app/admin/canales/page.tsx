@@ -55,7 +55,7 @@ export default function CanalesPage() {
                 toast.error('El nombre del canal es requerido');
                 throw new Error('Nombre requerido');
             }
-            
+
             if (!canalData.categoria.trim()) {
                 toast.error('La categoría del canal es requerida');
                 throw new Error('Categoría requerida');
@@ -63,7 +63,7 @@ export default function CanalesPage() {
 
             const url = editingCanal ? `/api/canales/${editingCanal.id}` : '/api/canales';
             const method = editingCanal ? 'PUT' : 'POST';
-            
+
             const response = await fetch(url, {
                 method,
                 headers: {

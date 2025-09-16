@@ -40,6 +40,48 @@ interface UsePlatformConfigReturn {
 let globalConfig: PlatformConfig | null = null;
 let globalPromise: Promise<PlatformConfig | null> | null = null;
 
+// Configuración por defecto
+const getDefaultConfig = (): PlatformConfig => ({
+    id: 'default',
+    nombre_empresa: 'ProSocial Platform',
+    nombre_plataforma: 'ProSocial Platform',
+    descripcion: 'Plataforma de gestión de estudios de fotografía',
+    isotipo: null,
+    logotipo: null,
+    comercial_telefono: null,
+    comercial_email: null,
+    comercial_whatsapp: null,
+    soporte_telefono: null,
+    soporte_email: null,
+    soporte_chat_url: null,
+    direccion: null,
+    horarios_atencion: null,
+    timezone: 'America/Mexico_City',
+    facebook_url: null,
+    instagram_url: null,
+    twitter_url: null,
+    linkedin_url: null,
+    youtube_url: null,
+    tiktok_url: null,
+    terminos_condiciones: null,
+    politica_privacidad: null,
+    aviso_legal: null,
+    meta_title: 'ProSocial Platform',
+    meta_description: 'Plataforma de gestión de estudios de fotografía',
+    meta_keywords: 'fotografía, estudios, gestión, CRM',
+    favicon: null,
+    og_image: null,
+    twitter_image: null,
+    analytics_gtag: null,
+    analytics_ga4: null,
+    analytics_facebook: null,
+    hotjar_id: null,
+    intercom_id: null,
+    zendesk_id: null,
+    createdAt: new Date(),
+    updatedAt: new Date()
+});
+
 export function usePlatformConfig(): UsePlatformConfigReturn {
     const [config, setConfig] = useState<PlatformConfig | null>(globalConfig);
     const [loading, setLoading] = useState(!globalConfig);
@@ -79,7 +121,24 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
                 const response = await fetch('/api/platform-config');
                 
                 if (!response.ok) {
-                    throw new Error('Error al cargar la configuración');
+                    // Intentar obtener el mensaje de error del servidor
+                    let errorMessage = 'Error al cargar la configuración';
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorData.message || errorMessage;
+                    } catch {
+                        // Si no se puede parsear el error, usar el mensaje por defecto
+                    }
+                    
+                    // Si es un error de conexión a la base de datos, usar configuración por defecto
+                    if (response.status >= 500) {
+                        console.warn('Error de servidor, usando configuración por defecto:', errorMessage);
+                        const defaultConfig = getDefaultConfig();
+                        globalConfig = defaultConfig;
+                        return defaultConfig;
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
 
                 const data = await response.json();
@@ -88,6 +147,15 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
                 console.error('Error fetching platform config:', err);
+                
+                // Si es un error de red o conexión, usar configuración por defecto
+                if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('connection')) {
+                    console.warn('Error de conexión, usando configuración por defecto');
+                    const defaultConfig = getDefaultConfig();
+                    globalConfig = defaultConfig;
+                    return defaultConfig;
+                }
+                
                 throw new Error(errorMessage);
             }
         })();
