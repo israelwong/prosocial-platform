@@ -1,49 +1,44 @@
-import Link from 'next/link'
+'use client';
 
-export default function AgenteLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
+import React, { useState } from 'react';
+import { Navbar } from './components/Navbar';
+import { Sidebar } from './components/Sidebar';
+
+export default function AgenteLayout({ children }: { children: React.ReactNode }) {
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [expandedMenus, setExpandedMenus] = useState<string[]>(['CRM', 'Gestión']); // CRM y Gestión expandidos por defecto
+
+    const toggleMenu = (menuName: string) => {
+        setExpandedMenus(prev =>
+            prev.includes(menuName)
+                ? prev.filter(name => name !== menuName)
+                : [...prev, menuName]
+        );
+    };
+
     return (
-        <div className="min-h-screen bg-zinc-900">
-            <header className="border-b border-zinc-700 bg-zinc-800">
-                <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-8">
-                            <Link href="/agente" className="flex items-center space-x-3">
-                                <div className="text-xl font-bold text-white">ProSocial Platform</div>
-                            </Link>
-                            <nav className="hidden md:flex items-center space-x-6">
-                                <Link href="/agente" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Dashboard
-                                </Link>
-                                <Link href="/agente/crm/kanban" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    CRM Kanban
-                                </Link>
-                                <Link href="/agente/leads" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Gestión de Leads
-                                </Link>
-                                <Link href="/agente/studios" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Gestión de Estudios
-                                </Link>
-                                <Link href="/agente/actividades" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Actividades
-                                </Link>
-                                <Link href="/agente/reportes" className="text-sm font-medium text-white hover:text-blue-400 transition-colors">
-                                    Reportes
-                                </Link>
-                            </nav>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                            Panel Agente
-                        </div>
+        <div className="min-h-screen flex flex-col relative">
+            {/* Navbar superior */}
+            <div>
+                <Navbar onMenuClick={() => setSidebarOpen(true)} />
+            </div>
+
+            {/* Contenido principal con sidebar */}
+            <div className="flex flex-1 min-h-0">
+                <Sidebar
+                    isOpen={sidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
+                    expandedMenus={expandedMenus}
+                    onToggleMenu={toggleMenu}
+                />
+
+                {/* Main content */}
+                <main className="flex-1 bg-zinc-950">
+                    <div className="p-4 lg:p-6">
+                        {children}
                     </div>
-                </div>
-            </header>
-            <main className="container mx-auto px-4 py-6">
-                {children}
-            </main>
+                </main>
+            </div>
         </div>
-    )
+    );
 }
