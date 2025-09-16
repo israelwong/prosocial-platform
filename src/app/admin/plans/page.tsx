@@ -9,7 +9,7 @@ import { Plan } from './types';
 // Función para obtener planes desde la base de datos
 async function getPlans(): Promise<Plan[]> {
     try {
-        const plans = await prisma.plans.findMany({
+        const plans = await prisma.platform_plans.findMany({
             include: {
                 _count: {
                     select: {

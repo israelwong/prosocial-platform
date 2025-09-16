@@ -9,11 +9,11 @@ import { Agent } from './types';
 async function getAgents(): Promise<Agent[]> {
     try {
         // Consulta optimizada con include para obtener el conteo de leads en una sola query
-        const agents = await prisma.prosocial_agents.findMany({
+        const agents = await prisma.platform_agents.findMany({
             include: {
                 _count: {
                     select: {
-                        prosocial_leads: true
+                        platform_leads: true
                     }
                 }
             },

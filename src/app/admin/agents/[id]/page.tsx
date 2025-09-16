@@ -43,10 +43,10 @@ interface AgentDetail {
 
 async function getAgent(id: string): Promise<AgentDetail | null> {
     try {
-        const agent = await prisma.prosocial_agents.findUnique({
+        const agent = await prisma.platform_agents.findUnique({
             where: { id },
             include: {
-                prosocial_leads: {
+                platform_leads: {
                     select: {
                         id: true,
                         nombre: true,
@@ -62,7 +62,7 @@ async function getAgent(id: string): Promise<AgentDetail | null> {
                 },
                 _count: {
                     select: {
-                        prosocial_leads: true
+                        platform_leads: true
                     }
                 }
             }

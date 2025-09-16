@@ -100,9 +100,9 @@ const crmStages = [
 // Función para obtener leads de la base de datos
 async function getLeads() {
     try {
-        const leads = await prisma.prosocial_leads.findMany({
+        const leads = await prisma.platform_leads.findMany({
             include: {
-                prosocial_agents: {
+                platform_agents: {
                     select: {
                         nombre: true,
                         email: true
@@ -154,20 +154,20 @@ async function getLeads() {
 // Función para calcular métricas
 async function getMetrics() {
     try {
-        const totalLeads = await prisma.prosocial_leads.count();
+        const totalLeads = await prisma.platform_leads.count();
 
         // Buscar la etapa "Suscritos" por nombre
-        const etapaSuscritos = await prisma.prosocial_pipeline_stages.findFirst({
+        const etapaSuscritos = await prisma.platform_pipeline_stages.findFirst({
             where: { nombre: 'Suscritos' }
         });
 
-        const suscritos = etapaSuscritos ? await prisma.prosocial_leads.count({
+        const suscritos = etapaSuscritos ? await prisma.platform_leads.count({
             where: { etapaId: etapaSuscritos.id }
         }) : 0;
 
         const conversionRate = totalLeads > 0 ? (suscritos / totalLeads) * 100 : 0;
 
-        const avgBudget = await prisma.prosocial_leads.aggregate({
+        const avgBudget = await prisma.platform_leads.aggregate({
             where: {
                 presupuestoMensual: { not: null }
             },

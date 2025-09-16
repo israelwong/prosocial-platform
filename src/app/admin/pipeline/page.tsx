@@ -15,11 +15,11 @@ interface PipelineStage {
 // Función para obtener las etapas del pipeline desde la base de datos
 async function getPipelineStages(): Promise<PipelineStage[]> {
     try {
-        const stages = await prisma.prosocial_pipeline_stages.findMany({
+        const stages = await prisma.platform_pipeline_stages.findMany({
             include: {
                 _count: {
                     select: {
-                        prosocial_leads: true
+                        platform_leads: true
                     }
                 }
             },
