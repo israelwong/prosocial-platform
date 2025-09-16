@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
-        const plataformas = await prisma.proSocialPlataformaPublicidad.findMany({
+        const plataformas = await prisma.prosocial_plataformas_publicidad.findMany({
             where: {
                 isActive: true
             },

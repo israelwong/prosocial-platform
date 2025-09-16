@@ -17,17 +17,17 @@ export async function GET(request: NextRequest) {
             where.isActive = isActive === 'true';
         }
 
-        const campanas = await prisma.proSocialCampaña.findMany({
+        const campanas = await prisma.prosocial_campanas.findMany({
             where,
             include: {
-                plataformas: {
+                prosocial_campana_plataformas: {
                     include: {
-                        plataforma: true
+                        prosocial_plataformas_publicidad: true
                     }
                 },
                 _count: {
                     select: {
-                        leads: true
+                        prosocial_leads: true
                     }
                 }
             },
@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
         
         const { plataformas, ...campañaData } = body;
         
-        const campaña = await prisma.proSocialCampaña.create({
+        const campaña = await prisma.prosocial_campanas.create({
             data: {
                 ...campañaData,
-                plataformas: {
+                prosocial_campana_plataformas: {
                     create: plataformas?.map((p: any) => ({
                         plataformaId: p.plataformaId,
                         presupuesto: p.presupuesto,
@@ -67,9 +67,9 @@ export async function POST(request: NextRequest) {
                 }
             },
             include: {
-                plataformas: {
+                prosocial_campana_plataformas: {
                     include: {
-                        plataforma: true
+                        prosocial_plataformas_publicidad: true
                     }
                 }
             }
