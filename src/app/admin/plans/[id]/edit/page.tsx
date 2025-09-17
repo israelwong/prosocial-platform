@@ -72,7 +72,7 @@ export default function EditPlanPage() {
     const router = useRouter();
     const params = useParams();
     const planId = params.id as string;
-    const isEdit = planId !== 'new';
+    const isEdit = planId !== 'new' && planId !== undefined;
 
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(isEdit);
@@ -570,8 +570,8 @@ export default function EditPlanPage() {
                     </CardContent>
                 </Card>
 
-                {/* Límites */}
-                <PlanServicesList planId={planId} />
+                {/* Límites - Solo mostrar en modo edición */}
+                {isEdit && <PlanServicesList planId={planId} />}
 
                 {/* Integración Stripe */}
                 <Card>
