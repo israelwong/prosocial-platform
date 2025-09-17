@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Verificar que la categoría existe si se proporciona
-        if (categoryId) {
+        if (categoryId && categoryId.trim() !== '') {
             const category = await prisma.service_categories.findUnique({
                 where: { id: categoryId }
             });
@@ -50,9 +50,12 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        // Normalizar categoryId (null si está vacío)
+        const normalizedCategoryId = categoryId && categoryId.trim() !== '' ? categoryId : null;
+
         // Obtener la siguiente posición disponible en la categoría
         const lastService = await prisma.platform_services.findFirst({
-            where: categoryId ? { categoryId } : { categoryId: null },
+            where: normalizedCategoryId ? { categoryId: normalizedCategoryId } : { categoryId: null },
             orderBy: { posicion: 'desc' }
         });
         const nextPosition = (lastService?.posicion || 0) + 1;
@@ -62,7 +65,7 @@ export async function POST(request: NextRequest) {
                 name,
                 slug,
                 description: description || null,
-                categoryId,
+                categoryId: normalizedCategoryId,
                 posicion: nextPosition,
                 active: true
             },
@@ -75,11 +78,21 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Error creating service:', error);
 
-        if (error instanceof Error && error.message.includes('Unique constraint')) {
-            return NextResponse.json(
-                { error: 'Ya existe un servicio con ese nombre o slug' },
-                { status: 409 }
-            );
+        // Manejar errores específicos de Prisma
+        if (error instanceof Error) {
+            if (error.message.includes('Unique constraint')) {
+                return NextResponse.json(
+                    { error: 'Ya existe un servicio con ese nombre o slug' },
+                    { status: 409 }
+                );
+            }
+            
+            if (error.message.includes('P1001') || error.message.includes('Can\'t reach database')) {
+                return NextResponse.json(
+                    { error: 'Error de conexión a la base de datos. Intenta nuevamente.' },
+                    { status: 503 }
+                );
+            }
         }
 
         return NextResponse.json(
