@@ -10,12 +10,12 @@ interface StatsProps {
 export function Stats({ agents }: StatsProps) {
     const totalAgents = agents.length;
     const activeAgents = agents.filter(a => a.activo).length;
-    const totalLeads = agents.reduce((sum, agent) => sum + agent._count.prosocial_leads, 0);
+    const totalLeads = agents.reduce((sum, agent) => sum + (agent._count.platform_leads || 0), 0);
     const averageGoal = agents.length > 0
-        ? Math.round(agents.reduce((sum, agent) => sum + agent.metaMensualLeads, 0) / agents.length)
+        ? Math.round(agents.reduce((sum, agent) => sum + (agent.metaMensualLeads || 0), 0) / agents.length)
         : 0;
     const averageCommission = agents.length > 0
-        ? (agents.reduce((sum, agent) => sum + Number(agent.comisionConversion), 0) / agents.length * 100)
+        ? (agents.reduce((sum, agent) => sum + (Number(agent.comisionConversion) || 0), 0) / agents.length * 100)
         : 0;
 
     return (
