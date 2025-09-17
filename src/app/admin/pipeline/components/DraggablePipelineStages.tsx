@@ -152,7 +152,12 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
 
-        if (over && active.id !== over.id && !isReordering) {
+        // No permitir drag and drop si ya se está reordenando
+        if (isReordering) {
+            return;
+        }
+
+        if (over && active.id !== over.id) {
             const oldIndex = localStages.findIndex((stage) => stage.id === active.id);
             const newIndex = localStages.findIndex((stage) => stage.id === over.id);
 
@@ -266,7 +271,7 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
             </CardHeader>
             <CardContent className="p-0">
                 <DndContext
-                    sensors={isReordering ? [] : sensors}
+                    sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                 >
@@ -274,7 +279,7 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
                         items={localStages.map(stage => stage.id)}
                         strategy={verticalListSortingStrategy}
                     >
-                        <div className="divide-y divide-zinc-800">
+                        <div className={`divide-y divide-zinc-800 ${isReordering ? 'pointer-events-none opacity-50' : ''}`}>
                             {localStages.map((stage, index) => (
                                 <SortableStageItem
                                     key={stage.id}
