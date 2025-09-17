@@ -15,7 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { PlanMigrationModal } from '../components/PlanMigrationModal';
+import { PlanMigrationModal } from './components/PlanMigrationModal';
 import { Plan as PlanType } from '../../types';
 
 // Schema de validación
