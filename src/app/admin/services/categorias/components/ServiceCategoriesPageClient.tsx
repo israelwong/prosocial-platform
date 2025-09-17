@@ -199,20 +199,16 @@ export function ServiceCategoriesPageClient() {
         try {
             setIsReordering(true);
 
-            // Actualizar solo las categorías que cambiaron de posición
-            const updates = [];
+            // Actualizar posiciones secuencialmente para evitar saturar la BD
             for (let i = 0; i < reorderedCategories.length; i++) {
                 const category = reorderedCategories[i];
                 const newPosition = i + 1; // Posiciones empiezan en 1
 
                 if (category.posicion !== newPosition) {
-                    updates.push(updateCategoryPosition(category.id, newPosition));
+                    await updateCategoryPosition(category.id, newPosition);
+                    // Pequeño delay para evitar saturar la BD
+                    await new Promise(resolve => setTimeout(resolve, 100));
                 }
-            }
-
-            // Ejecutar todas las actualizaciones en paralelo
-            if (updates.length > 0) {
-                await Promise.all(updates);
             }
 
             toast.success('Orden de categorías actualizado exitosamente');
