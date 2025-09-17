@@ -16,6 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { PlanMigrationModal } from './components/PlanMigrationModal';
+import { LimitsModal } from './components/LimitsModal';
 import { Plan as PlanType } from '../../types';
 
 // Schema de validación
@@ -70,6 +71,7 @@ export default function EditPlanPage() {
     const [features, setFeatures] = useState<string[]>([]);
     const [newFeature, setNewFeature] = useState('');
     const [showMigrationModal, setShowMigrationModal] = useState(false);
+    const [showLimitsModal, setShowLimitsModal] = useState(false);
     const [limits, setLimits] = useState<Record<string, unknown>>({});
     const [planData, setPlanData] = useState<PlanType | null>(null);
 
@@ -192,23 +194,10 @@ export default function EditPlanPage() {
         setValue('features', updatedFeatures);
     };
 
-    // Agregar límite
-    const addLimit = () => {
-        const key = prompt('Nombre del límite:');
-        const value = prompt('Valor del límite:');
-        if (key && value) {
-            const updatedLimits = { ...limits, [key]: value };
-            setLimits(updatedLimits);
-            setValue('limits', updatedLimits);
-        }
-    };
-
-    // Eliminar límite
-    const removeLimit = (key: string) => {
-        const updatedLimits = { ...limits };
-        delete updatedLimits[key];
-        setLimits(updatedLimits);
-        setValue('limits', updatedLimits);
+    // Manejar guardado de límites desde el modal
+    const handleLimitsSave = (newLimits: Record<string, unknown>) => {
+        setLimits(newLimits);
+        setValue('limits', newLimits);
     };
 
     const onSubmit = async (data: PlanFormData) => {
@@ -571,28 +560,56 @@ export default function EditPlanPage() {
                         <CardTitle>Límites del Plan</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <Button type="button" onClick={addLimit} variant="outline">
+                        <Button 
+                            type="button" 
+                            onClick={() => setShowLimitsModal(true)} 
+                            variant="outline"
+                        >
                             <Plus className="h-4 w-4 mr-2" />
-                            Agregar Límite
+                            Gestionar Límites
                         </Button>
 
                         <div className="space-y-2">
-                            {Object.entries(limits).map(([key, value]) => (
-                                <div key={key} className="flex items-center justify-between p-2 bg-muted rounded">
-                                    <span className="text-sm">
-                                        <strong>{key}:</strong> {String(value)}
-                                    </span>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => removeLimit(key)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
+                            {Object.keys(limits).length === 0 ? (
+                                <div className="text-center py-4 text-muted-foreground">
+                                    <p className="text-sm">No hay límites configurados</p>
+                                    <p className="text-xs">Haz clic en "Gestionar Límites" para agregar límites al plan</p>
                                 </div>
-                            ))}
+                            ) : (
+                                Object.entries(limits).map(([key, value]) => (
+                                    <div key={key} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="font-medium text-sm">{key}</span>
+                                                {typeof value === 'object' && value !== null && 'limite' in value ? (
+                                                    (value as any).limite === null ? (
+                                                        <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded">
+                                                            Ilimitado
+                                                        </span>
+                                                    ) : (value as any).limite === 0 ? (
+                                                        <span className="text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded">
+                                                            Sin acceso
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded">
+                                                            Límite: {(value as any).limite}
+                                                        </span>
+                                                    )
+                                                ) : (
+                                                    <span className="text-xs bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 px-2 py-1 rounded">
+                                                        {String(value)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {typeof value === 'object' && value !== null && 'descripcion' in value && (
+                                                <p className="text-xs text-muted-foreground">
+                                                    {(value as any).descripcion}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </CardContent>
                 </Card>
@@ -785,6 +802,13 @@ export default function EditPlanPage() {
                         fetchPlan();
                     }
                 }}
+            />
+
+            <LimitsModal
+                isOpen={showLimitsModal}
+                onClose={() => setShowLimitsModal(false)}
+                limits={limits}
+                onSave={handleLimitsSave}
             />
         </div>
     );
