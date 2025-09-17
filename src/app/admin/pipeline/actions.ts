@@ -202,17 +202,37 @@ export async function reorderPipelineStages(stageIds: string[]) {
             throw new Error(`No se encontraron ${missingIds.length} etapas: ${missingIds.join(', ')}`);
         }
 
-        // Actualizar el orden de todas las etapas
-        const updatePromises = stageIds.map((id, index) => {
-            console.log(`🔄 Actualizando etapa ${id} (orden: ${index + 1})`);
-            return prisma.platform_pipeline_stages.update({
-                where: { id },
-                data: { 
-                    orden: index + 1,
-                    updatedAt: new Date()
+        // Función para actualizar una etapa con reintentos específicos para P1001
+        const updateStageWithRetry = async (id: string, orden: number, maxRetries = 5) => {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    console.log(`🔄 Actualizando etapa ${id} (orden: ${orden}) - Intento ${attempt}/${maxRetries}`);
+                    return await prisma.platform_pipeline_stages.update({
+                        where: { id },
+                        data: { 
+                            orden,
+                            updatedAt: new Date()
+                        }
+                    });
+                } catch (error: unknown) {
+                    // Solo reintentar si es error de conectividad P1001
+                    const prismaError = error as { code?: string; message?: string };
+                    if (prismaError.code === 'P1001' && attempt < maxRetries) {
+                        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Backoff exponencial, máximo 5s
+                        console.warn(`⚠️ Error P1001 en intento ${attempt} para etapa ${id}, reintentando en ${delay}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue;
+                    }
+                    // Si no es P1001 o se agotaron los intentos, lanzar error
+                    throw error;
                 }
-            });
-        });
+            }
+        };
+
+        // Actualizar el orden de todas las etapas con reintentos
+        const updatePromises = stageIds.map((id, index) =>
+            updateStageWithRetry(id, index + 1)
+        );
 
         // Usar Promise.allSettled para manejar errores individuales
         const results = await Promise.allSettled(updatePromises);
@@ -220,11 +240,22 @@ export async function reorderPipelineStages(stageIds: string[]) {
         // Verificar si alguna actualización falló
         const failedUpdates = results.filter(result => result.status === 'rejected');
         if (failedUpdates.length > 0) {
-            console.error('❌ Algunas actualizaciones de orden fallaron:', failedUpdates);
+            console.error('❌ Algunas actualizaciones de orden fallaron después de reintentos:', failedUpdates);
             // Log detallado de errores
             failedUpdates.forEach((failed, index) => {
                 console.error(`  ${index + 1}. ID: ${stageIds[index]}, Error:`, failed.reason);
             });
+            
+            // Si todas fallaron por P1001, es un problema de conectividad general
+            const allP1001 = failedUpdates.every(failed => 
+                failed.reason?.code === 'P1001' || 
+                failed.reason?.message?.includes('Can\'t reach database server')
+            );
+            
+            if (allP1001) {
+                throw new Error('Error de conectividad con la base de datos. Verifica tu conexión a internet e intenta nuevamente.');
+            }
+            
             throw new Error(`Error al actualizar el orden de ${failedUpdates.length} etapas`);
         }
 
