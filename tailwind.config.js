@@ -22,7 +22,7 @@ const config = {
           foreground: "rgb(255 255 255)", // white
         },
         popover: {
-          DEFAULT: "rgb(24 24 27)", // zinc-900
+          DEFAULT: "rgb(9 9 11)", // zinc-950 - Fondo más oscuro para modales
           foreground: "rgb(255 255 255)", // white
         },
         primary: {
