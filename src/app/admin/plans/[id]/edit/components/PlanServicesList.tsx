@@ -50,9 +50,17 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
                 console.log('Received data:', data);
                 setServices(data);
             } else {
-                const errorData = await response.json();
+                let errorData;
+                try {
+                    errorData = await response.json();
+                } catch (jsonError) {
+                    console.error('Error parsing JSON response:', jsonError);
+                    errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
+                }
                 console.error('API Error:', errorData);
-                throw new Error(errorData.error || 'Error al cargar servicios del plan');
+                console.error('Response status:', response.status);
+                console.error('Response headers:', Object.fromEntries(response.headers.entries()));
+                throw new Error(errorData.error || `Error al cargar servicios del plan (${response.status})`);
             }
         } catch (error) {
             console.error('Error fetching plan services:', error);

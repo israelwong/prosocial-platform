@@ -10,6 +10,19 @@ export async function GET(
         const { id: planId } = await params;
         console.log('Fetching services for plan:', planId);
 
+        // Verificar que el plan existe
+        const plan = await prisma.platform_plans.findUnique({
+            where: { id: planId }
+        });
+
+        if (!plan) {
+            console.log('Plan not found:', planId);
+            return NextResponse.json(
+                { error: 'Plan no encontrado' },
+                { status: 404 }
+            );
+        }
+
         // Obtener todos los servicios ordenados por posición
         const allServices = await prisma.platform_services.findMany({
             orderBy: [
