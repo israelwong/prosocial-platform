@@ -229,13 +229,21 @@ export async function reorderPipelineStages(stageIds: string[]) {
             }
         };
 
-        // Actualizar el orden de todas las etapas con reintentos
-        const updatePromises = stageIds.map((id, index) =>
-            updateStageWithRetry(id, index + 1)
-        );
-
-        // Usar Promise.allSettled para manejar errores individuales
-        const results = await Promise.allSettled(updatePromises);
+        // Actualizar el orden de todas las etapas SECUENCIALMENTE para evitar saturar Supabase
+        const results = [];
+        for (let i = 0; i < stageIds.length; i++) {
+            const id = stageIds[i];
+            const orden = i + 1;
+            
+            try {
+                console.log(`🔄 Actualizando etapa ${id} (orden: ${orden}) - Secuencial ${i + 1}/${stageIds.length}`);
+                const result = await updateStageWithRetry(id, orden);
+                results.push({ status: 'fulfilled', value: result });
+            } catch (error) {
+                console.error(`❌ Error actualizando etapa ${id}:`, error);
+                results.push({ status: 'rejected', reason: error });
+            }
+        }
 
         // Verificar si alguna actualización falló
         const failedUpdates = results.filter(result => result.status === 'rejected');
