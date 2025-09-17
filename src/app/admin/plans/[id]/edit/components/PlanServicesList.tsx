@@ -1,19 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { 
-    Save, 
-    Loader2,
-    CheckCircle,
-    XCircle,
-    Infinity
+    Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
@@ -34,22 +29,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
     const [isLoading, setIsLoading] = useState(true);
     const [saving, setSaving] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (isEdit) {
-            fetchPlanServices();
-        } else {
-            fetchAllServices();
-        }
-    }, [planId, isEdit]);
-
-    // Notificar cambios al componente padre
-    useEffect(() => {
-        if (onServicesChange && services.length > 0) {
-            onServicesChange(services);
-        }
-    }, [services, onServicesChange]);
-
-    const fetchAllServices = async () => {
+    const fetchAllServices = useCallback(async () => {
         try {
             setIsLoading(true);
             console.log('Fetching all services for new plan');
@@ -63,7 +43,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
             console.log('Received all services:', allServices);
             
             // Convertir a formato ServiceWithPlanConfig con planService null
-            const servicesWithConfig = allServices.map((service: any) => ({
+            const servicesWithConfig: ServiceWithPlanConfig[] = allServices.map((service: ServiceWithPlanConfig) => ({
                 ...service,
                 planService: null
             }));
@@ -75,9 +55,9 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
-    const fetchPlanServices = async () => {
+    const fetchPlanServices = useCallback(async () => {
         try {
             setIsLoading(true);
             console.log('Fetching services for plan:', planId);
@@ -113,9 +93,24 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [planId]);
 
-    const updateServiceConfig = async (serviceId: string, updates: any) => {
+    useEffect(() => {
+        if (isEdit) {
+            fetchPlanServices();
+        } else {
+            fetchAllServices();
+        }
+    }, [planId, isEdit, fetchPlanServices, fetchAllServices]);
+
+    // Notificar cambios al componente padre
+    useEffect(() => {
+        if (onServicesChange && services.length > 0) {
+            onServicesChange(services);
+        }
+    }, [services, onServicesChange]);
+
+    const updateServiceConfig = async (serviceId: string, updates: { active?: boolean; limite?: number | null; unidad?: UnidadMedida | null }) => {
         if (!isEdit) {
             // En modo creación, solo actualizar el estado local
             setServices(prevServices => 
@@ -129,7 +124,8 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                             limite: null,
                             unidad: null,
                             createdAt: new Date(),
-                            updatedAt: new Date()
+                            updatedAt: new Date(),
+                            service: service
                         };
                         
                         return {
@@ -221,14 +217,29 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
 
     if (isLoading) {
         return (
-            <Card>
-                <CardHeader>
-                    <CardTitle>Servicios del Plan</CardTitle>
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
+                    <CardTitle className="text-lg font-semibold text-white">Servicios del Plan</CardTitle>
+                    <div className="text-sm text-zinc-400">
+                        Cargando servicios...
+                    </div>
                 </CardHeader>
-                <CardContent>
-                    <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                        <span>Cargando servicios...</span>
+                <CardContent className="p-0">
+                    <div className="divide-y divide-zinc-800">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="flex items-center justify-between p-4 animate-pulse">
+                                <div className="flex items-center space-x-4">
+                                    <div className="h-4 w-4 bg-zinc-700 rounded"></div>
+                                    <div className="h-4 w-6 bg-zinc-700 rounded"></div>
+                                    <div className="h-4 w-4 bg-zinc-700 rounded-full"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-32"></div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-6 w-16 bg-zinc-700 rounded"></div>
+                                    <div className="h-6 w-16 bg-zinc-700 rounded"></div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </CardContent>
             </Card>
@@ -238,14 +249,19 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
     // Si no hay servicios y no está cargando, mostrar mensaje apropiado
     if (services.length === 0 && !isLoading) {
         return (
-            <Card>
-                <CardHeader>
-                    <CardTitle>Servicios del Plan</CardTitle>
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
+                    <CardTitle className="text-lg font-semibold text-white">Servicios del Plan</CardTitle>
+                    <div className="text-sm text-zinc-400">
+                        Configura qué servicios están disponibles en este plan y sus límites
+                    </div>
                 </CardHeader>
-                <CardContent className="text-center py-12">
-                    <div className="text-muted-foreground">
-                        <p className="text-sm mb-2">No se pudieron cargar los servicios del plan.</p>
-                        <p className="text-xs">Verifica que el plan existe y tiene una configuración válida.</p>
+                <CardContent className="p-0">
+                    <div className="text-center py-12">
+                        <div className="text-zinc-400">
+                            <p className="text-sm mb-2 text-white">No se pudieron cargar los servicios del plan.</p>
+                            <p className="text-xs text-zinc-400">Verifica que el plan existe y tiene una configuración válida.</p>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
@@ -253,18 +269,18 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Servicios del Plan</CardTitle>
-                <p className="text-sm text-muted-foreground">
+        <Card className="border border-border bg-card shadow-sm">
+            <CardHeader className="border-b border-zinc-800">
+                <CardTitle className="text-lg font-semibold text-white">Servicios del Plan</CardTitle>
+                <div className="text-sm text-zinc-400">
                     {isEdit 
                         ? "Configura qué servicios están disponibles en este plan y sus límites"
                         : "Configura qué servicios estarán disponibles en este plan y sus límites. Los cambios se guardarán al crear el plan."
                     }
-                </p>
+                </div>
             </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
+            <CardContent className="p-0">
+                <div className="divide-y divide-zinc-800">
                     {services.map((service) => {
                         const isActive = service.planService?.active ?? false;
                         const isSaving = saving === service.id;
@@ -272,25 +288,37 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                         return (
                             <div
                                 key={service.id}
-                                className={`p-4 border rounded-lg transition-all ${
+                                className={`p-4 hover:bg-zinc-800/50 transition-colors ${
                                     isActive 
-                                        ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20' 
-                                        : 'border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900/20'
+                                        ? 'border-l-4 border-l-green-500' 
+                                        : ''
                                 }`}
                             >
                                 <div className="flex items-start justify-between mb-3">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="font-semibold">{service.name}</h3>
-                                            <Badge variant="outline" className="text-xs">
-                                                {service.slug}
-                                            </Badge>
+                                    <div className="flex items-center space-x-4 flex-1">
+                                        <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center space-x-2 mb-1">
+                                                <h3 className="font-medium text-white">{service.name}</h3>
+                                                <Badge variant="outline" className="text-xs">
+                                                    {service.slug}
+                                                </Badge>
+                                                <Badge 
+                                                    variant="outline" 
+                                                    className={`text-xs ${isActive 
+                                                        ? 'border-green-500 text-green-400' 
+                                                        : 'border-red-500 text-red-400'
+                                                    }`}
+                                                >
+                                                    {isActive ? "Activo" : "Inactivo"}
+                                                </Badge>
+                                            </div>
+                                            {service.description && (
+                                                <p className="text-sm text-zinc-400">
+                                                    {service.description}
+                                                </p>
+                                            )}
                                         </div>
-                                        {service.description && (
-                                            <p className="text-sm text-muted-foreground">
-                                                {service.description}
-                                            </p>
-                                        )}
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Switch
@@ -298,14 +326,14 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                             onCheckedChange={(checked) => handleToggleActive(service.id, checked)}
                                             disabled={isSaving}
                                         />
-                                        {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+                                        {isSaving && <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />}
                                     </div>
                                 </div>
 
                                 {isActive && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                         <div>
-                                            <Label htmlFor={`limite-${service.id}`}>Límite</Label>
+                                            <Label htmlFor={`limite-${service.id}`} className="text-sm text-zinc-400">Límite</Label>
                                             <Input
                                                 id={`limite-${service.id}`}
                                                 type="number"
@@ -313,24 +341,25 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                                 value={service.planService?.limite ?? ''}
                                                 onChange={(e) => handleLimiteChange(service.id, e.target.value)}
                                                 disabled={isSaving}
+                                                className="bg-zinc-900 border-zinc-700 text-white"
                                             />
-                                            <p className="text-xs text-muted-foreground mt-1">
+                                            <p className="text-xs text-zinc-500 mt-1">
                                                 Dejar vacío = ilimitado, 0 = sin acceso
                                             </p>
                                         </div>
                                         <div>
-                                            <Label htmlFor={`unidad-${service.id}`}>Unidad de Medida</Label>
+                                            <Label htmlFor={`unidad-${service.id}`} className="text-sm text-zinc-400">Unidad de Medida</Label>
                                             <Select
                                                 value={service.planService?.unidad ?? ''}
                                                 onValueChange={(value) => handleUnidadChange(service.id, value as UnidadMedida || null)}
                                                 disabled={isSaving}
                                             >
-                                                <SelectTrigger>
+                                                <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
                                                     <SelectValue placeholder="Seleccionar unidad" />
                                                 </SelectTrigger>
-                                                <SelectContent>
+                                                <SelectContent className="bg-zinc-900 border-zinc-700">
                                                     {Object.entries(UNIDAD_MEDIDA_LABELS).map(([value, label]) => (
-                                                        <SelectItem key={value} value={value}>
+                                                        <SelectItem key={value} value={value} className="text-white hover:bg-zinc-800">
                                                             {label}
                                                         </SelectItem>
                                                     ))}
@@ -341,10 +370,10 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                 )}
 
                                 {isActive && service.planService && (
-                                    <div className="mt-3 p-2 bg-white dark:bg-gray-800 rounded border">
+                                    <div className="mt-3 p-2 bg-zinc-900 border border-zinc-700 rounded">
                                         <div className="flex items-center gap-2 text-sm">
-                                            <span className="text-muted-foreground">Configuración actual:</span>
-                                            <Badge variant="secondary">
+                                            <span className="text-zinc-400">Configuración actual:</span>
+                                            <Badge variant="secondary" className="bg-zinc-800 text-zinc-200">
                                                 {formatLimite(service.planService.limite, service.planService.unidad)}
                                             </Badge>
                                         </div>

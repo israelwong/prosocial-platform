@@ -3,9 +3,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-    Edit, 
-    Trash2, 
+import {
+    Edit,
+    Trash2,
     Eye,
     EyeOff,
     GripVertical
@@ -23,11 +23,11 @@ interface ServiceCardProps {
     onToggleActive: (service: Service) => void;
 }
 
-export function ServiceCard({ 
-    service, 
-    onEdit, 
-    onDelete, 
-    onToggleActive 
+export function ServiceCard({
+    service,
+    onEdit,
+    onDelete,
+    onToggleActive
 }: ServiceCardProps) {
     const {
         attributes,
@@ -65,7 +65,7 @@ export function ServiceCard({
                     </span>
                 </div>
 
-                <div 
+                <div
                     className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: service.active ? '#10B981' : '#EF4444' }}
                 ></div>
@@ -73,12 +73,12 @@ export function ServiceCard({
                 <div className="flex-1">
                     <div className="flex items-center space-x-2">
                         <h3 className="font-medium text-white">{service.name}</h3>
-                        <Badge 
-                            variant="outline" 
-                            className={`text-xs ${service.active 
-                                ? 'border-green-500 text-green-400' 
+                        <Badge
+                            variant="outline"
+                            className={`text-xs ${service.active
+                                ? 'border-green-500 text-green-400'
                                 : 'border-red-500 text-red-400'
-                            }`}
+                                }`}
                         >
                             {service.active ? "Activo" : "Inactivo"}
                         </Badge>
