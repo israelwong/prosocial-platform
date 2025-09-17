@@ -15,15 +15,23 @@ import {
     DialogFooter 
 } from "@/components/ui/dialog";
 import { 
-    Plus, 
-    Edit, 
-    Trash2, 
-    Save, 
+    Select, 
+    SelectContent, 
+    SelectItem, 
+    SelectTrigger, 
+    SelectValue 
+} from "@/components/ui/select";
+import {
+    Plus,
+    Edit,
+    Trash2,
+    Save,
     X,
     AlertCircle,
     CheckCircle
 } from "lucide-react";
 import { toast } from "sonner";
+import { Service } from '../../../services/types';
 
 interface PlanLimit {
     limite: number | null;
@@ -42,11 +50,20 @@ export function LimitsModal({ isOpen, onClose, limits, onSave }: LimitsModalProp
     const [localLimits, setLocalLimits] = useState<Record<string, PlanLimit>>({});
     const [editingKey, setEditingKey] = useState<string | null>(null);
     const [isAddingNew, setIsAddingNew] = useState(false);
+    const [availableServices, setAvailableServices] = useState<Service[]>([]);
+    const [selectedServiceSlug, setSelectedServiceSlug] = useState<string>('');
     const [newLimit, setNewLimit] = useState<PlanLimit>({
         limite: null,
         descripcion: '',
         unidad: ''
     });
+
+    // Cargar servicios disponibles
+    useEffect(() => {
+        if (isOpen) {
+            fetchAvailableServices();
+        }
+    }, [isOpen]);
 
     // Convertir límites existentes al formato correcto
     useEffect(() => {
@@ -71,6 +88,19 @@ export function LimitsModal({ isOpen, onClose, limits, onSave }: LimitsModalProp
         }
     }, [isOpen, limits]);
 
+    const fetchAvailableServices = async () => {
+        try {
+            const response = await fetch('/api/services');
+            if (response.ok) {
+                const services = await response.json();
+                setAvailableServices(services);
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+            toast.error('Error al cargar servicios disponibles');
+        }
+    };
+
     const handleAddNew = () => {
         setIsAddingNew(true);
         setNewLimit({
@@ -81,11 +111,13 @@ export function LimitsModal({ isOpen, onClose, limits, onSave }: LimitsModalProp
     };
 
     const handleSaveNew = () => {
-        const key = prompt('Nombre del límite (ej: catalogos, proyectos_aprobados):');
-        if (!key) return;
+        if (!selectedServiceSlug) {
+            toast.error('Selecciona un servicio');
+            return;
+        }
         
-        if (localLimits[key]) {
-            toast.error('Ya existe un límite con ese nombre');
+        if (localLimits[selectedServiceSlug]) {
+            toast.error('Ya existe un límite para este servicio');
             return;
         }
 
@@ -96,10 +128,11 @@ export function LimitsModal({ isOpen, onClose, limits, onSave }: LimitsModalProp
 
         setLocalLimits(prev => ({
             ...prev,
-            [key]: { ...newLimit }
+            [selectedServiceSlug]: { ...newLimit }
         }));
         
         setIsAddingNew(false);
+        setSelectedServiceSlug('');
         setNewLimit({
             limite: null,
             descripcion: '',
@@ -179,7 +212,7 @@ export function LimitsModal({ isOpen, onClose, limits, onSave }: LimitsModalProp
                                     <ul className="list-disc list-inside space-y-1">
                                         <li><strong>Límite null:</strong> Acceso ilimitado a la funcionalidad</li>
                                         <li><strong>Límite 0:</strong> Sin acceso a la funcionalidad</li>
-                                        <li><strong>Límite > 0:</strong> Número máximo permitido</li>
+                                        <li><strong>Límite {'>'} 0:</strong> Número máximo permitido</li>
                                         <li><strong>Sin límite definido:</strong> No tiene acceso a la funcionalidad</li>
                                     </ul>
                                 </div>
@@ -328,6 +361,28 @@ export function LimitsModal({ isOpen, onClose, limits, onSave }: LimitsModalProp
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
+                                    <div>
+                                        <Label htmlFor="new-service">Servicio</Label>
+                                        <Select value={selectedServiceSlug} onValueChange={setSelectedServiceSlug}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecciona un servicio" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableServices
+                                                    .filter(service => !localLimits[service.slug])
+                                                    .map(service => (
+                                                        <SelectItem key={service.id} value={service.slug}>
+                                                            {service.name}
+                                                        </SelectItem>
+                                                    ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {selectedServiceSlug && (
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                {availableServices.find(s => s.slug === selectedServiceSlug)?.description}
+                                            </p>
+                                        )}
+                                    </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
                                             <Label htmlFor="new-limite">Límite</Label>
@@ -363,13 +418,16 @@ export function LimitsModal({ isOpen, onClose, limits, onSave }: LimitsModalProp
                                         />
                                     </div>
                                     <div className="flex gap-2">
-                                        <Button onClick={handleSaveNew}>
+                                        <Button onClick={handleSaveNew} disabled={!selectedServiceSlug}>
                                             <Save className="h-4 w-4 mr-2" />
                                             Agregar Límite
                                         </Button>
                                         <Button
                                             variant="outline"
-                                            onClick={() => setIsAddingNew(false)}
+                                            onClick={() => {
+                                                setIsAddingNew(false);
+                                                setSelectedServiceSlug('');
+                                            }}
                                         >
                                             <X className="h-4 w-4 mr-2" />
                                             Cancelar

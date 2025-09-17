@@ -519,6 +519,18 @@ model project_paquetes {
   @@index([projectId, status])
 }
 
+model platform_services {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([active])
+}
+
 model platform_plans {
   id                String          @id @default(cuid())
   name              String
