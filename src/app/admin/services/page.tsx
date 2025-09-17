@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Settings } from 'lucide-react';
 import Link from 'next/link';
-import { ServicesPageClient } from './components';
+import { ServicesByCategoryClient } from './components/ServicesByCategoryClient';
 
 export default function ServicesPage() {
     return (
@@ -32,7 +32,7 @@ export default function ServicesPage() {
             </div>
 
             {/* Client Components */}
-            <ServicesPageClient />
+            <ServicesByCategoryClient />
         </div>
     );
 }

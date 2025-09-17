@@ -29,19 +29,18 @@ import {
     useSensor,
     useSensors,
     DragEndEvent,
-    DragOverEvent,
+    DragStartEvent,
     DragOverlay,
     useDroppable,
 } from '@dnd-kit/core';
 import {
-    arrayMove,
     SortableContext,
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
 // Mapeo de iconos
-const iconMap: Record<string, React.ComponentType<any>> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
     Users,
     DollarSign,
     Calendar,
@@ -51,11 +50,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
     AlertTriangle,
 };
 
-interface ServicesByCategoryClientProps {
-    onServiceUpdate?: (service: Service) => void;
-}
-
-export function ServicesByCategoryClient({ onServiceUpdate }: ServicesByCategoryClientProps) {
+export function ServicesByCategoryClient() {
     const [categories, setCategories] = useState<ServiceCategory[]>([]);
     const [services, setServices] = useState<ServiceWithCategory[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -314,7 +309,10 @@ export function ServicesByCategoryClient({ onServiceUpdate }: ServicesByCategory
 
             // Actualizar la categoría del servicio movido
             movedService.categoryId = targetCategoryId;
-            movedService.category = targetCategoryId ? categories.find(c => c.id === targetCategoryId) || null : null;
+            const foundCategory = categories.find(c => c.id === targetCategoryId);
+            if (foundCategory) {
+                movedService.category = foundCategory;
+            }
 
             // Encontrar la nueva posición de inserción
             const targetCategoryServices = newServices.filter(s => s.categoryId === targetCategoryId);
@@ -360,8 +358,8 @@ export function ServicesByCategoryClient({ onServiceUpdate }: ServicesByCategory
         }
     }, [services, categories, updateServicePosition]);
 
-    const handleDragStart = (event: any) => {
-        setActiveId(event.active.id);
+    const handleDragStart = (event: DragStartEvent) => {
+        setActiveId(String(event.active.id));
     };
 
     // Componente para categorías vacías droppables
