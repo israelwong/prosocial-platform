@@ -167,7 +167,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <Label htmlFor="name">Nombre del Servicio</Label>
+                                <Label htmlFor="name" className="mb-2 block">Nombre del Servicio</Label>
                                 <Input
                                     id="name"
                                     placeholder="ej: Catálogos, Proyectos Aprobados"
@@ -176,7 +176,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                                 />
                             </div>
                             <div>
-                                <Label htmlFor="slug">Slug (identificador único)</Label>
+                                <Label htmlFor="slug" className="mb-2 block">Slug (identificador único)</Label>
                                 <Input
                                     id="slug"
                                     placeholder="ej: catalogos, proyectos_aprobados"
@@ -198,7 +198,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                         </div>
 
                         <div>
-                            <Label htmlFor="description">Descripción</Label>
+                            <Label htmlFor="description" className="mb-2 block">Descripción</Label>
                             <Textarea
                                 id="description"
                                 placeholder="Descripción del servicio y su propósito"
@@ -209,7 +209,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                         </div>
 
                         <div>
-                            <Label htmlFor="categoryId">Categoría</Label>
+                            <Label htmlFor="categoryId" className="mb-2 block">Categoría</Label>
                             <Select
                                 value={formData.categoryId}
                                 onValueChange={(value) => handleInputChange('categoryId', value === 'no-category' ? '' : value)}
@@ -236,7 +236,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                                 checked={formData.active}
                                 onCheckedChange={(checked) => handleInputChange('active', checked)}
                             />
-                            <Label htmlFor="active">Servicio activo</Label>
+                            <Label htmlFor="active" className="mb-0">Servicio activo</Label>
                         </div>
                     </div>
                 </div>
