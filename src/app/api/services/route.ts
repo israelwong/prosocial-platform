@@ -4,12 +4,10 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest) {
     try {
         const services = await prisma.platform_services.findMany({
-            where: {
-                active: true
-            },
-            orderBy: {
-                name: 'asc'
-            }
+            orderBy: [
+                { posicion: 'asc' },
+                { name: 'asc' }
+            ]
         });
 
         return NextResponse.json(services);
@@ -34,11 +32,18 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Obtener la siguiente posición disponible
+        const lastService = await prisma.platform_services.findFirst({
+            orderBy: { posicion: 'desc' }
+        });
+        const nextPosition = (lastService?.posicion || 0) + 1;
+
         const service = await prisma.platform_services.create({
             data: {
                 name,
                 slug,
                 description: description || null,
+                posicion: nextPosition,
                 active: true
             }
         });

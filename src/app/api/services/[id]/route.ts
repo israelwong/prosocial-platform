@@ -36,7 +36,7 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { name, slug, description, active } = body;
+        const { name, slug, description, posicion, active } = body;
 
         const service = await prisma.platform_services.update({
             where: { id },
@@ -44,6 +44,7 @@ export async function PUT(
                 ...(name && { name }),
                 ...(slug && { slug }),
                 ...(description !== undefined && { description }),
+                ...(posicion !== undefined && { posicion }),
                 ...(active !== undefined && { active }),
                 updatedAt: new Date()
             }
