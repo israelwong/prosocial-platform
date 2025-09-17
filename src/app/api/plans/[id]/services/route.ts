@@ -8,6 +8,7 @@ export async function GET(
 ) {
     try {
         const { id: planId } = await params;
+        console.log('Fetching services for plan:', planId);
 
         // Obtener todos los servicios ordenados por posición
         const allServices = await prisma.platform_services.findMany({
@@ -16,6 +17,7 @@ export async function GET(
                 { name: 'asc' }
             ]
         });
+        console.log('Found services:', allServices.length);
 
         // Obtener configuración de servicios para este plan
         const planServices = await prisma.plan_services.findMany({
@@ -24,6 +26,7 @@ export async function GET(
                 service: true
             }
         });
+        console.log('Found plan services:', planServices.length);
 
         // Crear un mapa de servicios configurados
         const planServicesMap = new Map(
@@ -36,9 +39,14 @@ export async function GET(
             planService: planServicesMap.get(service.id) || null
         }));
 
+        console.log('Returning services with config:', servicesWithConfig.length);
         return NextResponse.json(servicesWithConfig);
     } catch (error) {
         console.error('Error fetching plan services:', error);
+        console.error('Error details:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
+        });
         return NextResponse.json(
             { error: 'Error al obtener servicios del plan' },
             { status: 500 }

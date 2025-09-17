@@ -39,12 +39,20 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
     const fetchPlanServices = async () => {
         try {
             setIsLoading(true);
+            console.log('Fetching services for plan:', planId);
+            
             const response = await fetch(`/api/plans/${planId}/services`);
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+            
             if (response.ok) {
                 const data = await response.json();
+                console.log('Received data:', data);
                 setServices(data);
             } else {
-                throw new Error('Error al cargar servicios del plan');
+                const errorData = await response.json();
+                console.error('API Error:', errorData);
+                throw new Error(errorData.error || 'Error al cargar servicios del plan');
             }
         } catch (error) {
             console.error('Error fetching plan services:', error);
