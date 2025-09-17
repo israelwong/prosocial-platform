@@ -12,6 +12,11 @@ interface AgentCredentialsEmailProps {
     temporaryPassword: string;
     loginUrl: string;
     isNewAgent?: boolean;
+    platformData?: {
+        nombre: string;
+        logotipo: string;
+        isotipo: string;
+    };
 }
 
 export function AgentCredentialsEmail({
@@ -19,19 +24,23 @@ export function AgentCredentialsEmail({
     email,
     temporaryPassword,
     loginUrl,
-    isNewAgent = false
+    isNewAgent = false,
+    platformData
 }: AgentCredentialsEmailProps) {
+    const platformName = platformData?.nombre || 'ProSocial Platform';
+    
     const previewText = isNewAgent
-        ? `Bienvenido a ProSocial Platform, ${agentName}`
-        : `Nuevas credenciales para tu cuenta de ProSocial Platform`;
+        ? `Bienvenido a ${platformName}, ${agentName}`
+        : `Nuevas credenciales para tu cuenta de ${platformName}`;
 
     return (
         <EmailLayout
-            title="Credenciales de Acceso - ProSocial Platform"
+            title={`Credenciales de Acceso - ${platformName}`}
             previewText={previewText}
+            platformData={platformData}
         >
             <Text style={heading}>
-                {isNewAgent ? `¡Bienvenido a ProSocial Platform!` : 'Credenciales Actualizadas'}
+                {isNewAgent ? `¡Bienvenido a ${platformName}!` : 'Credenciales Actualizadas'}
             </Text>
 
             <Text style={paragraph}>
@@ -40,7 +49,7 @@ export function AgentCredentialsEmail({
 
             <Text style={paragraph}>
                 {isNewAgent
-                    ? 'Te damos la bienvenida al equipo de ProSocial Platform. Aquí están tus credenciales de acceso:'
+                    ? `Te damos la bienvenida al equipo de ${platformName}. Aquí están tus credenciales de acceso:`
                     : 'Tus credenciales de acceso han sido actualizadas. Aquí están tus nuevos datos de acceso:'
                 }
             </Text>
@@ -99,7 +108,7 @@ export function AgentCredentialsEmail({
 
             <Text style={signature}>
                 Saludos,<br />
-                <strong>Equipo ProSocial Platform</strong>
+                <strong>Equipo {platformName}</strong>
             </Text>
         </EmailLayout>
     );

@@ -1,6 +1,7 @@
 import { render } from '@react-email/components';
 import { AgentCredentialsEmail } from '@/emails/templates/AgentCredentialsEmail';
 import { sendEmail } from './resend-client';
+import { prisma } from '@/lib/prisma';
 
 export interface AgentCredentialsData {
     agentName: string;
@@ -14,9 +15,19 @@ export interface AgentCredentialsData {
  */
 export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
     try {
-        // Generar URL de login
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://prosocial-platform.vercel.app';
+        // Obtener configuración de la plataforma
+        const platformConfig = await prisma.platform_config.findFirst();
+        
+        // Generar URL de login - limpiar comillas extra
+        const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://prosocial-platform.vercel.app').replace(/['"]/g, '');
         const loginUrl = `${baseUrl}/login`;
+
+        // Datos dinámicos de la plataforma
+        const platformData = {
+            nombre: platformConfig?.nombre_empresa || 'ProSocial Platform',
+            logotipo: platformConfig?.logotipo || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg',
+            isotipo: platformConfig?.isotipo || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg',
+        };
 
         // Renderizar el template de React a HTML
         let emailHtml;
@@ -28,6 +39,7 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
                     temporaryPassword: data.temporaryPassword,
                     loginUrl,
                     isNewAgent: data.isNewAgent || false,
+                    platformData,
                 })
             );
             console.log('📧 HTML generado:', {
@@ -38,7 +50,7 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
         } catch (renderError) {
             console.error('❌ Error renderizando email:', renderError);
             // Fallback a HTML simple
-            emailHtml = generateSimpleHtml(data, loginUrl);
+            emailHtml = generateSimpleHtml(data, loginUrl, platformData);
         }
 
         // Enviar el email
@@ -48,7 +60,7 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
                 ? '🎉 Bienvenido a ProSocial Platform - Credenciales de Acceso'
                 : '🔑 Credenciales Actualizadas - ProSocial Platform',
             html: emailHtml,
-            text: generatePlainTextVersion(data, loginUrl),
+            text: generatePlainTextVersion(data, loginUrl, platformData),
         });
 
         if (result.success) {
@@ -67,13 +79,13 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
 /**
  * Genera HTML simple como fallback
  */
-function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string): string {
+function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string, platformData: { nombre: string; logotipo: string; isotipo: string }): string {
     const welcomeText = data.isNewAgent
-        ? '¡Bienvenido a ProSocial Platform!'
+        ? `¡Bienvenido a ${platformData.nombre}!`
         : 'Credenciales Actualizadas';
 
     const introText = data.isNewAgent
-        ? 'Te damos la bienvenida al equipo de ProSocial Platform. Aquí están tus credenciales de acceso:'
+        ? `Te damos la bienvenida al equipo de ${platformData.nombre}. Aquí están tus credenciales de acceso:`
         : 'Tus credenciales de acceso han sido actualizadas. Aquí están tus nuevos datos de acceso:';
 
     return `
@@ -81,11 +93,11 @@ function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string): strin
 <html>
 <head>
     <meta charset="utf-8">
-    <title>${welcomeText} - ProSocial Platform</title>
+    <title>${welcomeText} - ${platformData.nombre}</title>
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #1a1a1a;">ProSocial Platform</h1>
+        <h1 style="color: #1a1a1a;">${platformData.nombre}</h1>
     </div>
     
     <h2 style="color: #1a1a1a;">${welcomeText}</h2>
@@ -124,11 +136,11 @@ function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string): strin
     <p>Si necesitas ayuda o tienes alguna pregunta, no dudes en contactarnos.</p>
     
     <p>Saludos,<br>
-    <strong>Equipo ProSocial Platform</strong></p>
+    <strong>Equipo ${platformData.nombre}</strong></p>
     
     <hr style="border: none; border-top: 1px solid #e6ebf1; margin: 20px 0;">
     <p style="text-align: center; color: #8898aa; font-size: 12px;">
-        © 2024 ProSocial Platform. Todos los derechos reservados.<br>
+        © 2024 ${platformData.nombre}. Todos los derechos reservados.<br>
         <a href="https://prosocialmx.com" style="color: #556cd6;">Sitio Web</a> • 
         <a href="mailto:soporte@prosocialmx.com" style="color: #556cd6;">Soporte</a>
     </p>
@@ -139,13 +151,13 @@ function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string): strin
 /**
  * Genera versión en texto plano del email
  */
-function generatePlainTextVersion(data: AgentCredentialsData, loginUrl: string): string {
+function generatePlainTextVersion(data: AgentCredentialsData, loginUrl: string, platformData: { nombre: string; logotipo: string; isotipo: string }): string {
     const welcomeText = data.isNewAgent
-        ? '¡Bienvenido a ProSocial Platform!'
+        ? `¡Bienvenido a ${platformData.nombre}!`
         : 'Credenciales Actualizadas';
 
     const introText = data.isNewAgent
-        ? 'Te damos la bienvenida al equipo de ProSocial Platform. Aquí están tus credenciales de acceso:'
+        ? `Te damos la bienvenida al equipo de ${platformData.nombre}. Aquí están tus credenciales de acceso:`
         : 'Tus credenciales de acceso han sido actualizadas. Aquí están tus nuevos datos de acceso:';
 
     return `
@@ -169,9 +181,9 @@ IMPORTANTE:
 Si necesitas ayuda o tienes alguna pregunta, no dudes en contactarnos.
 
 Saludos,
-Equipo ProSocial Platform
+Equipo ${platformData.nombre}
 
-© 2024 ProSocial Platform. Todos los derechos reservados.
+© 2024 ${platformData.nombre}. Todos los derechos reservados.
 Sitio Web: https://prosocialmx.com
 Soporte: soporte@prosocialmx.com
 `.trim();

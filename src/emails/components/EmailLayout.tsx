@@ -15,13 +15,18 @@ interface EmailLayoutProps {
     children: React.ReactNode;
     title?: string;
     previewText?: string;
+    platformData?: {
+        nombre: string;
+        logotipo: string;
+        isotipo: string;
+    };
 }
 
-export function EmailLayout({ children, title, previewText }: EmailLayoutProps) {
+export function EmailLayout({ children, title, previewText, platformData }: EmailLayoutProps) {
     return (
         <Html>
             <Head>
-                <title>{title || 'ProSocial Platform'}</title>
+                <title>{title || platformData?.nombre || 'ProSocial Platform'}</title>
                 {previewText && (
                     <meta name="description" content={previewText} />
                 )}
@@ -31,10 +36,10 @@ export function EmailLayout({ children, title, previewText }: EmailLayoutProps) 
                     {/* Header con Logo */}
                     <Section style={header}>
                         <Img
-                            src="https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg"
+                            src={platformData?.logotipo || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg'}
                             width="160"
                             height="32"
-                            alt="ProSocial Platform"
+                            alt={platformData?.nombre || 'ProSocial Platform'}
                             style={logo}
                         />
                     </Section>
@@ -48,7 +53,7 @@ export function EmailLayout({ children, title, previewText }: EmailLayoutProps) 
                     <Section style={footer}>
                         <Hr style={hr} />
                         <Text style={footerText}>
-                            © 2024 ProSocial Platform. Todos los derechos reservados.
+                            © 2024 {platformData?.nombre || 'ProSocial Platform'}. Todos los derechos reservados.
                         </Text>
                         <Text style={footerText}>
                             <Link href="https://prosocialmx.com" style={footerLink}>
@@ -83,7 +88,8 @@ const container = {
 const header = {
     padding: '32px 24px 24px',
     textAlign: 'center' as const,
-    backgroundColor: '#18181b', // zinc-950
+    backgroundColor: '#f8f9fa', // Fondo claro para mejor contraste
+    borderBottom: '1px solid #e9ecef',
 };
 
 const logo = {
