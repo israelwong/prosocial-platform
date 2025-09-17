@@ -100,7 +100,7 @@ function SortableServiceCard({
 
             <div className="flex items-center justify-between">
                 <div className="text-xs text-muted-foreground">
-                    Posición: {service.posicion} | Creado: {new Date(service.createdAt).toLocaleDateString()}
+                    Creado: {new Date(service.createdAt).toLocaleDateString()}
                 </div>
                 <div className="flex gap-1">
                     <Button
@@ -253,7 +253,7 @@ export function ServicesPageClient() {
     const updateServicePosition = useCallback(async (serviceId: string, newPosition: number) => {
         try {
             console.log(`Updating service ${serviceId} to position ${newPosition}`);
-            
+
             const response = await fetch(`/api/services/${serviceId}`, {
                 method: 'PUT',
                 headers: {
