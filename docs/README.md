@@ -28,6 +28,8 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 ### 📋 **04-best-practices/** - Mejores Prácticas
 - **MEJORES_PRACTICAS_COMPONENTES.md** - Mejores prácticas para componentes
 - **PATRON_CREACION_SECCIONES_ADMIN.md** - Patrón para crear secciones admin
+- **TYPESCRIPT_BEST_PRACTICES.md** - Mejores prácticas de TypeScript
+- **UI_DESIGN_PATTERNS.md** - Patrones de diseño UI reutilizables
 
 ### 🗂️ **05-legacy/** - Código Legacy y Migración
 - **ANALISIS_LEGACY.md** - Análisis del código legacy
@@ -51,6 +53,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 1. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
 2. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
 3. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
+4. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
 
 ### 🔧 **Para Troubleshooting**
 1. **[Errores Comunes de Supabase](./03-troubleshooting/supabase-common-errors.md)**
