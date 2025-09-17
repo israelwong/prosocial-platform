@@ -64,7 +64,11 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
             }
         } catch (error) {
             console.error('Error fetching plan services:', error);
-            toast.error('Error al cargar servicios del plan');
+            if (error instanceof Error && error.message.includes('404')) {
+                toast.error('Plan no encontrado. Por favor, crea un plan primero.');
+            } else {
+                toast.error('Error al cargar servicios del plan');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -154,6 +158,23 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
                     <div className="flex items-center justify-center py-8">
                         <Loader2 className="h-6 w-6 animate-spin mr-2" />
                         <span>Cargando servicios...</span>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    // Si no hay servicios y no está cargando, mostrar mensaje apropiado
+    if (services.length === 0 && !isLoading) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Servicios del Plan</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center py-12">
+                    <div className="text-muted-foreground">
+                        <p className="text-sm mb-2">No se pudieron cargar los servicios del plan.</p>
+                        <p className="text-xs">Verifica que el plan existe y tiene una configuración válida.</p>
                     </div>
                 </CardContent>
             </Card>
