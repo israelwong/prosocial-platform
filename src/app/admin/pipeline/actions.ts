@@ -16,7 +16,7 @@ export async function createPipelineStage(formData: FormData) {
         // Obtener el siguiente orden
         let lastStage;
         let nextOrder = 0;
-        
+
         try {
             lastStage = await prisma.platform_pipeline_stages.findFirst({
                 orderBy: { orden: 'desc' }
@@ -42,7 +42,7 @@ export async function createPipelineStage(formData: FormData) {
         return { success: true, stage };
     } catch (error) {
         console.error('Error creating pipeline stage:', error);
-        
+
         // Manejar errores de conexión específicos
         if (error instanceof Error && (
             error.message.includes('Can\'t reach database server') ||
@@ -50,20 +50,20 @@ export async function createPipelineStage(formData: FormData) {
             error.message.includes('connection') ||
             error.message.includes('PrismaClientInitializationError')
         )) {
-            return { 
-                success: false, 
-                error: 'Error de conexión con la base de datos. Verifica tu conexión a internet e intenta nuevamente.' 
+            return {
+                success: false,
+                error: 'Error de conexión con la base de datos. Verifica tu conexión a internet e intenta nuevamente.'
             };
         }
-        
+
         // Manejar errores de validación específicos
         if (error instanceof Error && error.message.includes('Argument')) {
-            return { 
-                success: false, 
-                error: 'Error en los datos proporcionados. Verifica que todos los campos requeridos estén completos.' 
+            return {
+                success: false,
+                error: 'Error en los datos proporcionados. Verifica que todos los campos requeridos estén completos.'
             };
         }
-        
+
         return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
     }
 }
@@ -190,14 +190,22 @@ export async function reorderPipelineStages(stageIds: string[]) {
         const updatePromises = stageIds.map((id, index) =>
             prisma.platform_pipeline_stages.update({
                 where: { id },
-                data: {
+                data: { 
                     orden: index + 1,
                     updatedAt: new Date()
                 }
             })
         );
 
-        await Promise.all(updatePromises);
+        // Usar Promise.allSettled para manejar errores individuales
+        const results = await Promise.allSettled(updatePromises);
+        
+        // Verificar si alguna actualización falló
+        const failedUpdates = results.filter(result => result.status === 'rejected');
+        if (failedUpdates.length > 0) {
+            console.error('Algunas actualizaciones de orden fallaron:', failedUpdates);
+            throw new Error(`Error al actualizar el orden de ${failedUpdates.length} etapas`);
+        }
 
         revalidatePath('/admin/pipeline');
         return { success: true };
@@ -208,11 +216,20 @@ export async function reorderPipelineStages(stageIds: string[]) {
         if (error instanceof Error && (
             error.message.includes('Can\'t reach database server') ||
             error.message.includes('P1001') ||
-            error.message.includes('connection')
+            error.message.includes('connection') ||
+            error.message.includes('PrismaClientInitializationError')
         )) {
             return {
                 success: false,
-                error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.'
+                error: 'Error de conexión con la base de datos. Verifica tu conexión e intenta nuevamente.'
+            };
+        }
+        
+        // Manejar errores de actualización específicos
+        if (error instanceof Error && error.message.includes('actualizar el orden')) {
+            return {
+                success: false,
+                error: 'Error al actualizar el orden de algunas etapas. Intenta nuevamente.'
             };
         }
 
