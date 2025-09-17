@@ -20,6 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
 import {
     Search,
     Filter,
@@ -399,9 +400,11 @@ export function PlansContainer({
                                 }
                             </div>
                             {!searchTerm && filter === 'all' && (
-                                <Button>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Crear primer plan
+                                <Button asChild>
+                                    <Link href="/admin/plans/new">
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Crear primer plan
+                                    </Link>
                                 </Button>
                             )}
                         </div>

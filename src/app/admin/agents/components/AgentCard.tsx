@@ -164,7 +164,7 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
                             <MoreHorizontal className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-card border-border">
+                    <DropdownMenuContent align="end" className="!bg-zinc-950 !border-zinc-800 !text-white">
                         <DropdownMenuItem asChild>
                             <Link href={`/admin/agents/${agent.id}/edit`}>
                                 <Edit className="mr-2 h-4 w-4" />

@@ -9,7 +9,7 @@ export interface Agent {
     comisionConversion: number;
     createdAt: Date;
     _count: {
-        prosocial_leads: number;
+        platform_leads: number;
     };
 }
 
