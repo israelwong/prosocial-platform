@@ -130,7 +130,7 @@ export function ServicesPageClient() {
     const handleModalSave = (savedService: Service) => {
         if (editingService) {
             // Actualizar servicio existente localmente
-            setServices(prev => 
+            setServices(prev =>
                 prev.map(s => s.id === savedService.id ? savedService : s)
             );
             toast.success('Servicio actualizado exitosamente');

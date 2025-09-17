@@ -17,6 +17,7 @@ import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { PlanMigrationModal } from './components/PlanMigrationModal';
 import { SimpleLimitsModal } from './components/SimpleLimitsModal';
+import { PlanServicesList } from './components/PlanServicesList';
 import { Plan as PlanType } from '../../types';
 
 // Interfaz para límites del plan
@@ -570,64 +571,7 @@ export default function EditPlanPage() {
                 </Card>
 
                 {/* Límites */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Límites del Plan</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <Button
-                            type="button"
-                            onClick={() => setShowSimpleLimitsModal(true)}
-                            variant="outline"
-                        >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Gestionar Límites
-                        </Button>
-
-                        <div className="space-y-2">
-                            {Object.keys(limits).length === 0 ? (
-                                <div className="text-center py-4 text-muted-foreground">
-                                    <p className="text-sm">No hay límites configurados</p>
-                                    <p className="text-xs">Haz clic en &quot;Gestionar Límites&quot; para agregar límites al plan</p>
-                                </div>
-                            ) : (
-                                Object.entries(limits).map(([key, value]) => (
-                                    <div key={key} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="font-medium text-sm">{key}</span>
-                                                {typeof value === 'object' && value !== null && 'limite' in value ? (
-                                                    (value as PlanLimit).limite === null ? (
-                                                        <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded">
-                                                            Ilimitado
-                                                        </span>
-                                                    ) : (value as PlanLimit).limite === 0 ? (
-                                                        <span className="text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded">
-                                                            Sin acceso
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded">
-                                                            Límite: {(value as PlanLimit).limite}
-                                                        </span>
-                                                    )
-                                                ) : (
-                                                    <span className="text-xs bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 px-2 py-1 rounded">
-                                                        {String(value)}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {typeof value === 'object' && value !== null && 'descripcion' in value && (
-                                                <p className="text-xs text-muted-foreground">
-                                                    {(value as PlanLimit).descripcion}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+                <PlanServicesList planId={planId} />
 
                 {/* Integración Stripe */}
                 <Card>

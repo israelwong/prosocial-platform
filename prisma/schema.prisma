@@ -519,6 +519,18 @@ model project_paquetes {
   @@index([projectId, status])
 }
 
+enum UnidadMedida {
+  BOOLEAN
+  CANTIDAD
+  HORAS
+  USUARIOS
+  CATALOGOS
+  GB
+  PROYECTOS
+  COTIZACIONES
+  LANDING_PAGES
+}
+
 model platform_services {
   id          String   @id @default(cuid())
   name        String   @unique
@@ -529,7 +541,29 @@ model platform_services {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
+  // Relación con plan_services
+  plan_services plan_services[]
+  
   @@index([active])
+}
+
+model plan_services {
+  id          String      @id @default(cuid())
+  plan_id     String
+  service_id  String
+  active      Boolean     @default(false)
+  limite      Int?        // null = ilimitado, 0 = sin acceso
+  unidad      UnidadMedida?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // Relaciones
+  plan        platform_plans @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+  service     platform_services @relation(fields: [service_id], references: [id], onDelete: Cascade)
+  
+  @@unique([plan_id, service_id])
+  @@index([plan_id])
+  @@index([service_id])
 }
 
 model platform_plans {
@@ -550,6 +584,7 @@ model platform_plans {
   stripe_product_id String?
   projects          projects[]
   subscriptions     subscriptions[]
+  plan_services     plan_services[]
 
   @@index([active, orden])
   @@index([stripe_price_id])
