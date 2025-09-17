@@ -21,7 +21,7 @@ import {
     UnidadMedida, 
     UNIDAD_MEDIDA_LABELS,
     formatLimite 
-} from '../../types/plan-services';
+} from '../../../types/plan-services';
 
 interface PlanServicesListProps {
     planId: string;
