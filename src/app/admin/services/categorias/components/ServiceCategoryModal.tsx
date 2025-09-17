@@ -131,7 +131,7 @@ export function ServiceCategoryModal({
 
                 <div className="space-y-4">
                     <div>
-                        <Label htmlFor="name">Nombre *</Label>
+                        <Label htmlFor="name" className='mb-2'>Nombre *</Label>
                         <Input
                             id="name"
                             value={formData.name}
@@ -142,7 +142,7 @@ export function ServiceCategoryModal({
                     </div>
 
                     <div>
-                        <Label htmlFor="description">Descripción *</Label>
+                        <Label htmlFor="description" className='mb-2'>Descripción *</Label>
                         <Textarea
                             id="description"
                             value={formData.description}
@@ -154,7 +154,7 @@ export function ServiceCategoryModal({
                     </div>
 
                     <div>
-                        <Label htmlFor="icon">Icono *</Label>
+                        <Label htmlFor="icon" className='mb-2'>Icono *</Label>
                         <Input
                             id="icon"
                             value={formData.icon}
@@ -162,17 +162,11 @@ export function ServiceCategoryModal({
                             placeholder="Ej: Users, DollarSign, Calendar"
                             disabled={isLoading}
                         />
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground mt-2">
                             Nombre del icono de Lucide React (ej: Users, DollarSign, Calendar)
                         </p>
                     </div>
 
-                    {/* Información sobre ordenamiento */}
-                    <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-md">
-                        <p className="text-xs text-blue-800 dark:text-blue-200">
-                            <strong>Ordenamiento:</strong> {category ? 'El orden se mantiene igual' : 'La nueva categoría se colocará al final. Puedes reordenar arrastrando las categorías en la lista principal.'}
-                        </p>
-                    </div>
                 </div>
 
                 <DialogFooter>
