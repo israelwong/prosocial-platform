@@ -148,7 +148,7 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
             <div className="flex items-center space-x-4">
                 <div className="text-right space-y-1">
                     <div className="text-sm font-medium">
-                        {agent._count.prosocial_leads} leads asignados
+                        {agent._count.platform_leads} leads asignados
                     </div>
                     <div className="text-xs text-muted-foreground">
                         Meta: {agent.metaMensualLeads}/mes
@@ -164,7 +164,7 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
                             <MoreHorizontal className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="bg-card border-border">
                         <DropdownMenuItem asChild>
                             <Link href={`/admin/agents/${agent.id}/edit`}>
                                 <Edit className="mr-2 h-4 w-4" />
