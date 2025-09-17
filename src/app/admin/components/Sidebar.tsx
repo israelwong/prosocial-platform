@@ -82,7 +82,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <h3 className="px-3 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
                                 {section.title}
                             </h3>
-                            
+
                             {/* Items de la sección */}
                             <div className="space-y-1">
                                 {section.items.map((item) => {

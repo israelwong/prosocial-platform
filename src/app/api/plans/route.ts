@@ -39,9 +39,11 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
+        console.log("Creating plan with data:", JSON.stringify(body, null, 2));
 
         // Validar campos requeridos
         if (!body.name || !body.slug) {
+            console.log("Validation failed: missing name or slug");
             return NextResponse.json(
                 { error: "Nombre y slug son requeridos" },
                 { status: 400 }
@@ -57,6 +59,8 @@ export async function POST(request: NextRequest) {
                 JSON.parse(body.limits || '{}') : body.limits
         };
 
+        console.log("Processed plan data:", JSON.stringify(planData, null, 2));
+
         const plan = await prisma.platform_plans.create({
             data: planData,
             include: {
@@ -68,6 +72,8 @@ export async function POST(request: NextRequest) {
                 }
             }
         });
+
+        console.log("Plan created successfully:", plan.id);
 
         // Convertir Decimal a number para el frontend
         const planFormatted = {
@@ -82,10 +88,20 @@ export async function POST(request: NextRequest) {
 
         // Manejo de errores específicos
         if (error instanceof Error) {
+            console.error("Error message:", error.message);
+            console.error("Error stack:", error.stack);
+            
             if (error.message.includes('Unique constraint')) {
                 return NextResponse.json(
                     { error: "Ya existe un plan con ese slug" },
                     { status: 409 }
+                );
+            }
+            
+            if (error.message.includes('Invalid value')) {
+                return NextResponse.json(
+                    { error: "Datos inválidos en el plan" },
+                    { status: 400 }
                 );
             }
         }

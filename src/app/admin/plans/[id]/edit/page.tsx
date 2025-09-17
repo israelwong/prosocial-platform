@@ -214,22 +214,30 @@ export default function EditPlanPage() {
             const url = isEdit ? `/api/plans/${planId}` : '/api/plans';
             const method = isEdit ? 'PUT' : 'POST';
 
+            const requestData = {
+                ...data,
+                price_monthly: data.price_monthly ? parseFloat(data.price_monthly) : undefined,
+                price_yearly: data.price_yearly ? parseFloat(data.price_yearly) : undefined,
+                features: features,
+                limits: limits
+            };
+
+            console.log("Sending plan data:", JSON.stringify(requestData, null, 2));
+
             const response = await fetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    ...data,
-                    price_monthly: data.price_monthly ? parseFloat(data.price_monthly) : undefined,
-                    price_yearly: data.price_yearly ? parseFloat(data.price_yearly) : undefined,
-                    features: features,
-                    limits: limits
-                }),
+                body: JSON.stringify(requestData),
             });
+
+            console.log("Response status:", response.status);
+            console.log("Response ok:", response.ok);
 
             if (!response.ok) {
                 const error = await response.json();
+                console.error("API Error:", error);
                 throw new Error(error.error || 'Error al guardar el plan');
             }
 

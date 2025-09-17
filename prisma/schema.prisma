@@ -540,14 +540,14 @@ model platform_plans {
   active            Boolean         @default(true)
   orden             Int             @default(0)
   createdAt         DateTime        @default(now())
-  updatedAt         DateTime
+  updatedAt         DateTime        @updatedAt
   description       String?
   limits            Json?
   price_monthly     Decimal?
   price_yearly      Decimal?
   stripe_price_id   String?         @unique
   stripe_product_id String?
-  studios           projects[]
+  projects          projects[]
   subscriptions     subscriptions[]
 
   @@index([active, orden])
