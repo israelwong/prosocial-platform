@@ -133,24 +133,24 @@ export function AgentsContainer({ agents, onAgentDelete }: AgentsContainerProps)
             </Card>
 
             {/* Agents List */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Lista de Agentes</CardTitle>
-                    <CardDescription>
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
+                    <CardTitle className="text-lg font-semibold text-white">Lista de Agentes</CardTitle>
+                    <div className="text-sm text-zinc-400">
                         Gestiona todos los agentes comerciales del sistema
                         {searchTerm && (
-                            <span className="block text-xs text-muted-foreground mt-1">
+                            <span className="block text-xs text-zinc-500 mt-1">
                                 Mostrando {filteredAgents.length} de {agents.length} agentes
                             </span>
                         )}
-                    </CardDescription>
+                    </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                     {agents.length === 0 ? (
                         <div className="text-center py-8">
-                            <User className="mx-auto h-12 w-12 text-muted-foreground" />
-                            <h3 className="mt-2 text-sm font-semibold">No hay agentes</h3>
-                            <p className="mt-1 text-sm text-muted-foreground">
+                            <User className="mx-auto h-12 w-12 text-zinc-400" />
+                            <h3 className="mt-2 text-sm font-semibold text-white">No hay agentes</h3>
+                            <p className="mt-1 text-sm text-zinc-400">
                                 Comienza creando tu primer agente comercial.
                             </p>
                             <div className="mt-6">
@@ -164,14 +164,14 @@ export function AgentsContainer({ agents, onAgentDelete }: AgentsContainerProps)
                         </div>
                     ) : filteredAgents.length === 0 ? (
                         <div className="text-center py-8">
-                            <User className="mx-auto h-12 w-12 text-muted-foreground" />
-                            <h3 className="mt-2 text-sm font-semibold">No se encontraron agentes</h3>
-                            <p className="mt-1 text-sm text-muted-foreground">
+                            <User className="mx-auto h-12 w-12 text-zinc-400" />
+                            <h3 className="mt-2 text-sm font-semibold text-white">No se encontraron agentes</h3>
+                            <p className="mt-1 text-sm text-zinc-400">
                                 No hay agentes que coincidan con los filtros aplicados.
                             </p>
                         </div>
                     ) : (
-                        <div className="space-y-4">
+                        <div className="divide-y divide-zinc-800">
                             {filteredAgents.map((agent) => (
                                 <AgentCard
                                     key={agent.id}

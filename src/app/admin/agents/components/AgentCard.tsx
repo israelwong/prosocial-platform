@@ -119,20 +119,26 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
     };
 
     return (
-        <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+        <div className="flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors">
             <div className="flex items-center space-x-4">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                     <User className="h-5 w-5 text-primary" />
                 </div>
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{agent.nombre}</h3>
-                        <Badge variant={agent.activo ? "default" : "secondary"}>
+                <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                        <h3 className="font-medium text-white">{agent.nombre}</h3>
+                        <Badge 
+                            variant="outline" 
+                            className={`text-xs ${agent.activo 
+                                ? 'border-green-500 text-green-400' 
+                                : 'border-red-500 text-red-400'
+                            }`}
+                        >
                             {agent.activo ? "Activo" : "Inactivo"}
                         </Badge>
                         {getAuthStatusBadge()}
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-4 text-sm text-zinc-400">
                         <div className="flex items-center gap-1">
                             <Mail className="h-3 w-3" />
                             {agent.email}
@@ -147,13 +153,13 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
 
             <div className="flex items-center space-x-4">
                 <div className="text-right space-y-1">
-                    <div className="text-sm font-medium">
+                    <div className="text-sm font-medium text-white">
                         {agent._count.platform_leads} leads asignados
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-zinc-400">
                         Meta: {agent.metaMensualLeads}/mes
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-zinc-400">
                         Comisión: {(Number(agent.comisionConversion) * 100).toFixed(2)}%
                     </div>
                 </div>
