@@ -19,7 +19,8 @@ import {
     Target,
     Megaphone,
     Play,
-    History
+    History,
+    Wrench
 } from 'lucide-react';
 
 const navigation = [
@@ -38,6 +39,7 @@ const navigation = [
         icon: Settings,
         children: [
             { name: 'Planes', href: '/admin/plans', icon: CreditCard },
+            { name: 'Servicios', href: '/admin/services', icon: Wrench },
             { name: 'Agentes', href: '/admin/agents', icon: Users },
             { name: 'Pipeline', href: '/admin/pipeline', icon: Columns3 },
             { name: 'Canales', href: '/admin/canales', icon: Target },

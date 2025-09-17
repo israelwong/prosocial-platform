@@ -19,6 +19,13 @@ import { PlanMigrationModal } from './components/PlanMigrationModal';
 import { LimitsModal } from './components/LimitsModal';
 import { Plan as PlanType } from '../../types';
 
+// Interfaz para límites del plan
+interface PlanLimit {
+    limite: number | null;
+    descripcion: string;
+    unidad?: string;
+}
+
 // Schema de validación
 const planSchema = z.object({
     name: z.string()
@@ -573,7 +580,7 @@ export default function EditPlanPage() {
                             {Object.keys(limits).length === 0 ? (
                                 <div className="text-center py-4 text-muted-foreground">
                                     <p className="text-sm">No hay límites configurados</p>
-                                    <p className="text-xs">Haz clic en "Gestionar Límites" para agregar límites al plan</p>
+                                    <p className="text-xs">Haz clic en &quot;Gestionar Límites&quot; para agregar límites al plan</p>
                                 </div>
                             ) : (
                                 Object.entries(limits).map(([key, value]) => (
@@ -582,17 +589,17 @@ export default function EditPlanPage() {
                                             <div className="flex items-center gap-2 mb-1">
                                                 <span className="font-medium text-sm">{key}</span>
                                                 {typeof value === 'object' && value !== null && 'limite' in value ? (
-                                                    (value as any).limite === null ? (
+                                                    (value as PlanLimit).limite === null ? (
                                                         <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 px-2 py-1 rounded">
                                                             Ilimitado
                                                         </span>
-                                                    ) : (value as any).limite === 0 ? (
+                                                    ) : (value as PlanLimit).limite === 0 ? (
                                                         <span className="text-xs bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded">
                                                             Sin acceso
                                                         </span>
                                                     ) : (
                                                         <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded">
-                                                            Límite: {(value as any).limite}
+                                                            Límite: {(value as PlanLimit).limite}
                                                         </span>
                                                     )
                                                 ) : (
@@ -603,7 +610,7 @@ export default function EditPlanPage() {
                                             </div>
                                             {typeof value === 'object' && value !== null && 'descripcion' in value && (
                                                 <p className="text-xs text-muted-foreground">
-                                                    {(value as any).descripcion}
+                                                    {(value as PlanLimit).descripcion}
                                                 </p>
                                             )}
                                         </div>

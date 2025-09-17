@@ -1,0 +1,208 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { 
+    Dialog, 
+    DialogContent, 
+    DialogHeader, 
+    DialogTitle, 
+    DialogFooter 
+} from "@/components/ui/dialog";
+import { 
+    Save, 
+    X,
+    AlertCircle
+} from "lucide-react";
+import { toast } from "sonner";
+import { Service } from '../types';
+
+interface ServiceModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    service?: Service | null;
+    onSave: (service: Service) => void;
+}
+
+export function ServiceModal({ isOpen, onClose, service, onSave }: ServiceModalProps) {
+    const [formData, setFormData] = useState({
+        name: '',
+        slug: '',
+        description: '',
+        active: true
+    });
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            if (service) {
+                setFormData({
+                    name: service.name,
+                    slug: service.slug,
+                    description: service.description || '',
+                    active: service.active
+                });
+            } else {
+                setFormData({
+                    name: '',
+                    slug: '',
+                    description: '',
+                    active: true
+                });
+            }
+        }
+    }, [isOpen, service]);
+
+    const handleInputChange = (field: string, value: string | boolean) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+
+        // Auto-generar slug desde el nombre
+        if (field === 'name' && typeof value === 'string') {
+            const slug = value
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, '_')
+                .trim();
+            setFormData(prev => ({
+                ...prev,
+                slug
+            }));
+        }
+    };
+
+    const handleSubmit = async () => {
+        if (!formData.name.trim()) {
+            toast.error('El nombre es requerido');
+            return;
+        }
+
+        if (!formData.slug.trim()) {
+            toast.error('El slug es requerido');
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const url = service ? `/api/services/${service.id}` : '/api/services';
+            const method = service ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Error al guardar servicio');
+            }
+
+            const savedService = await response.json();
+            onSave(savedService);
+        } catch (error) {
+            console.error('Error saving service:', error);
+            toast.error(error instanceof Error ? error.message : 'Error al guardar servicio');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <AlertCircle className="h-5 w-5" />
+                        {service ? 'Editar Servicio' : 'Crear Nuevo Servicio'}
+                    </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-6">
+                    {/* Información */}
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-md">
+                        <div className="flex items-start gap-2">
+                            <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+                            <div className="text-sm text-blue-800 dark:text-blue-200">
+                                <p className="font-medium mb-1">Información del Servicio</p>
+                                <p>Los servicios definen las funcionalidades que pueden tener límites en los planes de suscripción.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Formulario */}
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="name">Nombre del Servicio</Label>
+                                <Input
+                                    id="name"
+                                    placeholder="ej: Catálogos, Proyectos Aprobados"
+                                    value={formData.name}
+                                    onChange={(e) => handleInputChange('name', e.target.value)}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="slug">Slug (identificador único)</Label>
+                                <Input
+                                    id="slug"
+                                    placeholder="ej: catalogos, proyectos_aprobados"
+                                    value={formData.slug}
+                                    onChange={(e) => handleInputChange('slug', e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <Label htmlFor="description">Descripción</Label>
+                            <Textarea
+                                id="description"
+                                placeholder="Descripción del servicio y su propósito"
+                                value={formData.description}
+                                onChange={(e) => handleInputChange('description', e.target.value)}
+                                rows={3}
+                            />
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <Switch
+                                id="active"
+                                checked={formData.active}
+                                onCheckedChange={(checked) => handleInputChange('active', checked)}
+                            />
+                            <Label htmlFor="active">Servicio activo</Label>
+                        </div>
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose} disabled={isLoading}>
+                        Cancelar
+                    </Button>
+                    <Button onClick={handleSubmit} disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Guardando...
+                            </>
+                        ) : (
+                            <>
+                                <Save className="h-4 w-4 mr-2" />
+                                {service ? 'Actualizar' : 'Crear'} Servicio
+                            </>
+                        )}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
