@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { User, Bell, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { PlatformIsotipo } from '@/components/platform';
+import { usePlatformName } from '@/hooks/usePlatformConfig';
 
 interface NavbarProps {
     onMenuClick: () => void;
@@ -14,6 +15,7 @@ interface NavbarProps {
 export function Navbar({ onMenuClick }: NavbarProps) {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const router = useRouter();
+    const platformName = usePlatformName();
 
     const handleLogout = async () => {
         const supabase = createClient();
@@ -41,6 +43,9 @@ export function Navbar({ onMenuClick }: NavbarProps) {
                             width={32} 
                             height={32} 
                         />
+                        <h1 className="text-lg font-semibold text-white">
+                            {platformName}
+                        </h1>
                         <span className="text-sm text-zinc-400 bg-zinc-800 px-2 py-1 rounded">
                             Agente
                         </span>

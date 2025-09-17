@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { User, Bell, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { createClientSupabase } from '@/lib/supabase';
 import { PlatformIsotipo } from '@/components/platform';
+import { usePlatformName } from '@/hooks/usePlatformConfig';
 
 interface NavbarProps {
     onMenuClick: () => void;
@@ -14,6 +15,7 @@ interface NavbarProps {
 export function Navbar({ onMenuClick }: NavbarProps) {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const router = useRouter();
+    const platformName = usePlatformName();
 
     const handleLogout = async () => {
         const supabase = createClientSupabase();
@@ -36,10 +38,15 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                 <div className="flex flex-1 items-center">
-                    <PlatformIsotipo
-                        width={32}
-                        height={32}
-                    />
+                    <div className="flex items-center space-x-3">
+                        <PlatformIsotipo
+                            width={32}
+                            height={32}
+                        />
+                        <h1 className="text-lg font-semibold text-white">
+                            {platformName}
+                        </h1>
+                    </div>
                 </div>
                 <div className="flex items-center gap-x-4 lg:gap-x-6">
                     <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-zinc-700" />
