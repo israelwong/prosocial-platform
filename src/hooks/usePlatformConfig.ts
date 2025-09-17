@@ -209,7 +209,7 @@ export function usePlatformLogo(): string | null {
 // Hook para obtener el isotipo (solo ícono)
 export function usePlatformIsotipo(): string | null {
     const { config } = usePlatformConfig();
-    return config?.logo_url || null; // Por ahora usamos el mismo, pero podríamos agregar un campo específico
+    return config?.favicon_url || null; // Isotipo = solo el icono (favicon)
 }
 
 // Hook para obtener información completa del branding
@@ -217,8 +217,8 @@ export function usePlatformBranding() {
     const { config } = usePlatformConfig();
     return {
         nombre: config?.nombre_empresa || 'ProSocial Platform',
-        isotipo: config?.logo_url || null,
-        logotipo: config?.logo_url || null, // Por ahora igual, pero podríamos separar
+        isotipo: config?.favicon_url || null, // Isotipo = solo el icono (favicon)
+        logotipo: config?.logo_url || null, // Logotipo = icono + nombre (logo_url)
         favicon: config?.favicon_url || null,
     };
 }

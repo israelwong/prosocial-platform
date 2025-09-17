@@ -25,8 +25,8 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
         // Datos dinámicos de la plataforma
         const platformData = {
             nombre: platformConfig?.nombre_empresa || 'ProSocial Platform',
-            logotipo: platformConfig?.logotipo || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg',
-            isotipo: platformConfig?.isotipo || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg',
+            logotipo: platformConfig?.logo_url || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg',
+            isotipo: platformConfig?.favicon_url || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg',
         };
 
         // Renderizar el template de React a HTML
