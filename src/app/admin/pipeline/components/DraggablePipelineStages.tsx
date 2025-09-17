@@ -131,6 +131,7 @@ function SortableStageItem({ stage, index, onEdit, canMoveUp, canMoveDown }: Sor
 export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineStagesProps) {
     const [localStages, setLocalStages] = useState(stages);
     const [isHydrated, setIsHydrated] = useState(false);
+    const [isReordering, setIsReordering] = useState(false);
 
     // Sincronizar el estado local cuando cambien las props
     useEffect(() => {
@@ -151,21 +152,33 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
 
-        if (over && active.id !== over.id) {
+        if (over && active.id !== over.id && !isReordering) {
             const oldIndex = localStages.findIndex((stage) => stage.id === active.id);
             const newIndex = localStages.findIndex((stage) => stage.id === over.id);
 
             const newStages = arrayMove(localStages, oldIndex, newIndex);
-            setLocalStages(newStages);
+            
+            try {
+                setIsReordering(true);
+                
+                // Actualizar el orden en el estado local primero
+                setLocalStages(newStages);
 
-            // Actualizar el orden en la base de datos
-            const stageIds = newStages.map(stage => stage.id);
-            const result = await reorderPipelineStages(stageIds);
+                // Actualizar el orden en la base de datos
+                const stageIds = newStages.map(stage => stage.id);
+                const result = await reorderPipelineStages(stageIds);
 
-            if (!result.success) {
-                console.error('Error reordering stages:', result.error);
+                if (!result.success) {
+                    console.error('Error reordering stages:', result.error);
+                    // Revertir el cambio local si falla
+                    setLocalStages(stages);
+                }
+            } catch (error) {
+                console.error('Error reordering stages:', error);
                 // Revertir el cambio local si falla
                 setLocalStages(stages);
+            } finally {
+                setIsReordering(false);
             }
         }
     };
@@ -241,12 +254,19 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
             <CardHeader className="border-b border-zinc-800">
                 <CardTitle className="text-lg font-semibold text-white">Etapas del Pipeline</CardTitle>
                 <p className="text-sm text-zinc-400">
-                    Arrastra para reordenar las etapas del pipeline
+                    {isReordering ? (
+                        <span className="flex items-center space-x-2">
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500"></div>
+                            <span>Actualizando posición...</span>
+                        </span>
+                    ) : (
+                        "Arrastra para reordenar las etapas del pipeline"
+                    )}
                 </p>
             </CardHeader>
             <CardContent className="p-0">
                 <DndContext
-                    sensors={sensors}
+                    sensors={isReordering ? [] : sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                 >
