@@ -14,10 +14,18 @@ export async function createPipelineStage(formData: FormData) {
         }
 
         // Obtener el siguiente orden
-        const lastStage = await prisma.platform_pipeline_stages.findFirst({
-            orderBy: { orden: 'desc' }
-        });
-        const nextOrder = (lastStage?.orden || 0) + 1;
+        let lastStage;
+        let nextOrder = 0;
+        
+        try {
+            lastStage = await prisma.platform_pipeline_stages.findFirst({
+                orderBy: { orden: 'desc' }
+            });
+            nextOrder = (lastStage?.orden || 0) + 1;
+        } catch (orderError) {
+            console.warn('No se pudo obtener el último orden, usando 0:', orderError);
+            nextOrder = 0;
+        }
 
         const stage = await prisma.platform_pipeline_stages.create({
             data: {
@@ -34,19 +42,28 @@ export async function createPipelineStage(formData: FormData) {
         return { success: true, stage };
     } catch (error) {
         console.error('Error creating pipeline stage:', error);
-
+        
         // Manejar errores de conexión específicos
         if (error instanceof Error && (
             error.message.includes('Can\'t reach database server') ||
             error.message.includes('P1001') ||
-            error.message.includes('connection')
+            error.message.includes('connection') ||
+            error.message.includes('PrismaClientInitializationError')
         )) {
-            return {
-                success: false,
-                error: 'Error de conexión con la base de datos. Por favor, intenta nuevamente.'
+            return { 
+                success: false, 
+                error: 'Error de conexión con la base de datos. Verifica tu conexión a internet e intenta nuevamente.' 
             };
         }
-
+        
+        // Manejar errores de validación específicos
+        if (error instanceof Error && error.message.includes('Argument')) {
+            return { 
+                success: false, 
+                error: 'Error en los datos proporcionados. Verifica que todos los campos requeridos estén completos.' 
+            };
+        }
+        
         return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
     }
 }
@@ -173,7 +190,7 @@ export async function reorderPipelineStages(stageIds: string[]) {
         const updatePromises = stageIds.map((id, index) =>
             prisma.platform_pipeline_stages.update({
                 where: { id },
-                data: { 
+                data: {
                     orden: index + 1,
                     updatedAt: new Date()
                 }
