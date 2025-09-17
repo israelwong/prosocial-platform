@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { User, Bell, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { createClientSupabase } from '@/lib/supabase';
-import { PlatformLogo } from '@/components/platform';
+import { PlatformIsotipo } from '@/components/platform';
 
 interface NavbarProps {
     onMenuClick: () => void;
@@ -36,11 +36,9 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
             <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                 <div className="flex flex-1 items-center">
-                    <PlatformLogo
+                    <PlatformIsotipo
                         width={32}
                         height={32}
-                        showText={true}
-                        textClassName="text-lg font-semibold text-white"
                     />
                 </div>
                 <div className="flex items-center gap-x-4 lg:gap-x-6">
