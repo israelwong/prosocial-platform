@@ -186,6 +186,22 @@ export async function togglePipelineStageStatus(id: string) {
 
 export async function reorderPipelineStages(stageIds: string[]) {
     try {
+        console.log('🔄 Reordenando etapas:', stageIds);
+        
+        // Verificar que las etapas existan antes de actualizar
+        const existingStages = await prisma.platform_pipeline_stages.findMany({
+            where: { id: { in: stageIds } },
+            select: { id: true, nombre: true }
+        });
+        
+        console.log('📋 Etapas existentes:', existingStages);
+        
+        if (existingStages.length !== stageIds.length) {
+            const missingIds = stageIds.filter(id => !existingStages.find(stage => stage.id === id));
+            console.error('❌ Etapas no encontradas:', missingIds);
+            throw new Error(`No se encontraron ${missingIds.length} etapas: ${missingIds.join(', ')}`);
+        }
+        
         // Actualizar el orden de todas las etapas
         const updatePromises = stageIds.map((id, index) =>
             prisma.platform_pipeline_stages.update({
@@ -203,9 +219,15 @@ export async function reorderPipelineStages(stageIds: string[]) {
         // Verificar si alguna actualización falló
         const failedUpdates = results.filter(result => result.status === 'rejected');
         if (failedUpdates.length > 0) {
-            console.error('Algunas actualizaciones de orden fallaron:', failedUpdates);
+            console.error('❌ Algunas actualizaciones de orden fallaron:', failedUpdates);
+            // Log detallado de errores
+            failedUpdates.forEach((failed, index) => {
+                console.error(`  ${index + 1}. ID: ${stageIds[index]}, Error:`, failed.reason);
+            });
             throw new Error(`Error al actualizar el orden de ${failedUpdates.length} etapas`);
         }
+        
+        console.log('✅ Reordenamiento completado exitosamente');
 
         revalidatePath('/admin/pipeline');
         return { success: true };
@@ -222,6 +244,14 @@ export async function reorderPipelineStages(stageIds: string[]) {
             return {
                 success: false,
                 error: 'Error de conexión con la base de datos. Verifica tu conexión e intenta nuevamente.'
+            };
+        }
+
+        // Manejar errores de etapas no encontradas
+        if (error instanceof Error && error.message.includes('No se encontraron')) {
+            return {
+                success: false,
+                error: 'Algunas etapas no se encontraron en la base de datos. Recarga la página e intenta nuevamente.'
             };
         }
         
