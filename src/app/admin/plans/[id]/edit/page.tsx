@@ -571,21 +571,7 @@ export default function EditPlanPage() {
                 </Card>
 
                 {/* Límites del Plan */}
-                {isEdit ? (
-                    <PlanServicesList planId={planId} />
-                ) : (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Límites del Plan</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-center py-12">
-                            <div className="text-muted-foreground">
-                                <p className="text-sm mb-2">Los límites del plan se configurarán después de guardar.</p>
-                                <p className="text-xs">Primero guarda el plan y luego podrás configurar los servicios disponibles.</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                <PlanServicesList planId={planId} isEdit={isEdit} />
 
                 {/* Integración Stripe */}
                 <Card>

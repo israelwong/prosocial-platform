@@ -25,16 +25,49 @@ import {
 
 interface PlanServicesListProps {
     planId: string;
+    isEdit?: boolean;
 }
 
-export function PlanServicesList({ planId }: PlanServicesListProps) {
+export function PlanServicesList({ planId, isEdit = true }: PlanServicesListProps) {
     const [services, setServices] = useState<ServiceWithPlanConfig[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [saving, setSaving] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchPlanServices();
-    }, [planId]);
+        if (isEdit) {
+            fetchPlanServices();
+        } else {
+            fetchAllServices();
+        }
+    }, [planId, isEdit]);
+
+    const fetchAllServices = async () => {
+        try {
+            setIsLoading(true);
+            console.log('Fetching all services for new plan');
+            
+            const response = await fetch('/api/services');
+            if (!response.ok) {
+                throw new Error('Error al cargar servicios');
+            }
+            
+            const allServices = await response.json();
+            console.log('Received all services:', allServices);
+            
+            // Convertir a formato ServiceWithPlanConfig con planService null
+            const servicesWithConfig = allServices.map((service: any) => ({
+                ...service,
+                planService: null
+            }));
+            
+            setServices(servicesWithConfig);
+        } catch (error) {
+            console.error('Error fetching all services:', error);
+            toast.error('Error al cargar servicios');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const fetchPlanServices = async () => {
         try {
@@ -75,6 +108,11 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
     };
 
     const updateServiceConfig = async (serviceId: string, updates: any) => {
+        if (!isEdit) {
+            toast.error('Guarda el plan primero para configurar los servicios');
+            return;
+        }
+        
         try {
             setSaving(serviceId);
             
@@ -186,7 +224,10 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
             <CardHeader>
                 <CardTitle>Servicios del Plan</CardTitle>
                 <p className="text-sm text-muted-foreground">
-                    Configura qué servicios están disponibles en este plan y sus límites
+                    {isEdit 
+                        ? "Configura qué servicios están disponibles en este plan y sus límites"
+                        : "Vista previa de los servicios disponibles. Guarda el plan para configurar los límites."
+                    }
                 </p>
             </CardHeader>
             <CardContent>
@@ -222,7 +263,7 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
                                         <Switch
                                             checked={isActive}
                                             onCheckedChange={(checked) => handleToggleActive(service.id, checked)}
-                                            disabled={isSaving}
+                                            disabled={isSaving || !isEdit}
                                         />
                                         {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
                                     </div>
@@ -238,7 +279,7 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
                                                 placeholder="Dejar vacío para ilimitado"
                                                 value={service.planService?.limite ?? ''}
                                                 onChange={(e) => handleLimiteChange(service.id, e.target.value)}
-                                                disabled={isSaving}
+                                                disabled={isSaving || !isEdit}
                                             />
                                             <p className="text-xs text-muted-foreground mt-1">
                                                 Dejar vacío = ilimitado, 0 = sin acceso
@@ -249,7 +290,7 @@ export function PlanServicesList({ planId }: PlanServicesListProps) {
                                             <Select
                                                 value={service.planService?.unidad ?? ''}
                                                 onValueChange={(value) => handleUnidadChange(service.id, value as UnidadMedida || null)}
-                                                disabled={isSaving}
+                                                disabled={isSaving || !isEdit}
                                             >
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Seleccionar unidad" />
