@@ -16,7 +16,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { PlanMigrationModal } from './components/PlanMigrationModal';
-import { LimitsModal } from './components/LimitsModal';
+import { SimpleLimitsModal } from './components/SimpleLimitsModal';
 import { Plan as PlanType } from '../../types';
 
 // Interfaz para límites del plan
@@ -78,7 +78,7 @@ export default function EditPlanPage() {
     const [features, setFeatures] = useState<string[]>([]);
     const [newFeature, setNewFeature] = useState('');
     const [showMigrationModal, setShowMigrationModal] = useState(false);
-    const [showLimitsModal, setShowLimitsModal] = useState(false);
+    const [showSimpleLimitsModal, setShowSimpleLimitsModal] = useState(false);
     const [limits, setLimits] = useState<Record<string, unknown>>({});
     const [planData, setPlanData] = useState<PlanType | null>(null);
 
@@ -202,7 +202,7 @@ export default function EditPlanPage() {
     };
 
     // Manejar guardado de límites desde el modal
-    const handleLimitsSave = (newLimits: Record<string, unknown>) => {
+    const handleLimitsSave = (newLimits: Record<string, PlanLimit>) => {
         setLimits(newLimits);
         setValue('limits', newLimits);
     };
@@ -567,14 +567,14 @@ export default function EditPlanPage() {
                         <CardTitle>Límites del Plan</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <Button 
-                            type="button" 
-                            onClick={() => setShowLimitsModal(true)} 
-                            variant="outline"
-                        >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Gestionar Límites
-                        </Button>
+                                <Button
+                                    type="button"
+                                    onClick={() => setShowSimpleLimitsModal(true)}
+                                    variant="outline"
+                                >
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Gestionar Límites
+                                </Button>
 
                         <div className="space-y-2">
                             {Object.keys(limits).length === 0 ? (
@@ -811,9 +811,9 @@ export default function EditPlanPage() {
                 }}
             />
 
-            <LimitsModal
-                isOpen={showLimitsModal}
-                onClose={() => setShowLimitsModal(false)}
+            <SimpleLimitsModal
+                isOpen={showSimpleLimitsModal}
+                onClose={() => setShowSimpleLimitsModal(false)}
                 limits={limits}
                 onSave={handleLimitsSave}
             />
