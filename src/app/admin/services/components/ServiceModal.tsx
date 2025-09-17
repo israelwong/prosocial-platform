@@ -26,9 +26,10 @@ interface ServiceModalProps {
     onClose: () => void;
     service?: Service | null;
     onSave: (service: Service) => void;
+    existingServices?: Service[];
 }
 
-export function ServiceModal({ isOpen, onClose, service, onSave }: ServiceModalProps) {
+export function ServiceModal({ isOpen, onClose, service, onSave, existingServices = [] }: ServiceModalProps) {
     const [formData, setFormData] = useState({
         name: '',
         slug: '',
@@ -88,6 +89,16 @@ export function ServiceModal({ isOpen, onClose, service, onSave }: ServiceModalP
             return;
         }
 
+        // Validar slug único
+        const isSlugDuplicate = existingServices.some(s => 
+            s.slug === formData.slug && s.id !== service?.id
+        );
+
+        if (isSlugDuplicate) {
+            toast.error('Ya existe un servicio con ese slug');
+            return;
+        }
+
         setIsLoading(true);
 
         try {
@@ -108,7 +119,10 @@ export function ServiceModal({ isOpen, onClose, service, onSave }: ServiceModalP
             }
 
             const savedService = await response.json();
+            
+            // Actualización local inmediata
             onSave(savedService);
+            
         } catch (error) {
             console.error('Error saving service:', error);
             toast.error(error instanceof Error ? error.message : 'Error al guardar servicio');
@@ -159,6 +173,17 @@ export function ServiceModal({ isOpen, onClose, service, onSave }: ServiceModalP
                                     value={formData.slug}
                                     onChange={(e) => handleInputChange('slug', e.target.value)}
                                 />
+                                {formData.slug && (
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                        {existingServices.some(s => 
+                                            s.slug === formData.slug && s.id !== service?.id
+                                        ) ? (
+                                            <span className="text-red-500">⚠️ Este slug ya está en uso</span>
+                                        ) : (
+                                            <span className="text-green-500">✅ Slug disponible</span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
 

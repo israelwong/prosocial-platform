@@ -4,8 +4,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-    Search, 
+import {
+    Search,
     Plus,
     Settings
 } from 'lucide-react';
@@ -129,13 +129,13 @@ export function ServicesPageClient() {
 
     const handleModalSave = (savedService: Service) => {
         if (editingService) {
-            // Actualizar servicio existente
-            setServices(prev =>
+            // Actualizar servicio existente localmente
+            setServices(prev => 
                 prev.map(s => s.id === savedService.id ? savedService : s)
             );
             toast.success('Servicio actualizado exitosamente');
         } else {
-            // Agregar nuevo servicio
+            // Agregar nuevo servicio al principio de la lista
             setServices(prev => [savedService, ...prev]);
             toast.success('Servicio creado exitosamente');
         }
@@ -334,6 +334,7 @@ export function ServicesPageClient() {
                 }}
                 service={editingService}
                 onSave={handleModalSave}
+                existingServices={services}
             />
         </div>
     );
