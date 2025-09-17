@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Eye, EyeOff, GripVertical } from 'lucide-react';
@@ -80,73 +79,85 @@ export default function CanalItem({
     };
 
     return (
-        <Card
+        <div
             ref={setNodeRef}
             style={style}
-            className={`bg-card border-border ${isDragging ? 'shadow-lg' : ''}`}
+            className="flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors"
         >
-            <CardContent className="p-3">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <div
-                            {...attributes}
-                            {...listeners}
-                            className="cursor-grab active:cursor-grabbing"
-                        >
-                            <GripVertical className="h-4 w-4 text-zinc-400" />
-                        </div>
-                        <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: canal.color || '#3B82F6' }}
-                        />
-                        <div>
-                            <h4 className="font-medium text-white text-sm">{canal.nombre}</h4>
-                            {canal.descripcion && (
-                                <p className="text-xs text-zinc-400">{canal.descripcion}</p>
-                            )}
-                        </div>
+            <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                    <div
+                        {...attributes}
+                        {...listeners}
+                        className="cursor-grab active:cursor-grabbing"
+                    >
+                        <GripVertical className="h-4 w-4 text-zinc-500" />
                     </div>
+                    <span className="text-sm font-medium text-zinc-400 w-6">
+                        {canal.orden}
+                    </span>
+                </div>
+
+                <div
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: canal.color || '#3B82F6' }}
+                ></div>
+
+                <div className="flex-1">
                     <div className="flex items-center space-x-2">
+                        <h3 className="font-medium text-white">{canal.nombre}</h3>
                         <Badge
-                            variant={canal.isActive ? "default" : "secondary"}
-                            className={canal.isActive ? "bg-green-600" : "bg-zinc-600"}
+                            variant="outline"
+                            className={`text-xs ${canal.isActive
+                                ? 'border-green-500 text-green-400'
+                                : 'border-red-500 text-red-400'
+                                }`}
                         >
                             {canal.isActive ? 'Activo' : 'Inactivo'}
                         </Badge>
                         <Badge
-                            variant={canal.isVisible ? "default" : "secondary"}
-                            className={canal.isVisible ? "bg-blue-600" : "bg-zinc-600"}
+                            variant="outline"
+                            className={`text-xs ${canal.isVisible
+                                ? 'border-blue-500 text-blue-400'
+                                : 'border-zinc-500 text-zinc-400'
+                                }`}
                         >
                             {canal.isVisible ? 'Visible' : 'Oculto'}
                         </Badge>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleToggleVisible(canal.id, !canal.isVisible)}
-                            disabled={isUpdating}
-                        >
-                            {canal.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => onEdit(canal)}
-                            disabled={isUpdating}
-                        >
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(canal.id)}
-                            disabled={isUpdating}
-                            className="text-red-400 hover:text-red-300"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                        </Button>
                     </div>
+                    {canal.descripcion && (
+                        <p className="text-sm text-zinc-400">{canal.descripcion}</p>
+                    )}
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+
+            <div className="flex items-center space-x-2">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleVisible(canal.id, !canal.isVisible)}
+                    disabled={isUpdating}
+                >
+                    {canal.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(canal)}
+                    disabled={isUpdating}
+                >
+                    <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(canal.id)}
+                    disabled={isUpdating}
+                    className="text-red-400 hover:text-red-300"
+                >
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </div>
+        </div>
     );
 }

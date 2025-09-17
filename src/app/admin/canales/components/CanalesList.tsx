@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import {
@@ -86,16 +86,32 @@ export default function CanalesList({
 
     if (loading) {
         return (
-            <div className="space-y-4">
-                {[1, 2, 3].map(i => (
-                    <Card key={i} className="animate-pulse">
-                        <CardContent className="p-6">
-                            <div className="h-4 bg-zinc-700 rounded w-1/4 mb-2"></div>
-                            <div className="h-3 bg-zinc-700 rounded w-1/2"></div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
+                    <CardTitle className="text-lg font-semibold text-white">Canales de Adquisición</CardTitle>
+                    <div className="text-sm text-zinc-400">
+                        Cargando canales...
+                    </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <div className="divide-y divide-zinc-800">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="flex items-center justify-between p-4 animate-pulse">
+                                <div className="flex items-center space-x-4">
+                                    <div className="h-4 w-4 bg-zinc-700 rounded"></div>
+                                    <div className="h-4 w-6 bg-zinc-700 rounded"></div>
+                                    <div className="h-4 w-4 bg-zinc-700 rounded-full"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-32"></div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-6 w-16 bg-zinc-700 rounded"></div>
+                                    <div className="h-6 w-16 bg-zinc-700 rounded"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
         );
     }
 
@@ -114,46 +130,53 @@ export default function CanalesList({
                 </div>
             </div>
 
-            {/* Indicador de reordenamiento */}
-            {isReordering && (
-                <div className="flex items-center justify-center py-2">
-                    <div className="flex items-center space-x-2 text-zinc-400">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-zinc-400"></div>
-                        <span className="text-sm">Actualizando orden...</span>
-                    </div>
-                </div>
-            )}
-
             {/* Lista de canales con drag and drop */}
-            <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-            >
-                <SortableContext
-                    items={filteredCanales.map(canal => canal.id)}
-                    strategy={verticalListSortingStrategy}
-                >
-                    <div className="space-y-2">
-                        {filteredCanales.map((canal) => (
-                            <CanalItem
-                                key={canal.id}
-                                canal={canal}
-                                onEdit={onEdit}
-                                onDelete={onDelete}
-                                onToggleActive={onToggleActive}
-                                onToggleVisible={onToggleVisible}
-                            />
-                        ))}
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
+                    <CardTitle className="text-lg font-semibold text-white">Canales de Adquisición</CardTitle>
+                    <div className="text-sm text-zinc-400">
+                        {isReordering ? (
+                            <span className="flex items-center space-x-2">
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500"></div>
+                                <span>Actualizando posición...</span>
+                            </span>
+                        ) : (
+                            "Arrastra para reordenar los canales de adquisición"
+                        )}
                     </div>
-                </SortableContext>
-            </DndContext>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={filteredCanales.map(canal => canal.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <div className={`divide-y divide-zinc-800 ${isReordering ? 'pointer-events-none opacity-50' : ''}`}>
+                                {filteredCanales.map((canal) => (
+                                    <CanalItem
+                                        key={canal.id}
+                                        canal={canal}
+                                        onEdit={onEdit}
+                                        onDelete={onDelete}
+                                        onToggleActive={onToggleActive}
+                                        onToggleVisible={onToggleVisible}
+                                    />
+                                ))}
+                            </div>
+                        </SortableContext>
+                    </DndContext>
 
-            {filteredCanales.length === 0 && (
-                <div className="text-center py-8">
-                    <p className="text-zinc-400">No se encontraron canales</p>
-                </div>
-            )}
+                    {filteredCanales.length === 0 && (
+                        <div className="text-center py-8">
+                            <p className="text-zinc-400">No se encontraron canales</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 }
