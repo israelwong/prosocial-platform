@@ -84,26 +84,98 @@ export function ServicesByCategoryClient() {
                 fetch('/api/services')
             ]);
 
-            // Verificar respuestas individualmente para mejor diagnóstico
+            let categoriesData = [];
+            let servicesData = [];
+            let hasErrors = false;
+
+            // Procesar categorías
             if (!categoriesResponse.ok) {
-                const categoriesError = await categoriesResponse.json().catch(() => ({ error: 'Error desconocido' }));
-                console.error('Error loading categories:', categoriesError);
-                throw new Error(`Error al cargar categorías: ${categoriesError.error || 'Error desconocido'}`);
+                let categoriesError = { error: 'Error desconocido' };
+                try {
+                    const errorText = await categoriesResponse.text();
+                    if (errorText) {
+                        categoriesError = JSON.parse(errorText);
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing categories response:', parseError);
+                    categoriesError = { 
+                        error: `HTTP ${categoriesResponse.status}: ${categoriesResponse.statusText}` 
+                    };
+                }
+                console.error('Error loading categories:', {
+                    status: categoriesResponse.status,
+                    statusText: categoriesResponse.statusText,
+                    error: categoriesError
+                });
+                
+                if (retryCount < maxRetries && (categoriesError.error.includes('P1001') || categoriesError.error.includes('Can\'t reach database'))) {
+                    // Reintentar para errores de conectividad
+                    const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+                    console.log(`Reintentando categorías en ${delay}ms (intento ${retryCount + 1}/${maxRetries})`);
+                    toast.error(`Error de conexión. Reintentando... (${retryCount + 1}/${maxRetries})`);
+                    
+                    setTimeout(() => {
+                        fetchData(retryCount + 1);
+                    }, delay);
+                    return;
+                } else {
+                    hasErrors = true;
+                    toast.error('Error al cargar categorías. Continuando con servicios...');
+                }
+            } else {
+                categoriesData = await categoriesResponse.json();
             }
 
+            // Procesar servicios
             if (!servicesResponse.ok) {
-                const servicesError = await servicesResponse.json().catch(() => ({ error: 'Error desconocido' }));
-                console.error('Error loading services:', servicesError);
-                throw new Error(`Error al cargar servicios: ${servicesError.error || 'Error desconocido'}`);
+                let servicesError = { error: 'Error desconocido' };
+                try {
+                    const errorText = await servicesResponse.text();
+                    if (errorText) {
+                        servicesError = JSON.parse(errorText);
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing services response:', parseError);
+                    servicesError = { 
+                        error: `HTTP ${servicesResponse.status}: ${servicesResponse.statusText}` 
+                    };
+                }
+                console.error('Error loading services:', {
+                    status: servicesResponse.status,
+                    statusText: servicesResponse.statusText,
+                    error: servicesError
+                });
+                
+                if (retryCount < maxRetries && (servicesError.error.includes('P1001') || servicesError.error.includes('Can\'t reach database'))) {
+                    // Reintentar para errores de conectividad
+                    const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+                    console.log(`Reintentando servicios en ${delay}ms (intento ${retryCount + 1}/${maxRetries})`);
+                    toast.error(`Error de conexión. Reintentando... (${retryCount + 1}/${maxRetries})`);
+                    
+                    setTimeout(() => {
+                        fetchData(retryCount + 1);
+                    }, delay);
+                    return;
+                } else {
+                    hasErrors = true;
+                    toast.error('Error al cargar servicios. Continuando con categorías...');
+                }
+            } else {
+                servicesData = await servicesResponse.json();
             }
 
-            const [categoriesData, servicesData] = await Promise.all([
-                categoriesResponse.json(),
-                servicesResponse.json()
-            ]);
+            // Si ambos fallan, mostrar error general
+            if (categoriesData.length === 0 && servicesData.length === 0) {
+                throw new Error('No se pudieron cargar ni categorías ni servicios');
+            }
 
             setCategories(categoriesData);
             setServices(servicesData);
+
+            if (hasErrors) {
+                toast.warning('Algunos datos no se pudieron cargar completamente. Intenta recargar la página.');
+            }
+
         } catch (error) {
             console.error('Error fetching data:', error);
             
@@ -123,10 +195,6 @@ export function ServicesByCategoryClient() {
                     } else {
                         toast.error('Error de conexión a la base de datos. Intenta recargar la página.');
                     }
-                } else if (error.message.includes('categorías')) {
-                    toast.error('Error al cargar categorías de servicios');
-                } else if (error.message.includes('servicios')) {
-                    toast.error('Error al cargar servicios');
                 } else {
                     toast.error(error.message);
                 }
