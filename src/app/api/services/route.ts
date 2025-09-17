@@ -4,7 +4,11 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest) {
     try {
         const services = await prisma.platform_services.findMany({
+            include: {
+                category: true
+            },
             orderBy: [
+                { category: { posicion: 'asc' } },
                 { posicion: 'asc' },
                 { name: 'asc' }
             ]
@@ -23,7 +27,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, slug, description } = body;
+        const { name, slug, description, categoryId } = body;
 
         if (!name || !slug) {
             return NextResponse.json(
@@ -32,8 +36,23 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Obtener la siguiente posición disponible
+        // Verificar que la categoría existe si se proporciona
+        if (categoryId) {
+            const category = await prisma.service_categories.findUnique({
+                where: { id: categoryId }
+            });
+
+            if (!category) {
+                return NextResponse.json(
+                    { error: 'La categoría especificada no existe' },
+                    { status: 400 }
+                );
+            }
+        }
+
+        // Obtener la siguiente posición disponible en la categoría
         const lastService = await prisma.platform_services.findFirst({
+            where: categoryId ? { categoryId } : { categoryId: null },
             orderBy: { posicion: 'desc' }
         });
         const nextPosition = (lastService?.posicion || 0) + 1;
@@ -43,15 +62,19 @@ export async function POST(request: NextRequest) {
                 name,
                 slug,
                 description: description || null,
+                categoryId,
                 posicion: nextPosition,
                 active: true
+            },
+            include: {
+                category: true
             }
         });
 
         return NextResponse.json(service, { status: 201 });
     } catch (error) {
         console.error('Error creating service:', error);
-        
+
         if (error instanceof Error && error.message.includes('Unique constraint')) {
             return NextResponse.json(
                 { error: 'Ya existe un servicio con ese nombre o slug' },

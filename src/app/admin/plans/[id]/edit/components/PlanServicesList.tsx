@@ -7,15 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { 
+import {
     Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { 
-    ServiceWithPlanConfig, 
-    UnidadMedida, 
+import {
+    ServiceWithPlanConfig,
+    UnidadMedida,
     UNIDAD_MEDIDA_LABELS,
-    formatLimite 
+    formatLimite
 } from '../../../types/plan-services';
 
 interface PlanServicesListProps {
@@ -33,21 +33,21 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         try {
             setIsLoading(true);
             console.log('Fetching all services for new plan');
-            
+
             const response = await fetch('/api/services');
             if (!response.ok) {
                 throw new Error('Error al cargar servicios');
             }
-            
+
             const allServices = await response.json();
             console.log('Received all services:', allServices);
-            
+
             // Convertir a formato ServiceWithPlanConfig con planService null
             const servicesWithConfig: ServiceWithPlanConfig[] = allServices.map((service: ServiceWithPlanConfig) => ({
                 ...service,
                 planService: null
             }));
-            
+
             setServices(servicesWithConfig);
         } catch (error) {
             console.error('Error fetching all services:', error);
@@ -61,11 +61,11 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         try {
             setIsLoading(true);
             console.log('Fetching services for plan:', planId);
-            
+
             const response = await fetch(`/api/plans/${planId}/services`);
             console.log('Response status:', response.status);
             console.log('Response ok:', response.ok);
-            
+
             if (response.ok) {
                 const data = await response.json();
                 console.log('Received data:', data);
@@ -113,7 +113,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
     const updateServiceConfig = async (serviceId: string, updates: { active?: boolean; limite?: number | null; unidad?: UnidadMedida | null }) => {
         if (!isEdit) {
             // En modo creación, solo actualizar el estado local
-            setServices(prevServices => 
+            setServices(prevServices =>
                 prevServices.map(service => {
                     if (service.id === serviceId) {
                         const currentConfig = service.planService || {
@@ -127,7 +127,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                             updatedAt: new Date(),
                             service: service
                         };
-                        
+
                         return {
                             ...service,
                             planService: {
@@ -141,10 +141,10 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
             );
             return;
         }
-        
+
         try {
             setSaving(serviceId);
-            
+
             const response = await fetch(`/api/plans/${planId}/services`, {
                 method: 'POST',
                 headers: {
@@ -161,10 +161,10 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
             }
 
             const updatedPlanService = await response.json();
-            
+
             // Actualizar estado local
-            setServices(prev => prev.map(service => 
-                service.id === serviceId 
+            setServices(prev => prev.map(service =>
+                service.id === serviceId
                     ? { ...service, planService: updatedPlanService }
                     : service
             ));
@@ -196,7 +196,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         if (!service) return;
 
         const limiteValue = limite === '' ? null : parseInt(limite);
-        
+
         await updateServiceConfig(serviceId, {
             active: service.planService?.active ?? false,
             limite: limiteValue,
@@ -273,7 +273,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
             <CardHeader className="border-b border-zinc-800">
                 <CardTitle className="text-lg font-semibold text-white">Servicios del Plan</CardTitle>
                 <div className="text-sm text-zinc-400">
-                    {isEdit 
+                    {isEdit
                         ? "Configura qué servicios están disponibles en este plan y sus límites"
                         : "Configura qué servicios estarán disponibles en este plan y sus límites. Los cambios se guardarán al crear el plan."
                     }
@@ -288,11 +288,10 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                         return (
                             <div
                                 key={service.id}
-                                className={`p-4 hover:bg-zinc-800/50 transition-colors ${
-                                    isActive 
-                                        ? 'border-l-4 border-l-green-500' 
-                                        : ''
-                                }`}
+                                className={`p-4 hover:bg-zinc-800/50 transition-colors ${isActive
+                                    ? 'border-l-4 border-l-green-500'
+                                    : ''
+                                    }`}
                             >
                                 <div className="flex items-start justify-between mb-3">
                                     <div className="flex items-center space-x-4 flex-1">
@@ -303,12 +302,12 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                                 <Badge variant="outline" className="text-xs">
                                                     {service.slug}
                                                 </Badge>
-                                                <Badge 
-                                                    variant="outline" 
-                                                    className={`text-xs ${isActive 
-                                                        ? 'border-green-500 text-green-400' 
+                                                <Badge
+                                                    variant="outline"
+                                                    className={`text-xs ${isActive
+                                                        ? 'border-green-500 text-green-400'
                                                         : 'border-red-500 text-red-400'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {isActive ? "Activo" : "Inactivo"}
                                                 </Badge>

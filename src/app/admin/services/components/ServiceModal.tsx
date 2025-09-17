@@ -6,20 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { 
-    Dialog, 
-    DialogContent, 
-    DialogHeader, 
-    DialogTitle, 
-    DialogFooter 
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter
 } from "@/components/ui/dialog";
-import { 
-    Save, 
+import {
+    Save,
     X,
     AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
-import { Service } from '../types';
+import { Service, ServiceCategory } from '../types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ServiceModalProps {
     isOpen: boolean;
@@ -27,13 +28,15 @@ interface ServiceModalProps {
     service?: Service | null;
     onSave: (service: Service) => void;
     existingServices?: Service[];
+    categories?: ServiceCategory[];
 }
 
-export function ServiceModal({ isOpen, onClose, service, onSave, existingServices = [] }: ServiceModalProps) {
+export function ServiceModal({ isOpen, onClose, service, onSave, existingServices = [], categories = [] }: ServiceModalProps) {
     const [formData, setFormData] = useState({
         name: '',
         slug: '',
         description: '',
+        categoryId: '',
         active: true
     });
     const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +48,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                     name: service.name,
                     slug: service.slug,
                     description: service.description || '',
+                    categoryId: service.categoryId || '',
                     active: service.active
                 });
             } else {
@@ -52,6 +56,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                     name: '',
                     slug: '',
                     description: '',
+                    categoryId: '',
                     active: true
                 });
             }
@@ -89,8 +94,13 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
             return;
         }
 
+        if (categories.length === 0) {
+            toast.error('No hay categorías disponibles. Crea una categoría primero.');
+            return;
+        }
+
         // Validar slug único
-        const isSlugDuplicate = existingServices.some(s => 
+        const isSlugDuplicate = existingServices.some(s =>
             s.slug === formData.slug && s.id !== service?.id
         );
 
@@ -119,10 +129,10 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
             }
 
             const savedService = await response.json();
-            
+
             // Actualización local inmediata
             onSave(savedService);
-            
+
         } catch (error) {
             console.error('Error saving service:', error);
             toast.error(error instanceof Error ? error.message : 'Error al guardar servicio');
@@ -175,7 +185,7 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                                 />
                                 {formData.slug && (
                                     <div className="text-xs text-muted-foreground mt-1">
-                                        {existingServices.some(s => 
+                                        {existingServices.some(s =>
                                             s.slug === formData.slug && s.id !== service?.id
                                         ) ? (
                                             <span className="text-red-500">⚠️ Este slug ya está en uso</span>
@@ -196,6 +206,28 @@ export function ServiceModal({ isOpen, onClose, service, onSave, existingService
                                 onChange={(e) => handleInputChange('description', e.target.value)}
                                 rows={3}
                             />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="categoryId">Categoría</Label>
+                            <Select
+                                value={formData.categoryId}
+                                onValueChange={(value) => handleInputChange('categoryId', value === 'no-category' ? '' : value)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Seleccionar categoría" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="no-category">
+                                        Sin categoría
+                                    </SelectItem>
+                                    {categories.map((category) => (
+                                        <SelectItem key={category.id} value={category.id}>
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="flex items-center space-x-2">

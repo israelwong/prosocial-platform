@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { ServicesPageClient } from './components';
 
@@ -15,12 +15,20 @@ export default function ServicesPage() {
                         Administra los servicios disponibles para configurar límites en los planes
                     </p>
                 </div>
-                <Button asChild>
-                    <Link href="/admin/services/new">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Nuevo Servicio
-                    </Link>
-                </Button>
+                <div className="flex items-center space-x-2">
+                    <Button variant="outline" asChild>
+                        <Link href="/admin/services/categorias">
+                            <Settings className="mr-2 h-4 w-4" />
+                            Categorías
+                        </Link>
+                    </Button>
+                    <Button asChild>
+                        <Link href="/admin/services/new">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Nuevo Servicio
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
             {/* Client Components */}

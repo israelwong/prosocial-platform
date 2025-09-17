@@ -7,9 +7,12 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        
+
         const service = await prisma.platform_services.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                category: true
+            }
         });
 
         if (!service) {
@@ -36,9 +39,56 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { name, slug, description, posicion, active } = body;
+        const { name, slug, description, categoryId, posicion, active } = body;
 
         console.log('Updating service:', { id, body });
+
+        // Si se está cambiando la categoría, verificar que existe
+        if (categoryId !== undefined && categoryId !== null) {
+            const category = await prisma.service_categories.findUnique({
+                where: { id: categoryId }
+            });
+
+            if (!category) {
+                return NextResponse.json(
+                    { error: 'La categoría especificada no existe' },
+                    { status: 400 }
+                );
+            }
+        }
+
+        // Si se está cambiando la posición, necesitamos reordenar otros servicios en la misma categoría
+        if (posicion !== undefined) {
+            const currentService = await prisma.platform_services.findUnique({
+                where: { id },
+                select: { categoryId: true, posicion: true }
+            });
+
+            if (currentService) {
+                const targetCategoryId = categoryId !== undefined ? categoryId : currentService.categoryId;
+
+                // Obtener todos los servicios en la misma categoría
+                const servicesInCategory = await prisma.platform_services.findMany({
+                    where: targetCategoryId ? { categoryId: targetCategoryId } : { categoryId: null },
+                    orderBy: { posicion: 'asc' }
+                });
+
+                // Reordenar posiciones
+                const servicesToUpdate = servicesInCategory.filter(s => s.id !== id);
+                servicesToUpdate.splice(posicion - 1, 0, { id, posicion: posicion } as any);
+
+                // Actualizar posiciones de todos los servicios afectados
+                for (let i = 0; i < servicesToUpdate.length; i++) {
+                    const serviceToUpdate = servicesToUpdate[i];
+                    if (serviceToUpdate.id !== id) {
+                        await prisma.platform_services.update({
+                            where: { id: serviceToUpdate.id },
+                            data: { posicion: i + 1 }
+                        });
+                    }
+                }
+            }
+        }
 
         const service = await prisma.platform_services.update({
             where: { id },
@@ -46,9 +96,13 @@ export async function PUT(
                 ...(name && { name }),
                 ...(slug && { slug }),
                 ...(description !== undefined && { description }),
+                ...(categoryId !== undefined && { categoryId }),
                 ...(posicion !== undefined && { posicion }),
                 ...(active !== undefined && { active }),
                 updatedAt: new Date()
+            },
+            include: {
+                category: true
             }
         });
 
@@ -81,7 +135,7 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        
+
         await prisma.platform_services.delete({
             where: { id }
         });

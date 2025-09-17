@@ -18,6 +18,8 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 ### 🛠️ **02-implementation/** - Guías de Implementación
 
 - **KANBAN_IMPLEMENTATION_GUIDE.md** - Guía completa del Kanban
+- **NESTED_DRAG_DROP_GUIDE.md** - Guía de implementación de drag & drop anidado
+- **SIMPLE_DRAG_DROP_GUIDE.md** - Guía de implementación de drag & drop simple
 - **IMPLEMENTATION_STATUS.md** - Estado actual de implementación
 - **LIMPIEZA_COMPLETADA.md** - Resumen de limpieza de código
 - **SUPABASE_TROUBLESHOOTING.md** - Guía de solución de problemas de Supabase
@@ -59,8 +61,10 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 
 1. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
 2. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
-3. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
-4. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
+3. **[Drag & Drop Anidado](./02-implementation/NESTED_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento anidado
+4. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
+5. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
+6. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
 
 ### 🔧 **Para Troubleshooting**
 
