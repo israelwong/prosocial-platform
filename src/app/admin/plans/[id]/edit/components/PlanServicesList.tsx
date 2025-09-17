@@ -306,14 +306,14 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                 </div>
             </CardHeader>
             <CardContent className="p-0">
-                {sortedCategories.map((categoryData) => (
-                    <div key={categoryData.name} className="border-b border-zinc-800 last:border-b-0">
+                {sortedCategories.map((categoryData, categoryIndex) => (
+                    <div key={categoryData.name} className={`${categoryIndex > 0 ? 'mt-6' : ''}`}>
                         {/* Header de categoría */}
-                        <div className="px-4 py-3 bg-zinc-800/30 border-b border-zinc-700">
+                        <div className="px-4 py-4 bg-zinc-800/40 border-b border-zinc-700">
                             <div className="flex items-center space-x-3">
-                                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                <h3 className="font-medium text-white">{categoryData.name}</h3>
-                                <Badge variant="outline" className="text-xs">
+                                <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-sm"></div>
+                                <h3 className="font-semibold text-white text-base">{categoryData.name}</h3>
+                                <Badge variant="outline" className="text-xs bg-zinc-700/50 border-zinc-600">
                                     {categoryData.services.length} servicios
                                 </Badge>
                             </div>
@@ -335,7 +335,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                     >
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="flex items-center space-x-4 flex-1">
-                                                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                                                <div className="w-2 h-2 rounded-full bg-zinc-500"></div>
                                                 <div className="flex-1">
                                                     <div className="flex items-center space-x-2 mb-1">
                                                         <h3 className="font-medium text-white">{service.name}</h3>
