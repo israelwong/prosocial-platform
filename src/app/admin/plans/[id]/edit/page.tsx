@@ -567,14 +567,14 @@ export default function EditPlanPage() {
                         <CardTitle>Límites del Plan</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                                <Button
-                                    type="button"
-                                    onClick={() => setShowSimpleLimitsModal(true)}
-                                    variant="outline"
-                                >
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Gestionar Límites
-                                </Button>
+                        <Button
+                            type="button"
+                            onClick={() => setShowSimpleLimitsModal(true)}
+                            variant="outline"
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Gestionar Límites
+                        </Button>
 
                         <div className="space-y-2">
                             {Object.keys(limits).length === 0 ? (

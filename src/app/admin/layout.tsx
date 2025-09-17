@@ -6,15 +6,6 @@ import { Sidebar } from './components/Sidebar';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [expandedMenus, setExpandedMenus] = useState<string[]>(['Gestión', 'Configuración']); // Gestión y Configuración expandidos por defecto
-
-    const toggleMenu = (menuName: string) => {
-        setExpandedMenus(prev =>
-            prev.includes(menuName)
-                ? prev.filter(name => name !== menuName)
-                : [...prev, menuName]
-        );
-    };
 
     return (
         <div className="min-h-screen flex flex-col relative">
@@ -28,8 +19,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Sidebar
                     isOpen={sidebarOpen}
                     onClose={() => setSidebarOpen(false)}
-                    expandedMenus={expandedMenus}
-                    onToggleMenu={toggleMenu}
                 />
 
                 {/* Main content */}
