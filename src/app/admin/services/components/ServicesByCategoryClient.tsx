@@ -74,7 +74,7 @@ export function ServicesByCategoryClient() {
 
     const fetchData = async (retryCount = 0) => {
         const maxRetries = 3;
-        
+
         try {
             setIsLoading(true);
 
@@ -98,8 +98,8 @@ export function ServicesByCategoryClient() {
                     }
                 } catch (parseError) {
                     console.error('Error parsing categories response:', parseError);
-                    categoriesError = { 
-                        error: `HTTP ${categoriesResponse.status}: ${categoriesResponse.statusText}` 
+                    categoriesError = {
+                        error: `HTTP ${categoriesResponse.status}: ${categoriesResponse.statusText}`
                     };
                 }
                 console.error('Error loading categories:', {
@@ -107,13 +107,13 @@ export function ServicesByCategoryClient() {
                     statusText: categoriesResponse.statusText,
                     error: categoriesError
                 });
-                
+
                 if (retryCount < maxRetries && (categoriesError.error.includes('P1001') || categoriesError.error.includes('Can\'t reach database'))) {
                     // Reintentar para errores de conectividad
                     const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
                     console.log(`Reintentando categorías en ${delay}ms (intento ${retryCount + 1}/${maxRetries})`);
                     toast.error(`Error de conexión. Reintentando... (${retryCount + 1}/${maxRetries})`);
-                    
+
                     setTimeout(() => {
                         fetchData(retryCount + 1);
                     }, delay);
@@ -136,8 +136,8 @@ export function ServicesByCategoryClient() {
                     }
                 } catch (parseError) {
                     console.error('Error parsing services response:', parseError);
-                    servicesError = { 
-                        error: `HTTP ${servicesResponse.status}: ${servicesResponse.statusText}` 
+                    servicesError = {
+                        error: `HTTP ${servicesResponse.status}: ${servicesResponse.statusText}`
                     };
                 }
                 console.error('Error loading services:', {
@@ -145,13 +145,13 @@ export function ServicesByCategoryClient() {
                     statusText: servicesResponse.statusText,
                     error: servicesError
                 });
-                
+
                 if (retryCount < maxRetries && (servicesError.error.includes('P1001') || servicesError.error.includes('Can\'t reach database'))) {
                     // Reintentar para errores de conectividad
                     const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
                     console.log(`Reintentando servicios en ${delay}ms (intento ${retryCount + 1}/${maxRetries})`);
                     toast.error(`Error de conexión. Reintentando... (${retryCount + 1}/${maxRetries})`);
-                    
+
                     setTimeout(() => {
                         fetchData(retryCount + 1);
                     }, delay);
@@ -178,7 +178,7 @@ export function ServicesByCategoryClient() {
 
         } catch (error) {
             console.error('Error fetching data:', error);
-            
+
             // Mostrar mensaje específico según el tipo de error
             if (error instanceof Error) {
                 if (error.message.includes('P1001') || error.message.includes('Can\'t reach database')) {
@@ -187,7 +187,7 @@ export function ServicesByCategoryClient() {
                         const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
                         console.log(`Reintentando en ${delay}ms (intento ${retryCount + 1}/${maxRetries})`);
                         toast.error(`Error de conexión. Reintentando... (${retryCount + 1}/${maxRetries})`);
-                        
+
                         setTimeout(() => {
                             fetchData(retryCount + 1);
                         }, delay);

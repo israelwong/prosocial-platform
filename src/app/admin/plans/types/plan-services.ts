@@ -38,6 +38,15 @@ export interface ServiceWithPlanConfig {
   description: string | null;
   posicion: number;
   active: boolean;
+  categoryId?: string | null;
+  category?: {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    posicion: number;
+    active: boolean;
+  } | null;
   planService?: PlanService | null;
 }
 

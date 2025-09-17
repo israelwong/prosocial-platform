@@ -268,6 +268,32 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         );
     }
 
+    // Agrupar servicios por categoría
+    const servicesByCategory = services.reduce((acc, service) => {
+        const categoryName = service.category?.name || 'Sin categoría';
+        if (!acc[categoryName]) {
+            acc[categoryName] = {
+                category: service.category,
+                services: []
+            };
+        }
+        acc[categoryName].services.push(service);
+        return acc;
+    }, {} as Record<string, { category: ServiceWithPlanConfig['category']; services: ServiceWithPlanConfig[] }>);
+
+    // Ordenar categorías por posición y servicios dentro de cada categoría
+    const sortedCategories = Object.entries(servicesByCategory)
+        .sort(([, a], [, b]) => {
+            const aPos = a.category?.posicion || 999;
+            const bPos = b.category?.posicion || 999;
+            return aPos - bPos;
+        })
+        .map(([categoryName, data]) => ({
+            name: categoryName,
+            ...data,
+            services: data.services.sort((a, b) => a.posicion - b.posicion)
+        }));
+
     return (
         <Card className="border border-border bg-card shadow-sm">
             <CardHeader className="border-b border-zinc-800">
@@ -280,108 +306,124 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                 </div>
             </CardHeader>
             <CardContent className="p-0">
-                <div className="divide-y divide-zinc-800">
-                    {services.map((service) => {
-                        const isActive = service.planService?.active ?? false;
-                        const isSaving = saving === service.id;
-
-                        return (
-                            <div
-                                key={service.id}
-                                className={`p-4 hover:bg-zinc-800/50 transition-colors ${isActive
-                                    ? 'border-l-4 border-l-green-500'
-                                    : ''
-                                    }`}
-                            >
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="flex items-center space-x-4 flex-1">
-                                        <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center space-x-2 mb-1">
-                                                <h3 className="font-medium text-white">{service.name}</h3>
-                                                <Badge variant="outline" className="text-xs">
-                                                    {service.slug}
-                                                </Badge>
-                                                <Badge
-                                                    variant="outline"
-                                                    className={`text-xs ${isActive
-                                                        ? 'border-green-500 text-green-400'
-                                                        : 'border-red-500 text-red-400'
-                                                        }`}
-                                                >
-                                                    {isActive ? "Activo" : "Inactivo"}
-                                                </Badge>
-                                            </div>
-                                            {service.description && (
-                                                <p className="text-sm text-zinc-400">
-                                                    {service.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <Switch
-                                            checked={isActive}
-                                            onCheckedChange={(checked) => handleToggleActive(service.id, checked)}
-                                            disabled={isSaving}
-                                        />
-                                        {isSaving && <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />}
-                                    </div>
-                                </div>
-
-                                {isActive && (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                        <div>
-                                            <Label htmlFor={`limite-${service.id}`} className="text-sm text-zinc-400">Límite</Label>
-                                            <Input
-                                                id={`limite-${service.id}`}
-                                                type="number"
-                                                placeholder="Dejar vacío para ilimitado"
-                                                value={service.planService?.limite ?? ''}
-                                                onChange={(e) => handleLimiteChange(service.id, e.target.value)}
-                                                disabled={isSaving}
-                                                className="bg-zinc-900 border-zinc-700 text-white"
-                                            />
-                                            <p className="text-xs text-zinc-500 mt-1">
-                                                Dejar vacío = ilimitado, 0 = sin acceso
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <Label htmlFor={`unidad-${service.id}`} className="text-sm text-zinc-400">Unidad de Medida</Label>
-                                            <Select
-                                                value={service.planService?.unidad ?? ''}
-                                                onValueChange={(value) => handleUnidadChange(service.id, value as UnidadMedida || null)}
-                                                disabled={isSaving}
-                                            >
-                                                <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
-                                                    <SelectValue placeholder="Seleccionar unidad" />
-                                                </SelectTrigger>
-                                                <SelectContent className="bg-zinc-900 border-zinc-700">
-                                                    {Object.entries(UNIDAD_MEDIDA_LABELS).map(([value, label]) => (
-                                                        <SelectItem key={value} value={value} className="text-white hover:bg-zinc-800">
-                                                            {label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {isActive && service.planService && (
-                                    <div className="mt-3 p-2 bg-zinc-900 border border-zinc-700 rounded">
-                                        <div className="flex items-center gap-2 text-sm">
-                                            <span className="text-zinc-400">Configuración actual:</span>
-                                            <Badge variant="secondary" className="bg-zinc-800 text-zinc-200">
-                                                {formatLimite(service.planService.limite, service.planService.unidad)}
-                                            </Badge>
-                                        </div>
-                                    </div>
-                                )}
+                {sortedCategories.map((categoryData) => (
+                    <div key={categoryData.name} className="border-b border-zinc-800 last:border-b-0">
+                        {/* Header de categoría */}
+                        <div className="px-4 py-3 bg-zinc-800/30 border-b border-zinc-700">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                <h3 className="font-medium text-white">{categoryData.name}</h3>
+                                <Badge variant="outline" className="text-xs">
+                                    {categoryData.services.length} servicios
+                                </Badge>
                             </div>
-                        );
-                    })}
-                </div>
+                        </div>
+
+                        {/* Servicios de la categoría */}
+                        <div className="divide-y divide-zinc-800">
+                            {categoryData.services.map((service) => {
+                                const isActive = service.planService?.active ?? false;
+                                const isSaving = saving === service.id;
+
+                                return (
+                                    <div
+                                        key={service.id}
+                                        className={`p-4 hover:bg-zinc-800/50 transition-colors ${isActive
+                                            ? 'border-l-4 border-l-green-500'
+                                            : ''
+                                            }`}
+                                    >
+                                        <div className="flex items-start justify-between mb-3">
+                                            <div className="flex items-center space-x-4 flex-1">
+                                                <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center space-x-2 mb-1">
+                                                        <h3 className="font-medium text-white">{service.name}</h3>
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {service.slug}
+                                                        </Badge>
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={`text-xs ${isActive
+                                                                ? 'border-green-500 text-green-400'
+                                                                : 'border-red-500 text-red-400'
+                                                                }`}
+                                                        >
+                                                            {isActive ? "Activo" : "Inactivo"}
+                                                        </Badge>
+                                                    </div>
+                                                    {service.description && (
+                                                        <p className="text-sm text-zinc-400">
+                                                            {service.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Switch
+                                                    checked={isActive}
+                                                    onCheckedChange={(checked) => handleToggleActive(service.id, checked)}
+                                                    disabled={isSaving}
+                                                />
+                                                {isSaving && <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />}
+                                            </div>
+                                        </div>
+
+                                        {isActive && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                                <div>
+                                                    <Label htmlFor={`limite-${service.id}`} className="text-sm text-zinc-400">Límite</Label>
+                                                    <Input
+                                                        id={`limite-${service.id}`}
+                                                        type="number"
+                                                        placeholder="Dejar vacío para ilimitado"
+                                                        value={service.planService?.limite ?? ''}
+                                                        onChange={(e) => handleLimiteChange(service.id, e.target.value)}
+                                                        disabled={isSaving}
+                                                        className="bg-zinc-900 border-zinc-700 text-white"
+                                                    />
+                                                    <p className="text-xs text-zinc-500 mt-1">
+                                                        Dejar vacío = ilimitado, 0 = sin acceso
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <Label htmlFor={`unidad-${service.id}`} className="text-sm text-zinc-400">Unidad de Medida</Label>
+                                                    <Select
+                                                        value={service.planService?.unidad ?? ''}
+                                                        onValueChange={(value) => handleUnidadChange(service.id, value as UnidadMedida || null)}
+                                                        disabled={isSaving}
+                                                    >
+                                                        <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
+                                                            <SelectValue placeholder="Seleccionar unidad" />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="bg-zinc-900 border-zinc-700">
+                                                            {Object.entries(UNIDAD_MEDIDA_LABELS).map(([value, label]) => (
+                                                                <SelectItem key={value} value={value} className="text-white hover:bg-zinc-800">
+                                                                    {label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {isActive && service.planService && (
+                                            <div className="mt-3 p-2 bg-zinc-900 border border-zinc-700 rounded">
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="text-zinc-400">Configuración actual:</span>
+                                                    <Badge variant="secondary" className="bg-zinc-800 text-zinc-200">
+                                                        {formatLimite(service.planService.limite, service.planService.unidad)}
+                                                    </Badge>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
             </CardContent>
         </Card>
     );
