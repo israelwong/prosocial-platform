@@ -203,7 +203,7 @@ export async function reorderPipelineStages(stageIds: string[]) {
                 try {
                     return await prisma.platform_pipeline_stages.update({
                         where: { id },
-                        data: { 
+                        data: {
                             orden,
                             updatedAt: new Date()
                         }
@@ -227,7 +227,7 @@ export async function reorderPipelineStages(stageIds: string[]) {
         for (let i = 0; i < stageIds.length; i++) {
             const id = stageIds[i];
             const orden = i + 1;
-            
+
             try {
                 const result = await updateStageWithRetry(id, orden);
                 results.push({ status: 'fulfilled', value: result });
@@ -242,14 +242,14 @@ export async function reorderPipelineStages(stageIds: string[]) {
             // Si todas fallaron por P1001, es un problema de conectividad general
             const allP1001 = failedUpdates.every(failed => {
                 const reason = failed.reason as unknown as { code?: string; message?: string };
-                return reason?.code === 'P1001' || 
-                       reason?.message?.includes('Can\'t reach database server');
+                return reason?.code === 'P1001' ||
+                    reason?.message?.includes('Can\'t reach database server');
             });
-            
+
             if (allP1001) {
                 throw new Error('Error de conectividad con la base de datos. Verifica tu conexión a internet e intenta nuevamente.');
             }
-            
+
             throw new Error(`Error al actualizar el orden de ${failedUpdates.length} etapas`);
         }
 

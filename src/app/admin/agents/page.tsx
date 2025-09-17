@@ -5,21 +5,25 @@ import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { AgentsPageClient } from './components';
 import { Agent } from './types';
+import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
 async function getAgents(): Promise<Agent[]> {
     try {
         // Consulta optimizada con include para obtener el conteo de leads en una sola query
-        const agents = await prisma.platform_agents.findMany({
-            include: {
-                _count: {
-                    select: {
-                        platform_leads: true
+        // Usar withRetry para manejar errores P1001 de conectividad
+        const agents = await withRetry(async () => {
+            return await prisma.platform_agents.findMany({
+                include: {
+                    _count: {
+                        select: {
+                            platform_leads: true
+                        }
                     }
+                },
+                orderBy: {
+                    createdAt: 'desc'
                 }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
+            });
         });
 
         // Convertir Decimal a number para el frontend
@@ -29,23 +33,7 @@ async function getAgents(): Promise<Agent[]> {
         }));
     } catch (error) {
         console.error('Error fetching agents:', error);
-
-        // Proporcionar información más específica del error
-        let errorMessage = 'Error de conexión a la base de datos';
-
-        if (error instanceof Error) {
-            if (error.message.includes('permission denied')) {
-                errorMessage = 'Permisos insuficientes para acceder a los datos. Verifica las políticas RLS de Supabase.';
-            } else if (error.message.includes('Tenant or user not found')) {
-                errorMessage = 'Credenciales de base de datos incorrectas. Verifica la configuración de Supabase.';
-            } else if (error.message.includes('timeout')) {
-                errorMessage = 'Tiempo de espera agotado. La base de datos podría estar sobrecargada.';
-            } else {
-                errorMessage = `Error de base de datos: ${error.message}`;
-            }
-        }
-
-        throw new Error(errorMessage);
+        throw new Error(getFriendlyErrorMessage(error));
     }
 }
 
@@ -92,10 +80,10 @@ export default async function AgentsPage() {
                             <div className="text-red-300 text-sm space-y-1">
                                 <p><strong>Posibles soluciones:</strong></p>
                                 <ul className="list-disc list-inside ml-4 space-y-1">
-                                    <li>Verifica que las variables de entorno estén configuradas correctamente</li>
+                                    <li>Verifica tu conexión a internet</li>
                                     <li>Confirma que el proyecto de Supabase esté activo</li>
-                                    <li>Revisa las políticas RLS en la tabla prosocial_agents</li>
-                                    <li>Intenta recargar la página</li>
+                                    <li>Espera unos segundos y recarga la página</li>
+                                    <li>Si el problema persiste, contacta al administrador</li>
                                 </ul>
                             </div>
                             <Link

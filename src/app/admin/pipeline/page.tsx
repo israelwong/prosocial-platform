@@ -1,6 +1,7 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
 import { PipelinePageClient } from './components/PipelinePageClient';
+import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
 interface PipelineStage {
     id: string;
@@ -15,17 +16,20 @@ interface PipelineStage {
 // Función para obtener las etapas del pipeline desde la base de datos
 async function getPipelineStages(): Promise<PipelineStage[]> {
     try {
-        const stages = await prisma.platform_pipeline_stages.findMany({
-            include: {
-                _count: {
-                    select: {
-                        platform_leads: true
+        // Usar withRetry para manejar errores P1001 de conectividad
+        const stages = await withRetry(async () => {
+            return await prisma.platform_pipeline_stages.findMany({
+                include: {
+                    _count: {
+                        select: {
+                            platform_leads: true
+                        }
                     }
+                },
+                orderBy: {
+                    orden: 'asc'
                 }
-            },
-            orderBy: {
-                orden: 'asc'
-            }
+            });
         });
 
         return stages.map(stage => ({
@@ -39,22 +43,7 @@ async function getPipelineStages(): Promise<PipelineStage[]> {
         }));
     } catch (error) {
         console.error('Error fetching pipeline stages:', error);
-
-        let errorMessage = 'Error de conexión a la base de datos';
-
-        if (error instanceof Error) {
-            if (error.message.includes('permission denied')) {
-                errorMessage = 'Permisos insuficientes para acceder a los datos del pipeline.';
-            } else if (error.message.includes('Tenant or user not found')) {
-                errorMessage = 'Credenciales de base de datos incorrectas.';
-            } else if (error.message.includes('timeout')) {
-                errorMessage = 'Tiempo de espera agotado al cargar el pipeline.';
-            } else {
-                errorMessage = `Error de base de datos: ${error.message}`;
-            }
-        }
-
-        throw new Error(errorMessage);
+        throw new Error(getFriendlyErrorMessage(error));
     }
 }
 
@@ -94,10 +83,10 @@ export default async function PipelinePage() {
                             <div className="text-red-300 text-sm space-y-1">
                                 <p><strong>Posibles soluciones:</strong></p>
                                 <ul className="list-disc list-inside ml-4 space-y-1">
-                                    <li>Verifica que las variables de entorno estén configuradas correctamente</li>
-                                    <li>Confirma que el modelo prosocial_pipeline_stages existe en la base de datos</li>
-                                    <li>Revisa las políticas RLS en la tabla prosocial_pipeline_stages</li>
-                                    <li>Intenta recargar la página</li>
+                                    <li>Verifica tu conexión a internet</li>
+                                    <li>Confirma que el proyecto de Supabase esté activo</li>
+                                    <li>Espera unos segundos y recarga la página</li>
+                                    <li>Si el problema persiste, contacta al administrador</li>
                                 </ul>
                             </div>
                         </div>
