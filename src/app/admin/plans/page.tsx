@@ -13,7 +13,7 @@ async function getPlans(): Promise<Plan[]> {
             include: {
                 _count: {
                     select: {
-                        studios: true,
+                        projects: true,
                         subscriptions: true
                     }
                 }

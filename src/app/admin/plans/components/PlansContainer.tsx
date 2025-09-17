@@ -99,8 +99,8 @@ export function PlansContainer({
                     bValue = b.price_monthly || 0;
                     break;
                 case 'studios':
-                    aValue = a._count?.studios || 0;
-                    bValue = b._count?.studios || 0;
+                    aValue = a._count?.projects || 0;
+                    bValue = b._count?.projects || 0;
                     break;
                 case 'orden':
                 default:

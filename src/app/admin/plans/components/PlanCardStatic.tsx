@@ -111,7 +111,7 @@ export function PlanCardStatic({
                 <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                     <div className="flex items-center">
                         <Building2 className="h-4 w-4 mr-2 text-zinc-500" />
-                        {plan._count.studios} Estudios
+                        {plan._count.projects} Estudios
                     </div>
                     <div className="flex items-center">
                         <Users className="h-4 w-4 mr-2 text-zinc-500" />

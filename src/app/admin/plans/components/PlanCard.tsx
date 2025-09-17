@@ -152,7 +152,7 @@ export function PlanCard({
                             <Building2 className="w-4 h-4 mr-1" />
                         </div>
                         <div className="text-2xl font-bold">
-                            {plan._count?.studios || 0}
+                            {plan._count?.projects || 0}
                         </div>
                         <div className="text-xs text-muted-foreground">Estudios</div>
                     </div>
@@ -237,9 +237,9 @@ export function PlanCard({
                             size="sm"
                             onClick={() => onDelete(plan.id)}
                             className="text-destructive hover:text-destructive"
-                            disabled={!!plan._count && (plan._count.studios > 0 || plan._count.subscriptions > 0)}
+                            disabled={!!plan._count && (plan._count.projects > 0 || plan._count.subscriptions > 0)}
                             title={
-                                plan._count && (plan._count.studios > 0 || plan._count.subscriptions > 0)
+                                plan._count && (plan._count.projects > 0 || plan._count.subscriptions > 0)
                                     ? 'No se puede eliminar un plan con estudios o suscripciones activas'
                                     : 'Eliminar plan'
                             }

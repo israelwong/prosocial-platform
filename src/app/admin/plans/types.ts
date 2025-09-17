@@ -15,7 +15,7 @@ export interface Plan {
     createdAt: Date;
     updatedAt: Date;
     _count?: {
-        studios: number;
+        projects: number;
         subscriptions: number;
     };
 }

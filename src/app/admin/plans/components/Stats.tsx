@@ -21,12 +21,12 @@ export function Stats({ plans }: StatsProps) {
     const totalPlans = plans.length;
     const activePlans = plans.filter(plan => plan.active).length;
     const popularPlans = plans.filter(plan => plan.popular).length;
-    const totalStudios = plans.reduce((acc, plan) => acc + (plan._count?.studios || 0), 0);
+    const totalStudios = plans.reduce((acc, plan) => acc + (plan._count?.projects || 0), 0);
     const totalSubscriptions = plans.reduce((acc, plan) => acc + (plan._count?.subscriptions || 0), 0);
 
     // Calcular ingresos estimados mensuales
     const estimatedMonthlyRevenue = plans.reduce((acc, plan) => {
-        const studiosCount = plan._count?.studios || 0;
+        const studiosCount = plan._count?.projects || 0;
         const monthlyPrice = plan.price_monthly || 0;
         return acc + (studiosCount * monthlyPrice);
     }, 0);
