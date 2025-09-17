@@ -78,6 +78,7 @@ export default function EditPlanPage() {
     const [isLoadingData, setIsLoadingData] = useState(isEdit);
     const [features, setFeatures] = useState<string[]>([]);
     const [newFeature, setNewFeature] = useState('');
+    const [planServices, setPlanServices] = useState<any[]>([]);
     const [showMigrationModal, setShowMigrationModal] = useState(false);
     const [showSimpleLimitsModal, setShowSimpleLimitsModal] = useState(false);
     const [limits, setLimits] = useState<Record<string, unknown>>({});
@@ -242,7 +243,34 @@ export default function EditPlanPage() {
                 throw new Error(error.error || 'Error al guardar el plan');
             }
 
-            await response.json();
+            const savedPlan = await response.json();
+
+            // Si es creación y hay servicios configurados, guardarlos
+            if (!isEdit && planServices.length > 0) {
+                const activeServices = planServices.filter(service => service.planService?.active);
+                
+                if (activeServices.length > 0) {
+                    try {
+                        for (const service of activeServices) {
+                            await fetch(`/api/plans/${savedPlan.id}/services`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    service_id: service.id,
+                                    active: service.planService.active,
+                                    limite: service.planService.limite,
+                                    unidad: service.planService.unidad
+                                }),
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error saving plan services:', error);
+                        toast.error('Plan creado pero hubo un error al guardar la configuración de servicios');
+                    }
+                }
+            }
 
             toast.success(
                 isEdit
@@ -397,6 +425,10 @@ export default function EditPlanPage() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleServicesChange = (services: any[]) => {
+        setPlanServices(services);
     };
 
     if (isLoadingData) {
@@ -571,7 +603,11 @@ export default function EditPlanPage() {
                 </Card>
 
                 {/* Límites del Plan */}
-                <PlanServicesList planId={planId} isEdit={isEdit} />
+                <PlanServicesList 
+                    planId={planId} 
+                    isEdit={isEdit} 
+                    onServicesChange={handleServicesChange}
+                />
 
                 {/* Integración Stripe */}
                 <Card>
