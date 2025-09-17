@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import Link from 'next/link';
 import { ServicesByCategoryClient } from './components/ServicesByCategoryClient';
 
@@ -20,12 +20,6 @@ export default function ServicesPage() {
                         <Link href="/admin/services/categorias">
                             <Settings className="mr-2 h-4 w-4" />
                             Categorías
-                        </Link>
-                    </Button>
-                    <Button asChild>
-                        <Link href="/admin/services/new">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Nuevo Servicio
                         </Link>
                     </Button>
                 </div>

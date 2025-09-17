@@ -460,7 +460,13 @@ export function ServicesByCategoryClient() {
             {/* Filtros */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Filtros y Búsqueda</CardTitle>
+                    <div className="flex items-center justify-between">
+                        <CardTitle>Filtros y Búsqueda</CardTitle>
+                        <Button onClick={handleCreate}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Nuevo Servicio
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="relative">
