@@ -186,19 +186,14 @@ export async function togglePipelineStageStatus(id: string) {
 
 export async function reorderPipelineStages(stageIds: string[]) {
     try {
-        console.log('🔄 Reordenando etapas:', stageIds);
-
         // Verificar que las etapas existan antes de actualizar
         const existingStages = await prisma.platform_pipeline_stages.findMany({
             where: { id: { in: stageIds } },
             select: { id: true, nombre: true }
         });
 
-        console.log('📋 Etapas existentes:', existingStages);
-
         if (existingStages.length !== stageIds.length) {
             const missingIds = stageIds.filter(id => !existingStages.find(stage => stage.id === id));
-            console.error('❌ Etapas no encontradas:', missingIds);
             throw new Error(`No se encontraron ${missingIds.length} etapas: ${missingIds.join(', ')}`);
         }
 
@@ -206,10 +201,9 @@ export async function reorderPipelineStages(stageIds: string[]) {
         const updateStageWithRetry = async (id: string, orden: number, maxRetries = 5) => {
             for (let attempt = 1; attempt <= maxRetries; attempt++) {
                 try {
-                    console.log(`🔄 Actualizando etapa ${id} (orden: ${orden}) - Intento ${attempt}/${maxRetries}`);
                     return await prisma.platform_pipeline_stages.update({
                         where: { id },
-                        data: {
+                        data: { 
                             orden,
                             updatedAt: new Date()
                         }
@@ -219,7 +213,6 @@ export async function reorderPipelineStages(stageIds: string[]) {
                     const prismaError = error as { code?: string; message?: string };
                     if (prismaError.code === 'P1001' && attempt < maxRetries) {
                         const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Backoff exponencial, máximo 5s
-                        console.warn(`⚠️ Error P1001 en intento ${attempt} para etapa ${id}, reintentando en ${delay}ms...`);
                         await new Promise(resolve => setTimeout(resolve, delay));
                         continue;
                     }
@@ -236,11 +229,9 @@ export async function reorderPipelineStages(stageIds: string[]) {
             const orden = i + 1;
             
             try {
-                console.log(`🔄 Actualizando etapa ${id} (orden: ${orden}) - Secuencial ${i + 1}/${stageIds.length}`);
                 const result = await updateStageWithRetry(id, orden);
                 results.push({ status: 'fulfilled', value: result });
             } catch (error) {
-                console.error(`❌ Error actualizando etapa ${id}:`, error);
                 results.push({ status: 'rejected', reason: error });
             }
         }
@@ -248,26 +239,19 @@ export async function reorderPipelineStages(stageIds: string[]) {
         // Verificar si alguna actualización falló
         const failedUpdates = results.filter(result => result.status === 'rejected');
         if (failedUpdates.length > 0) {
-            console.error('❌ Algunas actualizaciones de orden fallaron después de reintentos:', failedUpdates);
-            // Log detallado de errores
-            failedUpdates.forEach((failed, index) => {
-                console.error(`  ${index + 1}. ID: ${stageIds[index]}, Error:`, failed.reason);
-            });
-
             // Si todas fallaron por P1001, es un problema de conectividad general
-            const allP1001 = failedUpdates.every(failed =>
-                failed.reason?.code === 'P1001' ||
-                failed.reason?.message?.includes('Can\'t reach database server')
-            );
-
+            const allP1001 = failedUpdates.every(failed => {
+                const reason = failed.reason as unknown as { code?: string; message?: string };
+                return reason?.code === 'P1001' || 
+                       reason?.message?.includes('Can\'t reach database server');
+            });
+            
             if (allP1001) {
                 throw new Error('Error de conectividad con la base de datos. Verifica tu conexión a internet e intenta nuevamente.');
             }
-
+            
             throw new Error(`Error al actualizar el orden de ${failedUpdates.length} etapas`);
         }
-
-        console.log('✅ Reordenamiento completado exitosamente');
 
         revalidatePath('/admin/pipeline');
         return { success: true };
