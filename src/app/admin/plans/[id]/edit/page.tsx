@@ -19,6 +19,7 @@ import { PlanMigrationModal } from './components/PlanMigrationModal';
 import { SimpleLimitsModal } from './components/SimpleLimitsModal';
 import { PlanServicesList } from './components/PlanServicesList';
 import { Plan as PlanType } from '../../types';
+import { ServiceWithPlanConfig } from '../../types/plan-services';
 
 // Interfaz para límites del plan
 interface PlanLimit {
@@ -78,7 +79,7 @@ export default function EditPlanPage() {
     const [isLoadingData, setIsLoadingData] = useState(isEdit);
     const [features, setFeatures] = useState<string[]>([]);
     const [newFeature, setNewFeature] = useState('');
-    const [planServices, setPlanServices] = useState<any[]>([]);
+    const [planServices, setPlanServices] = useState<ServiceWithPlanConfig[]>([]);
     const [showMigrationModal, setShowMigrationModal] = useState(false);
     const [showSimpleLimitsModal, setShowSimpleLimitsModal] = useState(false);
     const [limits, setLimits] = useState<Record<string, unknown>>({});
@@ -248,7 +249,7 @@ export default function EditPlanPage() {
             // Si es creación y hay servicios configurados, guardarlos
             if (!isEdit && planServices.length > 0) {
                 const activeServices = planServices.filter(service => service.planService?.active);
-                
+
                 if (activeServices.length > 0) {
                     try {
                         for (const service of activeServices) {
@@ -259,9 +260,9 @@ export default function EditPlanPage() {
                                 },
                                 body: JSON.stringify({
                                     service_id: service.id,
-                                    active: service.planService.active,
-                                    limite: service.planService.limite,
-                                    unidad: service.planService.unidad
+                                    active: service.planService?.active || false,
+                                    limite: service.planService?.limite || null,
+                                    unidad: service.planService?.unidad || null
                                 }),
                             });
                         }
@@ -427,7 +428,7 @@ export default function EditPlanPage() {
         }
     };
 
-    const handleServicesChange = (services: any[]) => {
+    const handleServicesChange = (services: ServiceWithPlanConfig[]) => {
         setPlanServices(services);
     };
 
@@ -603,9 +604,9 @@ export default function EditPlanPage() {
                 </Card>
 
                 {/* Límites del Plan */}
-                <PlanServicesList 
-                    planId={planId} 
-                    isEdit={isEdit} 
+                <PlanServicesList
+                    planId={planId}
+                    isEdit={isEdit}
                     onServicesChange={handleServicesChange}
                 />
 
