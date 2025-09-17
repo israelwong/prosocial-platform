@@ -981,7 +981,7 @@ model subscriptions {
   updated_at             DateTime
   billing_cycles         platform_billing_cycles[]
   plans                  platform_plans   @relation(fields: [plan_id], references: [id])
-  studios                projects         @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  projects               projects         @relation(fields: [studio_id], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([stripe_subscription_id])
