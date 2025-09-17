@@ -189,9 +189,9 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
             <Card className="border border-border bg-card shadow-sm">
                 <CardHeader className="border-b border-zinc-800">
                     <CardTitle className="text-lg font-semibold text-white">Etapas del Pipeline</CardTitle>
-                    <p className="text-sm text-zinc-400">
-                        Cargando etapas...
-                    </p>
+                <div className="text-sm text-zinc-400">
+                    Cargando etapas...
+                </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     <div className="divide-y divide-zinc-800">
@@ -253,7 +253,7 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
         <Card className="border border-border bg-card shadow-sm">
             <CardHeader className="border-b border-zinc-800">
                 <CardTitle className="text-lg font-semibold text-white">Etapas del Pipeline</CardTitle>
-                <p className="text-sm text-zinc-400">
+                <div className="text-sm text-zinc-400">
                     {isReordering ? (
                         <span className="flex items-center space-x-2">
                             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500"></div>
@@ -262,7 +262,7 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
                     ) : (
                         "Arrastra para reordenar las etapas del pipeline"
                     )}
-                </p>
+                </div>
             </CardHeader>
             <CardContent className="p-0">
                 <DndContext
