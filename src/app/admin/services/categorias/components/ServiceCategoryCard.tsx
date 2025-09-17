@@ -51,18 +51,13 @@ export function ServiceCategoryCard({
             className="flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors"
         >
             <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                    <div
-                        {...attributes}
-                        {...listeners}
-                        className="cursor-grab active:cursor-grabbing"
-                        title="Arrastrar para reordenar"
-                    >
-                        <GripVertical className="h-4 w-4 text-zinc-500" />
-                    </div>
-                    <span className="text-sm font-medium text-zinc-400 w-6">
-                        {category.posicion}
-                    </span>
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="cursor-grab active:cursor-grabbing"
+                    title="Arrastrar para reordenar"
+                >
+                    <GripVertical className="h-4 w-4 text-zinc-500" />
                 </div>
 
                 <div
@@ -92,9 +87,6 @@ export function ServiceCategoryCard({
 
             <div className="flex items-center space-x-2">
                 <div className="text-right mr-4">
-                    <p className="text-sm font-medium text-white">
-                        Posición {category.posicion}
-                    </p>
                     <p className="text-xs text-zinc-400">
                         Creado: {new Date(category.createdAt).toLocaleDateString()}
                     </p>

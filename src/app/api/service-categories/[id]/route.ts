@@ -75,6 +75,24 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
             message: error instanceof Error ? error.message : 'Unknown error',
             stack: error instanceof Error ? error.stack : undefined
         });
+
+        // Manejar errores específicos de Prisma
+        if (error instanceof Error) {
+            if (error.message.includes('P1001') || error.message.includes('Can\'t reach database')) {
+                return NextResponse.json(
+                    { error: 'Error de conexión a la base de datos. Intenta nuevamente.' },
+                    { status: 503 }
+                );
+            }
+            
+            if (error.message.includes('Unique constraint')) {
+                return NextResponse.json(
+                    { error: 'Ya existe una categoría con ese nombre' },
+                    { status: 409 }
+                );
+            }
+        }
+
         return NextResponse.json({ error: 'Error al actualizar categoría de servicio' }, { status: 500 });
     }
 }
