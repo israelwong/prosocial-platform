@@ -21,7 +21,7 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
         // Renderizar el template de React a HTML
         let emailHtml;
         try {
-            emailHtml = render(
+            emailHtml = await render(
                 AgentCredentialsEmail({
                     agentName: data.agentName,
                     email: data.email,
