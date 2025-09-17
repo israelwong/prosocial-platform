@@ -21,6 +21,7 @@ export async function createPipelineStage(formData: FormData) {
 
         const stage = await prisma.platform_pipeline_stages.create({
             data: {
+                id: createId(),
                 nombre,
                 descripcion: descripcion || null,
                 color: color || '#3B82F6',
