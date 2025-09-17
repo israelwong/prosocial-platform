@@ -70,9 +70,11 @@ export function ServicesByCategoryClient() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const fetchData = async () => {
+    const fetchData = async (retryCount = 0) => {
+        const maxRetries = 3;
+        
         try {
             setIsLoading(true);
 
@@ -82,8 +84,17 @@ export function ServicesByCategoryClient() {
                 fetch('/api/services')
             ]);
 
-            if (!categoriesResponse.ok || !servicesResponse.ok) {
-                throw new Error('Error al cargar datos');
+            // Verificar respuestas individualmente para mejor diagnóstico
+            if (!categoriesResponse.ok) {
+                const categoriesError = await categoriesResponse.json().catch(() => ({ error: 'Error desconocido' }));
+                console.error('Error loading categories:', categoriesError);
+                throw new Error(`Error al cargar categorías: ${categoriesError.error || 'Error desconocido'}`);
+            }
+
+            if (!servicesResponse.ok) {
+                const servicesError = await servicesResponse.json().catch(() => ({ error: 'Error desconocido' }));
+                console.error('Error loading services:', servicesError);
+                throw new Error(`Error al cargar servicios: ${servicesError.error || 'Error desconocido'}`);
             }
 
             const [categoriesData, servicesData] = await Promise.all([
@@ -95,7 +106,33 @@ export function ServicesByCategoryClient() {
             setServices(servicesData);
         } catch (error) {
             console.error('Error fetching data:', error);
-            toast.error('Error al cargar datos');
+            
+            // Mostrar mensaje específico según el tipo de error
+            if (error instanceof Error) {
+                if (error.message.includes('P1001') || error.message.includes('Can\'t reach database')) {
+                    if (retryCount < maxRetries) {
+                        // Reintentar automáticamente para errores de conectividad
+                        const delay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+                        console.log(`Reintentando en ${delay}ms (intento ${retryCount + 1}/${maxRetries})`);
+                        toast.error(`Error de conexión. Reintentando... (${retryCount + 1}/${maxRetries})`);
+                        
+                        setTimeout(() => {
+                            fetchData(retryCount + 1);
+                        }, delay);
+                        return;
+                    } else {
+                        toast.error('Error de conexión a la base de datos. Intenta recargar la página.');
+                    }
+                } else if (error.message.includes('categorías')) {
+                    toast.error('Error al cargar categorías de servicios');
+                } else if (error.message.includes('servicios')) {
+                    toast.error('Error al cargar servicios');
+                } else {
+                    toast.error(error.message);
+                }
+            } else {
+                toast.error('Error inesperado al cargar datos');
+            }
         } finally {
             setIsLoading(false);
         }
