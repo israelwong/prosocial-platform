@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Plus, Eye, Users, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
-import { CanalFormModal, CanalesList, CanalModal } from './components';
+import { CanalesList, CanalModal } from './components';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
@@ -244,39 +246,102 @@ export default function CanalesPage() {
         setIsEditModalOpen(false);
     };
 
+    const handleCreateCanal = () => {
+        setEditingCanal(null);
+        setIsEditModalOpen(true);
+    };
+
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-white">Canales de Adquisición</h1>
-                    <p className="text-zinc-400">Gestiona los canales de adquisición de leads</p>
+                    <h1 className="text-2xl font-bold text-white">Gestión de Canales</h1>
+                    <p className="text-zinc-400 mt-1 text-sm">
+                        Configura los canales de adquisición de leads
+                    </p>
                 </div>
-                <CanalFormModal
-                    onCanalSubmit={handleCanalSubmit}
-                    editingCanal={editingCanal}
-                    onEdit={handleEdit}
-                    onCancel={handleCancel}
-                />
+                <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={handleCreateCanal}
+                >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nuevo Canal
+                </Button>
             </div>
 
-            <Card className="bg-card border-border">
-                <CardHeader>
-                    <CardTitle className="text-white">Lista de Canales</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Organiza y gestiona todos los canales de adquisición
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <CanalesList
-                        canales={canales}
-                        loading={loading}
-                        isReordering={isReordering}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        onToggleActive={handleToggleActive}
-                        onToggleVisible={handleToggleVisible}
-                        onReorder={handleReorder}
-                    />
+            {/* Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-3">
+                <Card className="border border-border bg-card shadow-sm">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-medium text-zinc-400">Total Canales</p>
+                                <p className="text-xl font-bold text-white">{canales.length}</p>
+                            </div>
+                            <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                                <BarChart3 className="h-4 w-4 text-white" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border border-border bg-card shadow-sm">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-medium text-zinc-400">Canales Activos</p>
+                                <p className="text-xl font-bold text-white">
+                                    {canales.filter(canal => canal.isActive).length}
+                                </p>
+                            </div>
+                            <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                                <Eye className="h-4 w-4 text-white" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border border-border bg-card shadow-sm">
+                    <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-xs font-medium text-zinc-400">Visibles para Clientes</p>
+                                <p className="text-xl font-bold text-white">
+                                    {canales.filter(canal => canal.isVisible).length}
+                                </p>
+                            </div>
+                            <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                                <Users className="h-4 w-4 text-white" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Canales List */}
+            <CanalesList
+                canales={canales}
+                loading={loading}
+                isReordering={isReordering}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onToggleActive={handleToggleActive}
+                onToggleVisible={handleToggleVisible}
+                onReorder={handleReorder}
+            />
+
+            {/* Instructions */}
+            <Card className="border border-border bg-card shadow-sm">
+                <CardContent className="p-4">
+                    <h3 className="font-medium text-white mb-2">Instrucciones</h3>
+                    <ul className="text-sm text-zinc-400 space-y-1">
+                        <li>• Arrastra los canales para reordenar la lista</li>
+                        <li>• Los canales activos se muestran en el formulario de leads</li>
+                        <li>• Los canales visibles aparecen para los clientes</li>
+                        <li>• Los canales inactivos no aparecen en el flujo de trabajo</li>
+                        <li>• El orden determina la prioridad en la selección</li>
+                    </ul>
                 </CardContent>
             </Card>
 
