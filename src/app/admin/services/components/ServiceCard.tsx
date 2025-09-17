@@ -48,68 +48,86 @@ export function ServiceCard({
         <div
             ref={setNodeRef}
             style={style}
-            className="border rounded-lg p-4 hover:bg-muted/50 transition-colors bg-zinc-900 border-zinc-800"
+            className="flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors"
         >
-            <div className="flex items-start justify-between mb-3">
-                <div className="flex items-start gap-3 flex-1">
+            <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
                     <div
                         {...attributes}
                         {...listeners}
-                        className="cursor-grab active:cursor-grabbing p-1 hover:bg-zinc-800 rounded"
+                        className="cursor-grab active:cursor-grabbing"
                         title="Arrastrar para reordenar"
                     >
                         <GripVertical className="h-4 w-4 text-zinc-500" />
                     </div>
-                    <div className="flex-1">
-                        <h3 className="font-semibold mb-1">{service.name}</h3>
-                        <p className="text-sm text-muted-foreground font-mono mb-2">
-                            {service.slug}
-                        </p>
+                    <span className="text-sm font-medium text-zinc-400 w-6">
+                        {service.posicion}
+                    </span>
+                </div>
+
+                <div 
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: service.active ? '#10B981' : '#EF4444' }}
+                ></div>
+
+                <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                        <h3 className="font-medium text-white">{service.name}</h3>
+                        <Badge 
+                            variant="outline" 
+                            className={`text-xs ${service.active 
+                                ? 'border-green-500 text-green-400' 
+                                : 'border-red-500 text-red-400'
+                            }`}
+                        >
+                            {service.active ? "Activo" : "Inactivo"}
+                        </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-zinc-400">
+                        <span className="font-mono">{service.slug}</span>
                         {service.description && (
-                            <p className="text-sm text-muted-foreground">
-                                {service.description}
-                            </p>
+                            <span>{service.description}</span>
                         )}
                     </div>
                 </div>
-                <Badge variant={service.active ? "default" : "secondary"}>
-                    {service.active ? "Activo" : "Inactivo"}
-                </Badge>
             </div>
 
-            <div className="flex items-center justify-between">
-                <div className="text-xs text-muted-foreground">
-                    Creado: {new Date(service.createdAt).toLocaleDateString()}
+            <div className="flex items-center space-x-2">
+                <div className="text-right mr-4">
+                    <p className="text-sm font-medium text-white">
+                        Posición {service.posicion}
+                    </p>
+                    <p className="text-xs text-zinc-400">
+                        Creado: {new Date(service.createdAt).toLocaleDateString()}
+                    </p>
                 </div>
-                <div className="flex gap-1">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onToggleActive(service)}
-                        title={service.active ? "Desactivar" : "Activar"}
-                    >
-                        {service.active ? (
-                            <Eye className="h-4 w-4" />
-                        ) : (
-                            <EyeOff className="h-4 w-4" />
-                        )}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(service)}
-                    >
-                        <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onDelete(service.id)}
-                        className="text-red-500 hover:text-red-700"
-                    >
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
-                </div>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onToggleActive(service)}
+                    title={service.active ? "Desactivar" : "Activar"}
+                >
+                    {service.active ? (
+                        <Eye className="h-4 w-4" />
+                    ) : (
+                        <EyeOff className="h-4 w-4" />
+                    )}
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(service)}
+                >
+                    <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(service.id)}
+                    className="text-red-400 hover:text-red-300"
+                >
+                    <Trash2 className="h-4 w-4" />
+                </Button>
             </div>
         </div>
     );

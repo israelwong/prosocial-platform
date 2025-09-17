@@ -127,12 +127,12 @@ export function AgentCard({ agent, onDelete }: AgentCardProps) {
                 <div className="flex-1">
                     <div className="flex items-center space-x-2">
                         <h3 className="font-medium text-white">{agent.nombre}</h3>
-                        <Badge 
-                            variant="outline" 
-                            className={`text-xs ${agent.activo 
-                                ? 'border-green-500 text-green-400' 
+                        <Badge
+                            variant="outline"
+                            className={`text-xs ${agent.activo
+                                ? 'border-green-500 text-green-400'
                                 : 'border-red-500 text-red-400'
-                            }`}
+                                }`}
                         >
                             {agent.activo ? "Activo" : "Inactivo"}
                         </Badge>

@@ -230,12 +230,32 @@ export function ServicesPageClient() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p className="text-muted-foreground">Cargando servicios...</p>
-                </div>
-            </div>
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
+                    <CardTitle className="text-lg font-semibold text-white">Servicios de la Plataforma</CardTitle>
+                    <div className="text-sm text-zinc-400">
+                        Cargando servicios...
+                    </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <div className="divide-y divide-zinc-800">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="flex items-center justify-between p-4 animate-pulse">
+                                <div className="flex items-center space-x-4">
+                                    <div className="h-4 w-4 bg-zinc-700 rounded"></div>
+                                    <div className="h-4 w-6 bg-zinc-700 rounded"></div>
+                                    <div className="h-4 w-4 bg-zinc-700 rounded-full"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-32"></div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <div className="h-6 w-16 bg-zinc-700 rounded"></div>
+                                    <div className="h-6 w-16 bg-zinc-700 rounded"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
         );
     }
 
@@ -260,24 +280,34 @@ export function ServicesPageClient() {
             </Card>
 
             {/* Lista de Servicios */}
-            <Card>
-                <CardHeader>
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
                     <div className="flex items-center justify-between">
-                        <CardTitle>Servicios de la Plataforma</CardTitle>
+                        <CardTitle className="text-lg font-semibold text-white">Servicios de la Plataforma</CardTitle>
                         <Button onClick={handleCreate}>
                             <Plus className="h-4 w-4 mr-2" />
                             Nuevo Servicio
                         </Button>
                     </div>
+                    <div className="text-sm text-zinc-400">
+                        {isReordering ? (
+                            <span className="flex items-center space-x-2">
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-500"></div>
+                                <span>Actualizando posición...</span>
+                            </span>
+                        ) : (
+                            "Arrastra para reordenar los servicios de la plataforma"
+                        )}
+                    </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
                     {filteredServices.length === 0 ? (
                         <div className="text-center py-12">
-                            <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                            <p className="text-lg font-medium mb-2">
+                            <Settings className="h-12 w-12 text-zinc-400 mx-auto mb-4" />
+                            <p className="text-lg font-medium mb-2 text-white">
                                 {searchTerm ? 'No se encontraron servicios' : 'No hay servicios creados'}
                             </p>
-                            <p className="text-muted-foreground mb-4">
+                            <p className="text-zinc-400 mb-4">
                                 {searchTerm
                                     ? 'Intenta con otros términos de búsqueda'
                                     : 'Crea tu primer servicio para comenzar'
@@ -300,15 +330,7 @@ export function ServicesPageClient() {
                                 items={filteredServices.map(service => service.id)}
                                 strategy={verticalListSortingStrategy}
                             >
-                                <div className={`space-y-4 ${isReordering ? 'pointer-events-none opacity-50' : ''}`}>
-                                    {isReordering && (
-                                        <div className="text-center py-2">
-                                            <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                                                Actualizando orden...
-                                            </div>
-                                        </div>
-                                    )}
+                                <div className={`divide-y divide-zinc-800 ${isReordering ? 'pointer-events-none opacity-50' : ''}`}>
                                     {filteredServices.map((service) => (
                                         <ServiceCard
                                             key={service.id}
