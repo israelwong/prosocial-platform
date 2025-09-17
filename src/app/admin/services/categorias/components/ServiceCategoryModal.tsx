@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { ServiceCategory, CreateServiceCategoryData, UpdateServiceCategoryData } from '../types';
+import { ServiceCategory, CreateServiceCategoryData } from '../types';
 
 interface ServiceCategoryModalProps {
     isOpen: boolean;
@@ -50,15 +50,17 @@ export function ServiceCategoryModal({
                 active: category.active
             });
         } else {
+            // Para nuevas categorías, calcular posición automáticamente
+            const nextPosition = existingCategories.length + 1;
             setFormData({
                 name: '',
                 description: '',
                 icon: '',
-                posicion: 0,
+                posicion: nextPosition,
                 active: true
             });
         }
-    }, [category]);
+    }, [category, existingCategories.length]);
 
     const handleInputChange = (field: string, value: string | number | boolean) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -165,18 +167,10 @@ export function ServiceCategoryModal({
                         </p>
                     </div>
 
-                    <div>
-                        <Label htmlFor="posicion">Posición</Label>
-                        <Input
-                            id="posicion"
-                            type="number"
-                            value={formData.posicion}
-                            onChange={(e) => handleInputChange('posicion', parseInt(e.target.value) || 0)}
-                            placeholder="0"
-                            disabled={isLoading}
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                            Orden de aparición (0 = al final)
+                    {/* Información sobre ordenamiento */}
+                    <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-md">
+                        <p className="text-xs text-blue-800 dark:text-blue-200">
+                            <strong>Ordenamiento:</strong> {category ? 'El orden se mantiene igual' : 'La nueva categoría se colocará al final. Puedes reordenar arrastrando las categorías en la lista principal.'}
                         </p>
                     </div>
                 </div>
