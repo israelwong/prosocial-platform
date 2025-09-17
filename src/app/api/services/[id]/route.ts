@@ -38,6 +38,8 @@ export async function PUT(
         const body = await request.json();
         const { name, slug, description, posicion, active } = body;
 
+        console.log('Updating service:', { id, body });
+
         const service = await prisma.platform_services.update({
             where: { id },
             data: {
@@ -50,10 +52,15 @@ export async function PUT(
             }
         });
 
+        console.log('Service updated successfully:', service.id);
         return NextResponse.json(service);
     } catch (error) {
         console.error('Error updating service:', error);
-        
+        console.error('Error details:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
+        });
+
         if (error instanceof Error && error.message.includes('Unique constraint')) {
             return NextResponse.json(
                 { error: 'Ya existe un servicio con ese nombre o slug' },

@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { 
-    Search, 
-    Edit, 
-    Trash2, 
+import {
+    Search,
+    Edit,
+    Trash2,
     Plus,
     Settings,
     Eye,
@@ -39,11 +39,11 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 // Componente de tarjeta arrastrable
-function SortableServiceCard({ 
-    service, 
-    onEdit, 
-    onDelete, 
-    onToggleActive 
+function SortableServiceCard({
+    service,
+    onEdit,
+    onDelete,
+    onToggleActive
 }: {
     service: Service;
     onEdit: (service: Service) => void;
@@ -223,7 +223,7 @@ export function ServicesPageClient() {
             }
 
             const updatedService = await response.json();
-            setServices(prev => 
+            setServices(prev =>
                 prev.map(s => s.id === service.id ? updatedService : s)
             );
             toast.success(`Servicio ${updatedService.active ? 'activado' : 'desactivado'} exitosamente`);
@@ -236,7 +236,7 @@ export function ServicesPageClient() {
     const handleModalSave = (savedService: Service) => {
         if (editingService) {
             // Actualizar servicio existente
-            setServices(prev => 
+            setServices(prev =>
                 prev.map(s => s.id === savedService.id ? savedService : s)
             );
             toast.success('Servicio actualizado exitosamente');
@@ -252,6 +252,8 @@ export function ServicesPageClient() {
     // Función para actualizar la posición de un servicio
     const updateServicePosition = useCallback(async (serviceId: string, newPosition: number) => {
         try {
+            console.log(`Updating service ${serviceId} to position ${newPosition}`);
+            
             const response = await fetch(`/api/services/${serviceId}`, {
                 method: 'PUT',
                 headers: {
@@ -262,11 +264,18 @@ export function ServicesPageClient() {
                 }),
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response ok:', response.ok);
+
             if (!response.ok) {
-                throw new Error('Error al actualizar posición del servicio');
+                const errorData = await response.json();
+                console.error('API Error:', errorData);
+                throw new Error(errorData.error || 'Error al actualizar posición del servicio');
             }
 
-            return await response.json();
+            const result = await response.json();
+            console.log('Service position updated successfully:', result);
+            return result;
         } catch (error) {
             console.error('Error updating service position:', error);
             throw error;
@@ -311,7 +320,7 @@ export function ServicesPageClient() {
         } catch (error) {
             console.error('Error reordering services:', error);
             toast.error('Error al actualizar el orden de los servicios');
-            
+
             // Revertir cambios locales si falla
             setServices(services);
         } finally {
@@ -375,7 +384,7 @@ export function ServicesPageClient() {
                                 {searchTerm ? 'No se encontraron servicios' : 'No hay servicios creados'}
                             </p>
                             <p className="text-muted-foreground mb-4">
-                                {searchTerm 
+                                {searchTerm
                                     ? 'Intenta con otros términos de búsqueda'
                                     : 'Crea tu primer servicio para comenzar'
                                 }
