@@ -19,6 +19,8 @@ interface EmailLayoutProps {
         nombre: string;
         logotipo: string;
         isotipo: string;
+        sitio_web?: string;
+        soporte_email?: string;
     };
 }
 
@@ -56,11 +58,11 @@ export function EmailLayout({ children, title, previewText, platformData }: Emai
                             © 2024 {platformData?.nombre || 'ProSocial Platform'}. Todos los derechos reservados.
                         </Text>
                         <Text style={footerText}>
-                            <Link href="https://prosocialmx.com" style={footerLink}>
+                            <Link href={platformData?.sitio_web || "https://prosocialmx.com"} style={footerLink}>
                                 Sitio Web
                             </Link>
                             {' • '}
-                            <Link href="mailto:soporte@prosocialmx.com" style={footerLink}>
+                            <Link href={`mailto:${platformData?.soporte_email || "soporte@prosocialmx.com"}`} style={footerLink}>
                                 Soporte
                             </Link>
                         </Text>

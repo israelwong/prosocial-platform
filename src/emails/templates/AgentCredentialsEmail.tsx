@@ -16,6 +16,8 @@ interface AgentCredentialsEmailProps {
         nombre: string;
         logotipo: string;
         isotipo: string;
+        sitio_web?: string;
+        soporte_email?: string;
     };
 }
 

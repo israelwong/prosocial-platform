@@ -27,6 +27,8 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
             nombre: platformConfig?.nombre_empresa || 'ProSocial Platform',
             logotipo: platformConfig?.logo_url || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg',
             isotipo: platformConfig?.favicon_url || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg',
+            sitio_web: platformConfig?.sitio_web || 'https://prosocialmx.com',
+            soporte_email: platformConfig?.soporte_email || 'soporte@prosocialmx.com',
         };
 
         // Renderizar el template de React a HTML
@@ -79,7 +81,7 @@ export async function sendAgentCredentialsEmail(data: AgentCredentialsData) {
 /**
  * Genera HTML simple como fallback
  */
-function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string, platformData: { nombre: string; logotipo: string; isotipo: string }): string {
+function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string, platformData: { nombre: string; logotipo: string; isotipo: string; sitio_web?: string; soporte_email?: string }): string {
     const welcomeText = data.isNewAgent
         ? `¡Bienvenido a ${platformData.nombre}!`
         : 'Credenciales Actualizadas';
@@ -141,8 +143,8 @@ function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string, platfo
     <hr style="border: none; border-top: 1px solid #e6ebf1; margin: 20px 0;">
     <p style="text-align: center; color: #8898aa; font-size: 12px;">
         © 2024 ${platformData.nombre}. Todos los derechos reservados.<br>
-        <a href="https://prosocialmx.com" style="color: #556cd6;">Sitio Web</a> • 
-        <a href="mailto:soporte@prosocialmx.com" style="color: #556cd6;">Soporte</a>
+        <a href="${platformData.sitio_web || 'https://prosocialmx.com'}" style="color: #556cd6;">Sitio Web</a> • 
+        <a href="mailto:${platformData.soporte_email || 'soporte@prosocialmx.com'}" style="color: #556cd6;">Soporte</a>
     </p>
 </body>
 </html>`.trim();
@@ -151,7 +153,7 @@ function generateSimpleHtml(data: AgentCredentialsData, loginUrl: string, platfo
 /**
  * Genera versión en texto plano del email
  */
-function generatePlainTextVersion(data: AgentCredentialsData, loginUrl: string, platformData: { nombre: string; logotipo: string; isotipo: string }): string {
+function generatePlainTextVersion(data: AgentCredentialsData, loginUrl: string, platformData: { nombre: string; logotipo: string; isotipo: string; sitio_web?: string; soporte_email?: string }): string {
     const welcomeText = data.isNewAgent
         ? `¡Bienvenido a ${platformData.nombre}!`
         : 'Credenciales Actualizadas';
@@ -184,8 +186,8 @@ Saludos,
 Equipo ${platformData.nombre}
 
 © 2024 ${platformData.nombre}. Todos los derechos reservados.
-Sitio Web: https://prosocialmx.com
-Soporte: soporte@prosocialmx.com
+Sitio Web: ${platformData.sitio_web || 'https://prosocialmx.com'}
+Soporte: ${platformData.soporte_email || 'soporte@prosocialmx.com'}
 `.trim();
 }
 
