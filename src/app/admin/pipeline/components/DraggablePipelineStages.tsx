@@ -130,11 +130,17 @@ function SortableStageItem({ stage, index, onEdit, canMoveUp, canMoveDown }: Sor
 
 export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineStagesProps) {
     const [localStages, setLocalStages] = useState(stages);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     // Sincronizar el estado local cuando cambien las props
     useEffect(() => {
         setLocalStages(stages);
     }, [stages]);
+
+    // Evitar problemas de hidratación con @dnd-kit
+    useEffect(() => {
+        setIsHydrated(true);
+    }, []);
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -163,6 +169,72 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
             }
         }
     };
+
+    // Evitar problemas de hidratación renderizando solo en el cliente
+    if (!isHydrated) {
+        return (
+            <Card className="border border-border bg-card shadow-sm">
+                <CardHeader className="border-b border-zinc-800">
+                    <CardTitle className="text-lg font-semibold text-white">Etapas del Pipeline</CardTitle>
+                    <p className="text-sm text-zinc-400">
+                        Cargando etapas...
+                    </p>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <div className="divide-y divide-zinc-800">
+                        {localStages.map((stage, index) => (
+                            <div
+                                key={stage.id}
+                                className="flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors"
+                            >
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex items-center space-x-2">
+                                        <div className="cursor-grab active:cursor-grabbing">
+                                            <GripVertical className="h-4 w-4 text-zinc-500" />
+                                        </div>
+                                        <span className="text-sm font-medium text-zinc-400 w-6">
+                                            {stage.order}
+                                        </span>
+                                    </div>
+                                    <div
+                                        className="w-4 h-4 rounded-full"
+                                        style={{ backgroundColor: stage.color }}
+                                    ></div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center space-x-2">
+                                            <h3 className="font-medium text-white">{stage.name}</h3>
+                                            {!stage.isActive && (
+                                                <Badge variant="secondary" className="text-xs">
+                                                    Inactivo
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        {stage.description && (
+                                            <p className="text-sm text-zinc-400 mt-1">
+                                                {stage.description}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Badge variant="outline" className="text-xs">
+                                        {stage.leadCount} leads
+                                    </Badge>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => onEdit(stage)}
+                                    >
+                                        <Eye className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
 
     return (
         <Card className="border border-border bg-card shadow-sm">
