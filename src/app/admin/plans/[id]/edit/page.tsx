@@ -13,7 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Save, Loader2, Plus, X } from 'lucide-react';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { PlanMigrationModal } from './components/PlanMigrationModal';
 import { SimpleLimitsModal } from './components/SimpleLimitsModal';
@@ -61,7 +61,6 @@ const planSchema = z.object({
     active: z.boolean(),
     stripe_price_id: z.string().optional(),
     stripe_product_id: z.string().optional(),
-    features: z.array(z.string()).optional(),
     limits: z.record(z.string(), z.unknown()).optional(),
     orden: z.number().int().min(0, 'El orden debe ser un número entero mayor o igual a 0').optional()
 });
@@ -77,8 +76,6 @@ export default function EditPlanPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingData, setIsLoadingData] = useState(isEdit);
-    const [features, setFeatures] = useState<string[]>([]);
-    const [newFeature, setNewFeature] = useState('');
     const [planServices, setPlanServices] = useState<ServiceWithPlanConfig[]>([]);
     const [showMigrationModal, setShowMigrationModal] = useState(false);
     const [showSimpleLimitsModal, setShowSimpleLimitsModal] = useState(false);
@@ -104,7 +101,6 @@ export default function EditPlanPage() {
             active: true,
             stripe_price_id: '',
             stripe_product_id: '',
-            features: [],
             limits: {},
             orden: undefined
         }
@@ -154,12 +150,10 @@ export default function EditPlanPage() {
                 active: plan.active,
                 stripe_price_id: plan.stripe_price_id || '',
                 stripe_product_id: plan.stripe_product_id || '',
-                features: Array.isArray(plan.features) ? plan.features : [],
                 limits: plan.limits || {},
                 orden: plan.orden
             });
 
-            setFeatures(Array.isArray(plan.features) ? plan.features : []);
             setLimits(plan.limits || {});
 
             // Verificar valores después del reset
@@ -185,24 +179,6 @@ export default function EditPlanPage() {
         }
     }, [isEdit, fetchPlan]);
 
-    // Agregar característica
-    const addFeature = () => {
-        if (newFeature.trim()) {
-            const currentFeatures = Array.isArray(features) ? features : [];
-            const updatedFeatures = [...currentFeatures, newFeature.trim()];
-            setFeatures(updatedFeatures);
-            setValue('features', updatedFeatures);
-            setNewFeature('');
-        }
-    };
-
-    // Eliminar característica
-    const removeFeature = (index: number) => {
-        const currentFeatures = Array.isArray(features) ? features : [];
-        const updatedFeatures = currentFeatures.filter((_, i) => i !== index);
-        setFeatures(updatedFeatures);
-        setValue('features', updatedFeatures);
-    };
 
     // Manejar guardado de límites desde el modal
     const handleLimitsSave = (newLimits: Record<string, PlanLimit>) => {
@@ -221,7 +197,6 @@ export default function EditPlanPage() {
                 ...data,
                 price_monthly: data.price_monthly ? parseFloat(data.price_monthly) : undefined,
                 price_yearly: data.price_yearly ? parseFloat(data.price_yearly) : undefined,
-                features: features,
                 limits: limits
             };
 
@@ -566,42 +541,6 @@ export default function EditPlanPage() {
                     </CardContent>
                 </Card>
 
-                {/* Características */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Características del Plan</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="flex gap-2">
-                            <Input
-                                value={newFeature}
-                                onChange={(e) => setNewFeature(e.target.value)}
-                                placeholder="Agregar característica..."
-                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
-                            />
-                            <Button type="button" onClick={addFeature} variant="outline">
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                        </div>
-
-                        <div className="space-y-2">
-                            {Array.isArray(features) && features.map((feature, index) => (
-                                <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                                    <span className="text-sm">{feature}</span>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => removeFeature(index)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
 
                 {/* Límites del Plan */}
                 <PlanServicesList
@@ -654,7 +593,7 @@ export default function EditPlanPage() {
                                 <div className="text-sm text-blue-200">
                                     <p className="font-medium mb-1">Sincronización Automática</p>
                                     <p className="text-blue-300/80">
-                                        Los precios se sincronizan automáticamente con Stripe. 
+                                        Los precios se sincronizan automáticamente con Stripe.
                                         Al cambiar precios, se crea un nuevo precio en Stripe manteniendo compatibilidad.
                                     </p>
                                 </div>
