@@ -160,17 +160,6 @@ export function DeletePlanModal({
                         </div>
                     </div>
 
-                    {/* Campo de confirmación */}
-                    <div className="p-4 bg-red-900/10 border border-red-700/20 rounded-lg">
-                        <div className="text-sm text-red-200">
-                            <p className="font-medium mb-2">
-                                Para confirmar la eliminación, escribe el nombre del plan:
-                            </p>
-                            <div className="bg-zinc-900 border border-red-700/30 rounded p-2 text-red-300 font-mono text-xs">
-                                {plan.name}
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <DialogFooter>

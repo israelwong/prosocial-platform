@@ -316,11 +316,11 @@ export function PlansContainer({
             }
 
             toast.success('Plan duplicado exitosamente');
-            
+
             // Cerrar modal y limpiar estado
             setShowDuplicateModal(false);
             setPlanToDuplicate(null);
-            
+
             // Navegar a la página de edición del plan duplicado
             window.location.href = `/admin/plans/${newPlan.id}/edit`;
         } catch (error) {
