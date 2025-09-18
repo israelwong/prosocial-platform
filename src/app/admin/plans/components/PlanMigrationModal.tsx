@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,17 @@ interface MigrationInfo {
     subscriptions: Subscription[];
 }
 
+interface MigrationResult {
+    status: 'success' | 'error';
+    subscriptionId: string;
+    error?: string;
+}
+
+interface MigrationResponse {
+    results: MigrationResult[];
+    archivedOldPlan: boolean;
+}
+
 interface PlanMigrationModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -48,14 +59,7 @@ export function PlanMigrationModal({
     const [selectedNewPlanId, setSelectedNewPlanId] = useState<string>('');
     const [availablePlans, setAvailablePlans] = useState<Plan[]>([]);
 
-    useEffect(() => {
-        if (isOpen && planId) {
-            fetchMigrationInfo();
-            fetchAvailablePlans();
-        }
-    }, [isOpen, planId]);
-
-    const fetchMigrationInfo = async () => {
+    const fetchMigrationInfo = useCallback(async () => {
         try {
             setIsLoading(true);
             const response = await fetch(`/api/plans/${planId}/migrate-subscriptions`);
@@ -72,9 +76,9 @@ export function PlanMigrationModal({
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [planId]);
 
-    const fetchAvailablePlans = async () => {
+    const fetchAvailablePlans = useCallback(async () => {
         try {
             const response = await fetch('/api/plans');
             if (response.ok) {
@@ -88,7 +92,14 @@ export function PlanMigrationModal({
         } catch (error) {
             console.error('Error fetching plans:', error);
         }
-    };
+    }, [planId]);
+
+    useEffect(() => {
+        if (isOpen && planId) {
+            fetchMigrationInfo();
+            fetchAvailablePlans();
+        }
+    }, [isOpen, planId, fetchMigrationInfo, fetchAvailablePlans]);
 
     const handleMigration = async () => {
         if (!selectedNewPlanId) {
@@ -120,11 +131,11 @@ export function PlanMigrationModal({
                 throw new Error(error.error || 'Error al migrar suscripciones');
             }
 
-            const result = await response.json();
+            const result: MigrationResponse = await response.json();
 
             // Mostrar resultados
-            const successCount = result.results.filter((r: any) => r.status === 'success').length;
-            const errorCount = result.results.filter((r: any) => r.status === 'error').length;
+            const successCount = result.results.filter((r: MigrationResult) => r.status === 'success').length;
+            const errorCount = result.results.filter((r: MigrationResult) => r.status === 'error').length;
 
             toast.success(`Migración completada: ${successCount} exitosas, ${errorCount} con errores`);
 
