@@ -14,7 +14,8 @@ import {
     Users,
     DollarSign,
     Crown,
-    Check
+    Check,
+    Copy
 } from 'lucide-react';
 import { Plan } from '../types';
 
@@ -22,6 +23,7 @@ interface PlanCardStaticProps {
     plan: Plan;
     onEdit: (plan: Plan) => void;
     onDelete: (planId: string) => void;
+    onDuplicate: (plan: Plan) => void;
     onToggleActive: (planId: string) => void;
     onTogglePopular: (planId: string) => void;
 }
@@ -30,6 +32,7 @@ export function PlanCardStatic({
     plan,
     onEdit,
     onDelete,
+    onDuplicate,
     onToggleActive,
     onTogglePopular
 }: PlanCardStaticProps) {
@@ -93,14 +96,25 @@ export function PlanCardStatic({
                             size="sm"
                             onClick={() => onEdit(plan)}
                             className="text-zinc-400 hover:text-white"
+                            title="Editar plan"
                         >
                             <Edit className="h-4 w-4" />
                         </Button>
                         <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => onDuplicate(plan)}
+                            className="text-blue-400 hover:text-blue-500"
+                            title="Duplicar plan"
+                        >
+                            <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => onDelete(plan.id)}
                             className="text-red-400 hover:text-red-500"
+                            title="Eliminar plan"
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>

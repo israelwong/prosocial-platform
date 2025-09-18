@@ -10,6 +10,7 @@ interface PlanCardWrapperProps {
     plan: Plan;
     onEdit: (plan: Plan) => void;
     onDelete: (planId: string) => void;
+    onDuplicate: (plan: Plan) => void;
     onToggleActive: (planId: string) => void;
     onTogglePopular: (planId: string) => void;
 }

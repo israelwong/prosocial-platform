@@ -15,7 +15,8 @@ import {
     Building2,
     Users,
     Crown,
-    GripVertical
+    GripVertical,
+    Copy
 } from 'lucide-react';
 import { Plan } from '../types';
 import { useIsClient } from '@/hooks/useIsClient';
@@ -24,6 +25,7 @@ interface PlanCardProps {
     plan: Plan;
     onEdit: (plan: Plan) => void;
     onDelete: (planId: string) => void;
+    onDuplicate: (plan: Plan) => void;
     onToggleActive: (planId: string) => void;
     onTogglePopular: (planId: string) => void;
 }
@@ -32,6 +34,7 @@ export function PlanCard({
     plan,
     onEdit,
     onDelete,
+    onDuplicate,
     onToggleActive,
     onTogglePopular
 }: PlanCardProps) {
@@ -229,8 +232,18 @@ export function PlanCard({
                             variant="ghost"
                             size="sm"
                             onClick={() => onEdit(plan)}
+                            title="Editar plan"
                         >
                             <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onDuplicate(plan)}
+                            className="text-blue-400 hover:text-blue-500"
+                            title="Duplicar plan"
+                        >
+                            <Copy className="h-4 w-4" />
                         </Button>
                         <Button
                             variant="ghost"

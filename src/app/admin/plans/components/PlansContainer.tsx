@@ -212,6 +212,76 @@ export function PlansContainer({
         }
     };
 
+    const handleDuplicate = async (plan: Plan) => {
+        try {
+            // Crear el objeto del plan duplicado
+            const duplicatedPlan = {
+                name: `${plan.name} (Copia)`,
+                slug: `${plan.slug}-copia-${Date.now()}`, // Slug único
+                description: plan.description,
+                price_monthly: plan.price_monthly,
+                price_yearly: plan.price_yearly,
+                popular: false, // No duplicar el estado popular
+                active: true, // Activar el plan duplicado
+                orden: Math.max(...plans.map(p => p.orden || 0)) + 1, // Último orden + 1
+                // No incluir stripe_price_id ni stripe_product_id - se generarán automáticamente
+            };
+
+            const response = await fetch('/api/plans', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(duplicatedPlan),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Error al duplicar el plan');
+            }
+
+            const newPlan = await response.json();
+            
+            // Si el plan original tenía servicios configurados, duplicarlos
+            if (plan.id) {
+                try {
+                    const servicesResponse = await fetch(`/api/plans/${plan.id}/services`);
+                    if (servicesResponse.ok) {
+                        const services = await servicesResponse.json();
+                        const activeServices = services.filter((service: any) => service.planService?.active);
+                        
+                        // Configurar los mismos servicios en el plan duplicado
+                        for (const service of activeServices) {
+                            await fetch(`/api/plans/${newPlan.id}/services`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    service_id: service.id,
+                                    active: true,
+                                    limite: service.planService?.limite,
+                                    unidad: service.planService?.unidad
+                                }),
+                            });
+                        }
+                    }
+                } catch (servicesError) {
+                    console.warn('Error duplicando servicios del plan:', servicesError);
+                    // No fallar la duplicación si hay error con los servicios
+                }
+            }
+
+            toast.success('Plan duplicado exitosamente');
+            
+            // Recargar la página para mostrar el nuevo plan
+            window.location.reload();
+        } catch (error) {
+            console.error('Error duplicating plan:', error);
+            toast.error(error instanceof Error ? error.message : 'Error al duplicar el plan');
+        }
+    };
+
     const handleToggleActive = async (planId: string) => {
         const plan = plans.find(p => p.id === planId);
         if (!plan) return;
@@ -426,6 +496,7 @@ export function PlansContainer({
                                             plan={plan}
                                             onEdit={handleEdit}
                                             onDelete={handleDelete}
+                                            onDuplicate={handleDuplicate}
                                             onToggleActive={handleToggleActive}
                                             onTogglePopular={handleTogglePopular}
                                         />
