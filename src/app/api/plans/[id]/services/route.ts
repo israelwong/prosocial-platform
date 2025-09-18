@@ -23,8 +23,11 @@ export async function GET(
             );
         }
 
-        // Obtener todos los servicios ordenados por posición
+        // Obtener todos los servicios ordenados por posición con sus categorías
         const allServices = await prisma.platform_services.findMany({
+            include: {
+                category: true
+            },
             orderBy: [
                 { posicion: 'asc' },
                 { name: 'asc' }
