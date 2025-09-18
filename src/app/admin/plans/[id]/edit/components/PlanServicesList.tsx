@@ -280,6 +280,10 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         return acc;
     }, {} as Record<string, { category: ServiceWithPlanConfig['category']; services: ServiceWithPlanConfig[] }>);
 
+    // Debug: Log para verificar agrupaciones
+    console.log('Services grouped by category:', servicesByCategory);
+    console.log('Number of categories:', Object.keys(servicesByCategory).length);
+
     // Ordenar categorías por posición y servicios dentro de cada categoría
     const sortedCategories = Object.entries(servicesByCategory)
         .sort(([, a], [, b]) => {
