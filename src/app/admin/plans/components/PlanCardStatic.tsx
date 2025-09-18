@@ -38,7 +38,7 @@ export function PlanCardStatic({
         return `$${price.toLocaleString()}`;
     };
 
-    const formatFeatures = (features: any) => {
+    const formatFeatures = (features: string[] | Record<string, unknown> | null | undefined) => {
         if (!features) return [];
         if (Array.isArray(features)) {
             return features;
@@ -84,7 +84,7 @@ export function PlanCardStatic({
                 </div>
                 <div className="flex items-center justify-between mt-2">
                     <div className="text-2xl font-bold text-white">
-                        {formatPrice(plan.price_monthly)}
+                        {formatPrice(plan.price_monthly ?? null)}
                         <span className="text-sm text-muted-foreground">/mes</span>
                     </div>
                     <div className="flex space-x-2">
@@ -111,15 +111,15 @@ export function PlanCardStatic({
                 <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                     <div className="flex items-center">
                         <Building2 className="h-4 w-4 mr-2 text-zinc-500" />
-                        {plan._count.projects} Estudios
+                        {plan._count?.projects || 0} Estudios
                     </div>
                     <div className="flex items-center">
                         <Users className="h-4 w-4 mr-2 text-zinc-500" />
-                        {plan._count.subscriptions} Suscripciones
+                        {plan._count?.subscriptions || 0} Suscripciones
                     </div>
                     <div className="flex items-center">
                         <DollarSign className="h-4 w-4 mr-2 text-zinc-500" />
-                        Anual: {formatPrice(plan.price_yearly)}
+                        Anual: {formatPrice(plan.price_yearly ?? null)}
                     </div>
                     <div className="flex items-center">
                         <Star className="h-4 w-4 mr-2 text-zinc-500" />
