@@ -32,6 +32,7 @@ import { PlanCardWrapper } from './PlanCardWrapper';
 import { DuplicatePlanModal } from './DuplicatePlanModal';
 import { DeletePlanModal } from './DeletePlanModal';
 import { Plan } from '../types';
+import { ServiceWithPlanConfig } from '../types/plan-services';
 import { toast } from 'sonner';
 
 interface PlansContainerProps {
@@ -291,7 +292,7 @@ export function PlansContainer({
                     const servicesResponse = await fetch(`/api/plans/${planToDuplicate.id}/services`);
                     if (servicesResponse.ok) {
                         const services = await servicesResponse.json();
-                        const activeServices = services.filter((service: any) => service.planService?.active);
+                        const activeServices = services.filter((service: ServiceWithPlanConfig) => service.planService?.active);
                         
                         // Configurar los mismos servicios en el plan duplicado
                         for (const service of activeServices) {
