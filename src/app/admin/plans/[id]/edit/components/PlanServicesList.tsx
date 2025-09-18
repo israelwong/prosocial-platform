@@ -217,8 +217,8 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
 
     if (isLoading) {
         return (
-            <Card className="border border-border bg-card shadow-sm">
-                <CardHeader className="border-b border-zinc-800">
+            <Card className="border border-zinc-700 bg-zinc-900/50 shadow-lg">
+                <CardHeader className="border-b border-zinc-700 bg-zinc-800/30">
                     <CardTitle className="text-lg font-semibold text-white">Servicios del Plan</CardTitle>
                     <div className="text-sm text-zinc-400">
                         Cargando servicios...
@@ -249,8 +249,8 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
     // Si no hay servicios y no está cargando, mostrar mensaje apropiado
     if (services.length === 0 && !isLoading) {
         return (
-            <Card className="border border-border bg-card shadow-sm">
-                <CardHeader className="border-b border-zinc-800">
+            <Card className="border border-zinc-700 bg-zinc-900/50 shadow-lg">
+                <CardHeader className="border-b border-zinc-700 bg-zinc-800/30">
                     <CardTitle className="text-lg font-semibold text-white">Servicios del Plan</CardTitle>
                     <div className="text-sm text-zinc-400">
                         Configura qué servicios están disponibles en este plan y sus límites
@@ -295,8 +295,8 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
         }));
 
     return (
-        <Card className="border border-border bg-card shadow-sm">
-            <CardHeader className="border-b border-zinc-800">
+        <Card className="border border-zinc-700 bg-zinc-900/50 shadow-lg">
+            <CardHeader className="border-b border-zinc-700 bg-zinc-800/30">
                 <CardTitle className="text-lg font-semibold text-white">Servicios del Plan</CardTitle>
                 <div className="text-sm text-zinc-400">
                     {isEdit
