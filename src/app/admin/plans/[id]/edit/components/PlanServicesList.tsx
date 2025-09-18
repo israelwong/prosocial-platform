@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -319,7 +318,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                             </div>
                         </div>
 
-                        {/* Servicios de la categoría */}
+                        {/* Servicios de la categoría - Versión Simplificada */}
                         <div className="divide-y divide-zinc-800">
                             {categoryData.services.map((service) => {
                                 const isActive = service.planService?.active ?? false;
@@ -333,32 +332,9 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                             : ''
                                             }`}
                                     >
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div className="flex items-center space-x-4 flex-1">
-                                                <div className="w-2 h-2 rounded-full bg-zinc-500"></div>
-                                                <div className="flex-1">
-                                                    <div className="flex items-center space-x-2 mb-1">
-                                                        <h3 className="font-medium text-white">{service.name}</h3>
-                                                        <Badge variant="outline" className="text-xs">
-                                                            {service.slug}
-                                                        </Badge>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className={`text-xs ${isActive
-                                                                ? 'border-green-500 text-green-400'
-                                                                : 'border-red-500 text-red-400'
-                                                                }`}
-                                                        >
-                                                            {isActive ? "Activo" : "Inactivo"}
-                                                        </Badge>
-                                                    </div>
-                                                    {service.description && (
-                                                        <p className="text-sm text-zinc-400">
-                                                            {service.description}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
+                                        {/* Fila simplificada: Switch | Nombre | Límite | Unidad | Resumen */}
+                                        <div className="flex items-center gap-4">
+                                            {/* Switch */}
                                             <div className="flex items-center gap-2">
                                                 <Switch
                                                     checked={isActive}
@@ -367,57 +343,56 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                                 />
                                                 {isSaving && <Loader2 className="h-4 w-4 animate-spin text-zinc-400" />}
                                             </div>
-                                        </div>
 
-                                        {isActive && (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                                <div>
-                                                    <Label htmlFor={`limite-${service.id}`} className="text-sm text-zinc-400">Límite</Label>
-                                                    <Input
-                                                        id={`limite-${service.id}`}
-                                                        type="number"
-                                                        placeholder="Dejar vacío para ilimitado"
-                                                        value={service.planService?.limite ?? ''}
-                                                        onChange={(e) => handleLimiteChange(service.id, e.target.value)}
-                                                        disabled={isSaving}
-                                                        className="bg-zinc-900 border-zinc-700 text-white"
-                                                    />
-                                                    <p className="text-xs text-zinc-500 mt-1">
-                                                        Dejar vacío = ilimitado, 0 = sin acceso
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <Label htmlFor={`unidad-${service.id}`} className="text-sm text-zinc-400">Unidad de Medida</Label>
-                                                    <Select
-                                                        value={service.planService?.unidad ?? ''}
-                                                        onValueChange={(value) => handleUnidadChange(service.id, value as UnidadMedida || null)}
-                                                        disabled={isSaving}
-                                                    >
-                                                        <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
-                                                            <SelectValue placeholder="Seleccionar unidad" />
-                                                        </SelectTrigger>
-                                                        <SelectContent className="bg-zinc-900 border-zinc-700">
-                                                            {Object.entries(UNIDAD_MEDIDA_LABELS).map(([value, label]) => (
-                                                                <SelectItem key={value} value={value} className="text-white hover:bg-zinc-800">
-                                                                    {label}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
+                                            {/* Nombre del servicio */}
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-medium text-white truncate">{service.name}</h3>
                                             </div>
-                                        )}
 
-                                        {isActive && service.planService && (
-                                            <div className="mt-3 p-2 bg-zinc-900 border border-zinc-700 rounded">
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <span className="text-zinc-400">Configuración actual:</span>
-                                                    <Badge variant="secondary" className="bg-zinc-800 text-zinc-200">
+                                            {/* Límite (máximo 3 dígitos) */}
+                                            <div className="w-20">
+                                                <Input
+                                                    type="number"
+                                                    placeholder="∞"
+                                                    value={service.planService?.limite ?? ''}
+                                                    onChange={(e) => handleLimiteChange(service.id, e.target.value)}
+                                                    disabled={isSaving || !isActive}
+                                                    className="bg-zinc-900 border-zinc-700 text-white text-center"
+                                                    maxLength={3}
+                                                />
+                                            </div>
+
+                                            {/* Unidad de medida */}
+                                            <div className="w-32">
+                                                <Select
+                                                    value={service.planService?.unidad ?? ''}
+                                                    onValueChange={(value) => handleUnidadChange(service.id, value as UnidadMedida || null)}
+                                                    disabled={isSaving || !isActive}
+                                                >
+                                                    <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white h-9">
+                                                        <SelectValue placeholder="Unidad" />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="bg-zinc-900 border-zinc-700">
+                                                        {Object.entries(UNIDAD_MEDIDA_LABELS).map(([value, label]) => (
+                                                            <SelectItem key={value} value={value} className="text-white hover:bg-zinc-800">
+                                                                {label}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            {/* Resumen de configuración */}
+                                            <div className="w-32 text-right">
+                                                {isActive && service.planService ? (
+                                                    <Badge variant="secondary" className="bg-zinc-800 text-zinc-200 text-xs">
                                                         {formatLimite(service.planService.limite, service.planService.unidad)}
                                                     </Badge>
-                                                </div>
+                                                ) : (
+                                                    <span className="text-xs text-zinc-500">Inactivo</span>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
                                 );
                             })}
