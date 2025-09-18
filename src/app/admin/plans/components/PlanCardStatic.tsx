@@ -38,7 +38,7 @@ export function PlanCardStatic({
 }: PlanCardStaticProps) {
     const formatPrice = (price: number | null) => {
         if (!price) return 'Gratis';
-        return `$${price.toLocaleString()}`;
+        return `$${price.toLocaleString('en-US')}`;
     };
 
     const formatFeatures = (features: string[] | Record<string, unknown> | null | undefined) => {
