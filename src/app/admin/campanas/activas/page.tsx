@@ -5,12 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Edit, Trash2, Play, Pause, Search, DollarSign, Users, Target, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
+import { CampanaModal } from './components';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
@@ -66,29 +64,6 @@ export default function CampanasActivasPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCampaña, setEditingCampaña] = useState<Campaña | null>(null);
-    const [formData, setFormData] = useState({
-        nombre: '',
-        descripcion: '',
-        presupuestoTotal: 0,
-        fechaInicio: '',
-        fechaFin: '',
-        status: 'planificada',
-        isActive: true,
-        leadsGenerados: 0,
-        leadsSuscritos: 0,
-        gastoReal: 0,
-        plataformas: [] as Array<{
-            id: string;
-            plataforma: {
-                id: string;
-                nombre: string;
-            };
-            presupuesto: number;
-            gastoReal: number;
-            leads: number;
-            conversiones: number;
-        }>
-    });
 
     useEffect(() => {
         fetchCampanas();
@@ -144,19 +119,30 @@ export default function CampanasActivasPage() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        try {
-            const campañaData = {
-                ...formData,
-                presupuestoTotal: parseFloat(formData.presupuestoTotal.toString()),
-                fechaInicio: new Date(formData.fechaInicio),
-                fechaFin: new Date(formData.fechaFin),
-                leadsGenerados: parseInt(formData.leadsGenerados.toString()),
-                leadsSuscritos: parseInt(formData.leadsSuscritos.toString()),
-                gastoReal: parseFloat(formData.gastoReal.toString())
+    const handleSaveCampaña = async (campañaData: {
+        nombre: string;
+        descripcion: string;
+        presupuestoTotal: number;
+        fechaInicio: Date;
+        fechaFin: Date;
+        status: string;
+        isActive: boolean;
+        leadsGenerados: number;
+        leadsSuscritos: number;
+        gastoReal: number;
+        plataformas: Array<{
+            id: string;
+            plataforma: {
+                id: string;
+                nombre: string;
             };
-
+            presupuesto: number;
+            gastoReal: number;
+            leads: number;
+            conversiones: number;
+        }>;
+    }) => {
+        try {
             if (editingCampaña) {
                 const response = await fetch(`/api/campanas/${editingCampaña.id}`, {
                     method: 'PUT',
@@ -185,42 +171,27 @@ export default function CampanasActivasPage() {
                 toast.success('Campaña creada exitosamente');
             }
 
-            setIsModalOpen(false);
             setEditingCampaña(null);
-            resetForm();
             fetchCampanas();
         } catch (error) {
             console.error('Error saving campaña:', error);
-            toast.error('Error al guardar la campaña');
+            throw error; // Re-throw para que el modal maneje el error
         }
     };
 
     const handleEdit = (campaña: Campaña) => {
         setEditingCampaña(campaña);
-        setFormData({
-            nombre: campaña.nombre,
-            descripcion: campaña.descripcion || '',
-            presupuestoTotal: campaña.presupuestoTotal,
-            fechaInicio: campaña.fechaInicio.toISOString().split('T')[0],
-            fechaFin: campaña.fechaFin.toISOString().split('T')[0],
-            status: campaña.status,
-            isActive: campaña.isActive,
-            leadsGenerados: campaña.leadsGenerados,
-            leadsSuscritos: campaña.leadsSuscritos,
-            gastoReal: campaña.gastoReal,
-            plataformas: campaña.plataformas.map(p => ({
-                id: p.plataforma.id,
-                plataforma: {
-                    id: p.plataforma.id,
-                    nombre: p.plataforma.nombre
-                },
-                presupuesto: p.presupuesto,
-                gastoReal: p.gastoReal,
-                leads: p.leads,
-                conversiones: p.conversiones
-            }))
-        });
         setIsModalOpen(true);
+    };
+
+    const handleOpenModal = () => {
+        setEditingCampaña(null);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingCampaña(null);
     };
 
     const handleDelete = async (id: string) => {
@@ -242,21 +213,6 @@ export default function CampanasActivasPage() {
         }
     };
 
-    const resetForm = () => {
-        setFormData({
-            nombre: '',
-            descripcion: '',
-            presupuestoTotal: 0,
-            fechaInicio: '',
-            fechaFin: '',
-            status: 'planificada',
-            isActive: true,
-            leadsGenerados: 0,
-            leadsSuscritos: 0,
-            gastoReal: 0,
-            plataformas: []
-        });
-    };
 
     const filteredCampanas = campanas.filter(campaña =>
         campaña.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -298,133 +254,11 @@ export default function CampanasActivasPage() {
                 </div>
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
-                        <Button onClick={() => { setEditingCampaña(null); resetForm(); }}>
+                        <Button onClick={handleOpenModal}>
                             <Plus className="h-4 w-4 mr-2" />
                             Nueva Campaña
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle>
-                                {editingCampaña ? 'Editar Campaña' : 'Crear Nueva Campaña'}
-                            </DialogTitle>
-                            <DialogDescription>
-                                {editingCampaña ? 'Modifica los datos de la campaña' : 'Crea una nueva campaña de marketing'}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Label htmlFor="nombre">Nombre *</Label>
-                                    <Input
-                                        id="nombre"
-                                        value={formData.nombre}
-                                        onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="status">Estado</Label>
-                                    <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Seleccionar estado" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {statusOptions.map(option => (
-                                                <SelectItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-
-                            <div>
-                                <Label htmlFor="descripcion">Descripción</Label>
-                                <Textarea
-                                    id="descripcion"
-                                    value={formData.descripcion}
-                                    onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-                                    rows={3}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <Label htmlFor="presupuestoTotal">Presupuesto Total *</Label>
-                                    <Input
-                                        id="presupuestoTotal"
-                                        type="number"
-                                        step="0.01"
-                                        value={formData.presupuestoTotal}
-                                        onChange={(e) => setFormData({ ...formData, presupuestoTotal: parseFloat(e.target.value) || 0 })}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="fechaInicio">Fecha Inicio *</Label>
-                                    <Input
-                                        id="fechaInicio"
-                                        type="date"
-                                        value={formData.fechaInicio}
-                                        onChange={(e) => setFormData({ ...formData, fechaInicio: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="fechaFin">Fecha Fin *</Label>
-                                    <Input
-                                        id="fechaFin"
-                                        type="date"
-                                        value={formData.fechaFin}
-                                        onChange={(e) => setFormData({ ...formData, fechaFin: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-4">
-                                <div>
-                                    <Label htmlFor="leadsGenerados">Leads Generados</Label>
-                                    <Input
-                                        id="leadsGenerados"
-                                        type="number"
-                                        value={formData.leadsGenerados}
-                                        onChange={(e) => setFormData({ ...formData, leadsGenerados: parseInt(e.target.value) || 0 })}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="leadsSuscritos">Leads Suscritos</Label>
-                                    <Input
-                                        id="leadsSuscritos"
-                                        type="number"
-                                        value={formData.leadsSuscritos}
-                                        onChange={(e) => setFormData({ ...formData, leadsSuscritos: parseInt(e.target.value) || 0 })}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="gastoReal">Gasto Real</Label>
-                                    <Input
-                                        id="gastoReal"
-                                        type="number"
-                                        step="0.01"
-                                        value={formData.gastoReal}
-                                        onChange={(e) => setFormData({ ...formData, gastoReal: parseFloat(e.target.value) || 0 })}
-                                    />
-                                </div>
-                            </div>
-
-                            <DialogFooter>
-                                <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>
-                                    Cancelar
-                                </Button>
-                                <Button type="submit">
-                                    {editingCampaña ? 'Actualizar' : 'Crear'}
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
                 </Dialog>
             </div>
 
@@ -578,6 +412,14 @@ export default function CampanasActivasPage() {
                     </p>
                 </div>
             )}
+
+            {/* Modal de Campaña */}
+            <CampanaModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSave={handleSaveCampaña}
+                editingCampaña={editingCampaña}
+            />
         </div>
     );
 }
