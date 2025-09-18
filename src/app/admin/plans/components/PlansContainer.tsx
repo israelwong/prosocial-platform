@@ -29,6 +29,7 @@ import {
     SortDesc
 } from 'lucide-react';
 import { PlanCardWrapper } from './PlanCardWrapper';
+import { DuplicatePlanModal } from './DuplicatePlanModal';
 import { Plan } from '../types';
 import { toast } from 'sonner';
 
@@ -53,6 +54,9 @@ export function PlansContainer({
     const [sortBy, setSortBy] = useState<SortType>('orden');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+    const [showDuplicateModal, setShowDuplicateModal] = useState(false);
+    const [planToDuplicate, setPlanToDuplicate] = useState<Plan | null>(null);
+    const [isDuplicating, setIsDuplicating] = useState(false);
 
     // Drag and Drop sensors
     const sensors = useSensors(
@@ -212,17 +216,32 @@ export function PlansContainer({
         }
     };
 
-    const handleDuplicate = async (plan: Plan) => {
+    const handleDuplicate = (plan: Plan) => {
+        setPlanToDuplicate(plan);
+        setShowDuplicateModal(true);
+    };
+
+    const handleConfirmDuplicate = async (duplicateData: {
+        name: string;
+        slug: string;
+        description: string;
+        active: boolean;
+        popular: boolean;
+    }) => {
+        if (!planToDuplicate) return;
+
         try {
+            setIsDuplicating(true);
+
             // Crear el objeto del plan duplicado
             const duplicatedPlan = {
-                name: `${plan.name} (Copia)`,
-                slug: `${plan.slug}-copia-${Date.now()}`, // Slug único
-                description: plan.description,
-                price_monthly: plan.price_monthly,
-                price_yearly: plan.price_yearly,
-                popular: false, // No duplicar el estado popular
-                active: true, // Activar el plan duplicado
+                name: duplicateData.name,
+                slug: duplicateData.slug,
+                description: duplicateData.description,
+                price_monthly: planToDuplicate.price_monthly,
+                price_yearly: planToDuplicate.price_yearly,
+                popular: duplicateData.popular,
+                active: duplicateData.active,
                 orden: Math.max(...plans.map(p => p.orden || 0)) + 1, // Último orden + 1
                 // No incluir stripe_price_id ni stripe_product_id - se generarán automáticamente
             };
@@ -243,9 +262,9 @@ export function PlansContainer({
             const newPlan = await response.json();
             
             // Si el plan original tenía servicios configurados, duplicarlos
-            if (plan.id) {
+            if (planToDuplicate.id) {
                 try {
-                    const servicesResponse = await fetch(`/api/plans/${plan.id}/services`);
+                    const servicesResponse = await fetch(`/api/plans/${planToDuplicate.id}/services`);
                     if (servicesResponse.ok) {
                         const services = await servicesResponse.json();
                         const activeServices = services.filter((service: any) => service.planService?.active);
@@ -274,11 +293,24 @@ export function PlansContainer({
 
             toast.success('Plan duplicado exitosamente');
             
+            // Cerrar modal y limpiar estado
+            setShowDuplicateModal(false);
+            setPlanToDuplicate(null);
+            
             // Recargar la página para mostrar el nuevo plan
             window.location.reload();
         } catch (error) {
             console.error('Error duplicating plan:', error);
             toast.error(error instanceof Error ? error.message : 'Error al duplicar el plan');
+        } finally {
+            setIsDuplicating(false);
+        }
+    };
+
+    const handleCloseDuplicateModal = () => {
+        if (!isDuplicating) {
+            setShowDuplicateModal(false);
+            setPlanToDuplicate(null);
         }
     };
 
@@ -507,6 +539,15 @@ export function PlansContainer({
                     )}
                 </CardContent>
             </Card>
+
+            {/* Modal de duplicación */}
+            <DuplicatePlanModal
+                isOpen={showDuplicateModal}
+                onClose={handleCloseDuplicateModal}
+                onConfirm={handleConfirmDuplicate}
+                plan={planToDuplicate}
+                isDuplicating={isDuplicating}
+            />
         </div>
     );
 }
