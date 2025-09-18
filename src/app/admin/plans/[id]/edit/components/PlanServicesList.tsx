@@ -315,7 +315,14 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                         <div className="px-4 py-4 bg-zinc-800/40 border-b border-zinc-700">
                             <div className="flex items-center space-x-3">
                                 <div className="w-3 h-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 shadow-sm"></div>
-                                <h3 className="font-semibold text-white text-base">{categoryData.name}</h3>
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-white text-base">{categoryData.name}</h3>
+                                    {categoryData.category?.description && (
+                                        <p className="text-xs text-zinc-400 mt-1">
+                                            {categoryData.category.description}
+                                        </p>
+                                    )}
+                                </div>
                                 <Badge variant="outline" className="text-xs bg-zinc-700/50 border-zinc-600">
                                     {categoryData.services.length} servicios
                                 </Badge>
@@ -351,6 +358,11 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
                                             {/* Nombre del servicio */}
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="font-medium text-white truncate">{service.name}</h3>
+                                                {service.description && (
+                                                    <p className="text-xs text-zinc-400 truncate mt-1">
+                                                        {service.description}
+                                                    </p>
+                                                )}
                                             </div>
 
                                             {/* Límite (máximo 3 dígitos) */}
