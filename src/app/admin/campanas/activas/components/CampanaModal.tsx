@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 
@@ -53,36 +51,13 @@ interface CampanaModalProps {
     editingCampaña: Campaña | null;
 }
 
-const statusOptions = [
-    { value: 'planificada', label: 'Planificada', color: 'bg-gray-500' },
-    { value: 'activa', label: 'Activa', color: 'bg-green-500' },
-    { value: 'pausada', label: 'Pausada', color: 'bg-yellow-500' },
-    { value: 'finalizada', label: 'Finalizada', color: 'bg-red-500' }
-];
 
 export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: CampanaModalProps) {
     const [formData, setFormData] = useState({
         nombre: '',
-        descripcion: '',
-        presupuestoTotal: 0,
         fechaInicio: '',
         fechaFin: '',
-        status: 'planificada',
-        isActive: true,
-        leadsGenerados: 0,
-        leadsSuscritos: 0,
-        gastoReal: 0,
-        plataformas: [] as Array<{
-            id: string;
-            plataforma: {
-                id: string;
-                nombre: string;
-            };
-            presupuesto: number;
-            gastoReal: number;
-            leads: number;
-            conversiones: number;
-        }>
+        isActive: true
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,41 +67,17 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
         if (editingCampaña) {
             setFormData({
                 nombre: editingCampaña.nombre,
-                descripcion: editingCampaña.descripcion || '',
-                presupuestoTotal: editingCampaña.presupuestoTotal,
                 fechaInicio: editingCampaña.fechaInicio.toISOString().split('T')[0],
                 fechaFin: editingCampaña.fechaFin.toISOString().split('T')[0],
-                status: editingCampaña.status,
-                isActive: editingCampaña.isActive,
-                leadsGenerados: editingCampaña.leadsGenerados,
-                leadsSuscritos: editingCampaña.leadsSuscritos,
-                gastoReal: editingCampaña.gastoReal,
-                plataformas: editingCampaña.plataformas.map(p => ({
-                    id: p.plataforma.id,
-                    plataforma: {
-                        id: p.plataforma.id,
-                        nombre: p.plataforma.nombre
-                    },
-                    presupuesto: p.presupuesto,
-                    gastoReal: p.gastoReal,
-                    leads: p.leads,
-                    conversiones: p.conversiones
-                }))
+                isActive: editingCampaña.isActive
             });
         } else {
             // Reset form for new campaign
             setFormData({
                 nombre: '',
-                descripcion: '',
-                presupuestoTotal: 0,
                 fechaInicio: '',
                 fechaFin: '',
-                status: 'planificada',
-                isActive: true,
-                leadsGenerados: 0,
-                leadsSuscritos: 0,
-                gastoReal: 0,
-                plataformas: []
+                isActive: true
             });
         }
     }, [editingCampaña, isOpen]);
@@ -139,12 +90,16 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
             
             const campañaData = {
                 ...formData,
-                presupuestoTotal: parseFloat(formData.presupuestoTotal.toString()),
                 fechaInicio: new Date(formData.fechaInicio),
                 fechaFin: new Date(formData.fechaFin),
-                leadsGenerados: parseInt(formData.leadsGenerados.toString()),
-                leadsSuscritos: parseInt(formData.leadsSuscritos.toString()),
-                gastoReal: parseFloat(formData.gastoReal.toString())
+                // Valores por defecto para campos no incluidos en el formulario simplificado
+                descripcion: editingCampaña?.descripcion || '',
+                presupuestoTotal: editingCampaña?.presupuestoTotal || 0,
+                status: editingCampaña?.status || 'planificada',
+                leadsGenerados: editingCampaña?.leadsGenerados || 0,
+                leadsSuscritos: editingCampaña?.leadsSuscritos || 0,
+                gastoReal: editingCampaña?.gastoReal || 0,
+                plataformas: editingCampaña?.plataformas || []
             };
 
             await onSave(campañaData);
@@ -176,71 +131,22 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
                 </DialogHeader>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="nombre" className="mb-2 block">Nombre *</Label>
-                            <Input
-                                id="nombre"
-                                value={formData.nombre}
-                                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                                required
-                                disabled={isSubmitting}
-                                className="bg-zinc-900 border-zinc-700 text-white"
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="status" className="mb-2 block">Estado</Label>
-                            <Select 
-                                value={formData.status} 
-                                onValueChange={(value) => setFormData({ ...formData, status: value })}
-                                disabled={isSubmitting}
-                            >
-                                <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
-                                    <SelectValue placeholder="Seleccionar estado" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-zinc-900 border-zinc-700">
-                                    {statusOptions.map(option => (
-                                        <SelectItem 
-                                            key={option.value} 
-                                            value={option.value}
-                                            className="text-white hover:bg-zinc-800"
-                                        >
-                                            {option.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-
                     <div>
-                        <Label htmlFor="descripcion" className="mb-2 block">Descripción</Label>
-                        <Textarea
-                            id="descripcion"
-                            value={formData.descripcion}
-                            onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-                            rows={3}
+                        <Label htmlFor="nombre" className="mb-2 block">Nombre de la Campaña *</Label>
+                        <Input
+                            id="nombre"
+                            value={formData.nombre}
+                            onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                            placeholder="Ej: Campaña de Verano 2024"
+                            required
                             disabled={isSubmitting}
                             className="bg-zinc-900 border-zinc-700 text-white"
                         />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="presupuestoTotal" className="mb-2 block">Presupuesto Total *</Label>
-                            <Input
-                                id="presupuestoTotal"
-                                type="number"
-                                step="0.01"
-                                value={formData.presupuestoTotal}
-                                onChange={(e) => setFormData({ ...formData, presupuestoTotal: parseFloat(e.target.value) || 0 })}
-                                required
-                                disabled={isSubmitting}
-                                className="bg-zinc-900 border-zinc-700 text-white"
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="fechaInicio" className="mb-2 block">Fecha Inicio *</Label>
+                            <Label htmlFor="fechaInicio" className="mb-2 block">Período Inicial *</Label>
                             <Input
                                 id="fechaInicio"
                                 type="date"
@@ -252,7 +158,7 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
                             />
                         </div>
                         <div>
-                            <Label htmlFor="fechaFin" className="mb-2 block">Fecha Fin *</Label>
+                            <Label htmlFor="fechaFin" className="mb-2 block">Período Final *</Label>
                             <Input
                                 id="fechaFin"
                                 type="date"
@@ -265,40 +171,29 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="flex items-center justify-between p-4 bg-zinc-900/50 border border-zinc-700 rounded-lg">
                         <div>
-                            <Label htmlFor="leadsGenerados" className="mb-2 block">Leads Generados</Label>
-                            <Input
-                                id="leadsGenerados"
-                                type="number"
-                                value={formData.leadsGenerados}
-                                onChange={(e) => setFormData({ ...formData, leadsGenerados: parseInt(e.target.value) || 0 })}
-                                disabled={isSubmitting}
-                                className="bg-zinc-900 border-zinc-700 text-white"
-                            />
+                            <Label htmlFor="isActive" className="text-sm font-medium">Estado de la Campaña</Label>
+                            <p className="text-xs text-zinc-500">La campaña estará activa y disponible para uso</p>
                         </div>
-                        <div>
-                            <Label htmlFor="leadsSuscritos" className="mb-2 block">Leads Suscritos</Label>
-                            <Input
-                                id="leadsSuscritos"
-                                type="number"
-                                value={formData.leadsSuscritos}
-                                onChange={(e) => setFormData({ ...formData, leadsSuscritos: parseInt(e.target.value) || 0 })}
+                        <div className="flex items-center space-x-2">
+                            <span className={`text-sm ${formData.isActive ? 'text-green-400' : 'text-red-400'}`}>
+                                {formData.isActive ? 'Activa' : 'Inactiva'}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
                                 disabled={isSubmitting}
-                                className="bg-zinc-900 border-zinc-700 text-white"
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="gastoReal" className="mb-2 block">Gasto Real</Label>
-                            <Input
-                                id="gastoReal"
-                                type="number"
-                                step="0.01"
-                                value={formData.gastoReal}
-                                onChange={(e) => setFormData({ ...formData, gastoReal: parseFloat(e.target.value) || 0 })}
-                                disabled={isSubmitting}
-                                className="bg-zinc-900 border-zinc-700 text-white"
-                            />
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                                    formData.isActive ? 'bg-blue-600' : 'bg-zinc-600'
+                                }`}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                        formData.isActive ? 'translate-x-6' : 'translate-x-1'
+                                    }`}
+                                />
+                            </button>
                         </div>
                     </div>
 
