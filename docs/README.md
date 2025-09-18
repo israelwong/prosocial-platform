@@ -36,6 +36,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **PATRON_CREACION_SECCIONES_ADMIN.md** - Patrón para crear secciones admin
 - **TYPESCRIPT_BEST_PRACTICES.md** - Mejores prácticas de TypeScript
 - **UI_DESIGN_PATTERNS.md** - Patrones de diseño UI reutilizables
+- **SISTEMA_LEADS_DESCUENTOS_IMPLEMENTADO.md** - Sistema de leads y descuentos implementado
 
 ### 🗂️ **05-legacy/** - Código Legacy y Migración
 
@@ -52,6 +53,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **SISTEMA_EMAILS_AGENTES.md** - Sistema de emails para agentes
 - **SISTEMA_SUSCRIPCIONES.md** - Sistema de suscripciones
 - **SOLUCION_MODELOS_PRISMA.md** - Solución de modelos de Prisma
+- **AI_CONTEXT_SISTEMA_LEADS_DESCUENTOS.md** - Contexto para agente IA sobre sistema de leads y descuentos
 
 ---
 
@@ -75,6 +77,8 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 
 1. **[Configuración de Stripe](./06-reference/STRIPE_SETUP.md)**
 2. **[Sistema de Suscripciones](./06-reference/SISTEMA_SUSCRIPCIONES.md)**
+3. **[Sistema de Leads y Descuentos](./04-best-practices/SISTEMA_LEADS_DESCUENTOS_IMPLEMENTADO.md)** - Sistema implementado
+4. **[Contexto para Agente IA](./06-reference/AI_CONTEXT_SISTEMA_LEADS_DESCUENTOS.md)** - Información crítica para IA
 
 ---
 

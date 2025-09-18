@@ -43,6 +43,7 @@ interface PipelineStage {
 interface DraggablePipelineStagesProps {
     stages: PipelineStage[];
     onEdit: (stage: PipelineStage) => void;
+    pipelineTypeId?: string;
 }
 
 interface SortableStageItemProps {
@@ -128,7 +129,7 @@ function SortableStageItem({ stage, index, onEdit, canMoveUp, canMoveDown }: Sor
     );
 }
 
-export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineStagesProps) {
+export function DraggablePipelineStages({ stages, onEdit, pipelineTypeId }: DraggablePipelineStagesProps) {
     const [localStages, setLocalStages] = useState(stages);
     const [isHydrated, setIsHydrated] = useState(false);
     const [isReordering, setIsReordering] = useState(false);
@@ -162,10 +163,10 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
             const newIndex = localStages.findIndex((stage) => stage.id === over.id);
 
             const newStages = arrayMove(localStages, oldIndex, newIndex);
-            
+
             try {
                 setIsReordering(true);
-                
+
                 // Actualizar el orden en el estado local primero
                 setLocalStages(newStages);
 
@@ -193,10 +194,12 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
         return (
             <Card className="border border-border bg-card shadow-sm">
                 <CardHeader className="border-b border-zinc-800">
-                    <CardTitle className="text-lg font-semibold text-white">Etapas del Pipeline</CardTitle>
-                <div className="text-sm text-zinc-400">
-                    Cargando etapas...
-                </div>
+                    <CardTitle className="text-lg font-semibold text-white">
+                        {pipelineTypeId ? 'Etapas' : 'Etapas del Pipeline'}
+                    </CardTitle>
+                    <div className="text-sm text-zinc-400">
+                        Cargando etapas...
+                    </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     <div className="divide-y divide-zinc-800">
@@ -257,7 +260,9 @@ export function DraggablePipelineStages({ stages, onEdit }: DraggablePipelineSta
     return (
         <Card className="border border-border bg-card shadow-sm">
             <CardHeader className="border-b border-zinc-800">
-                <CardTitle className="text-lg font-semibold text-white">Etapas del Pipeline</CardTitle>
+                <CardTitle className="text-lg font-semibold text-white">
+                    {pipelineTypeId ? 'Etapas' : 'Etapas del Pipeline'}
+                </CardTitle>
                 <div className="text-sm text-zinc-400">
                     {isReordering ? (
                         <span className="flex items-center space-x-2">

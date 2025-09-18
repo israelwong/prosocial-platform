@@ -636,6 +636,7 @@ model platform_agents {
   updatedAt               DateTime
   platform_leads          platform_leads[]
   platform_notifications  platform_notifications[]
+  agent_discount_codes    platform_agent_discount_codes[]
 
   @@index([activo])
 }
@@ -740,6 +741,17 @@ model platform_leads {
   etapaId                       String?
   canalAdquisicionId            String?
   campa_aId                     String?                        @map("campañaId")
+  
+  // Nuevos campos para mejor clasificación
+  tipo_lead                     String?                        @default("prospecto")
+  metodo_conversion             String?
+  agente_conversion_id          String?
+  fecha_primera_interaccion     DateTime?
+  numero_interacciones          Int?                           @default(0)
+  fuente_original               String?
+  utm_source                    String?
+  utm_medium                    String?
+  utm_campaign                  String?
   platform_activities           platform_activities[]
   platform_lead_bitacora        platform_lead_bitacora[]
   platform_agents               platform_agents?               @relation(fields: [agentId], references: [id])
@@ -748,6 +760,8 @@ model platform_leads {
   platform_pipeline_stages      platform_pipeline_stages?      @relation(fields: [etapaId], references: [id])
   studios                       projects?                      @relation(fields: [studioId], references: [id])
   platform_notifications        platform_notifications[]
+  discount_usage                platform_discount_usage[]
+  agent_discount_codes          platform_agent_discount_codes[]
 
   @@index([agentId])
   @@index([campa_aId])
@@ -783,6 +797,21 @@ model platform_notifications {
   @@index([userId, isRead])
 }
 
+model platform_pipeline_types {
+  id              String            @id @default(cuid())
+  nombre          String            @unique
+  descripcion     String?
+  color           String            @default("#3B82F6")
+  activo          Boolean           @default(true)
+  orden           Int               @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime
+  pipeline_stages platform_pipeline_stages[]
+
+  @@index([activo])
+  @@index([orden])
+}
+
 model platform_pipeline_stages {
   id              String            @id @default(cuid())
   nombre          String
@@ -790,12 +819,15 @@ model platform_pipeline_stages {
   color           String            @default("#3B82F6")
   orden           Int               @default(0)
   isActive        Boolean           @default(true)
+  pipeline_type_id String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime
+  pipeline_type   platform_pipeline_types? @relation(fields: [pipeline_type_id], references: [id])
   platform_leads  platform_leads[]
 
   @@index([isActive])
   @@index([orden])
+  @@index([pipeline_type_id])
 }
 
 model platform_plataformas_publicidad {
@@ -1035,6 +1067,8 @@ model subscriptions {
   billing_cycles         platform_billing_cycles[]
   plans                  platform_plans   @relation(fields: [plan_id], references: [id])
   projects               projects         @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  discount_usage         platform_discount_usage[]
+  agent_discount_codes   platform_agent_discount_codes[]
 
   @@index([status])
   @@index([stripe_subscription_id])
@@ -1062,6 +1096,73 @@ model project_user_profiles {
   @@index([projectId])
 }
 
+model platform_discount_codes {
+  id                String          @id @default(cuid())
+  codigo            String          @unique
+  nombre            String
+  descripcion       String?
+  tipo_descuento    String          // 'porcentaje', 'monto_fijo'
+  valor_descuento   Decimal
+  tipo_aplicacion   String          // 'plan_mensual', 'plan_anual', 'ambos'
+  fecha_inicio      DateTime
+  fecha_fin         DateTime
+  uso_maximo        Int?            // null = ilimitado
+  uso_actual        Int             @default(0)
+  activo            Boolean         @default(true)
+  stripe_coupon_id  String?         @unique
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime
+  discount_usage    platform_discount_usage[]
+
+  @@index([activo])
+  @@index([fecha_inicio, fecha_fin])
+  @@index([stripe_coupon_id])
+}
+
+model platform_discount_usage {
+  id                String          @id @default(cuid())
+  discount_code_id  String
+  lead_id           String?
+  subscription_id   String?
+  monto_descuento   Decimal
+  fecha_uso         DateTime        @default(now())
+  discount_code     platform_discount_codes @relation(fields: [discount_code_id], references: [id])
+  lead              platform_leads? @relation(fields: [lead_id], references: [id])
+  subscription      subscriptions?  @relation(fields: [subscription_id], references: [id])
+
+  @@index([discount_code_id])
+  @@index([lead_id])
+  @@index([subscription_id])
+  @@index([fecha_uso])
+}
+
+model platform_agent_discount_codes {
+  id                String          @id @default(cuid())
+  codigo_base       String
+  lead_id           String
+  agente_id         String
+  codigo_completo   String          @unique
+  tipo_descuento    String          // 'porcentaje', 'monto_fijo'
+  valor_descuento   Decimal
+  duracion_descuento String         // '1_mes', '3_meses', 'permanente'
+  stripe_coupon_id  String?         @unique
+  fecha_creacion    DateTime        @default(now())
+  fecha_expiracion  DateTime
+  usado             Boolean         @default(false)
+  fecha_uso         DateTime?
+  subscription_id   String?
+  activo            Boolean         @default(true)
+  lead              platform_leads  @relation(fields: [lead_id], references: [id])
+  agente            platform_agents @relation(fields: [agente_id], references: [id])
+  subscription      subscriptions?  @relation(fields: [subscription_id], references: [id])
+
+  @@index([lead_id])
+  @@index([agente_id])
+  @@index([codigo_completo])
+  @@index([usado])
+  @@index([fecha_expiracion])
+}
+
 enum PlatformLeadBitacoraTipo {
   NOTA_PERSONALIZADA
   CAMBIO_ETAPA
@@ -1075,4 +1176,6 @@ enum PlatformLeadBitacoraTipo {
   CONTRATO_FIRMADO
   SUSCRIPCION_ACTIVA
   CANCELACION
+  DESCUENTO_APLICADO
+  CODIGO_DESCUENTO_GENERADO
 }

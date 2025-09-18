@@ -21,13 +21,28 @@ interface PipelineStage {
     order: number;
     isActive: boolean;
     leadCount: number;
+    pipelineTypeId?: string | null;
+    pipelineType?: {
+        id: string;
+        nombre: string;
+        descripcion: string | null;
+        color: string;
+    } | null;
 }
 
-interface PipelinePageClientProps {
+interface PipelineType {
+    id: string;
+    nombre: string;
+    descripcion: string | null;
+    color: string;
     stages: PipelineStage[];
 }
 
-export function PipelinePageClient({ stages }: PipelinePageClientProps) {
+interface PipelinePageClientProps {
+    pipelineTypes: PipelineType[];
+}
+
+export function PipelinePageClient({ pipelineTypes }: PipelinePageClientProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStage, setEditingStage] = useState<PipelineStage | null>(null);
     const router = useRouter();
@@ -51,6 +66,12 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
         // Refrescar la página para obtener los datos actualizados
         router.refresh();
     };
+
+    // Calcular estadísticas totales
+    const allStages = pipelineTypes.flatMap(type => type.stages);
+    const totalStages = allStages.length;
+    const activeStages = allStages.filter(stage => stage.isActive).length;
+    const totalLeads = allStages.reduce((sum, stage) => sum + (stage.leadCount || 0), 0);
 
     return (
         <div className="space-y-6">
@@ -78,7 +99,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-xs font-medium text-zinc-400">Total Etapas</p>
-                                <p className="text-xl font-bold text-white">{stages.length}</p>
+                                <p className="text-xl font-bold text-white">{totalStages}</p>
                             </div>
                             <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
                                 <span className="text-white font-bold text-sm">E</span>
@@ -93,7 +114,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
                             <div>
                                 <p className="text-xs font-medium text-zinc-400">Etapas Activas</p>
                                 <p className="text-xl font-bold text-white">
-                                    {stages.filter(stage => stage.isActive).length}
+                                    {activeStages}
                                 </p>
                             </div>
                             <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
@@ -109,7 +130,7 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
                             <div>
                                 <p className="text-xs font-medium text-zinc-400">Total Leads</p>
                                 <p className="text-xl font-bold text-white">
-                                    {stages.reduce((sum, stage) => sum + (stage.leadCount || 0), 0)}
+                                    {totalLeads}
                                 </p>
                             </div>
                             <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
@@ -120,11 +141,38 @@ export function PipelinePageClient({ stages }: PipelinePageClientProps) {
                 </Card>
             </div>
 
-            {/* Pipeline Stages List with Drag & Drop */}
-            <DraggablePipelineStages
-                stages={stages}
-                onEdit={handleEditStage}
-            />
+            {/* Pipeline Types with Stages */}
+            <div className="space-y-6">
+                {pipelineTypes.map((pipelineType) => (
+                    <div key={pipelineType.id} className="space-y-4">
+                        {/* Pipeline Type Header */}
+                        <div className="flex items-center space-x-3">
+                            <div
+                                className="w-4 h-4 rounded-full"
+                                style={{ backgroundColor: pipelineType.color }}
+                            ></div>
+                            <h2 className="text-xl font-semibold text-white">
+                                {pipelineType.nombre}
+                            </h2>
+                            <Badge variant="outline" className="text-xs">
+                                {pipelineType.stages.length} etapas
+                            </Badge>
+                            {pipelineType.descripcion && (
+                                <p className="text-sm text-zinc-400">
+                                    {pipelineType.descripcion}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Stages for this type */}
+                        <DraggablePipelineStages
+                            stages={pipelineType.stages}
+                            onEdit={handleEditStage}
+                            pipelineTypeId={pipelineType.id}
+                        />
+                    </div>
+                ))}
+            </div>
 
             {/* Instructions */}
             <Card className="border border-border bg-card shadow-sm">

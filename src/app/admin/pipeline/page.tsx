@@ -11,18 +11,40 @@ interface PipelineStage {
     order: number;
     isActive: boolean;
     leadCount: number;
+    pipelineTypeId?: string | null;
+    pipelineType?: {
+        id: string;
+        nombre: string;
+        descripcion: string | null;
+        color: string;
+    } | null;
 }
 
-// Función para obtener las etapas del pipeline desde la base de datos
-async function getPipelineStages(): Promise<PipelineStage[]> {
+interface PipelineType {
+    id: string;
+    nombre: string;
+    descripcion: string | null;
+    color: string;
+    stages: PipelineStage[];
+}
+
+// Función para obtener las etapas del pipeline agrupadas por tipo
+async function getPipelineStagesGrouped(): Promise<PipelineType[]> {
     try {
         // Usar withRetry para manejar errores P1001 de conectividad
-        const stages = await withRetry(async () => {
-            return await prisma.platform_pipeline_stages.findMany({
+        const pipelineTypes = await withRetry(async () => {
+            return await prisma.platform_pipeline_types.findMany({
                 include: {
-                    _count: {
-                        select: {
-                            platform_leads: true
+                    pipeline_stages: {
+                        include: {
+                            _count: {
+                                select: {
+                                    platform_leads: true
+                                }
+                            }
+                        },
+                        orderBy: {
+                            orden: 'asc'
                         }
                     }
                 },
@@ -32,27 +54,40 @@ async function getPipelineStages(): Promise<PipelineStage[]> {
             });
         });
 
-        return stages.map(stage => ({
-            id: stage.id,
-            name: stage.nombre,
-            description: stage.descripcion,
-            color: stage.color,
-            order: stage.orden,
-            isActive: stage.isActive,
-            leadCount: stage._count.platform_leads
+        return pipelineTypes.map(type => ({
+            id: type.id,
+            nombre: type.nombre,
+            descripcion: type.descripcion,
+            color: type.color,
+            stages: type.pipeline_stages.map(stage => ({
+                id: stage.id,
+                name: stage.nombre,
+                description: stage.descripcion,
+                color: stage.color,
+                order: stage.orden,
+                isActive: stage.isActive,
+                leadCount: stage._count.platform_leads,
+                pipelineTypeId: stage.pipeline_type_id,
+                pipelineType: {
+                    id: type.id,
+                    nombre: type.nombre,
+                    descripcion: type.descripcion,
+                    color: type.color
+                }
+            }))
         }));
     } catch (error) {
-        console.error('Error fetching pipeline stages:', error);
+        console.error('Error fetching pipeline stages grouped:', error);
         throw new Error(getFriendlyErrorMessage(error));
     }
 }
 
 export default async function PipelinePage() {
-    let pipelineStages: PipelineStage[] = [];
+    let pipelineTypes: PipelineType[] = [];
     let error: string | null = null;
 
     try {
-        pipelineStages = await getPipelineStages();
+        pipelineTypes = await getPipelineStagesGrouped();
     } catch (err) {
         error = err instanceof Error ? err.message : 'Error desconocido al cargar el pipeline';
     }
@@ -96,5 +131,5 @@ export default async function PipelinePage() {
         );
     }
 
-    return <PipelinePageClient stages={pipelineStages} />;
+    return <PipelinePageClient pipelineTypes={pipelineTypes} />;
 }
