@@ -22,7 +22,7 @@ import { Plan } from '../types';
 interface PlanCardStaticProps {
     plan: Plan;
     onEdit: (plan: Plan) => void;
-    onDelete: (planId: string) => void;
+    onDelete: (plan: Plan) => void;
     onDuplicate: (plan: Plan) => void;
     onToggleActive: (planId: string) => void;
     onTogglePopular: (planId: string) => void;
@@ -112,7 +112,7 @@ export function PlanCardStatic({
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => onDelete(plan.id)}
+                            onClick={() => onDelete(plan)}
                             className="text-red-400 hover:text-red-500"
                             title="Eliminar plan"
                         >

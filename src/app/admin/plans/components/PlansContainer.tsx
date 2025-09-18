@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { PlanCardWrapper } from './PlanCardWrapper';
 import { DuplicatePlanModal } from './DuplicatePlanModal';
+import { DeletePlanModal } from './DeletePlanModal';
 import { Plan } from '../types';
 import { toast } from 'sonner';
 
@@ -57,6 +58,9 @@ export function PlansContainer({
     const [showDuplicateModal, setShowDuplicateModal] = useState(false);
     const [planToDuplicate, setPlanToDuplicate] = useState<Plan | null>(null);
     const [isDuplicating, setIsDuplicating] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [planToDelete, setPlanToDelete] = useState<Plan | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Drag and Drop sensors
     const sensors = useSensors(
@@ -193,13 +197,18 @@ export function PlansContainer({
         window.location.href = `/admin/plans/${plan.id}/edit`;
     };
 
-    const handleDelete = async (planId: string) => {
-        if (!confirm('¿Estás seguro de que deseas eliminar este plan?')) {
-            return;
-        }
+    const handleDelete = (plan: Plan) => {
+        setPlanToDelete(plan);
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!planToDelete) return;
 
         try {
-            const response = await fetch(`/api/plans/${planId}`, {
+            setIsDeleting(true);
+
+            const response = await fetch(`/api/plans/${planToDelete.id}`, {
                 method: 'DELETE',
             });
 
@@ -208,11 +217,26 @@ export function PlansContainer({
                 throw new Error(error.error || 'Error al eliminar el plan');
             }
 
-            onPlanDelete(planId);
             toast.success('Plan eliminado exitosamente');
+            
+            // Cerrar modal y limpiar estado
+            setShowDeleteModal(false);
+            setPlanToDelete(null);
+            
+            // Notificar al componente padre
+            onPlanDelete(planToDelete.id);
         } catch (error) {
             console.error('Error deleting plan:', error);
             toast.error(error instanceof Error ? error.message : 'Error al eliminar el plan');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleCloseDeleteModal = () => {
+        if (!isDeleting) {
+            setShowDeleteModal(false);
+            setPlanToDelete(null);
         }
     };
 
@@ -547,6 +571,15 @@ export function PlansContainer({
                 onConfirm={handleConfirmDuplicate}
                 plan={planToDuplicate}
                 isDuplicating={isDuplicating}
+            />
+
+            {/* Modal de eliminación */}
+            <DeletePlanModal
+                isOpen={showDeleteModal}
+                onClose={handleCloseDeleteModal}
+                onConfirm={handleConfirmDelete}
+                plan={planToDelete}
+                isDeleting={isDeleting}
             />
         </div>
     );
