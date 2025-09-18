@@ -610,67 +610,54 @@ export default function EditPlanPage() {
                     onServicesChange={handleServicesChange}
                 />
 
-                {/* Integración Stripe */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Integración con Stripe</CardTitle>
+                {/* Integración Stripe - Solo Lectura */}
+                <Card className="border border-zinc-700 bg-zinc-900/30">
+                    <CardHeader className="bg-zinc-800/20">
+                        <CardTitle className="text-white flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                            Integración con Stripe
+                        </CardTitle>
+                        <p className="text-sm text-zinc-400">
+                            Información de sincronización automática con Stripe
+                        </p>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="stripe_price_id">
-                                    Stripe Price ID <span className="text-muted-foreground">(Opcional)</span>
-                                </Label>
-                                <Input
-                                    id="stripe_price_id"
-                                    {...register('stripe_price_id')}
-                                    placeholder="Dejar vacío para generar automáticamente"
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    Si se deja vacío, se creará automáticamente en Stripe al guardar el plan
+                                <Label className="text-zinc-300">Stripe Product ID</Label>
+                                <div className="p-3 bg-zinc-800/50 border border-zinc-700 rounded-md">
+                                    <code className="text-sm text-zinc-200 font-mono">
+                                        {watch('stripe_product_id') || 'No configurado'}
+                                    </code>
+                                </div>
+                                <p className="text-xs text-zinc-500">
+                                    Se crea automáticamente al guardar el plan
                                 </p>
-                                {!watch('stripe_price_id') && (watch('price_monthly') || watch('price_yearly')) && (
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={async () => {
-                                            try {
-                                                setIsLoading(true);
-                                                const response = await fetch(`/api/plans/${planId}/create-stripe-price`, {
-                                                    method: 'POST',
-                                                });
-
-                                                if (response.ok) {
-                                                    const data = await response.json();
-                                                    setValue('stripe_price_id', data.stripe_price_id);
-                                                    setValue('stripe_product_id', data.stripe_product_id);
-                                                    toast.success('Precio creado automáticamente en Stripe');
-                                                } else {
-                                                    const error = await response.json();
-                                                    toast.error(error.error || 'Error al crear precio en Stripe');
-                                                }
-                                            } catch (error) {
-                                                console.error('Error:', error);
-                                                toast.error('Error al crear precio en Stripe');
-                                            } finally {
-                                                setIsLoading(false);
-                                            }
-                                        }}
-                                        disabled={isLoading}
-                                    >
-                                        {isLoading ? 'Creando...' : 'Crear Precio en Stripe'}
-                                    </Button>
-                                )}
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="stripe_product_id">Stripe Product ID</Label>
-                                <Input
-                                    id="stripe_product_id"
-                                    {...register('stripe_product_id')}
-                                    placeholder="prod_T39jUez5Bkutia"
-                                />
+                                <Label className="text-zinc-300">Stripe Price ID</Label>
+                                <div className="p-3 bg-zinc-800/50 border border-zinc-700 rounded-md">
+                                    <code className="text-sm text-zinc-200 font-mono">
+                                        {watch('stripe_price_id') || 'No configurado'}
+                                    </code>
+                                </div>
+                                <p className="text-xs text-zinc-500">
+                                    Se actualiza automáticamente al cambiar precios
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="p-3 bg-blue-900/20 border border-blue-700/30 rounded-md">
+                            <div className="flex items-start gap-2">
+                                <div className="w-4 h-4 rounded-full bg-blue-500 mt-0.5"></div>
+                                <div className="text-sm text-blue-200">
+                                    <p className="font-medium mb-1">Sincronización Automática</p>
+                                    <p className="text-blue-300/80">
+                                        Los precios se sincronizan automáticamente con Stripe. 
+                                        Al cambiar precios, se crea un nuevo precio en Stripe manteniendo compatibilidad.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </CardContent>
