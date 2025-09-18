@@ -219,11 +219,11 @@ export function PlansContainer({
             }
 
             toast.success('Plan eliminado exitosamente');
-            
+
             // Cerrar modal y limpiar estado
             setShowDeleteModal(false);
             setPlanToDelete(null);
-            
+
             // Notificar al componente padre
             onPlanDelete(planToDelete.id);
         } catch (error) {
@@ -249,7 +249,6 @@ export function PlansContainer({
     const handleConfirmDuplicate = async (duplicateData: {
         name: string;
         slug: string;
-        description: string;
         active: boolean;
         popular: boolean;
     }) => {
@@ -262,7 +261,7 @@ export function PlansContainer({
             const duplicatedPlan = {
                 name: duplicateData.name,
                 slug: duplicateData.slug,
-                description: duplicateData.description,
+                description: planToDuplicate.description, // Usar la descripción del plan original
                 price_monthly: planToDuplicate.price_monthly,
                 price_yearly: planToDuplicate.price_yearly,
                 popular: duplicateData.popular,
@@ -285,7 +284,7 @@ export function PlansContainer({
             }
 
             const newPlan = await response.json();
-            
+
             // Si el plan original tenía servicios configurados, duplicarlos
             if (planToDuplicate.id) {
                 try {
@@ -293,7 +292,7 @@ export function PlansContainer({
                     if (servicesResponse.ok) {
                         const services = await servicesResponse.json();
                         const activeServices = services.filter((service: ServiceWithPlanConfig) => service.planService?.active);
-                        
+
                         // Configurar los mismos servicios en el plan duplicado
                         for (const service of activeServices) {
                             await fetch(`/api/plans/${newPlan.id}/services`, {
@@ -322,8 +321,8 @@ export function PlansContainer({
             setShowDuplicateModal(false);
             setPlanToDuplicate(null);
             
-            // Recargar la página para mostrar el nuevo plan
-            window.location.reload();
+            // Navegar a la página de edición del plan duplicado
+            window.location.href = `/admin/plans/${newPlan.id}/edit`;
         } catch (error) {
             console.error('Error duplicating plan:', error);
             toast.error(error instanceof Error ? error.message : 'Error al duplicar el plan');

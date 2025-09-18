@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Copy, AlertTriangle } from 'lucide-react';
@@ -28,7 +27,6 @@ interface DuplicatePlanModalProps {
 interface DuplicatePlanData {
     name: string;
     slug: string;
-    description: string;
     active: boolean;
     popular: boolean;
 }
@@ -43,7 +41,6 @@ export function DuplicatePlanModal({
     const [formData, setFormData] = useState<DuplicatePlanData>({
         name: '',
         slug: '',
-        description: '',
         active: true,
         popular: false
     });
@@ -54,7 +51,6 @@ export function DuplicatePlanModal({
             setFormData({
                 name: `${plan.name} (Copia)`,
                 slug: `${plan.slug}-copia-${Date.now()}`,
-                description: plan.description || '',
                 active: true,
                 popular: false
             });
@@ -149,18 +145,6 @@ export function DuplicatePlanModal({
                             </p>
                         </div>
 
-                        <div>
-                            <Label htmlFor="description" className="mb-2 block">Descripción</Label>
-                            <Textarea
-                                id="description"
-                                value={formData.description}
-                                onChange={(e) => handleInputChange('description', e.target.value)}
-                                placeholder="Descripción del plan duplicado"
-                                rows={3}
-                                disabled={isDuplicating}
-                                className="bg-zinc-900 border-zinc-700 text-white"
-                            />
-                        </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="flex items-center justify-between p-3 bg-zinc-900/50 border border-zinc-700 rounded-lg">
@@ -201,7 +185,7 @@ export function DuplicatePlanModal({
                                     <li>• Se duplicarán todos los servicios configurados del plan original</li>
                                     <li>• Los precios se mantendrán iguales al plan original</li>
                                     <li>• Se generarán nuevos IDs de Stripe automáticamente</li>
-                                    <li>• El plan duplicado se colocará al final de la lista</li>
+                                    <li>• Después de duplicar, se abrirá automáticamente en modo de edición</li>
                                 </ul>
                             </div>
                         </div>
