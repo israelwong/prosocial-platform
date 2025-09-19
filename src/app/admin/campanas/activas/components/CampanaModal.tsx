@@ -21,24 +21,26 @@ interface CampañaPlataforma {
     gastoReal: number;
     leads: number;
     conversiones: number;
-    plataforma: Plataforma;
+    plataforma?: Plataforma;
+    platform_plataformas_publicidad?: Plataforma;
 }
 
 interface Campaña {
     id: string;
     nombre: string;
     descripcion: string | null;
-    presupuestoTotal: number;
-    fechaInicio: Date;
-    fechaFin: Date;
+    presupuestoTotal: number | string;
+    fechaInicio: string | Date;
+    fechaFin: string | Date;
     status: string;
     isActive: boolean;
     leadsGenerados: number;
     leadsSuscritos: number;
     gastoReal: number;
-    createdAt: Date;
-    updatedAt: Date;
-    plataformas: CampañaPlataforma[];
+    createdAt: string | Date;
+    updatedAt: string | Date;
+    plataformas?: CampañaPlataforma[];
+    platform_campana_plataformas?: CampañaPlataforma[];
     _count: {
         leads: number;
     };
@@ -47,7 +49,25 @@ interface Campaña {
 interface CampanaModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (campañaData: any) => Promise<void>;
+    onSave: (campañaData: {
+        nombre: string;
+        descripcion: string;
+        presupuestoTotal: number;
+        fechaInicio: Date;
+        fechaFin: Date;
+        isActive: boolean;
+        status: string;
+        leadsGenerados: number;
+        leadsSuscritos: number;
+        gastoReal: number;
+        plataformas: Array<{
+            plataformaId: string;
+            presupuesto: number;
+            gastoReal: number;
+            leads: number;
+            conversiones: number;
+        }>;
+    }) => Promise<void>;
     editingCampaña: Campaña | null;
 }
 
@@ -55,51 +75,100 @@ interface CampanaModalProps {
 export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: CampanaModalProps) {
     const [formData, setFormData] = useState({
         nombre: '',
+        descripcion: '',
+        presupuestoTotal: '',
         fechaInicio: '',
         fechaFin: '',
         isActive: true
     });
 
+    const [plataformas, setPlataformas] = useState<Plataforma[]>([]);
+    const [selectedPlataformas, setSelectedPlataformas] = useState<Array<{
+        plataformaId: string;
+        presupuesto: number;
+        gastoReal: number;
+        leads: number;
+        conversiones: number;
+    }>>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Cargar plataformas disponibles
+    useEffect(() => {
+        const fetchPlataformas = async () => {
+            try {
+                const response = await fetch('/api/plataformas');
+                if (response.ok) {
+                    const data = await response.json();
+                    setPlataformas(data || []);
+                }
+            } catch (error) {
+                console.error('Error fetching plataformas:', error);
+            }
+        };
+
+        if (isOpen) {
+            fetchPlataformas();
+        }
+    }, [isOpen]);
 
     // Actualizar formulario cuando cambie la campaña a editar
     useEffect(() => {
         if (editingCampaña) {
             setFormData({
                 nombre: editingCampaña.nombre,
-                fechaInicio: editingCampaña.fechaInicio.toISOString().split('T')[0],
-                fechaFin: editingCampaña.fechaFin.toISOString().split('T')[0],
+                descripcion: editingCampaña.descripcion || '',
+                presupuestoTotal: editingCampaña.presupuestoTotal.toString(),
+                fechaInicio: editingCampaña.fechaInicio instanceof Date
+                    ? editingCampaña.fechaInicio.toISOString().split('T')[0]
+                    : new Date(editingCampaña.fechaInicio).toISOString().split('T')[0],
+                fechaFin: editingCampaña.fechaFin instanceof Date
+                    ? editingCampaña.fechaFin.toISOString().split('T')[0]
+                    : new Date(editingCampaña.fechaFin).toISOString().split('T')[0],
                 isActive: editingCampaña.isActive
             });
+
+            // Cargar plataformas seleccionadas
+            const plataformas = editingCampaña.plataformas || editingCampaña.platform_campana_plataformas || [];
+            if (plataformas.length > 0) {
+                setSelectedPlataformas(plataformas.map(p => ({
+                    plataformaId: p.plataforma?.id || p.platform_plataformas_publicidad?.id || '',
+                    presupuesto: p.presupuesto,
+                    gastoReal: p.gastoReal,
+                    leads: p.leads,
+                    conversiones: p.conversiones
+                })));
+            }
         } else {
             // Reset form for new campaign
             setFormData({
                 nombre: '',
+                descripcion: '',
+                presupuestoTotal: '',
                 fechaInicio: '',
                 fechaFin: '',
                 isActive: true
             });
+            setSelectedPlataformas([]);
         }
     }, [editingCampaña, isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         try {
             setIsSubmitting(true);
-            
+
             const campañaData = {
                 ...formData,
                 fechaInicio: new Date(formData.fechaInicio),
                 fechaFin: new Date(formData.fechaFin),
-                // Valores por defecto para campos no incluidos en el formulario simplificado
-                descripcion: editingCampaña?.descripcion || '',
-                presupuestoTotal: editingCampaña?.presupuestoTotal || 0,
+                presupuestoTotal: parseFloat(formData.presupuestoTotal) || 0,
+                // Valores por defecto para campos no incluidos en el formulario
                 status: editingCampaña?.status || 'planificada',
                 leadsGenerados: editingCampaña?.leadsGenerados || 0,
                 leadsSuscritos: editingCampaña?.leadsSuscritos || 0,
                 gastoReal: editingCampaña?.gastoReal || 0,
-                plataformas: editingCampaña?.plataformas || []
+                plataformas: selectedPlataformas
             };
 
             await onSave(campañaData);
@@ -118,6 +187,31 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
         }
     };
 
+    const addPlataforma = (plataformaId: string) => {
+        const plataforma = plataformas.find(p => p.id === plataformaId);
+        if (plataforma && !selectedPlataformas.find(sp => sp.plataformaId === plataformaId)) {
+            setSelectedPlataformas([...selectedPlataformas, {
+                plataformaId,
+                presupuesto: 0,
+                gastoReal: 0,
+                leads: 0,
+                conversiones: 0
+            }]);
+        }
+    };
+
+    const removePlataforma = (plataformaId: string) => {
+        setSelectedPlataformas(selectedPlataformas.filter(sp => sp.plataformaId !== plataformaId));
+    };
+
+    const updatePlataforma = (plataformaId: string, field: string, value: number) => {
+        setSelectedPlataformas(selectedPlataformas.map(sp =>
+            sp.plataformaId === plataformaId
+                ? { ...sp, [field]: value }
+                : sp
+        ));
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -129,7 +223,7 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
                         {editingCampaña ? 'Modifica los datos de la campaña' : 'Crea una nueva campaña de marketing'}
                     </DialogDescription>
                 </DialogHeader>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <Label htmlFor="nombre" className="mb-2 block">Nombre de la Campaña *</Label>
@@ -142,6 +236,113 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
                             disabled={isSubmitting}
                             className="bg-zinc-900 border-zinc-700 text-white"
                         />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="descripcion" className="mb-2 block">Descripción</Label>
+                        <Input
+                            id="descripcion"
+                            value={formData.descripcion}
+                            onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
+                            placeholder="Descripción de la campaña..."
+                            disabled={isSubmitting}
+                            className="bg-zinc-900 border-zinc-700 text-white"
+                        />
+                    </div>
+
+                    <div>
+                        <Label htmlFor="presupuestoTotal" className="mb-2 block">Presupuesto Total *</Label>
+                        <Input
+                            id="presupuestoTotal"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={formData.presupuestoTotal}
+                            onChange={(e) => setFormData({ ...formData, presupuestoTotal: e.target.value })}
+                            placeholder="0.00"
+                            required
+                            disabled={isSubmitting}
+                            className="bg-zinc-900 border-zinc-700 text-white"
+                        />
+                    </div>
+
+                    {/* Selección de Plataformas */}
+                    <div>
+                        <Label className="mb-2 block">Plataformas de Publicidad</Label>
+
+                        {/* Selector de plataformas */}
+                        <div className="mb-4">
+                            <select
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        addPlataforma(e.target.value);
+                                        e.target.value = '';
+                                    }
+                                }}
+                                className="w-full p-2 bg-zinc-900 border border-zinc-700 text-white rounded-md"
+                                disabled={isSubmitting}
+                            >
+                                <option value="">Seleccionar plataforma...</option>
+                                {plataformas
+                                    .filter(p => !selectedPlataformas.find(sp => sp.plataformaId === p.id))
+                                    .map(plataforma => (
+                                        <option key={plataforma.id} value={plataforma.id}>
+                                            {plataforma.nombre} ({plataforma.tipo})
+                                        </option>
+                                    ))}
+                            </select>
+                        </div>
+
+                        {/* Plataformas seleccionadas */}
+                        {selectedPlataformas.length > 0 && (
+                            <div className="space-y-3">
+                                {selectedPlataformas.map(selectedPlataforma => {
+                                    const plataforma = plataformas.find(p => p.id === selectedPlataforma.plataformaId);
+                                    return (
+                                        <div key={selectedPlataforma.plataformaId} className="p-3 bg-zinc-800 border border-zinc-700 rounded-lg">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <h4 className="font-medium text-white">{plataforma?.nombre}</h4>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removePlataforma(selectedPlataforma.plataformaId)}
+                                                    className="text-red-400 hover:text-red-300"
+                                                    disabled={isSubmitting}
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <Label className="text-xs text-zinc-400">Presupuesto</Label>
+                                                    <Input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={selectedPlataforma.presupuesto}
+                                                        onChange={(e) => updatePlataforma(selectedPlataforma.plataformaId, 'presupuesto', parseFloat(e.target.value) || 0)}
+                                                        className="bg-zinc-900 border-zinc-700 text-white text-sm"
+                                                        disabled={isSubmitting}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <Label className="text-xs text-zinc-400">Gasto Real</Label>
+                                                    <Input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        value={selectedPlataforma.gastoReal}
+                                                        onChange={(e) => updatePlataforma(selectedPlataforma.plataformaId, 'gastoReal', parseFloat(e.target.value) || 0)}
+                                                        className="bg-zinc-900 border-zinc-700 text-white text-sm"
+                                                        disabled={isSubmitting}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -184,29 +385,27 @@ export function CampanaModal({ isOpen, onClose, onSave, editingCampaña }: Campa
                                 type="button"
                                 onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
                                 disabled={isSubmitting}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                                    formData.isActive ? 'bg-blue-600' : 'bg-zinc-600'
-                                }`}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${formData.isActive ? 'bg-blue-600' : 'bg-zinc-600'
+                                    }`}
                             >
                                 <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                        formData.isActive ? 'translate-x-6' : 'translate-x-1'
-                                    }`}
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.isActive ? 'translate-x-6' : 'translate-x-1'
+                                        }`}
                                 />
                             </button>
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button 
-                            type="button" 
-                            variant="outline" 
+                        <Button
+                            type="button"
+                            variant="outline"
                             onClick={handleClose}
                             disabled={isSubmitting}
                         >
                             Cancelar
                         </Button>
-                        <Button 
+                        <Button
                             type="submit"
                             disabled={isSubmitting}
                             className="bg-blue-600 hover:bg-blue-700"

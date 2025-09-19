@@ -27,24 +27,26 @@ interface CampañaPlataforma {
     gastoReal: number;
     leads: number;
     conversiones: number;
-    plataforma: Plataforma;
+    plataforma?: Plataforma;
+    platform_plataformas_publicidad?: Plataforma;
 }
 
 interface Campaña {
     id: string;
     nombre: string;
     descripcion: string | null;
-    presupuestoTotal: number;
-    fechaInicio: Date;
-    fechaFin: Date;
+    presupuestoTotal: number | string;
+    fechaInicio: string | Date;
+    fechaFin: string | Date;
     status: string;
     isActive: boolean;
     leadsGenerados: number;
     leadsSuscritos: number;
     gastoReal: number;
-    createdAt: Date;
-    updatedAt: Date;
-    plataformas: CampañaPlataforma[];
+    createdAt: string | Date;
+    updatedAt: string | Date;
+    plataformas?: CampañaPlataforma[];
+    platform_campana_plataformas?: CampañaPlataforma[];
     _count: {
         leads: number;
     };
@@ -229,8 +231,9 @@ export default function CampanasActivasPage() {
     };
 
     const calculateMetrics = (campaña: Campaña) => {
-        const costoAdquisicion = campaña.leadsGenerados > 0 ? campaña.gastoReal / campaña.leadsGenerados : 0;
-        const costoConversion = campaña.leadsSuscritos > 0 ? campaña.gastoReal / campaña.leadsSuscritos : 0;
+        const gastoReal = typeof campaña.gastoReal === 'string' ? parseFloat(campaña.gastoReal) : campaña.gastoReal;
+        const costoAdquisicion = campaña.leadsGenerados > 0 ? gastoReal / campaña.leadsGenerados : 0;
+        const costoConversion = campaña.leadsSuscritos > 0 ? gastoReal / campaña.leadsSuscritos : 0;
         const tasaConversion = campaña.leadsGenerados > 0 ? (campaña.leadsSuscritos / campaña.leadsGenerados) * 100 : 0;
 
         return { costoAdquisicion, costoConversion, tasaConversion };
@@ -302,7 +305,9 @@ export default function CampanasActivasPage() {
                                         <div>
                                             <p className="text-xs text-zinc-500">Presupuesto</p>
                                             <p className="text-sm font-medium text-white">
-                                                ${campaña.presupuestoTotal.toLocaleString()}
+                                                ${typeof campaña.presupuestoTotal === 'string'
+                                                    ? parseFloat(campaña.presupuestoTotal).toLocaleString()
+                                                    : campaña.presupuestoTotal.toLocaleString()}
                                             </p>
                                         </div>
                                     </div>
@@ -337,28 +342,31 @@ export default function CampanasActivasPage() {
                                 <div className="flex items-center space-x-2 text-sm text-zinc-400">
                                     <Calendar className="h-4 w-4" />
                                     <span>
-                                        {campaña.fechaInicio.toLocaleDateString()} - {campaña.fechaFin.toLocaleDateString()}
+                                        {new Date(campaña.fechaInicio).toLocaleDateString()} - {new Date(campaña.fechaFin).toLocaleDateString()}
                                     </span>
                                 </div>
 
                                 {/* Plataformas */}
-                                {campaña.plataformas.length > 0 && (
-                                    <div>
-                                        <p className="text-xs text-zinc-500 mb-2">Plataformas:</p>
-                                        <div className="flex flex-wrap gap-1">
-                                            {campaña.plataformas.slice(0, 3).map(plataforma => (
-                                                <Badge key={plataforma.id} variant="secondary" className="text-xs">
-                                                    {plataforma.plataforma.nombre}
-                                                </Badge>
-                                            ))}
-                                            {campaña.plataformas.length > 3 && (
-                                                <Badge variant="secondary" className="text-xs">
-                                                    +{campaña.plataformas.length - 3}
-                                                </Badge>
-                                            )}
+                                {(() => {
+                                    const plataformas = campaña.plataformas || campaña.platform_campana_plataformas || [];
+                                    return plataformas.length > 0 && (
+                                        <div>
+                                            <p className="text-xs text-zinc-500 mb-2">Plataformas:</p>
+                                            <div className="flex flex-wrap gap-1">
+                                                {plataformas.slice(0, 3).map(plataforma => (
+                                                    <Badge key={plataforma.id} variant="secondary" className="text-xs">
+                                                        {plataforma.plataforma?.nombre || plataforma.platform_plataformas_publicidad?.nombre || 'Plataforma'}
+                                                    </Badge>
+                                                ))}
+                                                {plataformas.length > 3 && (
+                                                    <Badge variant="secondary" className="text-xs">
+                                                        +{plataformas.length - 3}
+                                                    </Badge>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    );
+                                })()}
 
                                 {/* Acciones */}
                                 <div className="flex items-center justify-between pt-2">

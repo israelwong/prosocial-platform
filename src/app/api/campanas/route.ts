@@ -50,19 +50,29 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-
         const { plataformas, ...campañaData } = body;
 
         const campaña = await prisma.platform_campanas.create({
             data: {
-                ...campañaData,
+                nombre: campañaData.nombre,
+                descripcion: campañaData.descripcion,
+                presupuestoTotal: campañaData.presupuestoTotal,
+                fechaInicio: new Date(campañaData.fechaInicio),
+                fechaFin: new Date(campañaData.fechaFin),
+                isActive: campañaData.isActive,
+                status: campañaData.status || 'planificada',
+                leadsGenerados: campañaData.leadsGenerados || 0,
+                leadsSuscritos: campañaData.leadsSuscritos || 0,
+                gastoReal: campañaData.gastoReal || 0,
+                updatedAt: new Date(),
                 platform_campana_plataformas: {
                     create: plataformas?.map((p: any) => ({
                         plataformaId: p.plataformaId,
                         presupuesto: p.presupuesto,
                         gastoReal: p.gastoReal || 0,
                         leads: p.leads || 0,
-                        conversiones: p.conversiones || 0
+                        conversiones: p.conversiones || 0,
+                        updatedAt: new Date()
                     })) || []
                 }
             },
@@ -79,7 +89,10 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('Error creating campaña:', error);
         return NextResponse.json(
-            { error: 'Error al crear la campaña' },
+            {
+                error: 'Error al crear la campaña',
+                details: error instanceof Error ? error.message : 'Error desconocido'
+            },
             { status: 500 }
         );
     }
