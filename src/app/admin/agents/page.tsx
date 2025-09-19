@@ -1,8 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
+import { SectionNavigation } from '@/components/ui/section-navigation';
 import { AgentsPageClient } from './components';
 import { Agent } from './types';
 import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
@@ -50,20 +48,15 @@ export default async function AgentsPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Gestión de Agentes</h1>
-                    <p className="text-muted-foreground">
-                        Administra los agentes comerciales y su rendimiento
-                    </p>
-                </div>
-                <Button asChild>
-                    <Link href="/admin/agents/new">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Nuevo Agente
-                    </Link>
-                </Button>
-            </div>
+            <SectionNavigation
+                title="Gestión de Agentes"
+                description="Administra los agentes comerciales y su rendimiento"
+                actionButton={{
+                    label: "Nuevo Agente",
+                    href: "/admin/agents/new",
+                    icon: "UserPlus"
+                }}
+            />
 
             {/* Error State */}
             {error && (
@@ -86,19 +79,23 @@ export default async function AgentsPage() {
                                     <li>Si el problema persiste, contacta al administrador</li>
                                 </ul>
                             </div>
-                            <Link
-                                href="/admin/agents"
+                            <button
+                                onClick={() => window.location.reload()}
                                 className="mt-4 inline-block px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors"
                             >
                                 Recargar página
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
 
             {/* Client Components with State Management */}
-            {!error && <AgentsPageClient initialAgents={agents} />}
+            {!error && (
+                <div className="bg-zinc-900 border border-zinc-800 rounded-lg">
+                    <AgentsPageClient initialAgents={agents} />
+                </div>
+            )}
         </div>
     );
 }

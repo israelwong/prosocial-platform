@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { PipelinePageClient } from './components/PipelinePageClient';
+import { PipelineWrapper } from './components/PipelineWrapper';
 import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
 interface PipelineStage {
@@ -94,15 +94,7 @@ export default async function PipelinePage() {
 
     if (error) {
         return (
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Pipeline de Ventas</h1>
-                        <p className="text-muted-foreground">
-                            Gestiona las etapas del proceso de ventas
-                        </p>
-                    </div>
-                </div>
+            <div className="p-6 space-y-6">
 
                 {/* Error State */}
                 <div className="bg-red-900/20 border border-red-800 rounded-lg p-6">
@@ -131,5 +123,5 @@ export default async function PipelinePage() {
         );
     }
 
-    return <PipelinePageClient pipelineTypes={pipelineTypes} />;
+    return <PipelineWrapper pipelineTypes={pipelineTypes} />;
 }

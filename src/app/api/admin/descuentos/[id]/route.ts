@@ -6,11 +6,12 @@ const prisma = new PrismaClient();
 // GET /api/admin/descuentos/[id] - Obtener código de descuento específico
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const discountCode = await prisma.platform_discount_codes.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 discount_usage: {
                     include: {
@@ -74,10 +75,11 @@ export async function GET(
 // PUT /api/admin/descuentos/[id] - Actualizar código de descuento
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const body = await request.json();
+        const { id } = await params;
         const {
             codigo,
             nombre,
@@ -193,12 +195,13 @@ export async function PUT(
 // DELETE /api/admin/descuentos/[id] - Eliminar código de descuento
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         // Verificar que el código existe
         const existingCode = await prisma.platform_discount_codes.findUnique({
-            where: { id: params.id },
+            where: { id },
             include: {
                 discount_usage: true,
             },

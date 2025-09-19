@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SectionNavigation } from '@/components/ui/section-navigation';
 import { Plus, Eye, Users, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CanalesList, CanalModal } from './components';
@@ -254,21 +255,15 @@ export default function CanalesPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Gestión de Canales</h1>
-                    <p className="text-zinc-400 mt-1 text-sm">
-                        Configura los canales de adquisición de leads
-                    </p>
-                </div>
-                <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={handleCreateCanal}
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nuevo Canal
-                </Button>
-            </div>
+            <SectionNavigation
+                title="Gestión de Canales"
+                description="Configura los canales de adquisición de leads"
+                actionButton={{
+                    label: "Nuevo Canal",
+                    onClick: handleCreateCanal,
+                    icon: "Plus"
+                }}
+            />
 
             {/* Stats Cards */}
             <div className="grid gap-4 md:grid-cols-3">

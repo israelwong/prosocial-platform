@@ -11,7 +11,6 @@ import {
     Columns3,
     Target,
     Play,
-    History,
     Wrench,
     Users,
     Gift
@@ -24,13 +23,7 @@ const navigationSections = [
         items: [
             { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
             { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-        ]
-    },
-    {
-        title: 'Marketing',
-        items: [
-            { name: 'Campañas Activas', href: '/admin/campanas/activas', icon: Play },
-            { name: 'Historial', href: '/admin/campanas/historial', icon: History },
+            { name: 'Campañas', href: '/admin/campanas/activas', icon: Play },
         ]
     },
     {

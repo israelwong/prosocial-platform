@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+// GET /api/plataformas - Obtener todas las plataformas
+export async function GET(request: NextRequest) {
     try {
         const plataformas = await prisma.platform_plataformas_publicidad.findMany({
-            where: {
-                isActive: true
-            },
-            orderBy: [
-                { tipo: 'asc' },
-                { orden: 'asc' }
-            ]
+            orderBy: {
+                nombre: 'asc'
+            }
         });
 
         return NextResponse.json(plataformas);
@@ -23,19 +20,45 @@ export async function GET() {
     }
 }
 
+// POST /api/plataformas - Crear nueva plataforma
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
+        const { nombre, tipo, color, icono, descripcion } = body;
+
+        // Validar campos requeridos
+        if (!nombre || !tipo) {
+            return NextResponse.json(
+                { error: 'Nombre y tipo son requeridos' },
+                { status: 400 }
+            );
+        }
+
+        // Verificar si ya existe una plataforma con el mismo nombre
+        const existingPlataforma = await prisma.platform_plataformas_publicidad.findFirst({
+            where: {
+                nombre: {
+                    equals: nombre,
+                    mode: 'insensitive'
+                }
+            }
+        });
+
+        if (existingPlataforma) {
+            return NextResponse.json(
+                { error: 'Ya existe una plataforma con este nombre' },
+                { status: 400 }
+            );
+        }
 
         const plataforma = await prisma.platform_plataformas_publicidad.create({
             data: {
-                nombre: body.nombre,
-                descripcion: body.descripcion,
-                tipo: body.tipo,
-                color: body.color,
-                icono: body.icono,
-                isActive: body.isActive !== false,
-                orden: body.orden || 0,
+                nombre,
+                tipo,
+                color,
+                icono,
+                descripcion,
+                createdAt: new Date(),
                 updatedAt: new Date()
             }
         });

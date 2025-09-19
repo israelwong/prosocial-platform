@@ -1,8 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
+import { SectionNavigation } from '@/components/ui/section-navigation';
 import { PlansPageClient } from './components';
 import { Plan } from './types';
 
@@ -105,20 +103,15 @@ export default async function PlansPage() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Gestión de Planes</h1>
-                    <p className="text-muted-foreground">
-                        Administra los planes de suscripción de la plataforma
-                    </p>
-                </div>
-                <Button asChild>
-                    <Link href="/admin/plans/new">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Nuevo Plan
-                    </Link>
-                </Button>
-            </div>
+            <SectionNavigation
+                title="Gestión de Planes"
+                description="Administra los planes de suscripción de la plataforma"
+                actionButton={{
+                    label: "Nuevo Plan",
+                    href: "/admin/plans/new",
+                    icon: "Plus"
+                }}
+            />
 
             {/* Client Components */}
             <PlansPageClient initialPlans={plans} />

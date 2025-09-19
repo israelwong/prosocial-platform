@@ -133,11 +133,7 @@ export default function CampanasActivasPage() {
         leadsSuscritos: number;
         gastoReal: number;
         plataformas: Array<{
-            id: string;
-            plataforma: {
-                id: string;
-                nombre: string;
-            };
+            plataformaId: string;
             presupuesto: number;
             gastoReal: number;
             leads: number;
@@ -157,6 +153,16 @@ export default function CampanasActivasPage() {
                 if (!response.ok) {
                     throw new Error('Error al actualizar la campaña');
                 }
+
+                const updatedCampaña = await response.json();
+
+                // Actualizar estado local sin hacer nueva petición
+                setCampanas(prevCampanas =>
+                    prevCampanas.map(c =>
+                        c.id === editingCampaña.id ? updatedCampaña : c
+                    )
+                );
+
                 toast.success('Campaña actualizada exitosamente');
             } else {
                 const response = await fetch('/api/campanas', {
@@ -170,11 +176,16 @@ export default function CampanasActivasPage() {
                 if (!response.ok) {
                     throw new Error('Error al crear la campaña');
                 }
+
+                const newCampaña = await response.json();
+
+                // Agregar nueva campaña al estado local
+                setCampanas(prevCampanas => [...prevCampanas, newCampaña]);
+
                 toast.success('Campaña creada exitosamente');
             }
 
             setEditingCampaña(null);
-            fetchCampanas();
         } catch (error) {
             console.error('Error saving campaña:', error);
             throw error; // Re-throw para que el modal maneje el error
@@ -207,8 +218,13 @@ export default function CampanasActivasPage() {
             if (!response.ok) {
                 throw new Error('Error al eliminar la campaña');
             }
+
+            // Eliminar campaña del estado local sin hacer nueva petición
+            setCampanas(prevCampanas =>
+                prevCampanas.filter(c => c.id !== id)
+            );
+
             toast.success('Campaña eliminada exitosamente');
-            fetchCampanas();
         } catch (error) {
             console.error('Error deleting campaña:', error);
             toast.error('Error al eliminar la campaña');
@@ -248,34 +264,29 @@ export default function CampanasActivasPage() {
     }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
+        <div className="p-6 space-y-6">
+
+            {/* Filtros y Acciones */}
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Campañas Activas</h1>
-                    <p className="text-zinc-400">Gestiona las campañas de marketing activas</p>
+                <div className="flex items-center space-x-4">
+                    <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 h-4 w-4" />
+                        <Input
+                            placeholder="Buscar campañas..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
                 </div>
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
-                        <Button onClick={handleOpenModal}>
+                        <Button onClick={handleOpenModal} className="bg-blue-600 hover:bg-blue-700">
                             <Plus className="h-4 w-4 mr-2" />
                             Nueva Campaña
                         </Button>
                     </DialogTrigger>
                 </Dialog>
-            </div>
-
-            {/* Filtros */}
-            <div className="flex items-center space-x-4">
-                <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 h-4 w-4" />
-                    <Input
-                        placeholder="Buscar campañas..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                    />
-                </div>
             </div>
 
             {/* Campañas */}

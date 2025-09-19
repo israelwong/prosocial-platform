@@ -40,9 +40,10 @@ interface PipelineType {
 
 interface PipelinePageClientProps {
     pipelineTypes: PipelineType[];
+    onCreateStage?: () => void;
 }
 
-export function PipelinePageClient({ pipelineTypes }: PipelinePageClientProps) {
+export function PipelinePageClient({ pipelineTypes, onCreateStage }: PipelinePageClientProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingStage, setEditingStage] = useState<PipelineStage | null>(null);
     const router = useRouter();
@@ -51,6 +52,9 @@ export function PipelinePageClient({ pipelineTypes }: PipelinePageClientProps) {
         setEditingStage(null);
         setIsModalOpen(true);
     };
+
+    // Usar la función pasada desde el layout o la función local
+    const createStageHandler = onCreateStage || handleCreateStage;
 
     const handleEditStage = (stage: PipelineStage) => {
         setEditingStage(stage);
@@ -74,23 +78,7 @@ export function PipelinePageClient({ pipelineTypes }: PipelinePageClientProps) {
     const totalLeads = allStages.reduce((sum, stage) => sum + (stage.leadCount || 0), 0);
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Gestión de Pipeline</h1>
-                    <p className="text-zinc-400 mt-1 text-sm">
-                        Configura las etapas del pipeline de ventas
-                    </p>
-                </div>
-                <Button
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={handleCreateStage}
-                >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Nueva Etapa
-                </Button>
-            </div>
+        <div className="p-6 space-y-6">
 
             {/* Stats Cards */}
             <div className="grid gap-4 md:grid-cols-3">
