@@ -25,116 +25,79 @@ model platform_billing_cycles {
 
 model platform_config {
   id                    String   @id @default(cuid())
-  
-  // Información general
   nombre_empresa        String
   logo_url              String?
   favicon_url           String?
-  
-  // Contacto comercial
   comercial_telefono    String?
   comercial_email       String?
   comercial_whatsapp    String?
-  
-  // Contacto soporte
   soporte_telefono      String?
   soporte_email         String?
   soporte_chat_url      String?
-  
-  // Información general
   direccion             String?
   horarios_atencion     String?
   timezone              String   @default("America/Mexico_City")
-  
-  // Redes sociales
   facebook_url          String?
   instagram_url         String?
   twitter_url           String?
   linkedin_url          String?
-  
-  // Legal
   terminos_condiciones  String?
   politica_privacidad   String?
   aviso_legal           String?
-  
-  // SEO
   meta_description      String?
   meta_keywords         String?
-  
-  // Configuración técnica
   google_analytics_id   String?
   google_tag_manager_id String?
-  
   createdAt             DateTime @default(now())
   updatedAt             DateTime
 }
 
 model platform_services {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
-  description String?
-  categoryId  String   // Ahora obligatorio
-  posicion    Int      @default(0)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  category    service_categories @relation(fields: [categoryId], references: [id])
+  id            String             @id @default(cuid())
+  name          String             @unique
+  slug          String             @unique
+  description   String?
+  active        Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  posicion      Int                @default(0)
+  categoryId    String
   plan_services plan_services[]
-  
+  category      service_categories @relation(fields: [categoryId], references: [id])
+
   @@index([active, posicion])
   @@index([categoryId])
 }
 
 model platform_canales_adquisicion {
-  id              String            @id @default(cuid())
-  nombre          String            @unique
-  descripcion     String?
-  color           String?
-  icono           String?
-  isActive        Boolean           @default(true)
-  isVisible       Boolean           @default(true)
-  orden           Int               @default(0)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime
-  platform_leads  platform_leads[]
+  id             String           @id @default(cuid())
+  nombre         String           @unique
+  descripcion    String?
+  color          String?
+  icono          String?
+  isActive       Boolean          @default(true)
+  isVisible      Boolean          @default(true)
+  orden          Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  platform_leads platform_leads[]
 
   @@index([isActive])
   @@index([isVisible])
 }
 
-model platform_plataformas_redes_sociales {
-  id          String   @id @default(cuid())
-  nombre      String   @unique  // "Facebook", "Instagram", "X", "TikTok"
-  slug        String   @unique  // "facebook", "instagram", "x", "tiktok"
-  descripcion String?
-  color       String?  // "#1877F2" para Facebook, "#000000" para X
-  icono       String?  // "facebook", "instagram", "twitter" (para X)
-  urlBase     String?  // "https://facebook.com/", "https://x.com/"
-  isActive    Boolean  @default(true)
-  orden       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  project_redes_sociales project_redes_sociales[]
-  
-  @@index([isActive])
-  @@index([slug])
-}
-
 model platform_lead_bitacora {
-  id              String           @id @default(cuid())
-  leadId          String
-  tipo            PlatformLeadBitacoraTipo
-  titulo          String?
-  descripcion     String
-  metadata        Json?
-  usuarioId       String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime
-  platform_leads  platform_leads   @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  user_profiles   project_user_profiles?   @relation(fields: [usuarioId], references: [id])
+  id             String                   @id @default(cuid())
+  leadId         String
+  tipo           PlatformLeadBitacoraTipo
+  titulo         String?
+  descripcion    String
+  metadata       Json?
+  usuarioId      String?
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime
+  platform_leads platform_leads           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user_profiles  project_user_profiles?   @relation(fields: [usuarioId], references: [id])
 
   @@index([createdAt])
   @@index([leadId])
@@ -142,47 +105,45 @@ model platform_lead_bitacora {
 }
 
 model platform_leads {
-  id                            String                         @id @default(cuid())
-  nombre                        String
-  email                         String                         @unique
-  telefono                      String
-  nombreEstudio                 String?
-  slugEstudio                   String?
-  fechaUltimoContacto           DateTime?
-  planInteres                   String?
-  presupuestoMensual            Decimal?
-  fechaProbableInicio           DateTime?
-  agentId                       String?
-  puntaje                       Int?
-  prioridad                     String                         @default("media")
-  fechaConversion               DateTime?
-  studioId                      String?                        @unique
-  createdAt                     DateTime                       @default(now())
-  updatedAt                     DateTime
-  etapaId                       String?
-  canalAdquisicionId            String?
-  campa_aId                     String?                        @map("campañaId")
-  
-  // Nuevos campos para mejor clasificación
-  tipo_lead                     String?                        @default("prospecto")
-  metodo_conversion             String?
-  agente_conversion_id          String?
-  fecha_primera_interaccion     DateTime?
-  numero_interacciones          Int?                           @default(0)
-  fuente_original               String?
-  utm_source                    String?
-  utm_medium                    String?
-  utm_campaign                  String?
-  platform_activities           platform_activities[]
-  platform_lead_bitacora        platform_lead_bitacora[]
-  platform_agents               platform_agents?               @relation(fields: [agentId], references: [id])
-  platform_campanas             platform_campanas?             @relation(fields: [campa_aId], references: [id])
-  platform_canales_adquisicion  platform_canales_adquisicion?  @relation(fields: [canalAdquisicionId], references: [id])
-  platform_pipeline_stages      platform_pipeline_stages?      @relation(fields: [etapaId], references: [id])
-  studios                       projects?                      @relation(fields: [studioId], references: [id])
-  platform_notifications        platform_notifications[]
-  discount_usage                platform_discount_usage[]
-  agent_discount_codes          platform_agent_discount_codes[]
+  id                           String                          @id @default(cuid())
+  nombre                       String
+  email                        String                          @unique
+  telefono                     String
+  nombreEstudio                String?
+  slugEstudio                  String?
+  fechaUltimoContacto          DateTime?
+  planInteres                  String?
+  presupuestoMensual           Decimal?
+  fechaProbableInicio          DateTime?
+  agentId                      String?
+  puntaje                      Int?
+  prioridad                    String                          @default("media")
+  fechaConversion              DateTime?
+  studioId                     String?                         @unique
+  createdAt                    DateTime                        @default(now())
+  updatedAt                    DateTime
+  etapaId                      String?
+  canalAdquisicionId           String?
+  campa_aId                    String?                         @map("campañaId")
+  agente_conversion_id         String?
+  fecha_primera_interaccion    DateTime?
+  fuente_original              String?
+  metodo_conversion            String?
+  numero_interacciones         Int?                            @default(0)
+  tipo_lead                    String?                         @default("prospecto")
+  utm_campaign                 String?
+  utm_medium                   String?
+  utm_source                   String?
+  platform_activities          platform_activities[]
+  agent_discount_codes         platform_agent_discount_codes[]
+  discount_usage               platform_discount_usage[]
+  platform_lead_bitacora       platform_lead_bitacora[]
+  platform_agents              platform_agents?                @relation(fields: [agentId], references: [id])
+  platform_campanas            platform_campanas?              @relation(fields: [campa_aId], references: [id])
+  platform_canales_adquisicion platform_canales_adquisicion?   @relation(fields: [canalAdquisicionId], references: [id])
+  platform_pipeline_stages     platform_pipeline_stages?       @relation(fields: [etapaId], references: [id])
+  studios                      projects?                       @relation(fields: [studioId], references: [id])
+  platform_notifications       platform_notifications[]
 
   @@index([agentId])
   @@index([campa_aId])
@@ -191,25 +152,25 @@ model platform_leads {
 }
 
 model platform_notifications {
-  id               String            @id @default(cuid())
-  userId           String
-  titulo           String
-  mensaje          String
-  tipo             String            @default("info")
-  categoria        String            @default("general")
-  metadata         Json?
-  isRead           Boolean           @default(false)
-  isActive         Boolean           @default(true)
-  priority         String            @default("medium")
-  leadId           String?
-  agentId          String?
-  scheduledFor     DateTime?
-  expiresAt        DateTime?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime
-  platform_agents  platform_agents?  @relation(fields: [agentId], references: [id])
-  platform_leads   platform_leads?   @relation(fields: [leadId], references: [id])
-  user_profiles    project_user_profiles     @relation(fields: [userId], references: [id])
+  id              String                @id @default(cuid())
+  userId          String
+  titulo          String
+  mensaje         String
+  tipo            String                @default("info")
+  categoria       String                @default("general")
+  metadata        Json?
+  isRead          Boolean               @default(false)
+  isActive        Boolean               @default(true)
+  priority        String                @default("medium")
+  leadId          String?
+  agentId         String?
+  scheduledFor    DateTime?
+  expiresAt       DateTime?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime
+  platform_agents platform_agents?      @relation(fields: [agentId], references: [id])
+  platform_leads  platform_leads?       @relation(fields: [leadId], references: [id])
+  user_profiles   project_user_profiles @relation(fields: [userId], references: [id])
 
   @@index([createdAt])
   @@index([scheduledFor])
@@ -219,13 +180,13 @@ model platform_notifications {
 }
 
 model platform_pipeline_types {
-  id              String            @id @default(cuid())
-  nombre          String            @unique
+  id              String                     @id @default(cuid())
+  nombre          String                     @unique
   descripcion     String?
-  color           String            @default("#3B82F6")
-  activo          Boolean           @default(true)
-  orden           Int               @default(0)
-  createdAt       DateTime          @default(now())
+  color           String                     @default("#3B82F6")
+  activo          Boolean                    @default(true)
+  orden           Int                        @default(0)
+  createdAt       DateTime                   @default(now())
   updatedAt       DateTime
   pipeline_stages platform_pipeline_stages[]
 
@@ -234,17 +195,17 @@ model platform_pipeline_types {
 }
 
 model platform_pipeline_stages {
-  id              String            @id @default(cuid())
-  nombre          String
-  descripcion     String?
-  color           String            @default("#3B82F6")
-  orden           Int               @default(0)
-  isActive        Boolean           @default(true)
+  id               String                   @id @default(cuid())
+  nombre           String
+  descripcion      String?
+  color            String                   @default("#3B82F6")
+  orden            Int                      @default(0)
+  isActive         Boolean                  @default(true)
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime
   pipeline_type_id String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime
-  pipeline_type   platform_pipeline_types? @relation(fields: [pipeline_type_id], references: [id])
-  platform_leads  platform_leads[]
+  platform_leads   platform_leads[]
+  pipeline_type    platform_pipeline_types? @relation(fields: [pipeline_type_id], references: [id])
 
   @@index([isActive])
   @@index([orden])
@@ -252,17 +213,17 @@ model platform_pipeline_stages {
 }
 
 model platform_plataformas_publicidad {
-  id                            String                          @id @default(cuid())
-  nombre                        String                          @unique
-  descripcion                   String?
-  tipo                          String
-  color                         String?
-  icono                         String?
-  isActive                      Boolean                         @default(true)
-  orden                         Int                             @default(0)
-  createdAt                     DateTime                        @default(now())
-  updatedAt                     DateTime
-  platform_campana_plataformas  platform_campana_plataformas[]
+  id                           String                         @id @default(cuid())
+  nombre                       String                         @unique
+  descripcion                  String?
+  tipo                         String
+  color                        String?
+  icono                        String?
+  isActive                     Boolean                        @default(true)
+  orden                        Int                            @default(0)
+  createdAt                    DateTime                       @default(now())
+  updatedAt                    DateTime
+  platform_campana_plataformas platform_campana_plataformas[]
 
   @@index([isActive])
   @@index([tipo])
@@ -284,60 +245,60 @@ model platform_plans {
   price_yearly      Decimal?
   stripe_price_id   String?         @unique
   stripe_product_id String?
+  plan_services     plan_services[]
   projects          projects[]
   subscriptions     subscriptions[]
-  plan_services     plan_services[]
 
   @@index([active, orden])
   @@index([stripe_price_id])
 }
 
 model platform_activities {
-  id                 String          @id @default(cuid())
+  id                 String                 @id @default(cuid())
   leadId             String
   tipo               String
   descripcion        String
   resultado          String?
   proximaAccion      String?
   fechaProximaAccion DateTime?
-  createdAt          DateTime        @default(now())
+  createdAt          DateTime               @default(now())
   userId             String?
-  platform_leads     platform_leads  @relation(fields: [leadId], references: [id])
-  user_profiles      project_user_profiles?  @relation(fields: [userId], references: [id])
+  platform_leads     platform_leads         @relation(fields: [leadId], references: [id])
+  user_profiles      project_user_profiles? @relation(fields: [userId], references: [id])
 
   @@index([leadId, createdAt])
   @@index([userId, createdAt])
 }
 
 model platform_agents {
-  id                      String                    @id @default(cuid())
-  nombre                  String
-  email                   String                    @unique
-  telefono                String
-  activo                  Boolean                   @default(true)
-  metaMensualLeads        Int                       @default(20)
-  comisionConversion      Decimal                   @default(0.05)
-  createdAt               DateTime                  @default(now())
-  updatedAt               DateTime
-  platform_leads          platform_leads[]
-  platform_notifications  platform_notifications[]
-  agent_discount_codes    platform_agent_discount_codes[]
+  id                     String                          @id @default(cuid())
+  nombre                 String
+  email                  String                          @unique
+  telefono               String
+  activo                 Boolean                         @default(true)
+  metaMensualLeads       Int                             @default(20)
+  comisionConversion     Decimal                         @default(0.05)
+  createdAt              DateTime                        @default(now())
+  updatedAt              DateTime
+  agent_discount_codes   platform_agent_discount_codes[]
+  platform_leads         platform_leads[]
+  platform_notifications platform_notifications[]
 
   @@index([activo])
 }
 
 model platform_campana_plataformas {
-  id                               String                           @id @default(cuid())
-  campa_aId                        String                           @map("campañaId")
-  plataformaId                     String
-  presupuesto                      Decimal
-  gastoReal                        Decimal                          @default(0)
-  leads                            Int                              @default(0)
-  conversiones                     Int                              @default(0)
-  createdAt                        DateTime                         @default(now())
-  updatedAt                        DateTime
-  platform_campanas                platform_campanas                @relation(fields: [campa_aId], references: [id], onDelete: Cascade)
-  platform_plataformas_publicidad  platform_plataformas_publicidad  @relation(fields: [plataformaId], references: [id])
+  id                              String                          @id @default(cuid())
+  campa_aId                       String                          @map("campañaId")
+  plataformaId                    String
+  presupuesto                     Decimal
+  gastoReal                       Decimal                         @default(0)
+  leads                           Int                             @default(0)
+  conversiones                    Int                             @default(0)
+  createdAt                       DateTime                        @default(now())
+  updatedAt                       DateTime
+  platform_campanas               platform_campanas               @relation(fields: [campa_aId], references: [id], onDelete: Cascade)
+  platform_plataformas_publicidad platform_plataformas_publicidad @relation(fields: [plataformaId], references: [id])
 
   @@unique([campa_aId, plataformaId])
   @@index([campa_aId])
@@ -345,23 +306,23 @@ model platform_campana_plataformas {
 }
 
 model platform_campanas {
-  id                            String                          @id @default(cuid())
-  nombre                        String
-  descripcion                   String?
-  presupuestoTotal              Decimal
-  fechaInicio                   DateTime
-  fechaFin                      DateTime
-  isActive                      Boolean                         @default(true)
-  status                        String                          @default("planificada")
-  leadsGenerados                Int                             @default(0)
-  leadsSuscritos                Int                             @default(0)
-  gastoReal                     Decimal                         @default(0)
-  projectId                     String?                         // Opcional: para campañas dirigidas a un estudio específico
-  createdAt                     DateTime                        @default(now())
-  updatedAt                     DateTime
-  platform_campana_plataformas  platform_campana_plataformas[]
-  platform_leads                platform_leads[]
-  projects                      projects?                       @relation(fields: [projectId], references: [id])
+  id                           String                         @id @default(cuid())
+  nombre                       String
+  descripcion                  String?
+  presupuestoTotal             Decimal
+  fechaInicio                  DateTime
+  fechaFin                     DateTime
+  isActive                     Boolean                        @default(true)
+  status                       String                         @default("planificada")
+  leadsGenerados               Int                            @default(0)
+  leadsSuscritos               Int                            @default(0)
+  gastoReal                    Decimal                        @default(0)
+  projectId                    String?
+  createdAt                    DateTime                       @default(now())
+  updatedAt                    DateTime
+  platform_campana_plataformas platform_campana_plataformas[]
+  projects                     projects?                      @relation(fields: [projectId], references: [id])
+  platform_leads               platform_leads[]
 
   @@index([fechaInicio, fechaFin])
   @@index([isActive])
@@ -370,22 +331,22 @@ model platform_campanas {
 }
 
 model platform_discount_codes {
-  id                String          @id @default(cuid())
-  codigo            String          @unique
-  nombre            String
-  descripcion       String?
-  tipo_descuento    String          // 'porcentaje', 'monto_fijo'
-  valor_descuento   Decimal
-  tipo_aplicacion   String          // 'plan_mensual', 'plan_anual', 'ambos'
-  fecha_inicio      DateTime
-  fecha_fin         DateTime
-  uso_maximo        Int?            // null = ilimitado
-  uso_actual        Int             @default(0)
-  activo            Boolean         @default(true)
-  stripe_coupon_id  String?         @unique
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime
-  discount_usage    platform_discount_usage[]
+  id               String                    @id @default(cuid())
+  codigo           String                    @unique
+  nombre           String
+  descripcion      String?
+  tipo_descuento   String
+  valor_descuento  Decimal
+  tipo_aplicacion  String
+  fecha_inicio     DateTime
+  fecha_fin        DateTime
+  uso_maximo       Int?
+  uso_actual       Int                       @default(0)
+  activo           Boolean                   @default(true)
+  stripe_coupon_id String?                   @unique
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime
+  discount_usage   platform_discount_usage[]
 
   @@index([activo])
   @@index([fecha_inicio, fecha_fin])
@@ -393,15 +354,15 @@ model platform_discount_codes {
 }
 
 model platform_discount_usage {
-  id                String          @id @default(cuid())
-  discount_code_id  String
-  lead_id           String?
-  subscription_id   String?
-  monto_descuento   Decimal
-  fecha_uso         DateTime        @default(now())
-  discount_code     platform_discount_codes @relation(fields: [discount_code_id], references: [id])
-  lead              platform_leads? @relation(fields: [lead_id], references: [id])
-  subscription      subscriptions?  @relation(fields: [subscription_id], references: [id])
+  id               String                  @id @default(cuid())
+  discount_code_id String
+  lead_id          String?
+  subscription_id  String?
+  monto_descuento  Decimal
+  fecha_uso        DateTime                @default(now())
+  discount_code    platform_discount_codes @relation(fields: [discount_code_id], references: [id])
+  lead             platform_leads?         @relation(fields: [lead_id], references: [id])
+  subscription     subscriptions?          @relation(fields: [subscription_id], references: [id])
 
   @@index([discount_code_id])
   @@index([lead_id])
@@ -410,24 +371,24 @@ model platform_discount_usage {
 }
 
 model platform_agent_discount_codes {
-  id                String          @id @default(cuid())
-  codigo_base       String
-  lead_id           String
-  agente_id         String
-  codigo_completo   String          @unique
-  tipo_descuento    String          // 'porcentaje', 'monto_fijo'
-  valor_descuento   Decimal
-  duracion_descuento String         // '1_mes', '3_meses', 'permanente'
-  stripe_coupon_id  String?         @unique
-  fecha_creacion    DateTime        @default(now())
-  fecha_expiracion  DateTime
-  usado             Boolean         @default(false)
-  fecha_uso         DateTime?
-  subscription_id   String?
-  activo            Boolean         @default(true)
-  lead              platform_leads  @relation(fields: [lead_id], references: [id])
-  agente            platform_agents @relation(fields: [agente_id], references: [id])
-  subscription      subscriptions?  @relation(fields: [subscription_id], references: [id])
+  id                 String          @id @default(cuid())
+  codigo_base        String
+  lead_id            String
+  agente_id          String
+  codigo_completo    String          @unique
+  tipo_descuento     String
+  valor_descuento    Decimal
+  duracion_descuento String
+  stripe_coupon_id   String?         @unique
+  fecha_creacion     DateTime        @default(now())
+  fecha_expiracion   DateTime
+  usado              Boolean         @default(false)
+  fecha_uso          DateTime?
+  subscription_id    String?
+  activo             Boolean         @default(true)
+  agente             platform_agents @relation(fields: [agente_id], references: [id])
+  lead               platform_leads  @relation(fields: [lead_id], references: [id])
+  subscription       subscriptions?  @relation(fields: [subscription_id], references: [id])
 
   @@index([lead_id])
   @@index([agente_id])
@@ -436,52 +397,33 @@ model platform_agent_discount_codes {
   @@index([fecha_expiracion])
 }
 
-enum PlatformLeadBitacoraTipo {
-  NOTA_PERSONALIZADA
-  CAMBIO_ETAPA
-  ASIGNACION_AGENTE
-  DESASIGNACION_AGENTE
-  CREACION_LEAD
-  ACTUALIZACION_DATOS
-  LLAMADA_REALIZADA
-  EMAIL_ENVIADO
-  REUNION_AGENDADA
-  CONTRATO_FIRMADO
-  SUSCRIPCION_ACTIVA
-  CANCELACION
-  DESCUENTO_APLICADO
-  CODIGO_DESCUENTO_GENERADO
-}
-
-
-///// PROJECTS /////
-
 model projects {
-  id                       String                    @id @default(cuid())
+  id                       String                            @id @default(cuid())
   name                     String
-  slug                     String                    @unique
-  email                    String                    @unique
+  slug                     String                            @unique
+  email                    String                            @unique
   phone                    String?
   address                  String?
   website                  String?
   logoUrl                  String?
-  // Campos de identidad extendidos
-  slogan                   String?
-  descripcion              String?
-  palabras_clave           String?                   // JSON array como string
-  isotipo_url              String?
   planId                   String?
-  subscriptionStatus       String                    @default("trial")
+  subscriptionStatus       String                            @default("trial")
   subscriptionStart        DateTime?
   subscriptionEnd          DateTime?
-  stripeCustomerId         String?                   @unique
-  stripeSubscriptionId     String?                   @unique
-  stripeAccountId          String?                   @unique
-  stripeOnboardingComplete Boolean                   @default(false)
-  commissionRate           Decimal                   @default(0.30)
-  active                   Boolean                   @default(true)
-  createdAt                DateTime                  @default(now())
+  stripeCustomerId         String?                           @unique
+  stripeSubscriptionId     String?                           @unique
+  stripeAccountId          String?                           @unique
+  stripeOnboardingComplete Boolean                           @default(false)
+  commissionRate           Decimal                           @default(0.30)
+  active                   Boolean                           @default(true)
+  createdAt                DateTime                          @default(now())
   updatedAt                DateTime
+  descripcion              String?
+  isotipo_url              String?
+  palabras_clave           String?
+  slogan                   String?
+  platform_campanas        platform_campanas[]
+  platform_leads           platform_leads?
   agenda                   project_agenda[]
   project_campanas         project_campanas[]
   clientes                 project_clientes[]
@@ -490,22 +432,19 @@ model projects {
   cotizaciones             project_cotizaciones[]
   eventos                  project_eventos[]
   gastos                   project_gastos[]
+  horarios_atencion        project_horarios_atencion[]
   metodos_pago             project_metodos_pago[]
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
-  platform_leads           platform_leads?
-  platform_campanas        platform_campanas[]
+  redes_sociales           project_redes_sociales[]
   revenue_transactions     project_revenue_transactions[]
   servicios                project_servicios[]
   studio_revenue_products  project_studio_revenue_products[]
-  studio_users             project_users[]
-  plans                    platform_plans?           @relation(fields: [planId], references: [id])
-  subscriptions            subscriptions[]
-  user_profiles            project_user_profiles[]
-  // Nuevas relaciones para configuración de cuenta
   telefonos                project_telefonos[]
-  horarios_atencion        project_horarios_atencion[]
-  redes_sociales           project_redes_sociales[]
+  user_profiles            project_user_profiles[]
+  studio_users             project_users[]
+  plans                    platform_plans?                   @relation(fields: [planId], references: [id])
+  subscriptions            subscriptions[]
 
   @@index([planId])
   @@index([slug])
@@ -524,13 +463,13 @@ model project_configuraciones {
   status                      String   @default("active")
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime
-  projects                    projects  @relation(fields: [projectId], references: [id])
+  projects                    projects @relation(fields: [projectId], references: [id])
 
   @@index([projectId])
 }
 
 model project_agenda {
-  id            String        @id @default(cuid())
+  id            String          @id @default(cuid())
   projectId     String
   userId        String?
   eventoId      String
@@ -540,13 +479,13 @@ model project_agenda {
   direccion     String?
   fecha         DateTime?
   hora          String?
-  status        String        @default("pendiente")
-  createdAt     DateTime      @default(now())
+  status        String          @default("pendiente")
+  createdAt     DateTime        @default(now())
   updatedAt     DateTime
   agendaTipo    String?
-  eventos       project_eventos       @relation(fields: [eventoId], references: [id])
-  projects      projects       @relation(fields: [projectId], references: [id])
-  project_users  project_users? @relation(fields: [userId], references: [id])
+  eventos       project_eventos @relation(fields: [eventoId], references: [id])
+  projects      projects        @relation(fields: [projectId], references: [id])
+  project_users project_users?  @relation(fields: [userId], references: [id])
 
   @@index([projectId])
 }
@@ -559,21 +498,21 @@ model project_agenda_tipos {
 }
 
 model project_campanas {
-  id                    String   @id @default(cuid())
-  projectId             String
-  nombre                String
-  descripcion           String?
-  presupuestoTotal      Decimal?
-  fechaInicio           DateTime?
-  fechaFin              DateTime?
-  status                String   @default("activa")
-  plataforma            String?  // "facebook", "google", "instagram", etc.
-  url_campana           String?  // URL de la campaña en la plataforma
-  leadsGenerados        Int      @default(0)
-  gastoReal             Decimal  @default(0)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime
-  projects              projects @relation(fields: [projectId], references: [id])
+  id               String    @id @default(cuid())
+  projectId        String
+  nombre           String
+  descripcion      String?
+  presupuestoTotal Decimal?
+  fechaInicio      DateTime?
+  fechaFin         DateTime?
+  status           String    @default("activa")
+  plataforma       String?
+  url_campana      String?
+  leadsGenerados   Int       @default(0)
+  gastoReal        Decimal   @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime
+  projects         projects  @relation(fields: [projectId], references: [id])
 
   @@index([projectId])
   @@index([status])
@@ -581,21 +520,21 @@ model project_campanas {
 }
 
 model project_clientes {
-  id            String         @id @default(cuid())
+  id            String            @id @default(cuid())
   projectId     String
   nombre        String
   email         String
   telefono      String
   direccion     String?
-  status        String         @default("activo")
+  status        String            @default("activo")
   userId        String?
   passwordHash  String?
-  emailVerified Boolean        @default(false)
-  isActive      Boolean        @default(true)
+  emailVerified Boolean           @default(false)
+  isActive      Boolean           @default(true)
   lastLogin     DateTime?
-  createdAt     DateTime       @default(now())
+  createdAt     DateTime          @default(now())
   updatedAt     DateTime
-  projects      projects        @relation(fields: [projectId], references: [id])
+  projects      projects          @relation(fields: [projectId], references: [id])
   eventos       project_eventos[]
   pagos         project_pagos[]
 
@@ -605,17 +544,17 @@ model project_clientes {
 }
 
 model project_condiciones_comerciales {
-  id                                  String                                @id @default(cuid())
+  id                                  String                                        @id @default(cuid())
   projectId                           String
   nombre                              String
   descripcion                         String?
   descuento                           Float?
-  porcentaje_anticipo                 Float?                                @default(0)
-  status                              String                                @default("active")
-  orden                               Int?                                  @default(0)
-  createdAt                           DateTime                              @default(now())
+  porcentaje_anticipo                 Float?                                        @default(0)
+  status                              String                                        @default("active")
+  orden                               Int?                                          @default(0)
+  createdAt                           DateTime                                      @default(now())
   updatedAt                           DateTime
-  projects                            projects                               @relation(fields: [projectId], references: [id])
+  projects                            projects                                      @relation(fields: [projectId], references: [id])
   condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago[]
   cotizaciones                        project_cotizaciones[]
   pagos                               project_pagos[]
@@ -624,12 +563,12 @@ model project_condiciones_comerciales {
 }
 
 model project_condiciones_comerciales_metodo_pago {
-  id                       String                  @id @default(cuid())
+  id                       String                          @id @default(cuid())
   condicionesComercialesId String
   metodoPagoId             String
-  orden                    Int?                    @default(0)
-  status                   String                  @default("active")
-  createdAt                DateTime                @default(now())
+  orden                    Int?                            @default(0)
+  status                   String                          @default("active")
+  createdAt                DateTime                        @default(now())
   updatedAt                DateTime
   condiciones_comerciales  project_condiciones_comerciales @relation(fields: [condicionesComercialesId], references: [id], onDelete: Cascade)
   metodos_pago             project_metodos_pago            @relation(fields: [metodoPagoId], references: [id])
@@ -638,70 +577,70 @@ model project_condiciones_comerciales_metodo_pago {
 }
 
 model project_cotizacion_costos {
-  id           String       @id @default(cuid())
+  id           String               @id @default(cuid())
   cotizacionId String
   nombre       String
   descripcion  String?
-  costo        Float        @default(0)
-  tipo         String       @default("adicional")
-  posicion     Int          @default(0)
-  createdAt    DateTime     @default(now())
+  costo        Float                @default(0)
+  tipo         String               @default("adicional")
+  posicion     Int                  @default(0)
+  createdAt    DateTime             @default(now())
   updatedAt    DateTime
   cotizaciones project_cotizaciones @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
 }
 
 model project_cotizacion_servicios {
-  id                        String               @id @default(cuid())
+  id                        String                       @id @default(cuid())
   cotizacionId              String
   servicioId                String?
   servicioCategoriaId       String?
-  cantidad                  Int                  @default(1)
-  posicion                  Int                  @default(0)
+  cantidad                  Int                          @default(1)
+  posicion                  Int                          @default(0)
   userId                    String?
   fechaAsignacion           DateTime?
   FechaEntrega              DateTime?
-  status                    String               @default("pendiente")
+  status                    String                       @default("pendiente")
   seccion_nombre_snapshot   String?
   categoria_nombre_snapshot String?
-  nombre_snapshot           String               @default("Servicio migrado")
+  nombre_snapshot           String                       @default("Servicio migrado")
   descripcion_snapshot      String?
-  precio_unitario_snapshot  Float                @default(0)
-  costo_snapshot            Float                @default(0)
-  gasto_snapshot            Float                @default(0)
-  utilidad_snapshot         Float                @default(0)
-  precio_publico_snapshot   Float                @default(0)
-  tipo_utilidad_snapshot    String               @default("servicio")
-  precioUnitario            Float                @default(0)
-  subtotal                  Float                @default(0)
+  precio_unitario_snapshot  Float                        @default(0)
+  costo_snapshot            Float                        @default(0)
+  gasto_snapshot            Float                        @default(0)
+  utilidad_snapshot         Float                        @default(0)
+  precio_publico_snapshot   Float                        @default(0)
+  tipo_utilidad_snapshot    String                       @default("servicio")
+  precioUnitario            Float                        @default(0)
+  subtotal                  Float                        @default(0)
   nombre                    String?
   descripcion               String?
-  costo                     Float?               @default(0)
-  gasto                     Float?               @default(0)
-  utilidad                  Float?               @default(0)
-  precio_publico            Float?               @default(0)
-  tipo_utilidad             String?              @default("servicio")
+  costo                     Float?                       @default(0)
+  gasto                     Float?                       @default(0)
+  utilidad                  Float?                       @default(0)
+  precio_publico            Float?                       @default(0)
+  tipo_utilidad             String?                      @default("servicio")
   categoria_nombre          String?
   seccion_nombre            String?
-  es_personalizado          Boolean              @default(false)
+  es_personalizado          Boolean                      @default(false)
   servicio_original_id      String?
-  createdAt                 DateTime             @default(now())
+  createdAt                 DateTime                     @default(now())
   updatedAt                 DateTime
   cotizaciones              project_cotizaciones         @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
   servicio_categorias       project_servicio_categorias? @relation(fields: [servicioCategoriaId], references: [id])
   servicios                 project_servicios?           @relation(fields: [servicioId], references: [id])
-  studio_users              project_users?        @relation(fields: [userId], references: [id])
+  studio_users              project_users?               @relation(fields: [userId], references: [id])
   nomina_servicios          project_nomina_servicios[]
 }
 
 model project_cotizacion_visitas {
-  id           String       @id @default(cuid())
+  id           String               @id @default(cuid())
   cotizacionId String
-  createdAt    DateTime     @default(now())
+  createdAt    DateTime             @default(now())
   cotizaciones project_cotizaciones @relation(fields: [cotizacionId], references: [id], onDelete: Cascade)
 }
 
 model project_cotizaciones {
-  id                                  String                                @id @default(cuid())
+  id                                  String                                        @id @default(cuid())
   projectId                           String
   eventoTipoId                        String
   eventoId                            String
@@ -711,19 +650,19 @@ model project_cotizaciones {
   descripcion                         String?
   condicionesComercialesId            String?
   condicionesComercialesMetodoPagoId  String?
-  status                              String                                @default("pendiente")
-  archivada                           Boolean                               @default(false)
-  visible_cliente                     Boolean?                              @default(true)
-  createdAt                           DateTime                              @default(now())
+  status                              String                                        @default("pendiente")
+  archivada                           Boolean                                       @default(false)
+  visible_cliente                     Boolean?                                      @default(true)
+  createdAt                           DateTime                                      @default(now())
   updatedAt                           DateTime
-  expiresAt                           DateTime?                             @default(dbgenerated("(now() + '10 days'::interval)"))
+  expiresAt                           DateTime?                                     @default(dbgenerated("(now() + '10 days'::interval)"))
   cotizacion_costos                   project_cotizacion_costos[]
   cotizacion_servicios                project_cotizacion_servicios[]
   cotizacion_visitas                  project_cotizacion_visitas[]
   condiciones_comerciales             project_condiciones_comerciales?              @relation(fields: [condicionesComercialesId], references: [id])
   eventos                             project_eventos                               @relation(fields: [eventoId], references: [id])
   evento_tipos                        project_evento_tipos                          @relation(fields: [eventoTipoId], references: [id])
-  projects                            projects                               @relation(fields: [projectId], references: [id])
+  projects                            projects                                      @relation(fields: [projectId], references: [id])
   pagos                               project_pagos[]
   condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago[] @relation("CondicionesComercialesMetodoPagoToCotizacion")
 
@@ -732,30 +671,30 @@ model project_cotizaciones {
 }
 
 model project_evento_bitacoras {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   eventoId    String
   comentario  String
-  importancia String   @default("1")
-  status      String   @default("active")
-  createdAt   DateTime @default(now())
+  importancia String          @default("1")
+  status      String          @default("active")
+  createdAt   DateTime        @default(now())
   updatedAt   DateTime
-  eventos     project_eventos  @relation(fields: [eventoId], references: [id])
+  eventos     project_eventos @relation(fields: [eventoId], references: [id])
 }
 
 model project_evento_etapas {
-  id        String    @id @default(cuid())
+  id        String            @id @default(cuid())
   nombre    String
-  posicion  Int       @default(0)
-  createdAt DateTime  @default(now())
+  posicion  Int               @default(0)
+  createdAt DateTime          @default(now())
   updatedAt DateTime
   eventos   project_eventos[]
 }
 
 model project_evento_tipos {
-  id           String         @id @default(cuid())
+  id           String                 @id @default(cuid())
   nombre       String
-  posicion     Int            @default(0)
-  createdAt    DateTime       @default(now())
+  posicion     Int                    @default(0)
+  createdAt    DateTime               @default(now())
   updatedAt    DateTime
   cotizaciones project_cotizaciones[]
   eventos      project_eventos[]
@@ -763,16 +702,16 @@ model project_evento_tipos {
 }
 
 model project_eventos {
-  id               String             @id @default(cuid())
+  id               String                     @id @default(cuid())
   projectId        String
   clienteId        String
   eventoTipoId     String?
-  nombre           String?            @default("Pendiente")
+  nombre           String?                    @default("Pendiente")
   fecha_evento     DateTime
   sede             String?
   direccion        String?
-  status           String             @default("active")
-  createdAt        DateTime           @default(now())
+  status           String                     @default("active")
+  createdAt        DateTime                   @default(now())
   updatedAt        DateTime
   userId           String?
   eventoEtapaId    String?
@@ -782,8 +721,8 @@ model project_eventos {
   clientes         project_clientes           @relation(fields: [clienteId], references: [id])
   evento_etapas    project_evento_etapas?     @relation(fields: [eventoEtapaId], references: [id])
   evento_tipos     project_evento_tipos?      @relation(fields: [eventoTipoId], references: [id])
-  projects         projects            @relation(fields: [projectId], references: [id])
-  project_users    project_users?      @relation(fields: [userId], references: [id])
+  projects         projects                   @relation(fields: [projectId], references: [id])
+  project_users    project_users?             @relation(fields: [userId], references: [id])
   gastos           project_gastos[]
   nominas          project_nominas[]
 
@@ -793,27 +732,27 @@ model project_eventos {
 }
 
 model project_gastos {
-  id             String       @id @default(cuid())
+  id             String           @id @default(cuid())
   projectId      String
   concepto       String
   descripcion    String?
   monto          Float
   categoria      String
   subcategoria   String?
-  fecha          DateTime     @default(now())
+  fecha          DateTime         @default(now())
   fechaFactura   DateTime?
-  status         String       @default("activo")
+  status         String           @default("activo")
   metodoPago     String?
   numeroFactura  String?
   proveedor      String?
   eventoId       String?
   usuarioId      String
   comprobanteUrl String?
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime         @default(now())
   updatedAt      DateTime
-  eventos        project_eventos?     @relation(fields: [eventoId], references: [id])
-  projects       projects      @relation(fields: [projectId], references: [id])
-  project_users  project_users @relation(fields: [usuarioId], references: [id])
+  eventos        project_eventos? @relation(fields: [eventoId], references: [id])
+  projects       projects         @relation(fields: [projectId], references: [id])
+  project_users  project_users    @relation(fields: [usuarioId], references: [id])
 
   @@index([eventoId])
   @@index([fecha, categoria])
@@ -821,35 +760,35 @@ model project_gastos {
 }
 
 model project_metodos_pago {
-  id                                  String                                @id @default(cuid())
+  id                                  String                                        @id @default(cuid())
   projectId                           String
   metodo_pago                         String
   comision_porcentaje_base            Float?
   comision_fija_monto                 Float?
   num_msi                             Int?
   comision_msi_porcentaje             Float?
-  orden                               Int?                                  @default(0)
-  payment_method                      String?                               @default("card")
-  status                              String                                @default("active")
-  createdAt                           DateTime                              @default(now())
+  orden                               Int?                                          @default(0)
+  payment_method                      String?                                       @default("card")
+  status                              String                                        @default("active")
+  createdAt                           DateTime                                      @default(now())
   updatedAt                           DateTime
   condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago[]
-  projects                            projects                               @relation(fields: [projectId], references: [id])
+  projects                            projects                                      @relation(fields: [projectId], references: [id])
   pagos                               project_pagos[]
 
   @@index([projectId])
 }
 
 model project_nomina_servicios {
-  id                   String                @id @default(cuid())
+  id                   String                        @id @default(cuid())
   nominaId             String
   cotizacionServicioId String?
   servicio_nombre      String
   seccion_nombre       String?
   categoria_nombre     String?
   costo_asignado       Float
-  cantidad_asignada    Int                   @default(1)
-  createdAt            DateTime              @default(now())
+  cantidad_asignada    Int                           @default(1)
+  createdAt            DateTime                      @default(now())
   cotizacion_servicios project_cotizacion_servicios? @relation(fields: [cotizacionServicioId], references: [id])
   nominas              project_nominas               @relation(fields: [nominaId], references: [id], onDelete: Cascade)
 
@@ -857,43 +796,43 @@ model project_nomina_servicios {
 }
 
 model project_nominas {
-  id                                                String             @id @default(cuid())
-  projectId                                        String
-  userId                                            String
-  eventoId                                          String?
-  concepto                                          String
-  descripcion                                       String?
-  monto_bruto                                       Float
-  deducciones                                       Float              @default(0)
-  monto_neto                                        Float
-  tipo_pago                                         String             @default("individual")
-  servicios_incluidos                               Int                @default(1)
-  fecha_asignacion                                  DateTime           @default(now())
-  fecha_autorizacion                                DateTime?
-  fecha_pago                                        DateTime?
-  periodo_inicio                                    DateTime?
-  periodo_fin                                       DateTime?
-  status                                            String             @default("pendiente")
-  autorizado_por                                    String?
-  pagado_por                                        String?
-  metodo_pago                                       String?            @default("transferencia")
-  costo_total_snapshot                              Float              @default(0)
-  gasto_total_snapshot                              Float              @default(0)
-  comision_porcentaje                               Float?
-  createdAt                                         DateTime           @default(now())
-  updatedAt                                         DateTime
-  nomina_servicios                                  project_nomina_servicios[]
-  project_users_nominas_autorizado_porToproject_users project_users?      @relation("nominas_autorizado_porToproject_users", fields: [autorizado_por], references: [id])
-  eventos                                           project_eventos?           @relation(fields: [eventoId], references: [id])
-  project_users_nominas_pagado_porToproject_users     project_users?      @relation("nominas_pagado_porToproject_users", fields: [pagado_por], references: [id])
-  projects                                          projects            @relation(fields: [projectId], references: [id])
-  project_users_nominas_userIdToproject_users         project_users       @relation("nominas_userIdToproject_users", fields: [userId], references: [id])
+  id                                                  String                     @id @default(cuid())
+  projectId                                           String
+  userId                                              String
+  eventoId                                            String?
+  concepto                                            String
+  descripcion                                         String?
+  monto_bruto                                         Float
+  deducciones                                         Float                      @default(0)
+  monto_neto                                          Float
+  tipo_pago                                           String                     @default("individual")
+  servicios_incluidos                                 Int                        @default(1)
+  fecha_asignacion                                    DateTime                   @default(now())
+  fecha_autorizacion                                  DateTime?
+  fecha_pago                                          DateTime?
+  periodo_inicio                                      DateTime?
+  periodo_fin                                         DateTime?
+  status                                              String                     @default("pendiente")
+  autorizado_por                                      String?
+  pagado_por                                          String?
+  metodo_pago                                         String?                    @default("transferencia")
+  costo_total_snapshot                                Float                      @default(0)
+  gasto_total_snapshot                                Float                      @default(0)
+  comision_porcentaje                                 Float?
+  createdAt                                           DateTime                   @default(now())
+  updatedAt                                           DateTime
+  nomina_servicios                                    project_nomina_servicios[]
+  project_users_nominas_autorizado_porToproject_users project_users?             @relation("nominas_autorizado_porToproject_users", fields: [autorizado_por], references: [id])
+  eventos                                             project_eventos?           @relation(fields: [eventoId], references: [id])
+  project_users_nominas_pagado_porToproject_users     project_users?             @relation("nominas_pagado_porToproject_users", fields: [pagado_por], references: [id])
+  projects                                            projects                   @relation(fields: [projectId], references: [id])
+  project_users_nominas_userIdToproject_users         project_users              @relation("nominas_userIdToproject_users", fields: [userId], references: [id])
 
   @@index([projectId])
 }
 
 model project_pagos {
-  id                                  String                               @id @default(cuid())
+  id                                  String                                       @id @default(cuid())
   clienteId                           String?
   cotizacionId                        String?
   condicionesComercialesId            String?
@@ -904,32 +843,32 @@ model project_pagos {
   comisionStripe                      Float?
   concepto                            String
   descripcion                         String?
-  stripe_session_id                   String?                              @unique
-  stripe_payment_id                   String?                              @unique
-  status                              String                               @default("pending")
-  createdAt                           DateTime                             @default(now())
+  stripe_session_id                   String?                                      @unique
+  stripe_payment_id                   String?                                      @unique
+  status                              String                                       @default("pending")
+  createdAt                           DateTime                                     @default(now())
   updatedAt                           DateTime
   userId                              String?
-  tipo_transaccion                    String?                              @default("ingreso")
-  categoria_transaccion               String?                              @default("abono")
+  tipo_transaccion                    String?                                      @default("ingreso")
+  categoria_transaccion               String?                                      @default("abono")
   clientes                            project_clientes?                            @relation(fields: [clienteId], references: [id])
   condiciones_comerciales             project_condiciones_comerciales?             @relation(fields: [condicionesComercialesId], references: [id])
   condiciones_comerciales_metodo_pago project_condiciones_comerciales_metodo_pago? @relation(fields: [condicionesComercialesMetodoPagoId], references: [id])
   cotizaciones                        project_cotizaciones?                        @relation(fields: [cotizacionId], references: [id])
   metodos_pago                        project_metodos_pago?                        @relation(fields: [metodoPagoId], references: [id])
-  studio_users                        project_users?                        @relation(fields: [userId], references: [id])
+  studio_users                        project_users?                               @relation(fields: [userId], references: [id])
 }
 
 model project_paquete_servicios {
-  id                  String              @id @default(cuid())
+  id                  String                      @id @default(cuid())
   paqueteId           String
   servicioId          String
   servicioCategoriaId String
-  cantidad            Int                 @default(1)
-  posicion            Int                 @default(0)
-  visible_cliente     Boolean             @default(true)
-  status              String              @default("active")
-  createdAt           DateTime            @default(now())
+  cantidad            Int                         @default(1)
+  posicion            Int                         @default(0)
+  visible_cliente     Boolean                     @default(true)
+  status              String                      @default("active")
+  createdAt           DateTime                    @default(now())
   updatedAt           DateTime
   paquetes            project_paquetes            @relation(fields: [paqueteId], references: [id], onDelete: Cascade)
   servicio_categorias project_servicio_categorias @relation(fields: [servicioCategoriaId], references: [id])
@@ -937,7 +876,7 @@ model project_paquete_servicios {
 }
 
 model project_paquetes {
-  id                String              @id @default(cuid())
+  id                String                      @id @default(cuid())
   projectId         String
   eventoTipoId      String
   nombre            String
@@ -945,19 +884,19 @@ model project_paquetes {
   gasto             Float?
   utilidad          Float?
   precio            Float?
-  status            String              @default("active")
-  posicion          Int                 @default(0)
-  createdAt         DateTime            @default(now())
+  status            String                      @default("active")
+  posicion          Int                         @default(0)
+  createdAt         DateTime                    @default(now())
   updatedAt         DateTime
   paquete_servicios project_paquete_servicios[]
   evento_tipos      project_evento_tipos        @relation(fields: [eventoTipoId], references: [id])
-  projects          projects             @relation(fields: [projectId], references: [id])
+  projects          projects                    @relation(fields: [projectId], references: [id])
 
   @@index([projectId, status])
 }
 
 model project_revenue_products {
-  id                      String                    @id @default(cuid())
+  id                      String                            @id @default(cuid())
   nombre                  String
   descripcion             String
   categoria               String
@@ -966,9 +905,9 @@ model project_revenue_products {
   comisionStudio          Decimal
   tipoFacturacion         String
   cicloVida               Int?
-  activo                  Boolean                   @default(true)
+  activo                  Boolean                           @default(true)
   configuracion           Json?
-  createdAt               DateTime                  @default(now())
+  createdAt               DateTime                          @default(now())
   updatedAt               DateTime
   studio_revenue_products project_studio_revenue_products[]
 
@@ -990,25 +929,25 @@ model project_revenue_transactions {
   stripeFee           Decimal?
   createdAt           DateTime @default(now())
   updatedAt           DateTime
-  projects            projects  @relation(fields: [projectId], references: [id])
+  projects            projects @relation(fields: [projectId], references: [id])
 
   @@index([status])
   @@index([projectId, transactionDate])
 }
 
 model project_seccion_categorias {
-  id                  String              @id @default(cuid())
+  id                  String                      @id @default(cuid())
   seccionId           String
-  categoriaId         String              @unique
+  categoriaId         String                      @unique
   servicio_categorias project_servicio_categorias @relation(fields: [categoriaId], references: [id], onDelete: Cascade)
   servicio_secciones  project_servicio_secciones  @relation(fields: [seccionId], references: [id], onDelete: Cascade)
 }
 
 model project_servicio_categorias {
-  id                   String                 @id @default(cuid())
-  nombre               String                 @unique
-  posicion             Int                    @default(0)
-  createdAt            DateTime               @default(now())
+  id                   String                         @id @default(cuid())
+  nombre               String                         @unique
+  posicion             Int                            @default(0)
+  createdAt            DateTime                       @default(now())
   updatedAt            DateTime
   cotizacion_servicios project_cotizacion_servicios[]
   paquete_servicios    project_paquete_servicios[]
@@ -1017,167 +956,257 @@ model project_servicio_categorias {
 }
 
 model project_servicio_gastos {
-  id         String    @id @default(cuid())
+  id         String            @id @default(cuid())
   servicioId String
   nombre     String
   costo      Float
-  createdAt  DateTime  @default(now())
+  createdAt  DateTime          @default(now())
   updatedAt  DateTime
   servicios  project_servicios @relation(fields: [servicioId], references: [id])
 }
 
 model project_servicio_secciones {
-  id                 String               @id @default(cuid())
-  nombre             String               @unique
+  id                 String                       @id @default(cuid())
+  nombre             String                       @unique
   descripcion        String?
-  posicion           Int                  @default(0)
-  createdAt          DateTime             @default(now())
+  posicion           Int                          @default(0)
+  createdAt          DateTime                     @default(now())
   updatedAt          DateTime
   seccion_categorias project_seccion_categorias[]
 }
 
 model project_servicios {
-  id                   String                 @id @default(cuid())
+  id                   String                         @id @default(cuid())
   projectId            String
   servicioCategoriaId  String
   nombre               String
-  costo                Float                  @default(0)
-  gasto                Float                  @default(0)
-  utilidad             Float                  @default(0)
-  precio_publico       Float                  @default(0)
-  tipo_utilidad        String                 @default("servicio")
-  posicion             Int                    @default(0)
-  status               String                 @default("active")
-  visible_cliente      Boolean                @default(true)
-  createdAt            DateTime               @default(now())
+  costo                Float                          @default(0)
+  gasto                Float                          @default(0)
+  utilidad             Float                          @default(0)
+  precio_publico       Float                          @default(0)
+  tipo_utilidad        String                         @default("servicio")
+  posicion             Int                            @default(0)
+  status               String                         @default("active")
+  visible_cliente      Boolean                        @default(true)
+  createdAt            DateTime                       @default(now())
   updatedAt            DateTime
   cotizacion_servicios project_cotizacion_servicios[]
   paquete_servicios    project_paquete_servicios[]
   servicio_gastos      project_servicio_gastos[]
+  projects             projects                       @relation(fields: [projectId], references: [id])
   servicio_categorias  project_servicio_categorias    @relation(fields: [servicioCategoriaId], references: [id])
-  projects             projects                @relation(fields: [projectId], references: [id])
 
   @@index([projectId, status])
 }
 
 model project_sesiones {
-  id           String       @id @default(cuid())
+  id           String        @id @default(cuid())
   userId       String
-  token        String       @unique
-  status       String       @default("active")
-  createdAt    DateTime     @default(now())
+  token        String        @unique
+  status       String        @default("active")
+  createdAt    DateTime      @default(now())
   updatedAt    DateTime
   studio_users project_users @relation(fields: [userId], references: [id])
 }
 
 model project_studio_revenue_products {
-  id                  String           @id @default(cuid())
+  id                  String                   @id @default(cuid())
   projectId           String
   revenueProductId    String
-  activo              Boolean          @default(false)
+  activo              Boolean                  @default(false)
   precioCustom        Decimal?
   comisionCustom      Decimal?
   configuracionStudio Json?
   activadoEn          DateTime?
   desactivadoEn       DateTime?
-  createdAt           DateTime         @default(now())
+  createdAt           DateTime                 @default(now())
   updatedAt           DateTime
+  projects            projects                 @relation(fields: [projectId], references: [id])
   revenue_products    project_revenue_products @relation(fields: [revenueProductId], references: [id])
-  projects            projects          @relation(fields: [projectId], references: [id])
 
   @@unique([projectId, revenueProductId])
   @@index([projectId, activo])
 }
 
 model project_users {
-  id                                           String                 @id @default(cuid())
-  username                                     String?
-  email                                        String                 @unique
-  password                                     String
-  role                                         String                 @default("user")
-  telefono                                     String
-  status                                       String                 @default("inactive")
-  projectId                                    String
-  createdAt                                    DateTime               @default(now())
-  updatedAt                                    DateTime
-  agenda                                       project_agenda[]
-  cotizacion_servicios                         project_cotizacion_servicios[]
-  eventos                                      project_eventos[]
-  gastos                                       project_gastos[]
+  id                                            String                         @id @default(cuid())
+  username                                      String?
+  email                                         String                         @unique
+  password                                      String
+  role                                          String                         @default("user")
+  telefono                                      String
+  status                                        String                         @default("inactive")
+  projectId                                     String
+  createdAt                                     DateTime                       @default(now())
+  updatedAt                                     DateTime
+  agenda                                        project_agenda[]
+  cotizacion_servicios                          project_cotizacion_servicios[]
+  eventos                                       project_eventos[]
+  gastos                                        project_gastos[]
   nominas_nominas_autorizado_porToproject_users project_nominas[]              @relation("nominas_autorizado_porToproject_users")
   nominas_nominas_pagado_porToproject_users     project_nominas[]              @relation("nominas_pagado_porToproject_users")
   nominas_nominas_userIdToproject_users         project_nominas[]              @relation("nominas_userIdToproject_users")
-  pagos                                        project_pagos[]
-  sesiones                                     project_sesiones[]
-  projects                                     projects                @relation(fields: [projectId], references: [id])
+  pagos                                         project_pagos[]
+  sesiones                                      project_sesiones[]
+  projects                                      projects                       @relation(fields: [projectId], references: [id])
 
   @@index([email])
   @@index([projectId, status])
 }
 
 model project_user_profiles {
-  id                      String                    @id @default(cuid())
-  email                   String                    @unique
-  fullName                String?
-  avatarUrl               String?
-  role                    String
-  projectId               String?
-  isActive                Boolean                   @default(true)
-  createdAt               DateTime                  @default(now())
-  updatedAt               DateTime
-  platform_activities     platform_activities[]
-  platform_lead_bitacora  platform_lead_bitacora[]
-  platform_notifications  platform_notifications[]
-  projects                projects?                  @relation(fields: [projectId], references: [id])
+  id                     String                   @id @default(cuid())
+  email                  String                   @unique
+  fullName               String?
+  avatarUrl              String?
+  role                   String
+  projectId              String?
+  isActive               Boolean                  @default(true)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  platform_activities    platform_activities[]
+  platform_lead_bitacora platform_lead_bitacora[]
+  platform_notifications platform_notifications[]
+  projects               projects?                @relation(fields: [projectId], references: [id])
 
   @@index([email])
   @@index([role])
   @@index([projectId])
 }
 
-///// SUBSCRIPTIONS /////
-
 model subscriptions {
-  id                     String           @id @default(cuid())
+  id                     String                          @id @default(cuid())
   studio_id              String
-  stripe_subscription_id String           @unique
+  stripe_subscription_id String                          @unique
   stripe_customer_id     String
   plan_id                String
   status                 String
   current_period_start   DateTime
   current_period_end     DateTime
   billing_cycle_anchor   DateTime
-  created_at             DateTime         @default(now())
+  created_at             DateTime                        @default(now())
   updated_at             DateTime
-  billing_cycles         platform_billing_cycles[]
-  plans                  platform_plans   @relation(fields: [plan_id], references: [id])
-  projects               projects         @relation(fields: [studio_id], references: [id], onDelete: Cascade)
-  discount_usage         platform_discount_usage[]
   agent_discount_codes   platform_agent_discount_codes[]
+  billing_cycles         platform_billing_cycles[]
+  discount_usage         platform_discount_usage[]
+  plans                  platform_plans                  @relation(fields: [plan_id], references: [id])
+  projects               projects                        @relation(fields: [studio_id], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([stripe_subscription_id])
   @@index([studio_id])
 }
 
-
 model plan_services {
-  id          String      @id @default(cuid())
-  plan_id     String
-  service_id  String
-  active      Boolean     @default(false)
-  limite      Int?        // null = ilimitado, 0 = sin acceso
-  unidad      UnidadMedida?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  
-  // Relaciones
-  plan        platform_plans @relation(fields: [plan_id], references: [id], onDelete: Cascade)
-  service     platform_services @relation(fields: [service_id], references: [id], onDelete: Cascade)
-  
+  id         String            @id @default(cuid())
+  plan_id    String
+  service_id String
+  active     Boolean           @default(false)
+  limite     Int?
+  unidad     UnidadMedida?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  plan       platform_plans    @relation(fields: [plan_id], references: [id], onDelete: Cascade)
+  service    platform_services @relation(fields: [service_id], references: [id], onDelete: Cascade)
+
   @@unique([plan_id, service_id])
   @@index([plan_id])
   @@index([service_id])
+}
+
+model service_categories {
+  id          String              @id @default(cuid())
+  name        String              @unique
+  description String
+  icon        String
+  posicion    Int                 @default(0)
+  active      Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  services    platform_services[]
+
+  @@index([active, posicion])
+}
+
+model project_telefonos {
+  id        String   @id @default(cuid())
+  projectId String
+  numero    String
+  tipo      String
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  projects  projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([projectId, activo])
+}
+
+model project_horarios_atencion {
+  id          String   @id @default(cuid())
+  projectId   String
+  dia_semana  String
+  hora_inicio String
+  hora_fin    String
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  projects    projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, dia_semana])
+  @@index([projectId])
+  @@index([projectId, dia_semana])
+}
+
+model platform_plataformas_redes_sociales {
+  id          String   @id @default(cuid())
+  nombre      String   @unique
+  slug        String   @unique
+  descripcion String?
+  color       String?
+  icono       String?
+  urlBase     String?
+  orden       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  project_redes_sociales project_redes_sociales[]
+
+  @@index([isActive])
+  @@index([orden])
+}
+
+model project_redes_sociales {
+  id           String   @id @default(cuid())
+  projectId    String
+  plataformaId String?
+  url          String
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  projects     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  plataforma   platform_plataformas_redes_sociales? @relation(fields: [plataformaId], references: [id], onDelete: SetNull)
+
+  @@unique([projectId, plataformaId])
+  @@index([projectId])
+  @@index([plataformaId])
+}
+
+enum PlatformLeadBitacoraTipo {
+  NOTA_PERSONALIZADA
+  CAMBIO_ETAPA
+  ASIGNACION_AGENTE
+  DESASIGNACION_AGENTE
+  CREACION_LEAD
+  ACTUALIZACION_DATOS
+  LLAMADA_REALIZADA
+  EMAIL_ENVIADO
+  REUNION_AGENDADA
+  CONTRATO_FIRMADO
+  SUSCRIPCION_ACTIVA
+  CANCELACION
+  DESCUENTO_APLICADO
+  CODIGO_DESCUENTO_GENERADO
 }
 
 enum UnidadMedida {
@@ -1190,70 +1219,4 @@ enum UnidadMedida {
   PROYECTOS
   COTIZACIONES
   LANDING_PAGES
-}
-
-model service_categories {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  description String
-  icon        String
-  posicion    Int      @default(0)
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  services    platform_services[]
-  
-  @@index([active, posicion])
-}
-
-///// CONFIGURACIÓN DE CUENTA - NUEVOS MODELOS /////
-
-model project_telefonos {
-  id          String   @id @default(cuid())
-  projectId   String
-  numero      String
-  tipo        String   // "principal", "whatsapp", "emergencia", "oficina"
-  activo      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  projects    projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  @@index([projectId])
-  @@index([projectId, activo])
-}
-
-model project_horarios_atencion {
-  id          String   @id @default(cuid())
-  projectId   String
-  dia_semana  String   // "lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"
-  hora_inicio String   // "09:00"
-  hora_fin    String   // "18:00"
-  activo      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  projects    projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  @@index([projectId])
-  @@index([projectId, dia_semana])
-  @@unique([projectId, dia_semana])
-}
-
-model project_redes_sociales {
-  id          String   @id @default(cuid())
-  projectId   String
-  plataformaId String  // FK a platform_plataformas_redes_sociales
-  url         String
-  activo      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  projects    projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  plataforma  platform_plataformas_redes_sociales @relation(fields: [plataformaId], references: [id])
-  
-  @@index([projectId])
-  @@index([projectId, plataformaId])
-  @@unique([projectId, plataformaId])
 }

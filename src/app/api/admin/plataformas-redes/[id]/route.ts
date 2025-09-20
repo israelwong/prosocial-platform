@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
-const prisma = new PrismaClient();
-
+// GET - Obtener una plataforma específica
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const plataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
-      where: { id: params.id }
+    const plataforma = await withRetry(async () => {
+      return await prisma.platform_plataformas_redes_sociales.findUnique({
+        where: { id: params.id }
+      });
     });
 
     if (!plataforma) {
@@ -23,19 +25,37 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching plataforma:', error);
     return NextResponse.json(
-      { error: 'Error al cargar la plataforma' },
+      { error: getFriendlyErrorMessage(error) },
       { status: 500 }
     );
   }
 }
 
+// PUT - Actualizar una plataforma
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json();
-    
+    const formData = await request.formData();
+
+    const nombre = formData.get('nombre') as string;
+    const slug = formData.get('slug') as string;
+    const descripcion = formData.get('descripcion') as string;
+    const color = formData.get('color') as string;
+    const icono = formData.get('icono') as string;
+    const urlBase = formData.get('urlBase') as string;
+    const orden = parseInt(formData.get('orden') as string) || 1;
+    const isActive = formData.get('isActive') === 'true';
+
+    // Validaciones
+    if (!nombre || !slug) {
+      return NextResponse.json(
+        { error: 'Nombre y slug son requeridos' },
+        { status: 400 }
+      );
+    }
+
     // Verificar que la plataforma existe
     const existingPlataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
       where: { id: params.id }
@@ -48,59 +68,49 @@ export async function PUT(
       );
     }
 
-    // Si se está cambiando el slug, verificar que sea único
-    if (body.slug && body.slug !== existingPlataforma.slug) {
-      const existingSlug = await prisma.platform_plataformas_redes_sociales.findUnique({
-        where: { slug: body.slug }
-      });
-
-      if (existingSlug) {
-        return NextResponse.json(
-          { error: 'El slug ya existe' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Si se está cambiando el nombre, verificar que sea único
-    if (body.nombre && body.nombre !== existingPlataforma.nombre) {
-      const existingNombre = await prisma.platform_plataformas_redes_sociales.findUnique({
-        where: { nombre: body.nombre }
-      });
-
-      if (existingNombre) {
-        return NextResponse.json(
-          { error: 'El nombre ya existe' },
-          { status: 400 }
-        );
-      }
-    }
-
-    const plataformaActualizada = await prisma.platform_plataformas_redes_sociales.update({
-      where: { id: params.id },
-      data: {
-        nombre: body.nombre,
-        slug: body.slug,
-        descripcion: body.descripcion,
-        color: body.color,
-        icono: body.icono,
-        urlBase: body.urlBase,
-        isActive: body.isActive,
-        orden: body.orden,
-        updatedAt: new Date(),
+    // Verificar que el slug sea único (excluyendo la plataforma actual)
+    const existingSlug = await prisma.platform_plataformas_redes_sociales.findFirst({
+      where: {
+        slug,
+        id: { not: params.id }
       }
     });
 
-    return NextResponse.json(plataformaActualizada);
+    if (existingSlug) {
+      return NextResponse.json(
+        { error: 'El slug ya existe. Debe ser único.' },
+        { status: 400 }
+      );
+    }
+
+    const plataforma = await withRetry(async () => {
+      return await prisma.platform_plataformas_redes_sociales.update({
+        where: { id: params.id },
+        data: {
+          nombre,
+          slug,
+          descripcion: descripcion || null,
+          color: color || null,
+          icono: icono || null,
+          urlBase: urlBase || null,
+          orden,
+          isActive,
+          updatedAt: new Date()
+        }
+      });
+    });
+
+    return NextResponse.json(plataforma);
   } catch (error) {
     console.error('Error updating plataforma:', error);
     return NextResponse.json(
-      { error: 'Error al actualizar la plataforma' },
+      { error: getFriendlyErrorMessage(error) },
       { status: 500 }
     );
   }
 }
 
+// DELETE - Eliminar una plataforma
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -110,7 +120,11 @@ export async function DELETE(
     const existingPlataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
       where: { id: params.id },
       include: {
-        project_redes_sociales: true
+        _count: {
+          select: {
+            project_redes_sociales: true
+          }
+        }
       }
     });
 
@@ -121,23 +135,25 @@ export async function DELETE(
       );
     }
 
-    // Verificar si hay redes sociales usando esta plataforma
-    if (existingPlataforma.project_redes_sociales.length > 0) {
+    // Verificar si la plataforma está en uso
+    if (existingPlataforma._count.project_redes_sociales > 0) {
       return NextResponse.json(
-        { error: 'No se puede eliminar la plataforma porque está siendo usada por estudios' },
+        { error: 'No se puede eliminar la plataforma porque está siendo utilizada por uno o más estudios' },
         { status: 400 }
       );
     }
 
-    await prisma.platform_plataformas_redes_sociales.delete({
-      where: { id: params.id }
+    await withRetry(async () => {
+      return await prisma.platform_plataformas_redes_sociales.delete({
+        where: { id: params.id }
+      });
     });
 
     return NextResponse.json({ message: 'Plataforma eliminada exitosamente' });
   } catch (error) {
     console.error('Error deleting plataforma:', error);
     return NextResponse.json(
-      { error: 'Error al eliminar la plataforma' },
+      { error: getFriendlyErrorMessage(error) },
       { status: 500 }
     );
   }

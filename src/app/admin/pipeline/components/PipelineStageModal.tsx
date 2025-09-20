@@ -6,6 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     Dialog,
     DialogContent,
     DialogDescription,
@@ -23,16 +30,19 @@ interface PipelineStageModalProps {
         name: string;
         description: string | null;
         color: string;
+        pipelineTypeId?: string | null;
     } | null;
+    activeSection?: 'comercial' | 'soporte';
     onSuccess?: () => void;
 }
 
-export function PipelineStageModal({ isOpen, onClose, stage, onSuccess }: PipelineStageModalProps) {
+export function PipelineStageModal({ isOpen, onClose, stage, activeSection = 'comercial', onSuccess }: PipelineStageModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
-        color: '#3B82F6'
+        color: '#3B82F6',
+        pipelineTypeId: 'pipeline-comercial'
     });
 
     // Actualizar el formulario cuando cambie la etapa a editar
@@ -41,16 +51,20 @@ export function PipelineStageModal({ isOpen, onClose, stage, onSuccess }: Pipeli
             setFormData({
                 nombre: stage.name || '',
                 descripcion: stage.description || '',
-                color: stage.color || '#3B82F6'
+                color: stage.color || '#3B82F6',
+                pipelineTypeId: stage.pipelineTypeId || 'pipeline-comercial'
             });
         } else {
+            // Para nuevas etapas, usar la sección activa
+            const defaultPipelineType = activeSection === 'soporte' ? 'pipeline-soporte' : 'pipeline-comercial';
             setFormData({
                 nombre: '',
                 descripcion: '',
-                color: '#3B82F6'
+                color: '#3B82F6',
+                pipelineTypeId: defaultPipelineType
             });
         }
-    }, [stage, isOpen]);
+    }, [stage, isOpen, activeSection]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,6 +75,7 @@ export function PipelineStageModal({ isOpen, onClose, stage, onSuccess }: Pipeli
             form.append('nombre', formData.nombre);
             form.append('descripcion', formData.descripcion);
             form.append('color', formData.color);
+            form.append('pipelineTypeId', formData.pipelineTypeId);
 
             let result;
             if (stage) {
@@ -71,7 +86,7 @@ export function PipelineStageModal({ isOpen, onClose, stage, onSuccess }: Pipeli
 
             if (result.success) {
                 onClose();
-                setFormData({ nombre: '', descripcion: '', color: '#3B82F6' });
+                setFormData({ nombre: '', descripcion: '', color: '#3B82F6', pipelineTypeId: 'pipeline-comercial' });
                 // Llamar al callback de éxito para actualizar la lista
                 if (onSuccess) {
                     onSuccess();
@@ -87,7 +102,7 @@ export function PipelineStageModal({ isOpen, onClose, stage, onSuccess }: Pipeli
     };
 
     const handleClose = () => {
-        setFormData({ nombre: '', descripcion: '', color: '#3B82F6' });
+        setFormData({ nombre: '', descripcion: '', color: '#3B82F6', pipelineTypeId: 'pipeline-comercial' });
         onClose();
     };
 
@@ -107,6 +122,27 @@ export function PipelineStageModal({ isOpen, onClose, stage, onSuccess }: Pipeli
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="pipelineType" className="text-white">
+                                Tipo de Pipeline *
+                            </Label>
+                            <Select
+                                value={formData.pipelineTypeId}
+                                onValueChange={(value) => setFormData(prev => ({ ...prev, pipelineTypeId: value }))}
+                            >
+                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                    <SelectValue placeholder="Selecciona el tipo de pipeline" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-zinc-800 border-zinc-700">
+                                    <SelectItem value="pipeline-comercial" className="text-white hover:bg-zinc-700">
+                                        📈 Pipeline Comercial
+                                    </SelectItem>
+                                    <SelectItem value="pipeline-soporte" className="text-white hover:bg-zinc-700">
+                                        🎧 Pipeline de Soporte
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="nombre" className="text-white">
                                 Nombre *

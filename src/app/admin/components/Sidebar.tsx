@@ -13,7 +13,8 @@ import {
     Play,
     Wrench,
     Users,
-    Gift
+    Gift,
+    Share2
 } from 'lucide-react';
 
 // Estructura de navegación simplificada
@@ -33,6 +34,7 @@ const navigationSections = [
             { name: 'Servicios', href: '/admin/services', icon: Wrench },
             { name: 'Agentes', href: '/admin/agents', icon: Users },
             { name: 'Pipeline', href: '/admin/pipeline', icon: Columns3 },
+            { name: 'Redes Sociales', href: '/admin/redes-sociales', icon: Share2 },
             { name: 'Canales', href: '/admin/canales', icon: Target },
             { name: 'Descuentos', href: '/admin/descuentos', icon: Gift },
         ]

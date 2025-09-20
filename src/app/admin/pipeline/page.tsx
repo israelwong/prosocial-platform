@@ -95,7 +95,6 @@ export default async function PipelinePage() {
     if (error) {
         return (
             <div className="p-6 space-y-6">
-
                 {/* Error State */}
                 <div className="bg-red-900/20 border border-red-800 rounded-lg p-6">
                     <div className="flex items-start space-x-3">

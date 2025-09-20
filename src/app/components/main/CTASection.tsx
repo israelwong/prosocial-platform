@@ -1,5 +1,5 @@
 import React from 'react'
-import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { WhatsAppIcon } from '@/components/ui/icons/WhatsAppIcon'
 import { Phone } from 'lucide-react'
 
 interface CTASectionProps {

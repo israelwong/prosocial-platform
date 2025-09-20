@@ -34,12 +34,12 @@ interface Plataforma {
 interface RedSocial {
     id: string;
     projectId: string;
-    plataformaId: string;
+    plataformaId: string | null;
     url: string;
     activo: boolean;
     createdAt: string;
     updatedAt: string;
-    plataforma: Plataforma;
+    plataforma: Plataforma | null;
 }
 
 // Mapeo de íconos de Lucide
@@ -270,7 +270,8 @@ export default function RedesSocialesPage() {
     };
 
 
-    const getPlataformaInfo = (plataformaId: string) => {
+    const getPlataformaInfo = (plataformaId: string | null) => {
+        if (!plataformaId) return null;
         return plataformas.find(p => p.id === plataformaId);
     };
 
@@ -413,7 +414,7 @@ export default function RedesSocialesPage() {
                                         >
                                             <IconComponent className="h-5 w-5 text-white" />
                                         </div>
-                                        <p className="text-white font-medium">{plataformaInfo?.nombre}</p>
+                                        <p className="text-white font-medium">{plataformaInfo?.nombre || 'Plataforma no encontrada'}</p>
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <div className="flex items-center space-x-2">

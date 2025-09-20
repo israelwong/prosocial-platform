@@ -1,30 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
-const prisma = new PrismaClient();
-
+// GET - Obtener todas las plataformas de redes sociales
 export async function GET() {
   try {
-    const plataformas = await prisma.platform_plataformas_redes_sociales.findMany({
-      orderBy: { orden: 'asc' }
+    const plataformas = await withRetry(async () => {
+      return await prisma.platform_plataformas_redes_sociales.findMany({
+        orderBy: {
+          orden: 'asc'
+        }
+      });
     });
 
     return NextResponse.json(plataformas);
   } catch (error) {
-    console.error('Error fetching plataformas:', error);
+    console.error('Error fetching plataformas redes sociales:', error);
     return NextResponse.json(
-      { error: 'Error al cargar las plataformas' },
+      { error: getFriendlyErrorMessage(error) },
       { status: 500 }
     );
   }
 }
 
+// POST - Crear nueva plataforma de red social
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    
-    // Validar datos requeridos
-    if (!body.nombre || !body.slug) {
+    const formData = await request.formData();
+
+    const nombre = formData.get('nombre') as string;
+    const slug = formData.get('slug') as string;
+    const descripcion = formData.get('descripcion') as string;
+    const color = formData.get('color') as string;
+    const icono = formData.get('icono') as string;
+    const urlBase = formData.get('urlBase') as string;
+    const orden = parseInt(formData.get('orden') as string) || 1;
+    const isActive = formData.get('isActive') === 'true';
+
+    // Validaciones
+    if (!nombre || !slug) {
       return NextResponse.json(
         { error: 'Nombre y slug son requeridos' },
         { status: 400 }
@@ -33,51 +47,37 @@ export async function POST(request: NextRequest) {
 
     // Verificar que el slug sea único
     const existingSlug = await prisma.platform_plataformas_redes_sociales.findUnique({
-      where: { slug: body.slug }
+      where: { slug }
     });
 
     if (existingSlug) {
       return NextResponse.json(
-        { error: 'El slug ya existe' },
+        { error: 'El slug ya existe. Debe ser único.' },
         { status: 400 }
       );
     }
 
-    // Verificar que el nombre sea único
-    const existingNombre = await prisma.platform_plataformas_redes_sociales.findUnique({
-      where: { nombre: body.nombre }
+    const plataforma = await withRetry(async () => {
+      return await prisma.platform_plataformas_redes_sociales.create({
+        data: {
+          nombre,
+          slug,
+          descripcion: descripcion || null,
+          color: color || null,
+          icono: icono || null,
+          urlBase: urlBase || null,
+          orden,
+          isActive,
+          updatedAt: new Date()
+        }
+      });
     });
 
-    if (existingNombre) {
-      return NextResponse.json(
-        { error: 'El nombre ya existe' },
-        { status: 400 }
-      );
-    }
-
-    // Obtener el siguiente orden
-    const lastPlataforma = await prisma.platform_plataformas_redes_sociales.findFirst({
-      orderBy: { orden: 'desc' }
-    });
-
-    const nuevaPlataforma = await prisma.platform_plataformas_redes_sociales.create({
-      data: {
-        nombre: body.nombre,
-        slug: body.slug,
-        descripcion: body.descripcion || null,
-        color: body.color || null,
-        icono: body.icono || null,
-        urlBase: body.urlBase || null,
-        isActive: body.isActive !== undefined ? body.isActive : true,
-        orden: lastPlataforma ? lastPlataforma.orden + 1 : 0,
-      }
-    });
-
-    return NextResponse.json(nuevaPlataforma, { status: 201 });
+    return NextResponse.json(plataforma, { status: 201 });
   } catch (error) {
-    console.error('Error creating plataforma:', error);
+    console.error('Error creating plataforma red social:', error);
     return NextResponse.json(
-      { error: 'Error al crear la plataforma' },
+      { error: getFriendlyErrorMessage(error) },
       { status: 500 }
     );
   }

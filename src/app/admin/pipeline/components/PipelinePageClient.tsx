@@ -10,7 +10,6 @@ import {
     GripVertical,
     Eye
 } from 'lucide-react';
-import { PipelineStageModal } from './PipelineStageModal';
 import { DraggablePipelineStages } from './DraggablePipelineStages';
 
 interface PipelineStage {
@@ -41,34 +40,17 @@ interface PipelineType {
 interface PipelinePageClientProps {
     pipelineTypes: PipelineType[];
     onCreateStage?: () => void;
+    onEditStage?: (stage: PipelineStage) => void;
+    activeSection?: 'comercial' | 'soporte';
 }
 
-export function PipelinePageClient({ pipelineTypes, onCreateStage }: PipelinePageClientProps) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingStage, setEditingStage] = useState<PipelineStage | null>(null);
+export function PipelinePageClient({ pipelineTypes, onCreateStage, onEditStage, activeSection }: PipelinePageClientProps) {
     const router = useRouter();
 
-    const handleCreateStage = () => {
-        setEditingStage(null);
-        setIsModalOpen(true);
-    };
-
-    // Usar la función pasada desde el layout o la función local
-    const createStageHandler = onCreateStage || handleCreateStage;
-
     const handleEditStage = (stage: PipelineStage) => {
-        setEditingStage(stage);
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setEditingStage(null);
-    };
-
-    const handleModalSuccess = () => {
-        // Refrescar la página para obtener los datos actualizados
-        router.refresh();
+        if (onEditStage) {
+            onEditStage(stage);
+        }
     };
 
     // Calcular estadísticas totales
@@ -77,8 +59,42 @@ export function PipelinePageClient({ pipelineTypes, onCreateStage }: PipelinePag
     const activeStages = allStages.filter(stage => stage.isActive).length;
     const totalLeads = allStages.reduce((sum, stage) => sum + (stage.leadCount || 0), 0);
 
+    // Obtener información de la sección activa
+    const getSectionInfo = () => {
+        if (activeSection === 'comercial') {
+            return {
+                title: 'Pipeline Comercial',
+                description: 'Gestiona las etapas del proceso de ventas y conversión de leads',
+                icon: '📈',
+                color: '#3B82F6'
+            };
+        } else {
+            return {
+                title: 'Pipeline de Soporte',
+                description: 'Gestiona las etapas del proceso de atención al cliente y resolución de tickets',
+                icon: '🎧',
+                color: '#10B981'
+            };
+        }
+    };
+
+    const sectionInfo = getSectionInfo();
+
     return (
         <div className="p-6 space-y-6">
+            {/* Section Header */}
+            <div className="flex items-center space-x-3 mb-6">
+                <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold"
+                    style={{ backgroundColor: sectionInfo.color }}
+                >
+                    {sectionInfo.icon}
+                </div>
+                <div>
+                    <h2 className="text-xl font-semibold text-white">{sectionInfo.title}</h2>
+                    <p className="text-sm text-zinc-400">{sectionInfo.description}</p>
+                </div>
+            </div>
 
             {/* Stats Cards */}
             <div className="grid gap-4 md:grid-cols-3">
@@ -170,19 +186,21 @@ export function PipelinePageClient({ pipelineTypes, onCreateStage }: PipelinePag
                         <li>• Arrastra las etapas para reordenar el pipeline</li>
                         <li>• Las etapas activas se muestran en el Kanban CRM</li>
                         <li>• Las etapas inactivas no aparecen en el flujo de trabajo</li>
-                        <li>• El orden de las etapas determina el flujo de los leads</li>
-                        <li>• No se pueden eliminar etapas que contengan leads</li>
+                        {activeSection === 'comercial' ? (
+                            <>
+                                <li>• El orden de las etapas determina el flujo de los leads comerciales</li>
+                                <li>• No se pueden eliminar etapas que contengan leads</li>
+                            </>
+                        ) : (
+                            <>
+                                <li>• El orden de las etapas determina el flujo de los tickets de soporte</li>
+                                <li>• No se pueden eliminar etapas que contengan tickets</li>
+                            </>
+                        )}
                     </ul>
                 </CardContent>
             </Card>
 
-            {/* Modal */}
-            <PipelineStageModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                stage={editingStage}
-                onSuccess={handleModalSuccess}
-            />
         </div>
     );
 }
