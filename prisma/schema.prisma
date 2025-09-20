@@ -104,6 +104,25 @@ model platform_canales_adquisicion {
   @@index([isVisible])
 }
 
+model platform_plataformas_redes_sociales {
+  id          String   @id @default(cuid())
+  nombre      String   @unique  // "Facebook", "Instagram", "X", "TikTok"
+  slug        String   @unique  // "facebook", "instagram", "x", "tiktok"
+  descripcion String?
+  color       String?  // "#1877F2" para Facebook, "#000000" para X
+  icono       String?  // "facebook", "instagram", "twitter" (para X)
+  urlBase     String?  // "https://facebook.com/", "https://x.com/"
+  isActive    Boolean  @default(true)
+  orden       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  project_redes_sociales project_redes_sociales[]
+  
+  @@index([isActive])
+  @@index([slug])
+}
+
 model platform_lead_bitacora {
   id              String           @id @default(cuid())
   leadId          String
@@ -1225,15 +1244,16 @@ model project_horarios_atencion {
 model project_redes_sociales {
   id          String   @id @default(cuid())
   projectId   String
-  plataforma  String   // "facebook", "instagram", "twitter", "youtube", "tiktok", "linkedin", "website"
+  plataformaId String  // FK a platform_plataformas_redes_sociales
   url         String
   activo      Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   projects    projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  plataforma  platform_plataformas_redes_sociales @relation(fields: [plataformaId], references: [id])
   
   @@index([projectId])
-  @@index([projectId, plataforma])
-  @@unique([projectId, plataforma])
+  @@index([projectId, plataformaId])
+  @@unique([projectId, plataformaId])
 }
