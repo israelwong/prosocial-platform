@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Phone, MapPin, Globe } from 'lucide-react';
 import { Telefono, ContactoData } from '../types';
 
@@ -23,10 +22,10 @@ export function ContactoStats({ telefonos, contactoData, loading }: ContactoStat
                 {[...Array(3)].map((_, i) => (
                     <Card key={i} className="bg-zinc-800 border-zinc-700">
                         <CardHeader className="pb-2">
-                            <Skeleton className="h-4 w-24" />
+                            <div className="h-4 w-24 bg-zinc-700 rounded animate-pulse" />
                         </CardHeader>
                         <CardContent>
-                            <Skeleton className="h-8 w-16" />
+                            <div className="h-8 w-16 bg-zinc-700 rounded animate-pulse" />
                         </CardContent>
                     </Card>
                 ))}

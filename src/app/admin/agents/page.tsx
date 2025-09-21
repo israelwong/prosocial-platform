@@ -7,6 +7,11 @@ import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper'
 
 async function getAgents(): Promise<Agent[]> {
     try {
+        // En build time, retornar array vacío para evitar errores de conexión
+        if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+            return [];
+        }
+
         // Consulta optimizada con include para obtener el conteo de leads en una sola query
         // Usar withRetry para manejar errores P1001 de conectividad
         const agents = await withRetry(async () => {
@@ -31,6 +36,10 @@ async function getAgents(): Promise<Agent[]> {
         }));
     } catch (error) {
         console.error('Error fetching agents:', error);
+        // En build time, retornar array vacío en lugar de lanzar error
+        if (process.env.NODE_ENV === 'production') {
+            return [];
+        }
         throw new Error(getFriendlyErrorMessage(error));
     }
 }
@@ -79,12 +88,12 @@ export default async function AgentsPage() {
                                     <li>Si el problema persiste, contacta al administrador</li>
                                 </ul>
                             </div>
-                            <button
-                                onClick={() => window.location.reload()}
+                            <a
+                                href="/admin/agents"
                                 className="mt-4 inline-block px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors"
                             >
                                 Recargar página
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
