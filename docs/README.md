@@ -37,6 +37,10 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **TYPESCRIPT_BEST_PRACTICES.md** - Mejores prácticas de TypeScript
 - **UI_DESIGN_PATTERNS.md** - Patrones de diseño UI reutilizables
 - **SISTEMA_LEADS_DESCUENTOS_IMPLEMENTADO.md** - Sistema de leads y descuentos implementado
+- **METODOLOGIA_DESARROLLO_SECCIONES.md** - Metodología automatizada para desarrollo de secciones
+- **COMANDOS_AUTOMATIZACION.md** - Comandos para automatización de desarrollo
+- **REGLAS_AGENTE_AUTOMATIZACION.md** - Reglas específicas para el agente IA
+- **AUTOMATIZACION_GIT_AVANZADA.md** - Automatización avanzada con gestión de ramas Git
 
 ### 🗂️ **05-legacy/** - Código Legacy y Migración
 
@@ -67,6 +71,9 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 4. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
 5. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
 6. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
+7. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
+8. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
+9. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
 
 ### 🔧 **Para Troubleshooting**
 

@@ -1,38 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import {
-    Clock,
-    Plus,
-    Trash2,
-    Calendar
-} from 'lucide-react';
-
-interface Horario {
-    id: string;
-    dia: string;
-    hora_inicio: string;
-    hora_fin: string;
-    activo: boolean;
-}
-
-const DIAS_SEMANA = [
-    { value: 'lunes', label: 'Lunes' },
-    { value: 'martes', label: 'Martes' },
-    { value: 'miercoles', label: 'Miércoles' },
-    { value: 'jueves', label: 'Jueves' },
-    { value: 'viernes', label: 'Viernes' },
-    { value: 'sabado', label: 'Sábado' },
-    { value: 'domingo', label: 'Domingo' }
-];
+import { RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
+import { HorariosStats } from './components/HorariosStats';
+import { HorariosList } from './components/HorariosList';
+import { Horario } from './types';
 
 export default function HorariosPage() {
-    const [horarios, setHorarios] = useState<Horario[]>([
+    const [horarios, setHorarios] = useState<Horario[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Datos iniciales de horarios
+    const initialHorarios: Horario[] = [
         {
             id: '1',
             dia: 'lunes',
@@ -82,139 +65,99 @@ export default function HorariosPage() {
             hora_fin: '14:00',
             activo: false
         }
-    ]);
+    ];
 
-    const handleToggleHorario = (id: string) => {
-        setHorarios(prev => prev.map(h =>
-            h.id === id ? { ...h, activo: !h.activo } : h
-        ));
+    useEffect(() => {
+        loadData();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const loadData = async (isRetry = false) => {
+        if (!isRetry) {
+            setLoading(true);
+        }
+        setError(null);
+
+        try {
+            // Simular carga de datos (en el futuro esto vendrá de una API)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setHorarios(initialHorarios);
+        } catch (err) {
+            const errorMessage = 'Error al cargar horarios';
+            setError(errorMessage);
+            console.error('Error loading horarios:', err);
+
+            if (!isRetry) {
+                toast.error(errorMessage);
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleUpdateHorario = (id: string, field: string, value: string) => {
-        setHorarios(prev => prev.map(h =>
-            h.id === id ? { ...h, [field]: value } : h
-        ));
+
+    const handleToggleActive = async (id: string, activo: boolean) => {
+        try {
+            setHorarios(prev => prev.map(h =>
+                h.id === id ? { ...h, activo } : h
+            ));
+
+            toast.success(`Horario ${activo ? 'activado' : 'desactivado'} exitosamente`);
+        } catch (err) {
+            console.error('Error toggling horario:', err);
+            toast.error('Error al cambiar estado del horario');
+        }
+    };
+
+    const handleUpdateHorario = async (id: string, field: string, value: string) => {
+        try {
+            setHorarios(prev => prev.map(h =>
+                h.id === id ? { ...h, [field]: value } : h
+            ));
+        } catch (err) {
+            console.error('Error updating horario:', err);
+            toast.error('Error al actualizar horario');
+        }
     };
 
 
-    const getDiaLabel = (dia: string) => {
-        return DIAS_SEMANA.find(d => d.value === dia)?.label || dia;
-    };
-
-    const horariosActivos = horarios.filter(h => h.activo).length;
-    const horariosInactivos = horarios.filter(h => !h.activo).length;
-
-    return (
-        <div className="p-6 space-y-6">
-            {/* Resumen */}
-            <div className="grid gap-4 md:grid-cols-3">
+    if (error && !loading) {
+        return (
+            <div className="p-6">
                 <Card className="bg-zinc-800 border-zinc-700">
-                    <CardContent className="p-4">
-                        <div className="flex items-center space-x-2">
-                            <Clock className="h-5 w-5 text-green-400" />
-                            <div>
-                                <p className="text-2xl font-bold text-white">{horariosActivos}</p>
-                                <p className="text-sm text-zinc-400">Días Activos</p>
+                    <CardContent className="p-6 text-center">
+                        <div className="space-y-4">
+                            <div className="text-red-400">
+                                <RefreshCw className="h-12 w-12 mx-auto mb-4" />
+                                <h3 className="text-lg font-semibold mb-2">Error al cargar horarios</h3>
+                                <p className="text-zinc-400">{error}</p>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-zinc-800 border-zinc-700">
-                    <CardContent className="p-4">
-                        <div className="flex items-center space-x-2">
-                            <Clock className="h-5 w-5 text-zinc-400" />
-                            <div>
-                                <p className="text-2xl font-bold text-white">{horariosInactivos}</p>
-                                <p className="text-sm text-zinc-400">Días Inactivos</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-zinc-800 border-zinc-700">
-                    <CardContent className="p-4">
-                        <div className="flex items-center space-x-2">
-                            <Calendar className="h-5 w-5 text-blue-400" />
-                            <div>
-                                <p className="text-2xl font-bold text-white">{horarios.length}</p>
-                                <p className="text-sm text-zinc-400">Total Días</p>
-                            </div>
+                            <Button
+                                onClick={() => loadData(true)}
+                                variant="outline"
+                                className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                            >
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                                Reintentar
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
             </div>
+        );
+    }
 
-            {/* Horarios por día */}
-            <Card className="bg-zinc-800 border-zinc-700">
-                <CardHeader>
-                    <CardTitle className="text-white">Horarios por Día de la Semana</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Configura los horarios de atención para cada día
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {horarios.map((horario) => (
-                        <div key={horario.id} className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg">
-                            <div className="flex items-center space-x-4">
-                                <div className="w-24">
-                                    <p className="text-white font-medium">{getDiaLabel(horario.dia)}</p>
-                                </div>
+    return (
+        <div className="p-6 space-y-6">
+            {/* Estadísticas */}
+            <HorariosStats horarios={horarios} loading={loading} />
 
-                                <div className="flex items-center space-x-2">
-                                    <Input
-                                        type="time"
-                                        value={horario.hora_inicio}
-                                        onChange={(e) => handleUpdateHorario(horario.id, 'hora_inicio', e.target.value)}
-                                        className="bg-zinc-700 border-zinc-600 text-white w-32"
-                                        disabled={!horario.activo}
-                                    />
-                                    <span className="text-zinc-400">-</span>
-                                    <Input
-                                        type="time"
-                                        value={horario.hora_fin}
-                                        onChange={(e) => handleUpdateHorario(horario.id, 'hora_fin', e.target.value)}
-                                        className="bg-zinc-700 border-zinc-600 text-white w-32"
-                                        disabled={!horario.activo}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex items-center space-x-3">
-                                <div className="flex items-center space-x-2">
-                                    <Switch
-                                        checked={horario.activo}
-                                        onCheckedChange={() => handleToggleHorario(horario.id)}
-                                    />
-                                    <span className={`text-sm ${horario.activo ? 'text-green-400' : 'text-zinc-400'}`}>
-                                        {horario.activo ? 'Activo' : 'Inactivo'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </CardContent>
-            </Card>
-
-            {/* Horarios especiales */}
-            <Card className="bg-zinc-800 border-zinc-700">
-                <CardHeader>
-                    <CardTitle className="text-white">Horarios Especiales</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Configura horarios especiales para días festivos o eventos
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-center py-8">
-                        <Calendar className="h-12 w-12 text-zinc-500 mx-auto mb-4" />
-                        <p className="text-zinc-400 mb-4">Próximamente: Horarios especiales</p>
-                        <Button variant="outline" disabled>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Agregar Horario Especial
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+            {/* Lista de horarios */}
+            <HorariosList
+                horarios={horarios}
+                onToggleActive={handleToggleActive}
+                onUpdateHorario={handleUpdateHorario}
+                loading={loading}
+            />
 
             {/* Información de uso */}
             <Card className="bg-zinc-800 border-zinc-700">
