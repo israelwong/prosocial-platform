@@ -34,10 +34,19 @@ interface PlatformConfig {
 // Función para obtener la configuración de la plataforma
 async function getPlatformConfig(): Promise<PlatformConfig | null> {
     try {
+        // En build time, retornar null para evitar errores de conexión
+        if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+            return null;
+        }
+
         const config = await prisma.platform_config.findFirst();
         return config;
     } catch (error) {
         console.error('Error fetching platform config:', error);
+        // En build time, retornar null en lugar de lanzar error
+        if (process.env.NODE_ENV === 'production') {
+            return null;
+        }
         return null;
     }
 }

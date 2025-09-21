@@ -7,6 +7,11 @@ import { Plan } from './types';
 // Función para obtener planes desde la base de datos
 async function getPlans(): Promise<Plan[]> {
     try {
+        // En build time, retornar array vacío para evitar errores de conexión
+        if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+            return [];
+        }
+
         const plans = await prisma.platform_plans.findMany({
             include: {
                 _count: {
@@ -32,6 +37,11 @@ async function getPlans(): Promise<Plan[]> {
         })) as Plan[];
     } catch (error) {
         console.error('Error fetching plans:', error);
+
+        // En build time, retornar array vacío en lugar de lanzar error
+        if (process.env.NODE_ENV === 'production') {
+            return [];
+        }
 
         let errorMessage = 'Error de conexión a la base de datos';
 

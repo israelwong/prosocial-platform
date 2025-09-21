@@ -20,6 +20,11 @@ interface PlataformaRedSocial {
 // Función para obtener las plataformas de redes sociales
 async function getPlataformasRedesSociales(): Promise<PlataformaRedSocial[]> {
     try {
+        // En build time, retornar array vacío para evitar errores de conexión
+        if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+            return [];
+        }
+
         const plataformas = await withRetry(async () => {
             return await prisma.platform_plataformas_redes_sociales.findMany({
                 orderBy: {
@@ -31,6 +36,10 @@ async function getPlataformasRedesSociales(): Promise<PlataformaRedSocial[]> {
         return plataformas;
     } catch (error) {
         console.error('Error fetching plataformas redes sociales:', error);
+        // En build time, retornar array vacío en lugar de lanzar error
+        if (process.env.NODE_ENV === 'production') {
+            return [];
+        }
         throw new Error(getFriendlyErrorMessage(error));
     }
 }

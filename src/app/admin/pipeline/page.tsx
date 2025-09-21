@@ -31,6 +31,11 @@ interface PipelineType {
 // Función para obtener las etapas del pipeline agrupadas por tipo
 async function getPipelineStagesGrouped(): Promise<PipelineType[]> {
     try {
+        // En build time, retornar array vacío para evitar errores de conexión
+        if (process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL) {
+            return [];
+        }
+
         // Usar withRetry para manejar errores P1001 de conectividad
         const pipelineTypes = await withRetry(async () => {
             return await prisma.platform_pipeline_types.findMany({
@@ -78,6 +83,10 @@ async function getPipelineStagesGrouped(): Promise<PipelineType[]> {
         }));
     } catch (error) {
         console.error('Error fetching pipeline stages grouped:', error);
+        // En build time, retornar array vacío en lugar de lanzar error
+        if (process.env.NODE_ENV === 'production') {
+            return [];
+        }
         throw new Error(getFriendlyErrorMessage(error));
     }
 }
