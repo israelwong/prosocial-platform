@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { prisma } from '@/lib/prisma';
 import { PipelineWrapper } from './components/PipelineWrapper';
 import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
@@ -131,5 +131,21 @@ export default async function PipelinePage() {
         );
     }
 
-    return <PipelineWrapper pipelineTypes={pipelineTypes} />;
+    return (
+        <Suspense fallback={
+            <div className="p-6 space-y-6">
+                <div className="animate-pulse">
+                    <div className="h-8 bg-zinc-700 rounded w-1/3 mb-4"></div>
+                    <div className="h-4 bg-zinc-700 rounded w-1/2 mb-6"></div>
+                    <div className="grid gap-4">
+                        {[...Array(3)].map((_, i) => (
+                            <div key={i} className="h-20 bg-zinc-700 rounded"></div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        }>
+            <PipelineWrapper pipelineTypes={pipelineTypes} />
+        </Suspense>
+    );
 }
