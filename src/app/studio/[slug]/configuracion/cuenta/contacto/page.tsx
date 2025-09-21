@@ -1,35 +1,29 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-    Phone,
-    Plus,
-    X,
-    MapPin,
-    Globe,
-    Trash2
-} from 'lucide-react';
-
-interface Telefono {
-    id: string;
-    numero: string;
-    tipo: 'principal' | 'whatsapp' | 'emergencia' | 'oficina';
-    activo: boolean;
-}
+import { RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
+import { ContactoStats } from './components/ContactoStats';
+import { ContactoList } from './components/ContactoList';
+import { ContactoModal } from './components/ContactoModal';
+import { Telefono, TelefonoCreate, ContactoData } from './types';
 
 export default function ContactoPage() {
-    const [formData, setFormData] = useState({
-        direccion: 'Av. Principal 123, Col. Centro, Ciudad, CP 12345',
-        website: 'https://www.studiodemo.com'
+    const [telefonos, setTelefonos] = useState<Telefono[]>([]);
+    const [contactoData, setContactoData] = useState<ContactoData>({
+        direccion: '',
+        website: ''
     });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTelefono, setEditingTelefono] = useState<Telefono | null>(null);
+    const [modalLoading, setModalLoading] = useState(false);
 
-    const [telefonos, setTelefonos] = useState<Telefono[]>([
+    // Datos iniciales de ejemplo
+    const initialTelefonos: Telefono[] = [
         {
             id: '1',
             numero: '+52 55 1234 5678',
@@ -42,192 +36,158 @@ export default function ContactoPage() {
             tipo: 'whatsapp',
             activo: true
         }
-    ]);
+    ];
 
-    const [nuevoTelefono, setNuevoTelefono] = useState({
-        numero: '',
-        tipo: 'principal' as const
-    });
-
-    const handleInputChange = (field: string, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
+    const initialContactoData: ContactoData = {
+        direccion: 'Av. Principal 123, Col. Centro, Ciudad, CP 12345',
+        website: 'https://www.studiodemo.com'
     };
 
-    const handleAddTelefono = () => {
-        if (nuevoTelefono.numero.trim()) {
-            const telefono: Telefono = {
-                id: Date.now().toString(),
-                numero: nuevoTelefono.numero.trim(),
-                tipo: nuevoTelefono.tipo,
-                activo: true
-            };
-            setTelefonos(prev => [...prev, telefono]);
-            setNuevoTelefono({ numero: '', tipo: 'principal' });
+    useEffect(() => {
+        loadData();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const loadData = async (isRetry = false) => {
+        if (!isRetry) {
+            setLoading(true);
+        }
+        setError(null);
+
+        try {
+            // Simular carga de datos (en producción sería una API call)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            setTelefonos(initialTelefonos);
+            setContactoData(initialContactoData);
+        } catch (err) {
+            console.error('Error loading contacto data:', err);
+            setError('Error al cargar información de contacto');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleRemoveTelefono = (id: string) => {
-        setTelefonos(prev => prev.filter(t => t.id !== id));
+    const handleOpenModal = (telefono?: Telefono) => {
+        setEditingTelefono(telefono || null);
+        setIsModalOpen(true);
     };
 
-    const handleToggleTelefono = (id: string) => {
-        setTelefonos(prev => prev.map(t =>
-            t.id === id ? { ...t, activo: !t.activo } : t
-        ));
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingTelefono(null);
     };
 
+    const handleSaveTelefono = async (data: TelefonoCreate) => {
+        setModalLoading(true);
 
-    const getTipoLabel = (tipo: string) => {
-        const labels = {
-            principal: 'Principal',
-            whatsapp: 'WhatsApp',
-            emergencia: 'Emergencia',
-            oficina: 'Oficina'
-        };
-        return labels[tipo as keyof typeof labels] || tipo;
+        try {
+            if (editingTelefono) {
+                // Actualizar teléfono existente
+                const telefonoActualizado: Telefono = {
+                    ...editingTelefono,
+                    ...data
+                };
+                
+                setTelefonos(prev => prev.map(t => 
+                    t.id === editingTelefono.id ? telefonoActualizado : t
+                ));
+                
+                toast.success('Teléfono actualizado exitosamente');
+            } else {
+                // Crear nuevo teléfono
+                const nuevoTelefono: Telefono = {
+                    id: Date.now().toString(),
+                    ...data
+                };
+                
+                setTelefonos(prev => [...prev, nuevoTelefono]);
+                toast.success('Teléfono agregado exitosamente');
+            }
+            
+            handleCloseModal();
+        } catch (err) {
+            console.error('Error saving telefono:', err);
+            toast.error('Error al guardar teléfono');
+        } finally {
+            setModalLoading(false);
+        }
     };
 
-    const getTipoColor = (tipo: string) => {
-        const colors = {
-            principal: 'bg-blue-500',
-            whatsapp: 'bg-green-500',
-            emergencia: 'bg-red-500',
-            oficina: 'bg-zinc-500'
-        };
-        return colors[tipo as keyof typeof colors] || 'bg-zinc-500';
+    const handleDeleteTelefono = async (id: string) => {
+        try {
+            setTelefonos(prev => prev.filter(t => t.id !== id));
+            toast.success('Teléfono eliminado exitosamente');
+        } catch (err) {
+            console.error('Error deleting telefono:', err);
+            toast.error('Error al eliminar teléfono');
+        }
     };
+
+    const handleToggleActive = async (id: string, activo: boolean) => {
+        try {
+            setTelefonos(prev => prev.map(t =>
+                t.id === id ? { ...t, activo } : t
+            ));
+        } catch (err) {
+            console.error('Error toggling telefono:', err);
+            toast.error('Error al cambiar estado del teléfono');
+        }
+    };
+
+    const handleUpdateContactoData = async (field: keyof ContactoData, value: string) => {
+        try {
+            setContactoData(prev => ({ ...prev, [field]: value }));
+        } catch (err) {
+            console.error('Error updating contacto data:', err);
+            toast.error('Error al actualizar información');
+        }
+    };
+
+    if (error && !loading) {
+        return (
+            <div className="p-6">
+                <Card className="bg-zinc-800 border-zinc-700">
+                    <CardContent className="p-6 text-center">
+                        <p className="text-red-400 mb-4">{error}</p>
+                        <Button onClick={() => loadData(false)} variant="outline">
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Reintentar
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="p-6 space-y-6">
-            {/* Teléfonos */}
-            <Card className="bg-zinc-800 border-zinc-700">
-                <CardHeader>
-                    <CardTitle className="text-white">Teléfonos de Contacto</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Gestiona los números de teléfono de tu estudio
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {/* Lista de teléfonos existentes */}
-                    <div className="space-y-3">
-                        {telefonos.map((telefono) => (
-                            <div key={telefono.id} className="flex items-center justify-between p-3 bg-zinc-800 rounded-lg">
-                                <div className="flex items-center space-x-3">
-                                    <div className={`w-3 h-3 rounded-full ${getTipoColor(telefono.tipo)}`}></div>
-                                    <div>
-                                        <p className="text-white font-medium">{telefono.numero}</p>
-                                        <p className="text-zinc-400 text-sm">{getTipoLabel(telefono.tipo)}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleToggleTelefono(telefono.id)}
-                                        className={telefono.activo ? 'text-green-400' : 'text-zinc-400'}
-                                    >
-                                        {telefono.activo ? 'Activo' : 'Inactivo'}
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleRemoveTelefono(telefono.id)}
-                                        className="text-red-400 hover:text-red-300"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+            {/* Estadísticas */}
+            <ContactoStats 
+                telefonos={telefonos} 
+                contactoData={contactoData} 
+                loading={loading} 
+            />
 
-                    {/* Agregar nuevo teléfono */}
-                    <div className="border-t border-zinc-700 pt-4">
-                        <div className="flex space-x-2">
-                            <Input
-                                value={nuevoTelefono.numero}
-                                onChange={(e) => setNuevoTelefono(prev => ({ ...prev, numero: e.target.value }))}
-                                className="bg-zinc-800 border-zinc-700 text-white"
-                                placeholder="Número de teléfono"
-                            />
-                            <Select
-                                value={nuevoTelefono.tipo}
-                                onValueChange={(value: any) => setNuevoTelefono(prev => ({ ...prev, tipo: value }))}
-                            >
-                                <SelectTrigger className="w-40 bg-zinc-800 border-zinc-700 text-white">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="principal">Principal</SelectItem>
-                                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                                    <SelectItem value="emergencia">Emergencia</SelectItem>
-                                    <SelectItem value="oficina">Oficina</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button onClick={handleAddTelefono} variant="outline">
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+            {/* Lista de contacto */}
+            <ContactoList
+                telefonos={telefonos}
+                contactoData={contactoData}
+                onAddTelefono={() => handleOpenModal()}
+                onEditTelefono={handleOpenModal}
+                onDeleteTelefono={handleDeleteTelefono}
+                onToggleActive={handleToggleActive}
+                onUpdateContactoData={handleUpdateContactoData}
+                loading={loading}
+            />
 
-            {/* Dirección */}
-            <Card className="bg-zinc-800 border-zinc-700">
-                <CardHeader>
-                    <CardTitle className="text-white">Dirección</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Ubicación física de tu estudio
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="direccion" className="text-zinc-300">Dirección Completa</Label>
-                        <Textarea
-                            id="direccion"
-                            value={formData.direccion}
-                            onChange={(e) => handleInputChange('direccion', e.target.value)}
-                            className="bg-zinc-800 border-zinc-700 text-white min-h-[100px]"
-                            placeholder="Calle, número, colonia, ciudad, estado, código postal"
-                        />
-                    </div>
-
-                    <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                        <MapPin className="h-4 w-4" />
-                        <span>Esta dirección aparecerá en tu landing page y documentos oficiales</span>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Página Web */}
-            <Card className="bg-zinc-800 border-zinc-700">
-                <CardHeader>
-                    <CardTitle className="text-white">Página Web</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Sitio web oficial de tu estudio
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="website" className="text-zinc-300">URL del Sitio Web</Label>
-                        <Input
-                            id="website"
-                            value={formData.website}
-                            onChange={(e) => handleInputChange('website', e.target.value)}
-                            className="bg-zinc-800 border-zinc-700 text-white"
-                            placeholder="https://www.tu-estudio.com"
-                        />
-                    </div>
-
-                    <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                        <Globe className="h-4 w-4" />
-                        <span>Este enlace aparecerá en tu landing page y perfiles de redes sociales</span>
-                    </div>
-                </CardContent>
-            </Card>
+            {/* Modal para crear/editar teléfonos */}
+            <ContactoModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSave={handleSaveTelefono}
+                editingTelefono={editingTelefono}
+                loading={modalLoading}
+            />
 
             {/* Información de uso */}
             <Card className="bg-zinc-800 border-zinc-700">
