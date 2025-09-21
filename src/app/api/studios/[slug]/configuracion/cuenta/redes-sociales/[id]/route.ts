@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
 // GET - Obtener red social específica
 export async function GET(
@@ -12,9 +11,11 @@ export async function GET(
         const { slug, id } = await params;
 
         // Obtener el studio
-        const studio = await prisma.projects.findUnique({
-            where: { slug },
-            select: { id: true }
+        const studio = await withRetry(async () => {
+            return await prisma.projects.findUnique({
+                where: { slug },
+                select: { id: true }
+            });
         });
 
         if (!studio) {
@@ -25,14 +26,16 @@ export async function GET(
         }
 
         // Obtener la red social específica
-        const redSocial = await prisma.project_redes_sociales.findFirst({
-            where: {
-                id,
-                projectId: studio.id
-            },
-            include: {
-                plataforma: true
-            }
+        const redSocial = await withRetry(async () => {
+            return await prisma.project_redes_sociales.findFirst({
+                where: {
+                    id,
+                    projectId: studio.id
+                },
+                include: {
+                    plataforma: true
+                }
+            });
         });
 
         if (!redSocial) {
@@ -46,7 +49,7 @@ export async function GET(
     } catch (error) {
         console.error('Error fetching red social:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: getFriendlyErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -63,9 +66,11 @@ export async function PUT(
         const { url, activo } = body;
 
         // Obtener el studio
-        const studio = await prisma.projects.findUnique({
-            where: { slug },
-            select: { id: true }
+        const studio = await withRetry(async () => {
+            return await prisma.projects.findUnique({
+                where: { slug },
+                select: { id: true }
+            });
         });
 
         if (!studio) {
@@ -76,11 +81,13 @@ export async function PUT(
         }
 
         // Verificar que la red social existe y pertenece al studio
-        const redSocialExistente = await prisma.project_redes_sociales.findFirst({
-            where: {
-                id,
-                projectId: studio.id
-            }
+        const redSocialExistente = await withRetry(async () => {
+            return await prisma.project_redes_sociales.findFirst({
+                where: {
+                    id,
+                    projectId: studio.id
+                }
+            });
         });
 
         if (!redSocialExistente) {
@@ -103,22 +110,24 @@ export async function PUT(
         }
 
         // Actualizar la red social
-        const redSocialActualizada = await prisma.project_redes_sociales.update({
-            where: { id },
-            data: {
-                ...(url && { url }),
-                ...(activo !== undefined && { activo })
-            },
-            include: {
-                plataforma: true
-            }
+        const redSocialActualizada = await withRetry(async () => {
+            return await prisma.project_redes_sociales.update({
+                where: { id },
+                data: {
+                    ...(url && { url }),
+                    ...(activo !== undefined && { activo })
+                },
+                include: {
+                    plataforma: true
+                }
+            });
         });
 
         return NextResponse.json(redSocialActualizada);
     } catch (error) {
         console.error('Error updating red social:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: getFriendlyErrorMessage(error) },
             { status: 500 }
         );
     }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
 // GET - Obtener redes sociales del studio
 export async function GET(
@@ -12,9 +11,11 @@ export async function GET(
         const { slug } = await params;
 
         // Obtener el studio por slug
-        const studio = await prisma.projects.findUnique({
-            where: { slug },
-            select: { id: true, name: true }
+        const studio = await withRetry(async () => {
+            return await prisma.projects.findUnique({
+                where: { slug },
+                select: { id: true, name: true }
+            });
         });
 
         if (!studio) {
@@ -25,19 +26,21 @@ export async function GET(
         }
 
         // Obtener redes sociales del studio con información de la plataforma
-        const redesSociales = await prisma.project_redes_sociales.findMany({
-            where: { projectId: studio.id },
-            include: {
-                plataforma: true
-            },
-            orderBy: { createdAt: 'asc' }
+        const redesSociales = await withRetry(async () => {
+            return await prisma.project_redes_sociales.findMany({
+                where: { projectId: studio.id },
+                include: {
+                    plataforma: true
+                },
+                orderBy: { createdAt: 'asc' }
+            });
         });
 
         return NextResponse.json(redesSociales);
     } catch (error) {
         console.error('Error fetching redes sociales:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: getFriendlyErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -72,9 +75,11 @@ export async function POST(
         }
 
         // Obtener el studio
-        const studio = await prisma.projects.findUnique({
-            where: { slug },
-            select: { id: true }
+        const studio = await withRetry(async () => {
+            return await prisma.projects.findUnique({
+                where: { slug },
+                select: { id: true }
+            });
         });
 
         if (!studio) {
@@ -85,12 +90,14 @@ export async function POST(
         }
 
         // Verificar si ya existe una red social activa de la misma plataforma
-        const existingRed = await prisma.project_redes_sociales.findFirst({
-            where: {
-                projectId: studio.id,
-                plataformaId,
-                activo: true
-            }
+        const existingRed = await withRetry(async () => {
+            return await prisma.project_redes_sociales.findFirst({
+                where: {
+                    projectId: studio.id,
+                    plataformaId,
+                    activo: true
+                }
+            });
         });
 
         if (existingRed) {
@@ -101,23 +108,25 @@ export async function POST(
         }
 
         // Crear la red social
-        const nuevaRedSocial = await prisma.project_redes_sociales.create({
-            data: {
-                projectId: studio.id,
-                plataformaId,
-                url,
-                activo
-            },
-            include: {
-                plataforma: true
-            }
+        const nuevaRedSocial = await withRetry(async () => {
+            return await prisma.project_redes_sociales.create({
+                data: {
+                    projectId: studio.id,
+                    plataformaId,
+                    url,
+                    activo
+                },
+                include: {
+                    plataforma: true
+                }
+            });
         });
 
         return NextResponse.json(nuevaRedSocial, { status: 201 });
     } catch (error) {
         console.error('Error creating red social:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: getFriendlyErrorMessage(error) },
             { status: 500 }
         );
     }
@@ -141,9 +150,11 @@ export async function PUT(
         }
 
         // Obtener el studio
-        const studio = await prisma.projects.findUnique({
-            where: { slug },
-            select: { id: true }
+        const studio = await withRetry(async () => {
+            return await prisma.projects.findUnique({
+                where: { slug },
+                select: { id: true }
+            });
         });
 
         if (!studio) {
@@ -168,23 +179,25 @@ export async function PUT(
         }
 
         // Actualizar todas las redes sociales en una transacción
-        const resultados = await prisma.$transaction(
-            redesSociales.map(red =>
-                prisma.project_redes_sociales.update({
-                    where: { id: red.id },
-                    data: {
-                        url: red.url,
-                        activo: red.activo
-                    }
-                })
-            )
-        );
+        const resultados = await withRetry(async () => {
+            return await prisma.$transaction(
+                redesSociales.map(red =>
+                    prisma.project_redes_sociales.update({
+                        where: { id: red.id },
+                        data: {
+                            url: red.url,
+                            activo: red.activo
+                        }
+                    })
+                )
+            );
+        });
 
         return NextResponse.json(resultados);
     } catch (error) {
         console.error('Error updating redes sociales:', error);
         return NextResponse.json(
-            { error: 'Internal server error' },
+            { error: getFriendlyErrorMessage(error) },
             { status: 500 }
         );
     }

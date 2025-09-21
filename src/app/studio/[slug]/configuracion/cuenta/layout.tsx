@@ -63,11 +63,11 @@ export default function CuentaLayout({
             title="Cuenta"
             description="Configuración de identidad y contacto del estudio"
             navigationItems={navigationItemsWithSlug}
-            actionButton={{
-                label: "Guardar Cambios",
-                onClick: handleSave,
-                icon: Save
-            }}
+        // actionButton={{
+        //     label: "Guardar Cambios",
+        //     onClick: handleSave,
+        //     icon: Save
+        // }}
         >
             {children}
         </SectionLayout>
