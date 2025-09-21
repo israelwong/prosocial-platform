@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withRetry, getFriendlyErrorMessage } from "@/lib/database/retry-helper";
 
 // GET: Obtener todas las categorías
 export async function GET(request: NextRequest) {
     try {
-        const categories = await prisma.service_categories.findMany({
-            orderBy: [
-                { posicion: 'asc' },
-                { name: 'asc' }
-            ]
+        const categories = await withRetry(async () => {
+            return await prisma.service_categories.findMany({
+                orderBy: [
+                    { posicion: 'asc' },
+                    { name: 'asc' }
+                ]
+            });
         });
+        
         return NextResponse.json(categories);
     } catch (error) {
         console.error('Error fetching service categories:', error);
-        return NextResponse.json({ error: 'Error al obtener categorías de servicios' }, { status: 500 });
+        return NextResponse.json({ 
+            error: getFriendlyErrorMessage(error) || 'Error al obtener categorías de servicios' 
+        }, { status: 500 });
     }
 }
 

@@ -1,24 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper';
 
 export async function GET(request: NextRequest) {
     try {
-        const services = await prisma.platform_services.findMany({
-            include: {
-                category: true
-            },
-            orderBy: [
-                { category: { posicion: 'asc' } },
-                { posicion: 'asc' },
-                { name: 'asc' }
-            ]
+        const services = await withRetry(async () => {
+            return await prisma.platform_services.findMany({
+                include: {
+                    category: true
+                },
+                orderBy: [
+                    { category: { posicion: 'asc' } },
+                    { posicion: 'asc' },
+                    { name: 'asc' }
+                ]
+            });
         });
 
         return NextResponse.json(services);
     } catch (error) {
         console.error('Error fetching services:', error);
         return NextResponse.json(
-            { error: 'Error al obtener los servicios' },
+            { error: getFriendlyErrorMessage(error) || 'Error al obtener los servicios' },
             { status: 500 }
         );
     }
