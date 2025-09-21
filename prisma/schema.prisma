@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")      // Connection pooling
+  directUrl = env("DIRECT_URL")        // Direct connection (opcional)
 }
 
 model platform_billing_cycles {

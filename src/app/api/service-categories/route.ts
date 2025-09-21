@@ -13,12 +13,12 @@ export async function GET(request: NextRequest) {
                 ]
             });
         });
-        
+
         return NextResponse.json(categories);
     } catch (error) {
         console.error('Error fetching service categories:', error);
-        return NextResponse.json({ 
-            error: getFriendlyErrorMessage(error) || 'Error al obtener categorías de servicios' 
+        return NextResponse.json({
+            error: getFriendlyErrorMessage(error) || 'Error al obtener categorías de servicios'
         }, { status: 500 });
     }
 }

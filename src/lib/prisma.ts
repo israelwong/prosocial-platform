@@ -1,12 +1,25 @@
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClient | undefined
+// Patrón Singleton para evitar múltiples instancias en desarrollo
+declare global {
+  var prisma: PrismaClient | undefined;
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-    log: ['error'], // Solo mostrar errores, ocultar queries de debug
-    errorFormat: 'pretty',
-})
+const prisma = global.prisma || new PrismaClient({
+  // Configuración optimizada para producción
+  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+  errorFormat: 'pretty',
+  // Configuración de conexión optimizada
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+// Reutilización en desarrollo para evitar agotamiento de conexiones
+if (process.env.NODE_ENV !== "production") {
+  global.prisma = prisma;
+}
+
+export { prisma };

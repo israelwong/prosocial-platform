@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
                     { status: 409 }
                 );
             }
-            
+
             if (error.message.includes('P1001') || error.message.includes('Can\'t reach database')) {
                 return NextResponse.json(
                     { error: 'Error de conexión a la base de datos. Intenta nuevamente.' },

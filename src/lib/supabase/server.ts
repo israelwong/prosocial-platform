@@ -2,15 +2,23 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 /**
- * If using Fluid compute: Don't put this client in a global variable. Always create a new client within each
- * function when using it.
+ * Crea un cliente de Supabase optimizado para el servidor
+ * Configuración robusta con timeouts y manejo de errores
  */
 export async function createClient() {
   const cookieStore = await cookies()
 
+  // Validar variables de entorno
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Missing Supabase environment variables')
+  }
+
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
@@ -26,6 +34,18 @@ export async function createClient() {
             // This can be ignored if you have middleware refreshing
             // user sessions.
           }
+        },
+      },
+      // Configuración optimizada para producción
+      auth: {
+        persistSession: false, // No persistir sesiones en servidor
+        autoRefreshToken: false, // No auto-refresh en servidor
+        detectSessionInUrl: false, // No detectar sesión en URL
+      },
+      // Configuración de timeouts
+      global: {
+        headers: {
+          'X-Client-Info': 'prosocial-platform-server',
         },
       },
     }

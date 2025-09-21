@@ -1,43 +1,113 @@
 /**
  * Helper para manejar reintentos en operaciones de base de datos
- * Especialmente útil para errores P1001 de Supabase
+ * Implementa estrategia robusta con backoff exponencial y detección inteligente de errores
  */
 
 export interface RetryOptions {
     maxRetries?: number;
     baseDelay?: number;
     maxDelay?: number;
+    jitter?: boolean; // Agregar aleatoriedad para evitar thundering herd
 }
 
 /**
  * Ejecuta una función con reintentos automáticos para errores de conectividad
+ * Implementa backoff exponencial con jitter para evitar thundering herd
  */
 export async function withRetry<T>(
     operation: () => Promise<T>,
     options: RetryOptions = {}
 ): Promise<T> {
-    const { maxRetries = 3, baseDelay = 1000, maxDelay = 5000 } = options;
+    const { 
+        maxRetries = 3, 
+        baseDelay = 1000, 
+        maxDelay = 10000,
+        jitter = true 
+    } = options;
+
+    let lastError: unknown;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            return await operation();
+            const result = await operation();
+            
+            // Log exitoso en desarrollo
+            if (process.env.NODE_ENV === 'development' && attempt > 1) {
+                console.log(`✅ Operación exitosa en intento ${attempt}`);
+            }
+            
+            return result;
         } catch (error: unknown) {
+            lastError = error;
             const prismaError = error as { code?: string; message?: string };
             
-            // Solo reintentar si es error de conectividad P1001
-            if (prismaError.code === 'P1001' && attempt < maxRetries) {
-                const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
-                console.warn(`⚠️ Error P1001 en intento ${attempt}, reintentando en ${delay}ms...`);
+            // Verificar si es un error recuperable
+            if (isRecoverableError(error) && attempt < maxRetries) {
+                const delay = calculateDelay(attempt, baseDelay, maxDelay, jitter);
+                
+                console.warn(
+                    `⚠️ Error recuperable en intento ${attempt}/${maxRetries}: ${prismaError.code || 'Unknown'}. ` +
+                    `Reintentando en ${delay}ms...`
+                );
+                
                 await new Promise(resolve => setTimeout(resolve, delay));
                 continue;
             }
             
-            // Si no es P1001 o se agotaron los intentos, lanzar error
-            throw error;
+            // Si no es recuperable o se agotaron los intentos, lanzar error
+            break;
         }
     }
     
-    throw new Error('Operación falló después de todos los reintentos');
+    // Log final de error
+    console.error(`❌ Operación falló después de ${maxRetries} intentos`);
+    throw lastError;
+}
+
+/**
+ * Calcula el delay con backoff exponencial y jitter opcional
+ */
+function calculateDelay(
+    attempt: number, 
+    baseDelay: number, 
+    maxDelay: number, 
+    jitter: boolean
+): number {
+    const exponentialDelay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
+    
+    if (jitter) {
+        // Agregar jitter del ±25% para evitar thundering herd
+        const jitterAmount = exponentialDelay * 0.25;
+        const randomJitter = (Math.random() - 0.5) * 2 * jitterAmount;
+        return Math.max(100, exponentialDelay + randomJitter); // Mínimo 100ms
+    }
+    
+    return exponentialDelay;
+}
+
+/**
+ * Verifica si un error es recuperable (debe reintentarse)
+ */
+function isRecoverableError(error: unknown): boolean {
+    const prismaError = error as { code?: string; message?: string };
+    
+    // Errores de conectividad que deben reintentarse
+    const recoverableCodes = ['P1001', 'P1008', 'P1017'];
+    const recoverableMessages = [
+        'Can\'t reach database server',
+        'Connection timeout',
+        'Connection refused',
+        'Network error',
+        'ECONNREFUSED',
+        'ETIMEDOUT'
+    ];
+    
+    return (
+        recoverableCodes.includes(prismaError.code || '') ||
+        recoverableMessages.some(msg => 
+            prismaError.message?.toLowerCase().includes(msg.toLowerCase())
+        )
+    );
 }
 
 /**
