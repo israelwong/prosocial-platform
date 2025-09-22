@@ -7,3 +7,4 @@ export * from "./redes-sociales-schemas";
 export * from "./horarios-schemas";
 export * from "./contacto-schemas";
 export * from "./identidad-schemas";
+export * from "./media-schemas";

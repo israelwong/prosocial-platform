@@ -47,42 +47,42 @@ export default function IdentidadPage() {
         loadData();
     }, [loadData]);
 
-  const handleUpdateIdentidad = async (data: IdentidadUpdate) => {
-    try {
-      await actualizarIdentidadBasica(slug, data);
-      // No recargar datos - la actualización optimista ya actualizó la UI
-    } catch (error) {
-      console.error('Error updating identidad:', error);
-      throw error;
-    }
-  };
+    const handleUpdateIdentidad = async (data: IdentidadUpdate) => {
+        try {
+            await actualizarIdentidadBasica(slug, data);
+            // No recargar datos - la actualización optimista ya actualizó la UI
+        } catch (error) {
+            console.error('Error updating identidad:', error);
+            throw error;
+        }
+    };
 
-  const handleUpdatePalabrasClave = async (palabras: string[]) => {
-    try {
-      await actualizarPalabrasClave(slug, palabras);
-      // No recargar datos - la actualización optimista ya actualizó la UI
-    } catch (error) {
-      console.error('Error updating palabras clave:', error);
-      throw error;
-    }
-  };
+    const handleUpdatePalabrasClave = async (palabras: string[]) => {
+        try {
+            await actualizarPalabrasClave(slug, palabras);
+            // No recargar datos - la actualización optimista ya actualizó la UI
+        } catch (error) {
+            console.error('Error updating palabras clave:', error);
+            throw error;
+        }
+    };
 
-  const handleUpdateLogo = async (tipo: 'logo' | 'isotipo', url: string) => {
-    try {
-      await actualizarLogo(slug, { tipo, url });
-      // No recargar datos - la actualización optimista ya actualizó la UI
-    } catch (error) {
-      console.error('Error updating logo:', error);
-      throw error;
-    }
-  };
+    const handleUpdateLogo = async (tipo: 'logo' | 'isotipo', url: string) => {
+        try {
+            await actualizarLogo(slug, { tipo, url });
+            // No recargar datos - la actualización optimista ya actualizó la UI
+        } catch (error) {
+            console.error('Error updating logo:', error);
+            throw error;
+        }
+    };
 
-  // Función para actualizar el estado local
-  const handleLocalUpdate = (updates: Partial<IdentidadData>) => {
-    if (identidadData) {
-      setIdentidadData(prev => prev ? { ...prev, ...updates } : null);
-    }
-  };
+    // Función para actualizar el estado local
+    const handleLocalUpdate = (updates: Partial<IdentidadData>) => {
+        if (identidadData) {
+            setIdentidadData(prev => prev ? { ...prev, ...updates } : null);
+        }
+    };
 
     if (loading) {
         return (
@@ -120,14 +120,14 @@ export default function IdentidadPage() {
                         Datos fundamentales de tu estudio
                     </CardDescription>
                 </CardHeader>
-        <CardContent>
-          <IdentidadForm 
-            data={identidadData}
-            onUpdate={handleUpdateIdentidad}
-            onLocalUpdate={handleLocalUpdate}
-            loading={loading}
-          />
-        </CardContent>
+                <CardContent>
+                    <IdentidadForm
+                        data={identidadData}
+                        onUpdate={handleUpdateIdentidad}
+                        onLocalUpdate={handleLocalUpdate}
+                        loading={loading}
+                    />
+                </CardContent>
             </Card>
 
             {/* Palabras Clave */}
@@ -138,14 +138,14 @@ export default function IdentidadPage() {
                         Términos que describen tu negocio (SEO y búsquedas)
                     </CardDescription>
                 </CardHeader>
-        <CardContent>
-          <PalabrasClaveManager 
-            palabrasClave={identidadData.palabras_clave}
-            onUpdate={handleUpdatePalabrasClave}
-            onLocalUpdate={(palabras) => handleLocalUpdate({ palabras_clave: palabras })}
-            loading={loading}
-          />
-        </CardContent>
+                <CardContent>
+                    <PalabrasClaveManager
+                        palabrasClave={identidadData.palabras_clave}
+                        onUpdate={handleUpdatePalabrasClave}
+                        onLocalUpdate={(palabras) => handleLocalUpdate({ palabras_clave: palabras })}
+                        loading={loading}
+                    />
+                </CardContent>
             </Card>
 
             {/* Logos */}
@@ -158,15 +158,16 @@ export default function IdentidadPage() {
                             Logo completo con texto (header, tarjetas, documentos)
                         </CardDescription>
                     </CardHeader>
-          <CardContent>
+                    <CardContent>
             <LogoManager 
               tipo="logo"
               url={identidadData.logoUrl}
               onUpdate={(url) => handleUpdateLogo('logo', url)}
               onLocalUpdate={(url) => handleLocalUpdate({ logoUrl: url })}
+              studioSlug={slug}
               loading={loading}
             />
-          </CardContent>
+                    </CardContent>
                 </Card>
 
                 {/* Isotipo */}
@@ -177,15 +178,16 @@ export default function IdentidadPage() {
                             Símbolo o ícono sin texto (favicon, redes sociales)
                         </CardDescription>
                     </CardHeader>
-          <CardContent>
+                    <CardContent>
             <LogoManager 
               tipo="isotipo"
               url={identidadData.isotipo_url}
               onUpdate={(url) => handleUpdateLogo('isotipo', url)}
               onLocalUpdate={(url) => handleLocalUpdate({ isotipo_url: url })}
+              studioSlug={slug}
               loading={loading}
             />
-          </CardContent>
+                    </CardContent>
                 </Card>
             </div>
 
