@@ -2,7 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { 
+    obtenerDashboardStudio, 
+    obtenerEventosRecientes, 
+    obtenerClientesRecientes,
+    type DashboardStudio,
+    type DashboardEvento,
+    type DashboardCliente
+} from '@/lib/actions/studio/dashboard.actions'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -17,43 +24,10 @@ import {
     Settings
 } from 'lucide-react'
 
-interface Studio {
-    id: string
-    name: string
-    slug: string
-    email: string
-    phone: string
-    address: string
-    website: string
-    subscriptionStatus: string
-    plan: {
-        name: string
-        priceMonthly: number
-    }
-    _count: {
-        eventos: number
-        clientes: number
-    }
-}
-
-interface Evento {
-    id: string
-    nombre: string
-    fecha_evento: string
-    status: string
-    cliente: {
-        nombre: string
-        email: string
-    }[]
-}
-
-interface Cliente {
-    id: string
-    nombre: string
-    email: string
-    telefono: string
-    status: string
-}
+// Usar los tipos importados de dashboard.actions
+type Studio = DashboardStudio;
+type Evento = DashboardEvento;
+type Cliente = DashboardCliente;
 
 export default function StudioDashboard() {
     const params = useParams()
@@ -66,67 +40,37 @@ export default function StudioDashboard() {
 
     useEffect(() => {
         const fetchStudioData = async () => {
-            const supabase = createClient()
-
             try {
-                // Obtener información del studio
-                const { data: studioData, error: studioError } = await supabase
-                    .from('studios')
-                    .select(`
-          *,
-          plan:plans(name, priceMonthly)
-        `)
-                    .eq('slug', studioSlug)
-                    .single()
+                setLoading(true);
 
-                if (studioError) {
-                    console.error('Error fetching studio:', studioError)
-                    return
+                // Obtener información del studio
+                const studioData = await obtenerDashboardStudio(studioSlug);
+                if (!studioData) {
+                    console.error('Studio no encontrado:', studioSlug);
+                    return;
                 }
 
-                setStudio(studioData)
+                setStudio(studioData);
 
                 // Obtener eventos recientes
-                const { data: eventosData, error: eventosError } = await supabase
-                    .from('eventos')
-                    .select(`
-          id,
-          nombre,
-          fecha_evento,
-          status,
-          cliente:clientes(nombre, email)
-        `)
-                    .eq('studioId', studioData.id)
-                    .order('fecha_evento', { ascending: false })
-                    .limit(5)
-
-                if (!eventosError) {
-                    setEventos(eventosData || [])
-                }
+                const eventosData = await obtenerEventosRecientes(studioSlug);
+                setEventos(eventosData);
 
                 // Obtener clientes recientes
-                const { data: clientesData, error: clientesError } = await supabase
-                    .from('clientes')
-                    .select('id, nombre, email, telefono, status')
-                    .eq('studioId', studioData.id)
-                    .order('createdAt', { ascending: false })
-                    .limit(5)
-
-                if (!clientesError) {
-                    setClientes(clientesData || [])
-                }
+                const clientesData = await obtenerClientesRecientes(studioSlug);
+                setClientes(clientesData);
 
             } catch (error) {
-                console.error('Error fetching studio data:', error)
+                console.error('Error fetching studio data:', error);
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-        }
+        };
 
         if (studioSlug) {
-            fetchStudioData()
+            fetchStudioData();
         }
-    }, [studioSlug])
+    }, [studioSlug]);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -180,7 +124,12 @@ export default function StudioDashboard() {
             <div className="space-y-4">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h1 className="text-3xl font-bold">{studio.name}</h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-3xl font-bold">{studio.name}</h1>
+                            <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                                Modo Desarrollo
+                            </Badge>
+                        </div>
                         <p className="text-gray-600 mt-1">Dashboard del estudio</p>
                     </div>
                     <div className="flex gap-2">
@@ -207,12 +156,13 @@ export default function StudioDashboard() {
                                 <p className="font-medium">{studio.email}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Teléfono</p>
-                                <p className="font-medium">{studio.phone}</p>
+                                <p className="text-sm text-gray-600">Dirección</p>
+                                <p className="font-medium">{studio.address || 'No especificada'}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600">Plan</p>
                                 <p className="font-medium">{studio.plan.name} - ${studio.plan.priceMonthly}/mes</p>
+                                <p className="text-xs text-gray-500">Modo desarrollo</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600">Estado</p>
