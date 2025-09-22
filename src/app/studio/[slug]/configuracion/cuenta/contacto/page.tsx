@@ -58,7 +58,7 @@ export default function ContactoPage() {
 
             // Cargar datos usando Server Actions
             const data = await obtenerContactoStudio(slug);
-            
+
             // Convertir tipos de string a tipos específicos
             const telefonosConTipos = (data.telefonos || []).map(telefono => ({
                 id: telefono.id,
@@ -69,7 +69,7 @@ export default function ContactoPage() {
                 createdAt: telefono.createdAt,
                 updatedAt: telefono.updatedAt
             }));
-            
+
             setTelefonos(telefonosConTipos);
             setContactoData(data.contactoData || { direccion: '', website: '' });
         } catch (err) {
