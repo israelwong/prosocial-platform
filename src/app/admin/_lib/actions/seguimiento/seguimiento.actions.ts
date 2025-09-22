@@ -4,7 +4,7 @@
 
 import { EVENTO_STATUS, COTIZACION_STATUS, PAGO_STATUS } from '@/app/admin/_lib/constants/status';
 import { ETAPA_CODES } from '@/app/admin/_lib/constants/etapas';
-import prisma from '@/app/admin/_lib/prismaClient';
+import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import {
     SeguimientoBusquedaSchema,

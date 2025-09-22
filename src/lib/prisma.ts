@@ -5,7 +5,7 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-const prisma = global.prisma || new PrismaClient({
+const prisma = globalThis.prisma || new PrismaClient({
   // Configuración optimizada para producción
   log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
   errorFormat: 'pretty',
@@ -19,7 +19,7 @@ const prisma = global.prisma || new PrismaClient({
 
 // Reutilización en desarrollo para evitar agotamiento de conexiones
 if (process.env.NODE_ENV !== "production") {
-  global.prisma = prisma;
+  globalThis.prisma = prisma;
 }
 
 export { prisma };

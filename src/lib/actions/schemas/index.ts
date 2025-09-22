@@ -5,3 +5,4 @@ export * from "./studio-schemas";
 export * from "./user-schemas";
 export * from "./redes-sociales-schemas";
 export * from "./horarios-schemas";
+export * from "./contacto-schemas";

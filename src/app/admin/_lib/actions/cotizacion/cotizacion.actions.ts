@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from '@/app/admin/_lib/prismaClient';
+import { prisma } from '@/lib/prisma';
 import { retryDatabaseOperation } from '@/app/admin/_lib/utils/database-retry';
 import { obtenerEventoCompleto } from '@/app/admin/_lib/actions/evento/evento.actions';
 import { obtenerTiposEvento } from '@/app/admin/_lib/actions/evento/tipo/eventoTipo.actions';

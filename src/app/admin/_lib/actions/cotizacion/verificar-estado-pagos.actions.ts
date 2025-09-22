@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 /**
  * Verifica si una cotización tiene pagos en estado 'paid' o 'pending'
@@ -23,7 +21,7 @@ export async function verificarEstadoPagosCotizacion(cotizacionId: string) {
         });
 
         const tienePagos = pagos.length > 0;
-        
+
         if (!tienePagos) {
             return {
                 tienePagos: false,

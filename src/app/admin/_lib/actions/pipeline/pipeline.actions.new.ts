@@ -1,6 +1,6 @@
 'use server';
 
-import prisma from '@/app/admin/_lib/prismaClient';
+import { prisma } from '@/lib/prisma';
 import {
     crearEtapaSchema,
     actualizarEtapaSchema,

@@ -1,10 +1,11 @@
 export interface Telefono {
     id: string;
+    projectId: string;
     numero: string;
     tipo: 'principal' | 'whatsapp' | 'emergencia' | 'oficina';
     activo: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface TelefonoCreate {

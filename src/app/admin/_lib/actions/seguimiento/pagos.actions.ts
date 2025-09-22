@@ -2,7 +2,7 @@
 
 import { PAGO_STATUS, COTIZACION_STATUS, EVENTO_STATUS, AGENDA_STATUS, type PagoStatus } from '@/app/admin/_lib/constants/status'
 import { EVENTO_ETAPAS } from '@/app/admin/_lib/constants/evento-etapas'
-import prisma from '@/app/admin/_lib/prismaClient'
+import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { crearFechaLocal } from '@/app/admin/_lib/utils/fechas'

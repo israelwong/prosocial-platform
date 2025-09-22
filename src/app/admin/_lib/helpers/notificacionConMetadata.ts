@@ -3,7 +3,7 @@
  * Útil cuando el cliente de Prisma no reconoce los nuevos campos
  */
 
-import prisma from '@/app/admin/_lib/prismaClient'
+import { prisma } from '@/lib/prisma'
 
 interface NotificacionConMetadata {
     titulo: string

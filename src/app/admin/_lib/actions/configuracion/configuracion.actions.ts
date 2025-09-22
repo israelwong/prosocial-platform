@@ -2,7 +2,7 @@
 
 'use server';
 
-import prisma from '@/app/admin/_lib/prismaClient'; // Revisa que la ruta sea correcta
+import { prisma } from '@/lib/prisma'; // Revisa que la ruta sea correcta
 import { revalidatePath } from 'next/cache';
 import { ConfiguracionSchema } from './configuracion.schemas';
 

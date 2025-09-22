@@ -10,6 +10,15 @@ import { ContactoStats } from './components/ContactoStats';
 import { ContactoList } from './components/ContactoList';
 import { ContactoModal } from './components/ContactoModal';
 import { Telefono, TelefonoCreate, ContactoData } from './types';
+import {
+    obtenerContactoStudio,
+    crearTelefono,
+    actualizarTelefono,
+    eliminarTelefono,
+    toggleTelefonoEstado,
+    actualizarContactoData,
+    obtenerEstadisticasContacto
+} from '@/lib/actions/studio/config/contacto.actions';
 
 export default function ContactoPage() {
     const params = useParams();
@@ -23,25 +32,13 @@ export default function ContactoPage() {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTelefono, setEditingTelefono] = useState<Telefono | null>(null);
     const [modalLoading, setModalLoading] = useState(false);
 
-    // Datos iniciales de ejemplo
-    const initialTelefonos: Telefono[] = [
-        {
-            id: '1',
-            numero: '+52 55 1234 5678',
-            tipo: 'principal',
-            activo: true
-        },
-        {
-            id: '2',
-            numero: '+52 55 9876 5432',
-            tipo: 'whatsapp',
-            activo: true
-        }
-    ];
+    // Datos iniciales de ejemplo (ya no se usan, se cargan desde la base de datos)
+    // const initialTelefonos: Telefono[] = [];
 
     const initialContactoData: ContactoData = {
         direccion: 'Av. Principal 123, Col. Centro, Ciudad, CP 12345',
@@ -55,33 +52,42 @@ export default function ContactoPage() {
     }, [slug]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const loadData = async (isRetry = false) => {
-        if (!isRetry) {
-            setLoading(true);
-        }
-        setError(null);
-
         try {
+            if (!isRetry) {
+                setLoading(true);
+                setError(null);
+                setRetryCount(0);
+            }
+
             if (!slug || slug === 'undefined') {
                 throw new Error('Slug no disponible');
             }
 
-            const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/contacto`);
-
-            if (!response.ok) {
-                throw new Error(`Error al cargar datos de contacto: ${response.status}`);
-            }
-
-            const data = await response.json();
+            // Cargar datos usando Server Actions
+            const data = await obtenerContactoStudio(slug);
             setTelefonos(data.telefonos || []);
             setContactoData(data.contactoData || { direccion: '', website: '' });
         } catch (err) {
             console.error('❌ Error loading contacto data:', err);
-            setError('Error al cargar información de contacto');
-            // Fallback a datos de ejemplo si hay error
-            setTelefonos(initialTelefonos);
-            setContactoData(initialContactoData);
+            const errorMessage = err instanceof Error ? err.message : 'Error desconocido al cargar los datos de contacto';
+
+            // Si es un error de conexión y no hemos reintentado mucho, intentar de nuevo
+            if (retryCount < 3 && (errorMessage.includes('conexión') || errorMessage.includes('database') || errorMessage.includes('server'))) {
+                setRetryCount(prev => prev + 1);
+                setTimeout(() => {
+                    loadData(true);
+                }, 2000 * retryCount); // Reintento con delay incremental
+                return;
+            }
+
+            setError(errorMessage);
+            if (!isRetry) {
+                toast.error(errorMessage);
+            }
         } finally {
-            setLoading(false);
+            if (!isRetry) {
+                setLoading(false);
+            }
         }
     };
 
@@ -100,46 +106,32 @@ export default function ContactoPage() {
 
         try {
             if (editingTelefono) {
-                // Actualizar teléfono existente
-                const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/contacto/telefonos/${editingTelefono.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                // Actualizar teléfono existente usando Server Actions
+                const telefonoActualizado = await actualizarTelefono(editingTelefono.id, {
+                    id: editingTelefono.id,
+                    ...data,
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Error al actualizar teléfono');
-                }
-
-                const result = await response.json();
                 setTelefonos(prev => prev.map(t =>
-                    t.id === editingTelefono.id ? result.telefono : t
+                    t.id === editingTelefono.id ? telefonoActualizado : t
                 ));
 
                 toast.success('Teléfono actualizado exitosamente');
             } else {
-                // Crear nuevo teléfono
-                const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/contacto/telefonos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                // Crear nuevo teléfono usando Server Actions
+                const nuevoTelefono = await crearTelefono(slug, {
+                    ...data,
+                    activo: data.activo ?? true,
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Error al crear teléfono');
-                }
-
-                const result = await response.json();
-                setTelefonos(prev => [...prev, result.telefono]);
+                setTelefonos(prev => [...prev, nuevoTelefono]);
                 toast.success('Teléfono agregado exitosamente');
             }
 
             handleCloseModal();
         } catch (err) {
             console.error('Error saving telefono:', err);
-            toast.error(err instanceof Error ? err.message : 'Error al guardar teléfono');
+            const errorMessage = err instanceof Error ? err.message : 'Error al guardar teléfono';
+            toast.error(errorMessage);
         } finally {
             setModalLoading(false);
         }
@@ -147,53 +139,42 @@ export default function ContactoPage() {
 
     const handleDeleteTelefono = async (id: string) => {
         try {
-            const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/contacto/telefonos/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al eliminar teléfono');
-            }
-
+            // Eliminar teléfono usando Server Actions
+            await eliminarTelefono(id);
             setTelefonos(prev => prev.filter(t => t.id !== id));
             toast.success('Teléfono eliminado exitosamente');
         } catch (err) {
             console.error('Error deleting telefono:', err);
-            toast.error(err instanceof Error ? err.message : 'Error al eliminar teléfono');
+            const errorMessage = err instanceof Error ? err.message : 'Error al eliminar teléfono';
+            toast.error(errorMessage);
         }
     };
 
     const handleToggleActive = async (id: string, activo: boolean) => {
         try {
-            // Encontrar el teléfono actual para obtener todos sus datos
-            const telefonoActual = telefonos.find(t => t.id === id);
-            if (!telefonoActual) {
-                throw new Error('Teléfono no encontrado');
-            }
-
-            const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/contacto/telefonos/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    numero: telefonoActual.numero,
-                    tipo: telefonoActual.tipo,
-                    activo
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al cambiar estado del teléfono');
-            }
-
-            const result = await response.json();
+            // Actualizar optimísticamente
             setTelefonos(prev => prev.map(t =>
-                t.id === id ? result.telefono : t
+                t.id === id ? { ...t, activo } : t
             ));
+
+            // Llamar Server Action
+            const telefonoActualizado = await toggleTelefonoEstado(id, { id, activo });
+
+            // Actualizar con datos confirmados
+            setTelefonos(prev => prev.map(t =>
+                t.id === id ? telefonoActualizado : t
+            ));
+
+            toast.success(`Teléfono ${activo ? 'activado' : 'desactivado'} exitosamente`);
         } catch (err) {
             console.error('Error toggling telefono:', err);
-            toast.error(err instanceof Error ? err.message : 'Error al cambiar estado del teléfono');
+            const errorMessage = err instanceof Error ? err.message : 'Error al cambiar estado del teléfono';
+            toast.error(errorMessage);
+
+            // Revertir cambio optimístico
+            setTelefonos(prev => prev.map(t =>
+                t.id === id ? { ...t, activo: !activo } : t
+            ));
         }
     };
 
@@ -208,21 +189,11 @@ export default function ContactoPage() {
 
     const handleSaveContactoData = async (field: keyof ContactoData, value: string) => {
         try {
-            const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/contacto`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ field, value })
-            });
+            // Actualizar datos de contacto usando Server Actions
+            const dataActualizada = await actualizarContactoData(slug, { field, value });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Error al guardar datos');
-            }
-
-            const result = await response.json();
-
-            // Actualizar el estado local con los datos confirmados de la base de datos
-            setContactoData(prev => ({ ...prev, ...result.data }));
+            // Actualizar el estado local con los datos confirmados
+            setContactoData(prev => ({ ...prev, ...dataActualizada }));
         } catch (err) {
             console.error('Error saving contacto data:', err);
             throw err; // Re-lanzar para que el componente hijo maneje el toast
@@ -235,9 +206,13 @@ export default function ContactoPage() {
                 <Card className="bg-zinc-800 border-zinc-700">
                     <CardContent className="p-6 text-center">
                         <p className="text-red-400 mb-4">{error}</p>
-                        <Button onClick={() => loadData(false)} variant="outline">
+                        <Button
+                            onClick={() => loadData(false)}
+                            variant="outline"
+                            disabled={retryCount >= 3}
+                        >
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            Reintentar
+                            {retryCount >= 3 ? 'Máximo de reintentos alcanzado' : 'Reintentar'}
                         </Button>
                     </CardContent>
                 </Card>

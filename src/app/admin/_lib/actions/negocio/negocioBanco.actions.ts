@@ -1,5 +1,5 @@
 'use server'
-import prisma from '@/app/admin/_lib/prismaClient'
+import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 
 export interface NegocioBanco {

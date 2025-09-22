@@ -25,8 +25,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Crear el perfil usando Prisma (bypass RLS)
-        const { PrismaClient } = await import('@prisma/client')
-        const prisma = new PrismaClient()
+        const { prisma } = await import('@/lib/prisma')
 
         try {
             const profile = await prisma.userProfile.create({
