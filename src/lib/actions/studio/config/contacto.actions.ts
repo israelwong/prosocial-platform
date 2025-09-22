@@ -8,18 +8,14 @@ import {
     TelefonoUpdateSchema,
     TelefonosBulkUpdateSchema,
     TelefonoToggleSchema,
-    TelefonoDeleteSchema,
     TelefonosFiltersSchema,
-    ContactoDataSchema,
     ContactoDataUpdateSchema,
     ContactoDataBulkUpdateSchema,
     type TelefonoCreateForm,
     type TelefonoUpdateForm,
     type TelefonosBulkUpdateForm,
     type TelefonoToggleForm,
-    type TelefonoDeleteForm,
     type TelefonosFiltersForm,
-    type ContactoDataForm,
     type ContactoDataUpdateForm,
     type ContactoDataBulkUpdateForm,
 } from "@/lib/actions/schemas/contacto-schemas";
@@ -134,16 +130,19 @@ export async function crearTelefono(
         const validatedData = TelefonoCreateSchema.parse(data);
 
         // 3. Verificar si ya existe un teléfono del mismo tipo activo
-        const existingTelefono = await prisma.project_telefonos.findFirst({
-            where: {
-                projectId: studio.id,
-                tipo: validatedData.tipo,
-                activo: true,
-            },
-        });
+        // Solo para tipo "principal" limitamos a uno activo
+        if (validatedData.tipo === "principal") {
+            const existingTelefono = await prisma.project_telefonos.findFirst({
+                where: {
+                    projectId: studio.id,
+                    tipo: "principal",
+                    activo: true,
+                },
+            });
 
-        if (existingTelefono && validatedData.activo) {
-            throw new Error(`Ya tienes un teléfono activo de tipo ${validatedData.tipo}`);
+            if (existingTelefono && validatedData.activo) {
+                throw new Error("Ya tienes un teléfono principal activo. Desactiva el existente o elige otro tipo.");
+            }
         }
 
         // 4. Crear teléfono
