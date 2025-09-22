@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import {
@@ -73,6 +74,8 @@ export default function IdentidadPage() {
             // No recargar datos - la actualización optimista ya actualizó la UI
         } catch (error) {
             console.error('Error updating logo:', error);
+            // Recargar datos en caso de error para sincronizar con la base de datos
+            await loadData();
             throw error;
         }
     };
@@ -81,6 +84,19 @@ export default function IdentidadPage() {
     const handleLocalUpdate = (updates: Partial<IdentidadData>) => {
         if (identidadData) {
             setIdentidadData(prev => prev ? { ...prev, ...updates } : null);
+        }
+    };
+
+    // Función para recargar datos manualmente
+    const handleRefresh = async () => {
+        setLoading(true);
+        try {
+            await loadData();
+            toast.success('Datos actualizados');
+        } catch {
+            toast.error('Error al actualizar datos');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -112,6 +128,20 @@ export default function IdentidadPage() {
 
     return (
         <div className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-white">Identidad del Estudio</h1>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRefresh}
+                    disabled={loading}
+                    className="flex items-center space-x-2"
+                >
+                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                    <span>Actualizar</span>
+                </Button>
+            </div>
+
             {/* Información Básica */}
             <Card className="bg-zinc-800 border-zinc-700">
                 <CardHeader>
@@ -159,14 +189,14 @@ export default function IdentidadPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-            <LogoManager 
-              tipo="logo"
-              url={identidadData.logoUrl}
-              onUpdate={(url) => handleUpdateLogo('logo', url)}
-              onLocalUpdate={(url) => handleLocalUpdate({ logoUrl: url })}
-              studioSlug={slug}
-              loading={loading}
-            />
+                        <LogoManager
+                            tipo="logo"
+                            url={identidadData.logoUrl}
+                            onUpdate={(url) => handleUpdateLogo('logo', url)}
+                            onLocalUpdate={(url) => handleLocalUpdate({ logoUrl: url })}
+                            studioSlug={slug}
+                            loading={loading}
+                        />
                     </CardContent>
                 </Card>
 
@@ -179,14 +209,14 @@ export default function IdentidadPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-            <LogoManager 
-              tipo="isotipo"
-              url={identidadData.isotipo_url}
-              onUpdate={(url) => handleUpdateLogo('isotipo', url)}
-              onLocalUpdate={(url) => handleLocalUpdate({ isotipo_url: url })}
-              studioSlug={slug}
-              loading={loading}
-            />
+                        <LogoManager
+                            tipo="isotipo"
+                            url={identidadData.isotipo_url}
+                            onUpdate={(url) => handleUpdateLogo('isotipo', url)}
+                            onLocalUpdate={(url) => handleLocalUpdate({ isotipo_url: url })}
+                            studioSlug={slug}
+                            loading={loading}
+                        />
                     </CardContent>
                 </Card>
             </div>

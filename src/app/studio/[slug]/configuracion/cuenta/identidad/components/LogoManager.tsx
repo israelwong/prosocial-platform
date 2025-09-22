@@ -4,27 +4,29 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, Image as ImageIcon, X, Loader2 } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { ALLOWED_MIME_TYPES } from '@/lib/actions/schemas/media-schemas';
+import { Dropzone } from '@/components/ui/dropzone';
+import { FilePreview } from '@/components/ui/file-preview';
 
 interface LogoManagerProps {
   tipo: 'logo' | 'isotipo';
-  url?: string | null;
+  url?: string | null | undefined;
   onUpdate: (url: string) => Promise<void>;
   onLocalUpdate: (url: string | null) => void;
   studioSlug: string;
   loading?: boolean;
 }
 
-export function LogoManager({ 
-  tipo, 
-  url, 
-  onUpdate, 
+export function LogoManager({
+  tipo,
+  url,
+  onUpdate,
   onLocalUpdate,
   studioSlug,
-  loading = false 
+  loading = false
 }: LogoManagerProps) {
   const [nuevaUrl, setNuevaUrl] = useState('');
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -46,10 +48,7 @@ export function LogoManager({
     }
   });
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const handleFileSelect = async (file: File) => {
     // Validar tipo de archivo
     if (!ALLOWED_MIME_TYPES.image.includes(file.type as "image/png" | "image/svg+xml")) {
       toast.error('Tipo de archivo no permitido. Solo se permiten PNG y SVG.');
@@ -84,14 +83,14 @@ export function LogoManager({
 
   const handleUpdateUrl = async () => {
     if (!nuevaUrl.trim()) return;
-    
+
     const urlTrimmed = nuevaUrl.trim();
-    
+
     // Actualización optimista - actualizar UI inmediatamente
     onLocalUpdate(urlTrimmed);
     setNuevaUrl('');
     setShowUrlInput(false);
-    
+
     try {
       await onUpdate(urlTrimmed);
       toast.success(`${tipo === 'logo' ? 'Logo' : 'Isotipo'} actualizado`);
@@ -105,19 +104,23 @@ export function LogoManager({
   };
 
   const handleRemoveUrl = async () => {
+    // Guardar la URL original para rollback
+    const originalUrl = url ?? null;
+    
     // Actualización optimista - actualizar UI inmediatamente
     onLocalUpdate(null);
     
     try {
-      if (url) {
-        await deleteFile(url);
+      if (originalUrl) {
+        await deleteFile(originalUrl);
       }
       await onUpdate('');
       toast.success(`${tipo === 'logo' ? 'Logo' : 'Isotipo'} eliminado`);
-    } catch {
+    } catch (error) {
       // Revertir cambios en caso de error
-      onLocalUpdate(url || null);
+      onLocalUpdate(originalUrl);
       toast.error(`Error al eliminar ${tipo === 'logo' ? 'logo' : 'isotipo'}`);
+      console.error('Error al eliminar archivo:', error);
     }
   };
 
@@ -134,43 +137,15 @@ export function LogoManager({
     <div className="space-y-4">
       {url ? (
         <div className="space-y-3">
-          <div className="w-full h-32 bg-zinc-800 rounded-lg flex items-center justify-center border-2 border-dashed border-zinc-700">
-            <ImageIcon className="h-8 w-8 text-zinc-500" />
-          </div>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-1"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading || loading}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Cambiar {titulo}
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleRemoveUrl}
-              disabled={uploading || loading}
-            >
-              {uploading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <X className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div className="w-full h-32 bg-zinc-800 rounded-lg flex items-center justify-center border-2 border-dashed border-zinc-700">
-            <div className="text-center">
-              <Upload className="h-8 w-8 text-zinc-500 mx-auto mb-2" />
-              <p className="text-zinc-500 text-sm">Subir {titulo}</p>
-              <p className="text-zinc-600 text-xs mt-1">PNG, SVG (máx. 5MB)</p>
-            </div>
-          </div>
+          {/* Previsualización del archivo */}
+          <FilePreview
+            file={url}
+            onRemove={handleRemoveUrl}
+            onView={() => window.open(url, '_blank')}
+            showActions={true}
+          />
+          
+          {/* Botón para cambiar archivo */}
           <Button 
             variant="outline" 
             size="sm" 
@@ -179,17 +154,41 @@ export function LogoManager({
             disabled={uploading || loading}
           >
             <Upload className="h-4 w-4 mr-2" />
-            Seleccionar Archivo
+            Cambiar {titulo}
           </Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {/* Dropzone para subir archivo */}
+          <Dropzone
+            onFileSelect={handleFileSelect}
+            acceptedFileTypes={{
+              'image/png': ['.png'],
+              'image/svg+xml': ['.svg']
+            }}
+            maxSize={5}
+            maxFiles={1}
+            disabled={uploading || loading}
+            className="h-32"
+          >
+            <div className="text-center">
+              <Upload className="h-8 w-8 text-zinc-500 mx-auto mb-2" />
+              <p className="text-zinc-500 text-sm">Subir {titulo}</p>
+              <p className="text-zinc-600 text-xs mt-1">PNG, SVG (máx. 5MB)</p>
+            </div>
+          </Dropzone>
         </div>
       )}
 
-      {/* Input de archivo oculto */}
+      {/* Input de archivo oculto para compatibilidad */}
       <input
         ref={fileInputRef}
         type="file"
         accept=".png,.svg,image/png,image/svg+xml"
-        onChange={handleFileSelect}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFileSelect(file);
+        }}
         className="hidden"
       />
 
