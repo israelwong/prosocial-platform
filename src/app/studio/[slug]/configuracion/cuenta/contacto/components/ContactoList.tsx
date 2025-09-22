@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, MapPin, Globe } from 'lucide-react';
+import { Plus, MapPin, Globe, Loader2 } from 'lucide-react';
 import { ContactoItem } from './ContactoItem';
 import { Telefono, ContactoData } from '../types';
+import { toast } from 'sonner';
 
 interface ContactoListProps {
     telefonos: Telefono[];
@@ -18,6 +19,7 @@ interface ContactoListProps {
     onDeleteTelefono: (id: string) => void;
     onToggleActive: (id: string, activo: boolean) => void;
     onUpdateContactoData: (field: keyof ContactoData, value: string) => void;
+    onSaveContactoData: (field: keyof ContactoData, value: string) => Promise<void>;
     loading?: boolean;
 }
 
@@ -29,8 +31,34 @@ export function ContactoList({
     onDeleteTelefono,
     onToggleActive,
     onUpdateContactoData,
+    onSaveContactoData,
     loading
 }: ContactoListProps) {
+    const [savingField, setSavingField] = useState<string | null>(null);
+    const [localData, setLocalData] = useState<ContactoData>(contactoData);
+
+    // Sincronizar estado local con props
+    useEffect(() => {
+        setLocalData(contactoData);
+    }, [contactoData]);
+
+    const handleFieldBlur = async (field: keyof ContactoData) => {
+        const value = localData[field];
+        setSavingField(field);
+        try {
+            await onSaveContactoData(field, value);
+            const fieldLabels = {
+                direccion: 'dirección del negocio',
+                website: 'página web'
+            };
+            toast.success(`${fieldLabels[field]} actualizada exitosamente`);
+        } catch (error) {
+            console.error('Error in handleFieldBlur:', error);
+            toast.error(`Error al actualizar ${field === 'direccion' ? 'la dirección' : 'la página web'}`);
+        } finally {
+            setSavingField(null);
+        }
+    };
     return (
         <div className="space-y-6">
             {/* Teléfonos */}
@@ -75,6 +103,7 @@ export function ContactoList({
                                     key={telefono.id}
                                     telefono={telefono}
                                     onDelete={onDeleteTelefono}
+                                    onEdit={onEditTelefono}
                                     onToggleActive={onToggleActive}
                                 />
                             ))}
@@ -86,18 +115,34 @@ export function ContactoList({
             {/* Dirección */}
             <Card className="bg-zinc-800 border-zinc-700">
                 <CardHeader>
-                    <CardTitle className="text-white">Dirección</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Ubicación física de tu estudio
-                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="text-white">Dirección</CardTitle>
+                            <CardDescription className="text-zinc-400">
+                                Ubicación física de tu estudio
+                            </CardDescription>
+                        </div>
+                        <Button
+                            onClick={() => handleFieldBlur('direccion')}
+                            disabled={savingField === 'direccion'}
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            {savingField === 'direccion' ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                'Actualizar'
+                            )}
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="direccion" className="text-zinc-300">Dirección Completa</Label>
                         <Textarea
                             id="direccion"
-                            value={contactoData.direccion}
-                            onChange={(e) => onUpdateContactoData('direccion', e.target.value)}
+                            value={localData.direccion}
+                            onChange={(e) => setLocalData(prev => ({ ...prev, direccion: e.target.value }))}
                             className="bg-zinc-800 border-zinc-700 text-white min-h-[100px]"
                             placeholder="Calle, número, colonia, ciudad, estado, código postal"
                         />
@@ -113,18 +158,34 @@ export function ContactoList({
             {/* Página Web */}
             <Card className="bg-zinc-800 border-zinc-700">
                 <CardHeader>
-                    <CardTitle className="text-white">Página Web</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Sitio web oficial de tu estudio
-                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="text-white">Página Web</CardTitle>
+                            <CardDescription className="text-zinc-400">
+                                Sitio web oficial de tu estudio
+                            </CardDescription>
+                        </div>
+                        <Button
+                            onClick={() => handleFieldBlur('website')}
+                            disabled={savingField === 'website'}
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            {savingField === 'website' ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                'Actualizar'
+                            )}
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="website" className="text-zinc-300">URL del Sitio Web</Label>
                         <Input
                             id="website"
-                            value={contactoData.website}
-                            onChange={(e) => onUpdateContactoData('website', e.target.value)}
+                            value={localData.website}
+                            onChange={(e) => setLocalData(prev => ({ ...prev, website: e.target.value }))}
                             className="bg-zinc-800 border-zinc-700 text-white"
                             placeholder="https://www.tu-estudio.com"
                         />

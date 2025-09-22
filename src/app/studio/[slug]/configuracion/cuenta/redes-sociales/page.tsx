@@ -10,6 +10,15 @@ import { RedSocialStats } from './components/RedSocialStats';
 import { RedSocialList } from './components/RedSocialList';
 import { RedSocialModal } from './components/RedSocialModal';
 import { Plataforma, RedSocial } from './types';
+import {
+    obtenerRedesSocialesStudio,
+    crearRedSocial,
+    actualizarRedSocial,
+    eliminarRedSocial,
+    toggleRedSocialEstado,
+    obtenerEstadisticasRedesSociales
+} from '@/lib/actions/studio/config/redes-sociales.actions';
+import { obtenerPlataformasRedesSociales } from '@/lib/actions/shared/plataformas.actions';
 
 export default function RedesSocialesPage() {
     const params = useParams();
@@ -39,25 +48,10 @@ export default function RedesSocialesPage() {
                 setRetryCount(0);
             }
 
-            // Cargar plataformas disponibles y redes sociales en paralelo
-            const [plataformasResponse, redesResponse] = await Promise.all([
-                fetch('/api/plataformas-redes'),
-                fetch(`/api/studios/${slug}/configuracion/cuenta/redes-sociales`)
-            ]);
-
-            if (!plataformasResponse.ok) {
-                const errorData = await plataformasResponse.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Error al cargar plataformas de redes sociales');
-            }
-
-            if (!redesResponse.ok) {
-                const errorData = await redesResponse.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Error al cargar redes sociales del studio');
-            }
-
+            // Cargar plataformas disponibles y redes sociales en paralelo usando Server Actions
             const [plataformasData, redesData] = await Promise.all([
-                plataformasResponse.json(),
-                redesResponse.json()
+                obtenerPlataformasRedesSociales(),
+                obtenerRedesSocialesStudio(slug)
             ]);
 
             setPlataformas(plataformasData);
@@ -108,47 +102,30 @@ export default function RedesSocialesPage() {
 
         try {
             if (editingRed) {
-                // Actualizar red social existente
-                const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/redes-sociales/${editingRed.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
+                // Actualizar red social existente usando Server Action
+                const redActualizada = await actualizarRedSocial(editingRed.id, {
+                    id: editingRed.id,
+                    url: data.url,
+                    activo: data.activo,
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    const errorMessage = errorData.error || `Error al actualizar red social (${response.status})`;
-                    throw new Error(errorMessage);
-                }
-
-                const redActualizada = await response.json();
                 setRedes(prev => prev.map(r => r.id === editingRed.id ? redActualizada : r));
                 toast.success('Red social actualizada exitosamente');
             } else {
-                // Crear nueva red social
-                const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/redes-sociales`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
+                // Crear nueva red social usando Server Action
+                const nuevaRedSocial = await crearRedSocial(slug, {
+                    plataformaId: data.plataformaId,
+                    url: data.url,
+                    activo: data.activo,
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    const errorMessage = errorData.error || `Error al crear red social (${response.status})`;
-                    throw new Error(errorMessage);
-                }
-
-                const nuevaRedSocial = await response.json();
                 setRedes(prev => [...prev, nuevaRedSocial]);
                 toast.success('Red social agregada exitosamente');
             }
         } catch (err) {
             console.error('Error saving red social:', err);
-            toast.error(editingRed ? 'Error al actualizar la red social' : 'Error al agregar la red social');
+            const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+            toast.error(errorMessage);
             throw err; // Re-throw para que el modal maneje el error
         } finally {
             setModalLoading(false);
@@ -157,44 +134,34 @@ export default function RedesSocialesPage() {
 
     const handleDeleteRed = async (id: string) => {
         try {
-            const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/redes-sociales/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al eliminar red social');
-            }
+            // Eliminar red social usando Server Action
+            await eliminarRedSocial(id);
 
             setRedes(prev => prev.filter(r => r.id !== id));
             toast.success('Red social eliminada exitosamente');
 
         } catch (err) {
             console.error('Error al eliminar red social:', err);
-            toast.error('Error al eliminar la red social');
+            const errorMessage = err instanceof Error ? err.message : 'Error al eliminar la red social';
+            toast.error(errorMessage);
         }
     };
 
     const handleToggleActive = async (id: string, activo: boolean) => {
         try {
-            const response = await fetch(`/api/studios/${slug}/configuracion/cuenta/redes-sociales/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ activo })
+            // Toggle estado usando Server Action
+            const redActualizada = await toggleRedSocialEstado(id, {
+                id,
+                activo,
             });
 
-            if (!response.ok) {
-                throw new Error('Error al actualizar estado');
-            }
-
-            const redActualizada = await response.json();
             setRedes(prev => prev.map(r => r.id === id ? redActualizada : r));
             toast.success(`Red social ${activo ? 'activada' : 'desactivada'} exitosamente`);
 
         } catch (err) {
             console.error('Error al actualizar estado:', err);
-            toast.error('Error al actualizar el estado de la red social');
+            const errorMessage = err instanceof Error ? err.message : 'Error al actualizar el estado de la red social';
+            toast.error(errorMessage);
         }
     };
 

@@ -1,0 +1,6 @@
+// Exportaciones centralizadas de schemas
+export * from "./shared-schemas";
+export * from "./lead-schemas";
+export * from "./studio-schemas";
+export * from "./user-schemas";
+export * from "./redes-sociales-schemas";

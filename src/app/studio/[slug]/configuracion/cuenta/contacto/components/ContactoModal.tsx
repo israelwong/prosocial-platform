@@ -12,7 +12,7 @@ import { Telefono, TelefonoCreate, TIPOS_TELEFONO } from '../types';
 interface ContactoModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: TelefonoCreate) => Promise<void>;
+    onSave: (data: TelefonoCreate, editingTelefono?: Telefono) => Promise<void>;
     editingTelefono?: Telefono | null;
     loading?: boolean;
 }
@@ -43,14 +43,14 @@ export function ContactoModal({ isOpen, onClose, onSave, editingTelefono, loadin
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!formData.numero.trim()) {
             return;
         }
 
         setSaving(true);
         try {
-            await onSave(formData);
+            await onSave(formData, editingTelefono || undefined);
             onClose();
         } catch (error) {
             // El error ya se maneja en la función padre

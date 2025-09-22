@@ -4,8 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")      // Connection pooling
-  directUrl = env("DIRECT_URL")        // Direct connection (opcional)
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model platform_billing_cycles {
@@ -1160,17 +1160,17 @@ model project_horarios_atencion {
 }
 
 model platform_plataformas_redes_sociales {
-  id          String   @id @default(cuid())
-  nombre      String   @unique
-  slug        String   @unique
-  descripcion String?
-  color       String?
-  icono       String?
-  urlBase     String?
-  orden       Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                     String                   @id @default(cuid())
+  nombre                 String                   @unique
+  slug                   String                   @unique
+  descripcion            String?
+  color                  String?
+  icono                  String?
+  urlBase                String?
+  orden                  Int                      @default(0)
+  isActive               Boolean                  @default(true)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
   project_redes_sociales project_redes_sociales[]
 
   @@index([isActive])
@@ -1178,15 +1178,15 @@ model platform_plataformas_redes_sociales {
 }
 
 model project_redes_sociales {
-  id           String   @id @default(cuid())
+  id           String                               @id @default(cuid())
   projectId    String
   plataformaId String?
   url          String
-  activo       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  projects     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  plataforma   platform_plataformas_redes_sociales? @relation(fields: [plataformaId], references: [id], onDelete: SetNull)
+  activo       Boolean                              @default(true)
+  createdAt    DateTime                             @default(now())
+  updatedAt    DateTime                             @updatedAt
+  plataforma   platform_plataformas_redes_sociales? @relation(fields: [plataformaId], references: [id])
+  projects     projects                             @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, plataformaId])
   @@index([projectId])

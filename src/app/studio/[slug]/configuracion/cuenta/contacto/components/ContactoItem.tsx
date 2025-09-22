@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Edit } from 'lucide-react';
 import { ConfirmModal } from '@/app/studio/[slug]/components/ConfirmModal';
 import { Telefono, TIPOS_TELEFONO } from '../types';
 import { toast } from 'sonner';
@@ -10,10 +10,11 @@ import { toast } from 'sonner';
 interface ContactoItemProps {
     telefono: Telefono;
     onDelete: (id: string) => void;
+    onEdit: (telefono: Telefono) => void;
     onToggleActive: (id: string, activo: boolean) => void;
 }
 
-export function ContactoItem({ telefono, onDelete, onToggleActive }: ContactoItemProps) {
+export function ContactoItem({ telefono, onDelete, onEdit, onToggleActive }: ContactoItemProps) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
 
@@ -73,6 +74,16 @@ export function ContactoItem({ telefono, onDelete, onToggleActive }: ContactoIte
                             className={`h-8 px-3 text-xs ${telefono.activo ? 'border-green-600 text-green-400 hover:bg-green-900/20' : 'border-zinc-600 text-zinc-400 hover:bg-zinc-700'}`}
                         >
                             {telefono.activo ? 'Activo' : 'Inactivo'}
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onEdit(telefono)}
+                            className="h-8 w-8 p-0 border-blue-600 text-blue-400 hover:bg-blue-900/20"
+                            title="Editar teléfono"
+                        >
+                            <Edit className="h-3 w-3" />
                         </Button>
 
                         <Button
