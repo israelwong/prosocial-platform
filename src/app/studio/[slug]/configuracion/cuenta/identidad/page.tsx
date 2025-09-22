@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import {
@@ -87,18 +86,6 @@ export default function IdentidadPage() {
         }
     };
 
-    // Función para recargar datos manualmente
-    const handleRefresh = async () => {
-        setLoading(true);
-        try {
-            await loadData();
-            toast.success('Datos actualizados');
-        } catch {
-            toast.error('Error al actualizar datos');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     if (loading) {
         return (
@@ -130,16 +117,6 @@ export default function IdentidadPage() {
         <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-white">Identidad del Estudio</h1>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleRefresh}
-                    disabled={loading}
-                    className="flex items-center space-x-2"
-                >
-                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                    <span>Actualizar</span>
-                </Button>
             </div>
 
             {/* Información Básica */}

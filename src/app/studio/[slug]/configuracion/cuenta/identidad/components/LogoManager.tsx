@@ -106,10 +106,10 @@ export function LogoManager({
   const handleRemoveUrl = async () => {
     // Guardar la URL original para rollback
     const originalUrl = url ?? null;
-    
+
     // Actualización optimista - actualizar UI inmediatamente
     onLocalUpdate(null);
-    
+
     try {
       if (originalUrl) {
         await deleteFile(originalUrl);
@@ -144,11 +144,11 @@ export function LogoManager({
             onView={() => window.open(url, '_blank')}
             showActions={true}
           />
-          
+
           {/* Botón para cambiar archivo */}
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             className="w-full"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading || loading}
@@ -195,7 +195,7 @@ export function LogoManager({
       {/* Barra de progreso */}
       {uploading && (
         <div className="w-full bg-zinc-700 rounded-full h-2">
-          <div 
+          <div
             className="bg-blue-600 h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
