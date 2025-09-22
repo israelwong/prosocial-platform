@@ -9,13 +9,11 @@ import {
     HorariosBulkUpdateSchema,
     HorarioToggleSchema,
     HorariosFiltersSchema,
-    ZonaHorariaSchema,
     type HorarioCreateForm,
     type HorarioUpdateForm,
     type HorariosBulkUpdateForm,
     type HorarioToggleForm,
     type HorariosFiltersForm,
-    type ZonaHorariaForm,
 } from "@/lib/actions/schemas/horarios-schemas";
 
 // Obtener horarios del studio
@@ -358,27 +356,5 @@ export async function inicializarHorariosPorDefecto(studioSlug: string) {
     });
 }
 
-// Actualizar zona horaria del studio
-export async function actualizarZonaHoraria(
-    studioSlug: string,
-    data: ZonaHorariaForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Validar datos
-        const validatedData = ZonaHorariaSchema.parse(data);
-
-        // 2. Actualizar studio
-        const studio = await prisma.projects.update({
-            where: { slug: studioSlug },
-            data: {
-                horarios_atencion: validatedData.zona_horaria,
-            },
-            select: { id: true, slug: true, horarios_atencion: true },
-        });
-
-        // 3. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/horarios`);
-
-        return studio;
-    });
-}
+// Nota: La zona horaria se maneja a nivel de plataforma, no por proyecto individual
+// Si necesitas esta funcionalidad, deberías actualizar platform_config en lugar de projects

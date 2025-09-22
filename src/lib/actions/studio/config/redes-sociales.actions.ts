@@ -7,13 +7,11 @@ import {
   RedSocialCreateSchema,
   RedSocialUpdateSchema,
   RedSocialBulkUpdateSchema,
-  RedSocialDeleteSchema,
   RedSocialToggleSchema,
   RedSocialFiltersSchema,
   type RedSocialCreateForm,
   type RedSocialUpdateForm,
   type RedSocialBulkUpdateForm,
-  type RedSocialDeleteForm,
   type RedSocialToggleForm,
   type RedSocialFiltersForm,
 } from "@/lib/actions/schemas/redes-sociales-schemas";
@@ -35,7 +33,11 @@ export async function obtenerRedesSocialesStudio(
     }
 
     // 2. Construir filtros
-    const whereClause: any = {
+    const whereClause: {
+      projectId: string;
+      activo?: boolean;
+      plataformaId?: string;
+    } = {
       projectId: studio.id,
     };
 
