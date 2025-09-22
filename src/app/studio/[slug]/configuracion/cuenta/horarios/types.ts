@@ -1,22 +1,23 @@
 export interface Horario {
     id: string;
-    dia: string;
+    projectId: string;
+    dia_semana: string;
     hora_inicio: string;
     hora_fin: string;
     activo: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface HorarioCreate {
-    dia: string;
+    dia_semana: string;
     hora_inicio: string;
     hora_fin: string;
     activo?: boolean;
 }
 
 export interface HorarioUpdate {
-    dia?: string;
+    dia_semana?: string;
     hora_inicio?: string;
     hora_fin?: string;
     activo?: boolean;

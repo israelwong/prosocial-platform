@@ -37,7 +37,7 @@ export function HorariosItem({
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <div className="w-24">
-                        <p className="text-white font-medium">{getDiaLabel(horario.dia)}</p>
+                        <p className="text-white font-medium">{getDiaLabel(horario.dia_semana)}</p>
                     </div>
 
                     <div className="flex items-center space-x-2">

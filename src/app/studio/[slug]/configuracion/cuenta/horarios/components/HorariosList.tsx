@@ -4,6 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HorariosItem } from './HorariosItem';
 import { Horario } from '../types';
+import { DIAS_SEMANA } from '../types';
 
 interface HorariosListProps {
     horarios: Horario[];
@@ -18,6 +19,26 @@ export function HorariosList({
     onUpdateHorario,
     loading
 }: HorariosListProps) {
+    // Crear un mapa de horarios por día para acceso rápido
+    const horariosPorDia = new Map(
+        horarios.map(horario => [horario.dia_semana, horario])
+    );
+
+    // Crear horarios para todos los días de la semana
+    const todosLosDias = DIAS_SEMANA.map(dia => {
+        const horarioExistente = horariosPorDia.get(dia.value);
+        return horarioExistente || {
+            id: `temp-${dia.value}`,
+            projectId: '',
+            dia_semana: dia.value,
+            hora_inicio: '09:00',
+            hora_fin: '18:00',
+            activo: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+    });
+
     return (
         <Card className="bg-zinc-800 border-zinc-700">
             <CardHeader>
@@ -35,15 +56,8 @@ export function HorariosList({
                             </div>
                         ))}
                     </div>
-                ) : horarios.length === 0 ? (
-                    <div className="text-center py-8">
-                        <p className="text-zinc-400">No hay horarios configurados</p>
-                        <p className="text-zinc-500 text-sm mt-2">
-                            Los horarios se configuran automáticamente para todos los días de la semana
-                        </p>
-                    </div>
                 ) : (
-                    horarios.map((horario) => (
+                    todosLosDias.map((horario) => (
                         <HorariosItem
                             key={horario.id}
                             horario={horario}
