@@ -47,11 +47,10 @@ const navigationItems = [
         items: [
             { name: 'Cuenta', href: '/studio/demo-studio/configuracion/cuenta', icon: User },
             { name: 'Suscripción', href: '/studio/demo-studio/configuracion/suscripcion', icon: CreditCard },
-            { name: 'Negocio', href: '/studio/demo-studio/configuracion/negocio', icon: Building2 },
             { name: 'Catálogo', href: '/studio/demo-studio/configuracion/catalogo', icon: Package },
             { name: 'Paquetes', href: '/studio/demo-studio/configuracion/paquetes', icon: Gift },
             { name: 'Personal', href: '/studio/demo-studio/configuracion/personal', icon: UserCheck },
-            { name: 'Pagos', href: '/studio/demo-studio/configuracion/pagos', icon: Wallet },
+            { name: 'Cuentas Bancarias', href: '/studio/demo-studio/configuracion/cuentas-bancarias', icon: Wallet },
             { name: 'Integraciones', href: '/studio/demo-studio/configuracion/integraciones', icon: Zap }
         ]
     }
