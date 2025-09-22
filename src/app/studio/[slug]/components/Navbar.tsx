@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Bell, User, ChevronDown, LayoutDashboard, Settings } from 'lucide-react';
-import { useRealtimeStudio } from '@/hooks/useRealtimeStudio';
+import { useStudioData } from '@/hooks/useStudioData';
 import type { IdentidadData } from '../configuracion/cuenta/identidad/types';
 
 interface NavbarProps {
@@ -16,17 +16,15 @@ export function Navbar({ className }: NavbarProps) {
   const slug = params.slug as string;
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  // Usar hook de realtime para datos del studio
+  // Usar hook simplificado para datos del studio
   const { 
     identidadData, 
     loading, 
-    error, 
-    isConnected, 
-    reconnectionAttempts 
-  } = useRealtimeStudio({
+    error 
+  } = useStudioData({
     studioSlug: slug,
     onUpdate: (data) => {
-      console.log('Navbar updated with new studio data:', data);
+      console.log('🎯 [NAVBAR] Updated with new studio data:', data);
     }
   });
 
@@ -136,14 +134,16 @@ export function Navbar({ className }: NavbarProps) {
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
           </button>
 
-          {/* Indicador de conexión Realtime */}
+          {/* Indicador de estado de datos */}
           <div className="relative">
             <div className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-green-500' : 'bg-red-500'
+              loading ? 'bg-yellow-500' : error ? 'bg-red-500' : 'bg-green-500'
             }`} title={
-              isConnected 
-                ? 'Conectado a Realtime' 
-                : `Desconectado (${reconnectionAttempts} intentos)`
+              loading 
+                ? 'Cargando datos...' 
+                : error 
+                  ? 'Error al cargar datos' 
+                  : 'Datos cargados correctamente'
             }></div>
           </div>
 
