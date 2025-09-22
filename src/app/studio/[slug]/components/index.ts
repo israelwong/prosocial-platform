@@ -1,2 +1,2 @@
-// Componentes reutilizables para el área de studio
-export { ConfirmModal } from './ConfirmModal';
+export { Navbar } from './Navbar';
+export { Sidebar } from './Sidebar';
