@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Bell, User, ChevronDown, LayoutDashboard, Settings } from 'lucide-react';
-import { obtenerIdentidadStudio } from '@/lib/actions/studio/config/identidad.actions';
+import { useRealtimeStudio } from '@/hooks/useRealtimeStudio';
 import type { IdentidadData } from '../configuracion/cuenta/identidad/types';
 
 interface NavbarProps {
@@ -15,38 +15,20 @@ export function Navbar({ className }: NavbarProps) {
   const params = useParams();
   const slug = params.slug as string;
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [identidadData, setIdentidadData] = useState<IdentidadData | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  // Cargar datos de identidad del studio
-  useEffect(() => {
-    const loadIdentidad = async () => {
-      try {
-        setLoading(true);
-        const data = await obtenerIdentidadStudio(slug);
-        setIdentidadData(data);
-      } catch (error) {
-        console.error('Error loading identidad:', error);
-        // Fallback a datos por defecto
-        setIdentidadData({
-          id: slug,
-          name: 'Studio',
-          slug: slug,
-          slogan: null,
-          descripcion: null,
-          palabras_clave: [],
-          logoUrl: null,
-          isotipo_url: null
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (slug) {
-      loadIdentidad();
+  // Usar hook de realtime para datos del studio
+  const { 
+    identidadData, 
+    loading, 
+    error, 
+    isConnected, 
+    reconnectionAttempts 
+  } = useRealtimeStudio({
+    studioSlug: slug,
+    onUpdate: (data) => {
+      console.log('Navbar updated with new studio data:', data);
     }
-  }, [slug]);
+  });
 
   // Función para renderizar el logo/isotipo
   const renderLogo = () => {
@@ -153,6 +135,17 @@ export function Navbar({ className }: NavbarProps) {
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
           </button>
+
+          {/* Indicador de conexión Realtime */}
+          <div className="relative">
+            <div className={`w-2 h-2 rounded-full ${
+              isConnected ? 'bg-green-500' : 'bg-red-500'
+            }`} title={
+              isConnected 
+                ? 'Conectado a Realtime' 
+                : `Desconectado (${reconnectionAttempts} intentos)`
+            }></div>
+          </div>
 
           {/* Usuario Menu */}
           <div className="relative">
