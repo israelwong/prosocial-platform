@@ -11,6 +11,7 @@ interface LogoManagerProps {
   tipo: 'logo' | 'isotipo';
   url?: string | null;
   onUpdate: (url: string) => Promise<void>;
+  onLocalUpdate: (url: string | null) => void;
   loading?: boolean;
 }
 
@@ -18,6 +19,7 @@ export function LogoManager({
   tipo, 
   url, 
   onUpdate, 
+  onLocalUpdate,
   loading = false 
 }: LogoManagerProps) {
   const [nuevaUrl, setNuevaUrl] = useState('');
@@ -27,13 +29,22 @@ export function LogoManager({
   const handleUpdateUrl = async () => {
     if (!nuevaUrl.trim()) return;
     
+    const urlTrimmed = nuevaUrl.trim();
     setUpdating(true);
+    
+    // Actualización optimista - actualizar UI inmediatamente
+    onLocalUpdate(urlTrimmed);
+    setNuevaUrl('');
+    setShowUrlInput(false);
+    
     try {
-      await onUpdate(nuevaUrl.trim());
-      setNuevaUrl('');
-      setShowUrlInput(false);
+      await onUpdate(urlTrimmed);
       toast.success(`${tipo === 'logo' ? 'Logo' : 'Isotipo'} actualizado`);
     } catch (error) {
+      // Revertir cambios en caso de error
+      onLocalUpdate(url);
+      setNuevaUrl(urlTrimmed);
+      setShowUrlInput(true);
       toast.error(`Error al actualizar ${tipo === 'logo' ? 'logo' : 'isotipo'}`);
     } finally {
       setUpdating(false);
@@ -42,10 +53,16 @@ export function LogoManager({
 
   const handleRemoveUrl = async () => {
     setUpdating(true);
+    
+    // Actualización optimista - actualizar UI inmediatamente
+    onLocalUpdate(null);
+    
     try {
       await onUpdate('');
       toast.success(`${tipo === 'logo' ? 'Logo' : 'Isotipo'} eliminado`);
     } catch (error) {
+      // Revertir cambios en caso de error
+      onLocalUpdate(url);
       toast.error(`Error al eliminar ${tipo === 'logo' ? 'logo' : 'isotipo'}`);
     } finally {
       setUpdating(false);

@@ -12,12 +12,14 @@ import { IdentidadData, IdentidadUpdate } from '../types';
 interface IdentidadFormProps {
   data: IdentidadData;
   onUpdate: (data: IdentidadUpdate) => Promise<void>;
+  onLocalUpdate: (data: Partial<IdentidadData>) => void;
   loading?: boolean;
 }
 
 export function IdentidadForm({ 
   data, 
   onUpdate, 
+  onLocalUpdate,
   loading = false 
 }: IdentidadFormProps) {
   const [formData, setFormData] = useState({
@@ -38,10 +40,23 @@ export function IdentidadForm({
     e.preventDefault();
     setSaving(true);
 
+    // Actualización optimista - actualizar UI inmediatamente
+    onLocalUpdate({
+      name: formData.nombre,
+      slogan: formData.slogan || null,
+      descripcion: formData.descripcion || null,
+    });
+
     try {
       await onUpdate(formData);
       toast.success('Información básica actualizada');
     } catch (error) {
+      // Revertir cambios en caso de error
+      onLocalUpdate({
+        name: data.name,
+        slogan: data.slogan,
+        descripcion: data.descripcion,
+      });
       toast.error('Error al actualizar información');
     } finally {
       setSaving(false);

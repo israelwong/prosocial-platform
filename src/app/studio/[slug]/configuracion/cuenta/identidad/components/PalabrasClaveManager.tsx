@@ -10,12 +10,14 @@ import { toast } from 'sonner';
 interface PalabrasClaveManagerProps {
   palabrasClave: string[];
   onUpdate: (palabras: string[]) => Promise<void>;
+  onLocalUpdate: (palabras: string[]) => void;
   loading?: boolean;
 }
 
 export function PalabrasClaveManager({ 
   palabrasClave, 
   onUpdate, 
+  onLocalUpdate,
   loading = false 
 }: PalabrasClaveManagerProps) {
   const [nuevaPalabra, setNuevaPalabra] = useState('');
@@ -33,11 +35,17 @@ export function PalabrasClaveManager({
     const nuevasPalabras = [...palabrasClave, palabraTrimmed];
     setUpdating(true);
     
+    // Actualización optimista - actualizar UI inmediatamente
+    onLocalUpdate(nuevasPalabras);
+    setNuevaPalabra('');
+    
     try {
       await onUpdate(nuevasPalabras);
-      setNuevaPalabra('');
       toast.success('Palabra clave agregada');
     } catch (error) {
+      // Revertir cambios en caso de error
+      onLocalUpdate(palabrasClave);
+      setNuevaPalabra(palabraTrimmed);
       toast.error('Error al agregar palabra clave');
     } finally {
       setUpdating(false);
@@ -48,10 +56,15 @@ export function PalabrasClaveManager({
     const nuevasPalabras = palabrasClave.filter(p => p !== palabra);
     setUpdating(true);
     
+    // Actualización optimista - actualizar UI inmediatamente
+    onLocalUpdate(nuevasPalabras);
+    
     try {
       await onUpdate(nuevasPalabras);
       toast.success('Palabra clave eliminada');
     } catch (error) {
+      // Revertir cambios en caso de error
+      onLocalUpdate(palabrasClave);
       toast.error('Error al eliminar palabra clave');
     } finally {
       setUpdating(false);
