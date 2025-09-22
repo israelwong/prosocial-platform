@@ -16,8 +16,7 @@ import {
     actualizarTelefono,
     eliminarTelefono,
     toggleTelefonoEstado,
-    actualizarContactoData,
-    obtenerEstadisticasContacto
+    actualizarContactoData
 } from '@/lib/actions/studio/config/contacto.actions';
 
 export default function ContactoPage() {
@@ -37,13 +36,7 @@ export default function ContactoPage() {
     const [editingTelefono, setEditingTelefono] = useState<Telefono | null>(null);
     const [modalLoading, setModalLoading] = useState(false);
 
-    // Datos iniciales de ejemplo (ya no se usan, se cargan desde la base de datos)
-    // const initialTelefonos: Telefono[] = [];
-
-    const initialContactoData: ContactoData = {
-        direccion: 'Av. Principal 123, Col. Centro, Ciudad, CP 12345',
-        website: 'https://www.studiodemo.com'
-    };
+    // Los datos se cargan desde la base de datos, no hay datos hardcodeados
 
     useEffect(() => {
         if (slug && slug !== 'undefined') {
@@ -65,7 +58,19 @@ export default function ContactoPage() {
 
             // Cargar datos usando Server Actions
             const data = await obtenerContactoStudio(slug);
-            setTelefonos(data.telefonos || []);
+            
+            // Convertir tipos de string a tipos específicos
+            const telefonosConTipos = (data.telefonos || []).map(telefono => ({
+                id: telefono.id,
+                projectId: telefono.projectId,
+                numero: telefono.numero,
+                tipo: telefono.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina',
+                activo: telefono.activo,
+                createdAt: telefono.createdAt,
+                updatedAt: telefono.updatedAt
+            }));
+            
+            setTelefonos(telefonosConTipos);
             setContactoData(data.contactoData || { direccion: '', website: '' });
         } catch (err) {
             console.error('❌ Error loading contacto data:', err);
@@ -113,7 +118,10 @@ export default function ContactoPage() {
                 });
 
                 setTelefonos(prev => prev.map(t =>
-                    t.id === editingTelefono.id ? telefonoActualizado : t
+                    t.id === editingTelefono.id ? {
+                        ...telefonoActualizado,
+                        tipo: telefonoActualizado.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina'
+                    } : t
                 ));
 
                 toast.success('Teléfono actualizado exitosamente');
@@ -123,7 +131,10 @@ export default function ContactoPage() {
                     ...data,
                     activo: data.activo ?? true,
                 });
-                setTelefonos(prev => [...prev, nuevoTelefono]);
+                setTelefonos(prev => [...prev, {
+                    ...nuevoTelefono,
+                    tipo: nuevoTelefono.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina'
+                }]);
                 toast.success('Teléfono agregado exitosamente');
             }
 
@@ -162,7 +173,10 @@ export default function ContactoPage() {
 
             // Actualizar con datos confirmados
             setTelefonos(prev => prev.map(t =>
-                t.id === id ? telefonoActualizado : t
+                t.id === id ? {
+                    ...telefonoActualizado,
+                    tipo: telefonoActualizado.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina'
+                } : t
             ));
 
             toast.success(`Teléfono ${activo ? 'activado' : 'desactivado'} exitosamente`);

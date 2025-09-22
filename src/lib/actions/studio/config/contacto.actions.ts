@@ -35,6 +35,7 @@ export async function obtenerContactoStudio(studioSlug: string) {
                 telefonos: {
                     select: {
                         id: true,
+                        projectId: true,
                         numero: true,
                         tipo: true,
                         activo: true,
