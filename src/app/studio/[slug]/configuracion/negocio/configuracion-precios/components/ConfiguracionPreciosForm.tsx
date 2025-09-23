@@ -40,7 +40,7 @@ function PorcentajeField({ label, name, description, register, errors, placehold
                     type="number"
                     min="0"
                     max="100"
-                    step="0.1"
+                    step="1"
                     placeholder={placeholder}
                     className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
@@ -214,7 +214,7 @@ export function ConfiguracionPreciosForm({
                             <PorcentajeField
                                 label="Utilidad en Servicios"
                                 name="utilidad_servicio"
-                                description="Margen de utilidad para servicios fotográficos"
+                                description="Margen de utilidad para servicios"
                                 register={register}
                                 errors={errors}
                                 placeholder="30"

@@ -549,7 +549,7 @@ model project_condiciones_comerciales {
   projectId                           String
   nombre                              String
   descripcion                         String?
-  descuento                           Float?
+  porcentaje_descuento                           Float?
   porcentaje_anticipo                 Float?                                        @default(0)
   status                              String                                        @default("active")
   orden                               Int?                                          @default(0)
