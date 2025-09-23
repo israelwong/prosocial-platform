@@ -27,6 +27,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **SUPABASE_TROUBLESHOOTING.md** - Guía de solución de problemas de Supabase
 - **GUIA_MIGRACION_API_REST.md** - **NUEVA** Guía de migración API REST → Server Actions
 - **GUIA_IMPLEMENTACION_PASO_A_PASO.md** - **NUEVA** Guía de implementación paso a paso
+- **CONFIGURACION_PRECIOS_SOBREPRECIO.md** - **NUEVA** Documentación del sobreprecio para descuentos
 
 ### 🔧 **03-troubleshooting/** - Solución de Problemas
 

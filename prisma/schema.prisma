@@ -460,7 +460,7 @@ model project_configuraciones {
   comision_venta              Float
   sobreprecio                 Float
   claveAutorizacion           String?
-  numeroMaximoServiciosPorDia Int?
+  // numeroMaximoServiciosPorDia Int?
   status                      String   @default("active")
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime
