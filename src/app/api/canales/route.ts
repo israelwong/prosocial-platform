@@ -3,10 +3,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
     try {
-        const canales = await prisma.platform_canales_adquisicion.findMany({
+        const canales = await prisma.platform_acquisition_channels.findMany({
             orderBy: [
-                { orden: 'asc' },
-                { nombre: 'asc' }
+                { order: 'asc' },
+                { name: 'asc' }
             ]
         });
 
@@ -33,26 +33,26 @@ export async function POST(request: NextRequest) {
         }
 
         // Obtener el último orden para asignar el siguiente
-        const lastCanal = await prisma.platform_canales_adquisicion.findFirst({
-            orderBy: { orden: 'desc' },
-            select: { orden: true }
+        const lastCanal = await prisma.platform_acquisition_channels.findFirst({
+            orderBy: { order: 'desc' },
+            select: { order: true }
         });
-        
-        const nextOrden = lastCanal ? lastCanal.orden + 1 : 0;
+
+        const nextOrder = lastCanal ? lastCanal.order + 1 : 0;
 
         // Preparar datos para crear
         const canalData = {
-            nombre: body.nombre.trim(),
-            descripcion: body.descripcion?.trim() || null,
+            name: body.nombre.trim(),
+            description: body.descripcion?.trim() || null,
             color: body.color || '#3B82F6',
-            icono: body.icono || null,
+            icon: body.icono || null,
             isActive: body.isActive ?? true,
             isVisible: body.isVisible ?? true,
-            orden: body.orden ?? nextOrden, // Usar el orden proporcionado o el siguiente disponible
+            order: body.orden ?? nextOrder, // Usar el orden proporcionado o el siguiente disponible
             updatedAt: new Date()
         };
 
-        const canal = await prisma.platform_canales_adquisicion.create({
+        const canal = await prisma.platform_acquisition_channels.create({
             data: canalData
         });
 

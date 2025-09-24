@@ -7,15 +7,15 @@ export const MetodoPagoSchema = z.object({
     metodo_pago: z.string().min(3, { message: 'El nombre debe tener al menos 3 caracteres.' }),
 
     // Tratamos los números como strings para el formulario
-    comision_porcentaje_base: z.string().nullable().optional(),
-    comision_fija_monto: z.string().nullable().optional(),
+    comision_porcentaje_base: z.string().optional(),
+    comision_fija_monto: z.string().optional(),
 
-    payment_method: z.string().nullable().optional(),
-    tipo: z.enum(['manual', 'stripe_automatico', 'msi']).default('manual'),
-    requiere_stripe: z.boolean().default(false),
+    payment_method: z.string().optional(),
+    tipo: z.enum(['manual', 'stripe_automatico', 'msi']),
+    requiere_stripe: z.boolean(),
 
     status: z.enum(['active', 'inactive']),
-    orden: z.number().optional().default(0),
+    orden: z.number(),
 });
 
 export type MetodoPagoForm = z.infer<typeof MetodoPagoSchema>;

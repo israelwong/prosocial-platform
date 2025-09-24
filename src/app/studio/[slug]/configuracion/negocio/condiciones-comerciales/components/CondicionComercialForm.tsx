@@ -58,8 +58,10 @@ export function CondicionComercialForm({ studioSlug, condicion, onClose, onSucce
                 descripcion: condicion.descripcion || '',
                 porcentaje_descuento: condicion.porcentaje_descuento?.toString() || '',
                 porcentaje_anticipo: condicion.porcentaje_anticipo?.toString() || '',
-                status: condicion.status,
-                orden: condicion.orden,
+                status: (condicion.status === 'active' || condicion.status === 'inactive')
+                    ? condicion.status
+                    : 'active' as 'active' | 'inactive',
+                orden: condicion.orden ?? 0,
             });
         }
     }, [condicion, reset]);

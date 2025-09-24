@@ -1,0 +1,371 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import {
+    PERSONNEL_TYPE_LABELS,
+    type PersonnelType,
+    type PersonalCreateForm,
+    type PersonalUpdateForm,
+} from '@/lib/actions/schemas/personal-schemas';
+import type { Personal } from '../types';
+
+interface PersonalModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (data: PersonalCreateForm | PersonalUpdateForm) => Promise<void>;
+    personal?: Personal | null;
+    loading: boolean;
+    defaultType?: PersonnelType;
+}
+
+export function PersonalModal({
+    isOpen,
+    onClose,
+    onSave,
+    personal,
+    loading,
+    defaultType
+}: PersonalModalProps) {
+    const [formData, setFormData] = useState({
+        fullName: '',
+        email: '',
+        phone: '',
+        type: defaultType || 'EMPLEADO' as PersonnelType,
+        isActive: true,
+        profileIds: [] as string[],
+        profileDescriptions: {} as Record<string, string>,
+    });
+
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    // Reset form cuando cambia el personal o se abre/cierra
+    useEffect(() => {
+        if (isOpen) {
+            if (personal) {
+                // Modo edición
+                const profileDescriptions: Record<string, string> = {};
+                personal.professional_profiles.forEach(p => {
+                    if (p.description) {
+                        profileDescriptions[p.profile.id] = p.description;
+                    }
+                });
+
+                setFormData({
+                    fullName: personal.fullName || '',
+                    email: personal.email,
+                    phone: personal.phone || '',
+                    type: personal.type || 'EMPLEADO',
+                    isActive: personal.isActive,
+                    profileIds: personal.professional_profiles.map(p => p.profile.id),
+                    profileDescriptions,
+                });
+            } else {
+                // Modo creación
+                setFormData({
+                    fullName: '',
+                    email: '',
+                    phone: '',
+                    type: defaultType || 'EMPLEADO',
+                    isActive: true,
+                    profileIds: [],
+                    profileDescriptions: {},
+                });
+            }
+            setErrors({});
+        }
+    }, [isOpen, personal, defaultType]);
+
+    const handleInputChange = (field: string, value: string | boolean | PersonnelType) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        // Limpiar error del campo cuando el usuario empiece a escribir
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: '' }));
+        }
+    };
+
+    const handleProfileToggle = (profileId: string) => {
+        setFormData(prev => {
+            const isSelected = prev.profileIds.includes(profileId);
+            const newProfileIds = isSelected
+                ? prev.profileIds.filter(id => id !== profileId)
+                : [...prev.profileIds, profileId];
+
+            // Si se deselecciona, limpiar la descripción
+            const newDescriptions = { ...prev.profileDescriptions };
+            if (isSelected) {
+                delete newDescriptions[profileId];
+            }
+
+            return {
+                ...prev,
+                profileIds: newProfileIds,
+                profileDescriptions: newDescriptions,
+            };
+        });
+    };
+
+    const handleProfileDescriptionChange = (profileId: string, description: string) => {
+        setFormData(prev => ({
+            ...prev,
+            profileDescriptions: {
+                ...prev.profileDescriptions,
+                [profileId]: description,
+            },
+        }));
+    };
+
+    const validateForm = (): boolean => {
+        const newErrors: Record<string, string> = {};
+
+        if (!formData.fullName.trim()) {
+            newErrors.fullName = 'El nombre completo es requerido';
+        }
+
+        if (!formData.email.trim()) {
+            newErrors.email = 'El email es requerido';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            newErrors.email = 'El formato del email no es válido';
+        }
+
+        if (formData.profileIds.length === 0) {
+            newErrors.profiles = 'Debe seleccionar al menos un perfil profesional';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSave = async () => {
+        if (!validateForm()) {
+            toast.error('Por favor corrige los errores en el formulario');
+            return;
+        }
+
+        try {
+            const saveData = {
+                ...formData,
+                fullName: formData.fullName.trim(),
+                email: formData.email.trim().toLowerCase(),
+                phone: formData.phone.trim() || undefined,
+                ...(personal && { id: personal.id }),
+            };
+
+            await onSave(saveData);
+            onClose();
+        } catch (error) {
+            console.error('Error saving personal:', error);
+            // El error ya se maneja en el componente padre
+        }
+    };
+
+    // TODO: Obtener perfiles dinámicos desde Server Action
+    const allProfiles: Array<{ id: string; name: string; slug: string; color?: string; icon?: string }> = [];
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle className="text-white">
+                        {personal ? 'Editar' : 'Crear'} {PERSONNEL_TYPE_LABELS[formData.type]}
+                    </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-6">
+                    {/* Información básica */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="fullName" className="text-white">
+                                Nombre completo *
+                            </Label>
+                            <Input
+                                id="fullName"
+                                value={formData.fullName}
+                                onChange={(e) => handleInputChange('fullName', e.target.value)}
+                                className="bg-zinc-800 border-zinc-700 text-white"
+                                placeholder="Nombre completo"
+                                disabled={loading}
+                            />
+                            {errors.fullName && (
+                                <p className="text-sm text-red-400 mt-1">{errors.fullName}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="email" className="text-white">
+                                Email *
+                            </Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => handleInputChange('email', e.target.value)}
+                                className="bg-zinc-800 border-zinc-700 text-white"
+                                placeholder="email@ejemplo.com"
+                                disabled={loading}
+                            />
+                            {errors.email && (
+                                <p className="text-sm text-red-400 mt-1">{errors.email}</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <Label htmlFor="phone" className="text-white">
+                                Teléfono
+                            </Label>
+                            <Input
+                                id="phone"
+                                value={formData.phone}
+                                onChange={(e) => handleInputChange('phone', e.target.value)}
+                                className="bg-zinc-800 border-zinc-700 text-white"
+                                placeholder="+52 55 1234 5678"
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div>
+                            <Label htmlFor="type" className="text-white">
+                                Tipo *
+                            </Label>
+                            <Select
+                                value={formData.type}
+                                onValueChange={(value: PersonnelType) => handleInputChange('type', value)}
+                                disabled={loading}
+                            >
+                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                    <SelectValue placeholder="Seleccionar tipo" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-zinc-800 border-zinc-700">
+                                    {Object.entries(PERSONNEL_TYPE_LABELS).map(([value, label]) => (
+                                        <SelectItem
+                                            key={value}
+                                            value={value}
+                                            className="text-white hover:bg-zinc-700"
+                                        >
+                                            {label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    {/* Estado activo */}
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="isActive"
+                            checked={formData.isActive}
+                            onCheckedChange={(checked) => handleInputChange('isActive', checked)}
+                            disabled={loading}
+                        />
+                        <Label htmlFor="isActive" className="text-white">
+                            Activo
+                        </Label>
+                    </div>
+
+                    {/* Perfiles profesionales */}
+                    <div>
+                        <Label className="text-white text-base font-medium">
+                            Perfiles Profesionales *
+                        </Label>
+                        <p className="text-sm text-zinc-400 mb-4">
+                            Selecciona uno o más perfiles que describan las habilidades de esta persona
+                        </p>
+
+                        {errors.profiles && (
+                            <p className="text-sm text-red-400 mb-3">{errors.profiles}</p>
+                        )}
+
+                        <div className="space-y-3">
+                            {allProfiles.length === 0 ? (
+                                <div className="text-center py-8 text-zinc-400">
+                                    <p>No hay perfiles profesionales disponibles.</p>
+                                    <p className="text-sm mt-1">Contacta al administrador para configurar perfiles.</p>
+                                </div>
+                            ) : (
+                                allProfiles.map((profile) => {
+                                    const isSelected = formData.profileIds.includes(profile.id);
+                                    return (
+                                        <div key={profile.id} className="border border-zinc-700 rounded-lg p-4">
+                                            <div className="flex items-start space-x-3">
+                                                <Checkbox
+                                                    id={`profile-${profile.id}`}
+                                                    checked={isSelected}
+                                                    onCheckedChange={() => handleProfileToggle(profile.id)}
+                                                    disabled={loading}
+                                                    className="mt-1"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between">
+                                                        <Label
+                                                            htmlFor={`profile-${profile.id}`}
+                                                            className="text-white font-medium cursor-pointer"
+                                                        >
+                                                            {profile.name}
+                                                        </Label>
+                                                        {isSelected && (
+                                                            <Badge variant="secondary" className="bg-blue-600 text-white">
+                                                                Seleccionado
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-zinc-400 mt-1">
+                                                        {profile.slug}
+                                                    </p>
+
+                                                    {/* Descripción personalizada para el perfil */}
+                                                    {isSelected && (
+                                                        <div className="mt-3">
+                                                            <Label className="text-sm text-zinc-300">
+                                                                Descripción específica (opcional)
+                                                            </Label>
+                                                            <Textarea
+                                                                value={formData.profileDescriptions[profile.id] || ''}
+                                                                onChange={(e) => handleProfileDescriptionChange(profile.id, e.target.value)}
+                                                                className="bg-zinc-800 border-zinc-600 text-white text-sm mt-1"
+                                                                placeholder={`Describe la experiencia específica en ${profile.name.toLowerCase()}...`}
+                                                                rows={2}
+                                                                disabled={loading}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Botones */}
+                <div className="flex justify-end space-x-3 pt-4 border-t border-zinc-800">
+                    <Button
+                        variant="outline"
+                        onClick={onClose}
+                        disabled={loading}
+                        className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        disabled={loading}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                        {loading ? 'Guardando...' : (personal ? 'Actualizar' : 'Crear')}
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}

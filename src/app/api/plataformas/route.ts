@@ -4,9 +4,9 @@ import { prisma } from '@/lib/prisma';
 // GET /api/plataformas - Obtener todas las plataformas
 export async function GET(request: NextRequest) {
     try {
-        const plataformas = await prisma.platform_plataformas_publicidad.findMany({
+        const plataformas = await prisma.platform_advertising_platforms.findMany({
             orderBy: {
-                nombre: 'asc'
+                name: 'asc'
             }
         });
 
@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
         }
 
         // Verificar si ya existe una plataforma con el mismo nombre
-        const existingPlataforma = await prisma.platform_plataformas_publicidad.findFirst({
+        const existingPlataforma = await prisma.platform_advertising_platforms.findFirst({
             where: {
-                nombre: {
+                name: {
                     equals: nombre,
                     mode: 'insensitive'
                 }
@@ -51,13 +51,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const plataforma = await prisma.platform_plataformas_publicidad.create({
+        const plataforma = await prisma.platform_advertising_platforms.create({
             data: {
-                nombre,
-                tipo,
+                name: nombre,
+                type: tipo,
                 color,
-                icono,
-                descripcion,
+                icon: icono,
+                description: descripcion,
                 createdAt: new Date(),
                 updatedAt: new Date()
             }

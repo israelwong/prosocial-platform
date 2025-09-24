@@ -4,13 +4,13 @@ import { IdSchema, UrlSchema } from "./shared-schemas";
 // Schema para plataforma de red social
 export const PlataformaSchema = z.object({
     id: IdSchema,
-    nombre: z.string().min(1, "Nombre requerido"),
+    name: z.string().min(1, "Nombre requerido"),
     slug: z.string().min(1, "Slug requerido"),
-    descripcion: z.string().optional(),
+    description: z.string().optional(),
     color: z.string().optional(),
-    icono: z.string().optional(),
-    urlBase: z.string().url("URL base inválida").optional(),
-    orden: z.number().min(0).default(0),
+    icon: z.string().optional(),
+    baseUrl: z.string().url("URL base inválida").optional(),
+    order: z.number().min(0).default(0),
 });
 
 // Schema para crear red social

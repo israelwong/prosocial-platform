@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { LucideIcon, UserPlus, Plus, Settings, BarChart3, Calendar, Users, Building2, Target, TrendingUp } from 'lucide-react';
+import { LucideIcon, UserPlus, Plus, Settings, BarChart3, Calendar, Users, Building2, Target, TrendingUp, Tag } from 'lucide-react';
 
 export interface NavigationItem {
     name: string;
@@ -39,6 +39,7 @@ const getIcon = (icon: LucideIcon | string): LucideIcon => {
             'Building2': Building2,
             'Target': Target,
             'TrendingUp': TrendingUp,
+            'Tag': Tag,
         };
         return iconMap[icon] || Plus; // Fallback a Plus si no se encuentra
     }
@@ -53,9 +54,18 @@ export function SectionNavigation({
     className
 }: SectionNavigationProps) {
     const pathname = usePathname();
+    const params = useParams();
+    const slug = params.slug as string;
 
     const isActiveLink = (href: string) => {
         if (!pathname) return false;
+
+        // Si estamos en la página principal de personal, marcar empleados como activo
+        if (pathname === `/studio/${slug}/configuracion/negocio/personal` &&
+            href.includes('/empleados')) {
+            return true;
+        }
+
         return pathname === href;
     };
 

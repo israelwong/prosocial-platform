@@ -7,8 +7,8 @@ export interface CondicionComercialData {
     descripcion?: string | null;
     porcentaje_descuento?: number | null;
     porcentaje_anticipo?: number | null;
-    status: 'active' | 'inactive';
-    orden: number;
+    status: string;
+    orden: number | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -19,8 +19,8 @@ export interface CondicionComercialUpdate {
     descripcion?: string | null;
     porcentaje_descuento?: number | null;
     porcentaje_anticipo?: number | null;
-    status: 'active' | 'inactive';
-    orden: number;
+    status: string;
+    orden: number | null;
 }
 
 export interface CondicionComercialFormData {
@@ -28,6 +28,6 @@ export interface CondicionComercialFormData {
     descripcion?: string | null;
     porcentaje_descuento?: string | null;
     porcentaje_anticipo?: string | null;
-    status: 'active' | 'inactive';
-    orden: number;
+    status: string;
+    orden: number | null;
 }

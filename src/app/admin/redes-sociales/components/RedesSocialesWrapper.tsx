@@ -8,13 +8,13 @@ import { PlataformaModal } from './PlataformaModal';
 
 interface PlataformaRedSocial {
     id: string;
-    nombre: string;
+    name: string;
     slug: string;
-    descripcion: string | null;
+    description: string | null;
     color: string | null;
-    icono: string | null;
-    urlBase: string | null;
-    orden: number;
+    icon: string | null;
+    baseUrl: string | null;
+    order: number;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;

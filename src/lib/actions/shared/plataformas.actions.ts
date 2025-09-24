@@ -8,8 +8,8 @@ import { PlataformaSchema, type PlataformaForm } from "@/lib/actions/schemas/red
 export async function obtenerPlataformasRedesSociales() {
   return await retryDatabaseOperation(async () => {
     // Obtener plataformas
-    const plataformas = await prisma.platform_plataformas_redes_sociales.findMany({
-      orderBy: { orden: "asc" },
+    const plataformas = await prisma.platform_social_networks.findMany({
+      orderBy: { order: "asc" },
     });
 
     return plataformas;
@@ -20,7 +20,7 @@ export async function obtenerPlataformasRedesSociales() {
 export async function obtenerPlataformaPorId(plataformaId: string) {
   return await retryDatabaseOperation(async () => {
     // Obtener plataforma
-    const plataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
+    const plataforma = await prisma.platform_social_networks.findUnique({
       where: { id: plataformaId },
     });
 
@@ -39,7 +39,7 @@ export async function crearPlataformaRedSocial(data: PlataformaForm) {
     const validatedData = PlataformaSchema.parse(data);
 
     // 2. Verificar que el slug no existe
-    const existingPlataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
+    const existingPlataforma = await prisma.platform_social_networks.findUnique({
       where: { slug: validatedData.slug },
     });
 
@@ -48,7 +48,7 @@ export async function crearPlataformaRedSocial(data: PlataformaForm) {
     }
 
     // 3. Crear plataforma
-    const plataforma = await prisma.platform_plataformas_redes_sociales.create({
+    const plataforma = await prisma.platform_social_networks.create({
       data: validatedData,
     });
 
@@ -63,7 +63,7 @@ export async function actualizarPlataformaRedSocial(
 ) {
   return await retryDatabaseOperation(async () => {
     // 1. Verificar que la plataforma existe
-    const existingPlataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
+    const existingPlataforma = await prisma.platform_social_networks.findUnique({
       where: { id: plataformaId },
     });
 
@@ -75,7 +75,7 @@ export async function actualizarPlataformaRedSocial(
     const validatedData = PlataformaSchema.partial().parse(data);
 
     // 3. Actualizar plataforma
-    const plataforma = await prisma.platform_plataformas_redes_sociales.update({
+    const plataforma = await prisma.platform_social_networks.update({
       where: { id: plataformaId },
       data: validatedData,
     });
@@ -88,7 +88,7 @@ export async function actualizarPlataformaRedSocial(
 export async function eliminarPlataformaRedSocial(plataformaId: string) {
   return await retryDatabaseOperation(async () => {
     // 1. Verificar que la plataforma existe
-    const existingPlataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
+    const existingPlataforma = await prisma.platform_social_networks.findUnique({
       where: { id: plataformaId },
       include: {
         _count: {
@@ -109,7 +109,7 @@ export async function eliminarPlataformaRedSocial(plataformaId: string) {
     }
 
     // 3. Eliminar plataforma
-    await prisma.platform_plataformas_redes_sociales.delete({
+    await prisma.platform_social_networks.delete({
       where: { id: plataformaId },
     });
 

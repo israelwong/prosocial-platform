@@ -12,7 +12,7 @@ export const CondicionComercialSchema = z.object({
     porcentaje_anticipo: z.string().nullable().optional(),
 
     status: z.enum(['active', 'inactive']),
-    orden: z.number().optional().default(0),
+    orden: z.number(),
 });
 
 // Schema con validaciones personalizadas que requiere sobreprecio
@@ -26,7 +26,7 @@ export const CondicionComercialWithValidationSchema = z.object({
     porcentaje_anticipo: z.string().nullable().optional(),
 
     status: z.enum(['active', 'inactive']),
-    orden: z.number().optional().default(0),
+    orden: z.number(),
 }).refine((data) => {
     // Validar que el descuento no sea mayor al sobreprecio
     if (data.porcentaje_descuento) {

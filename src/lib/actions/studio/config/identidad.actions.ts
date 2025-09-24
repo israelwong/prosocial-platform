@@ -30,7 +30,11 @@ export async function obtenerIdentidadStudio(studioSlug: string) {
     });
 
     if (!studio) {
-      throw new Error("Studio no encontrado");
+      console.error(`❌ Studio no encontrado con slug: ${studioSlug}`);
+      return {
+        success: false,
+        error: `Studio con slug "${studioSlug}" no encontrado. Verifica que el studio existe y está activo.`,
+      };
     }
 
     // Parsear palabras clave si existen

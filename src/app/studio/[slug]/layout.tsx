@@ -1,27 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Navbar, Sidebar } from './components';
+import { Navbar } from './components';
 
+// Este es el layout raíz, común a TODAS las páginas del estudio
 export default function StudioLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-zinc-950">
-            {/* Navbar Superior */}
+        <div className="flex flex-col h-screen bg-zinc-950 text-white overflow-hidden">
             <Navbar />
-
-            <div className="flex">
-                {/* Sidebar Lateral */}
-                <Sidebar />
-
-                {/* Contenido Principal */}
-                <main className="flex-1 p-6">
-                    {children}
-                </main>
-            </div>
+            {children}
         </div>
     );
 }

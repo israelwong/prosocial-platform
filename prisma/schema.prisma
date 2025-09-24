@@ -70,15 +70,15 @@ model platform_services {
   @@index([categoryId])
 }
 
-model platform_canales_adquisicion {
+model platform_acquisition_channels {
   id             String           @id @default(cuid())
-  nombre         String           @unique
-  descripcion    String?
+  name           String           @unique
+  description    String?
   color          String?
-  icono          String?
+  icon           String?
   isActive       Boolean          @default(true)
   isVisible      Boolean          @default(true)
-  orden          Int              @default(0)
+  order          Int              @default(0)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime
   platform_leads platform_leads[]
@@ -107,31 +107,31 @@ model platform_lead_bitacora {
 
 model platform_leads {
   id                           String                          @id @default(cuid())
-  nombre                       String
+  name                         String
   email                        String                          @unique
-  telefono                     String
-  nombreEstudio                String?
-  slugEstudio                  String?
-  fechaUltimoContacto          DateTime?
-  planInteres                  String?
-  presupuestoMensual           Decimal?
-  fechaProbableInicio          DateTime?
+  phone                        String
+  studioName                   String?
+  studioSlug                   String?
+  lastContactDate              DateTime?
+  interestedPlan               String?
+  monthlyBudget                Decimal?
+  probableStartDate            DateTime?
   agentId                      String?
-  puntaje                      Int?
-  prioridad                    String                          @default("media")
-  fechaConversion              DateTime?
+  score                        Int?
+  priority                     String                          @default("medium")
+  conversionDate               DateTime?
   studioId                     String?                         @unique
   createdAt                    DateTime                        @default(now())
   updatedAt                    DateTime
-  etapaId                      String?
-  canalAdquisicionId           String?
-  campa_aId                    String?                         @map("campañaId")
-  agente_conversion_id         String?
-  fecha_primera_interaccion    DateTime?
-  fuente_original              String?
-  metodo_conversion            String?
-  numero_interacciones         Int?                            @default(0)
-  tipo_lead                    String?                         @default("prospecto")
+  stageId                      String?
+  acquisitionChannelId         String?
+  campaignId                   String?                         @map("campañaId")
+  agentConversionId            String?
+  firstInteractionDate         DateTime?
+  originalSource               String?
+  conversionMethod             String?
+  interactionCount             Int?                            @default(0)
+  leadType                     String?                         @default("prospect")
   utm_campaign                 String?
   utm_medium                   String?
   utm_source                   String?
@@ -140,16 +140,16 @@ model platform_leads {
   discount_usage               platform_discount_usage[]
   platform_lead_bitacora       platform_lead_bitacora[]
   platform_agents              platform_agents?                @relation(fields: [agentId], references: [id])
-  platform_campanas            platform_campanas?              @relation(fields: [campa_aId], references: [id])
-  platform_canales_adquisicion platform_canales_adquisicion?   @relation(fields: [canalAdquisicionId], references: [id])
-  platform_pipeline_stages     platform_pipeline_stages?       @relation(fields: [etapaId], references: [id])
+  platform_campaigns           platform_campaigns?             @relation(fields: [campaignId], references: [id])
+  platform_acquisition_channels platform_acquisition_channels?   @relation(fields: [acquisitionChannelId], references: [id])
+  platform_pipeline_stages     platform_pipeline_stages?       @relation(fields: [stageId], references: [id])
   studios                      projects?                       @relation(fields: [studioId], references: [id])
   platform_notifications       platform_notifications[]
 
   @@index([agentId])
-  @@index([campa_aId])
-  @@index([canalAdquisicionId])
-  @@index([etapaId, prioridad])
+  @@index([campaignId])
+  @@index([acquisitionChannelId])
+  @@index([stageId, priority])
 }
 
 model platform_notifications {
@@ -213,21 +213,21 @@ model platform_pipeline_stages {
   @@index([pipeline_type_id])
 }
 
-model platform_plataformas_publicidad {
+model platform_advertising_platforms {
   id                           String                         @id @default(cuid())
-  nombre                       String                         @unique
-  descripcion                  String?
-  tipo                         String
+  name                         String                         @unique
+  description                  String?
+  type                         String
   color                        String?
-  icono                        String?
+  icon                         String?
   isActive                     Boolean                        @default(true)
-  orden                        Int                            @default(0)
+  order                        Int                            @default(0)
   createdAt                    DateTime                       @default(now())
   updatedAt                    DateTime
-  platform_campana_plataformas platform_campana_plataformas[]
+  platform_campaign_platforms platform_campaign_platforms[]
 
   @@index([isActive])
-  @@index([tipo])
+  @@index([type])
 }
 
 model platform_plans {
@@ -288,44 +288,44 @@ model platform_agents {
   @@index([activo])
 }
 
-model platform_campana_plataformas {
+model platform_campaign_platforms {
   id                              String                          @id @default(cuid())
-  campa_aId                       String                          @map("campañaId")
-  plataformaId                    String
-  presupuesto                     Decimal
-  gastoReal                       Decimal                         @default(0)
+  campaignId                      String                          @map("campañaId")
+  platformId                      String
+  budget                          Decimal
+  actualSpend                     Decimal                         @default(0)
   leads                           Int                             @default(0)
-  conversiones                    Int                             @default(0)
+  conversions                     Int                             @default(0)
   createdAt                       DateTime                        @default(now())
   updatedAt                       DateTime
-  platform_campanas               platform_campanas               @relation(fields: [campa_aId], references: [id], onDelete: Cascade)
-  platform_plataformas_publicidad platform_plataformas_publicidad @relation(fields: [plataformaId], references: [id])
+  platform_campaigns             platform_campaigns             @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  platform_advertising_platforms platform_advertising_platforms @relation(fields: [platformId], references: [id])
 
-  @@unique([campa_aId, plataformaId])
-  @@index([campa_aId])
-  @@index([plataformaId])
+  @@unique([campaignId, platformId])
+  @@index([campaignId])
+  @@index([platformId])
 }
 
-model platform_campanas {
+model platform_campaigns {
   id                           String                         @id @default(cuid())
-  nombre                       String
-  descripcion                  String?
-  presupuestoTotal             Decimal
-  fechaInicio                  DateTime
-  fechaFin                     DateTime
+  name                         String
+  description                  String?
+  totalBudget                  Decimal
+  startDate                    DateTime
+  endDate                      DateTime
   isActive                     Boolean                        @default(true)
-  status                       String                         @default("planificada")
-  leadsGenerados               Int                            @default(0)
-  leadsSuscritos               Int                            @default(0)
-  gastoReal                    Decimal                        @default(0)
+  status                       String                         @default("planned")
+  leadsGenerated               Int                            @default(0)
+  leadsSubscribed              Int                            @default(0)
+  actualSpend                  Decimal                        @default(0)
   projectId                    String?
   createdAt                    DateTime                       @default(now())
   updatedAt                    DateTime
-  platform_campana_plataformas platform_campana_plataformas[]
+  platform_campaign_platforms platform_campaign_platforms[]
   projects                     projects?                      @relation(fields: [projectId], references: [id])
   platform_leads               platform_leads[]
 
-  @@index([fechaInicio, fechaFin])
+  @@index([startDate, endDate])
   @@index([isActive])
   @@index([status])
   @@index([projectId])
@@ -408,7 +408,7 @@ model projects {
   website                  String?
   logoUrl                  String?
   planId                   String?
-  subscriptionStatus       String                            @default("trial")
+  subscriptionStatus       SubscriptionStatus                @default(TRIAL)
   subscriptionStart        DateTime?
   subscriptionEnd          DateTime?
   stripeCustomerId         String?                           @unique
@@ -423,10 +423,9 @@ model projects {
   isotipo_url              String?
   palabras_clave           String?
   slogan                   String?
-  platform_campanas        platform_campanas[]
+  platform_campaigns       platform_campaigns[]
   platform_leads           platform_leads?
   agenda                   project_agenda[]
-  project_campanas         project_campanas[]
   clientes                 project_clientes[]
   condiciones_comerciales  project_condiciones_comerciales[]
   configuraciones          project_configuraciones[]
@@ -444,6 +443,7 @@ model projects {
   telefonos                project_telefonos[]
   user_profiles            project_user_profiles[]
   studio_users             project_users[]
+  professional_profiles    project_professional_profiles[]   // ✅ Perfiles profesionales dinámicos
   plans                    platform_plans?                   @relation(fields: [planId], references: [id])
   subscriptions            subscriptions[]
 
@@ -460,7 +460,6 @@ model project_configuraciones {
   comision_venta              Float
   sobreprecio                 Float
   claveAutorizacion           String?
-  // numeroMaximoServiciosPorDia Int?
   status                      String   @default("active")
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime
@@ -498,27 +497,6 @@ model project_agenda_tipos {
   updatedAt DateTime
 }
 
-model project_campanas {
-  id               String    @id @default(cuid())
-  projectId        String
-  nombre           String
-  descripcion      String?
-  presupuestoTotal Decimal?
-  fechaInicio      DateTime?
-  fechaFin         DateTime?
-  status           String    @default("activa")
-  plataforma       String?
-  url_campana      String?
-  leadsGenerados   Int       @default(0)
-  gastoReal        Decimal   @default(0)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime
-  projects         projects  @relation(fields: [projectId], references: [id])
-
-  @@index([projectId])
-  @@index([status])
-  @@index([fechaInicio, fechaFin])
-}
 
 model project_clientes {
   id            String            @id @default(cuid())
@@ -1033,13 +1011,18 @@ model project_users {
   id                                            String                         @id @default(cuid())
   username                                      String?
   email                                         String                         @unique
-  password                                      String
+  password                                      String?                        // Opcional para personal sin login
+  fullName                                      String?                        // Nombre completo
+  phone                                         String?                        // Teléfono (renombrado de telefono)
+  type                                          PersonnelType?                 // EMPLEADO | PROVEEDOR
   role                                          String                         @default("user")
-  telefono                                      String
   status                                        String                         @default("inactive")
+  isActive                                      Boolean                        @default(true)
   projectId                                     String
   createdAt                                     DateTime                       @default(now())
-  updatedAt                                     DateTime
+  updatedAt                                     DateTime                       @updatedAt
+
+  // Relaciones operativas existentes
   agenda                                        project_agenda[]
   cotizacion_servicios                          project_cotizacion_servicios[]
   eventos                                       project_eventos[]
@@ -1051,8 +1034,57 @@ model project_users {
   sesiones                                      project_sesiones[]
   projects                                      projects                       @relation(fields: [projectId], references: [id])
 
+  // Nueva relación para perfiles profesionales
+  professional_profiles                         project_user_professional_profiles[]
+
   @@index([email])
   @@index([projectId, status])
+  @@index([type])
+  @@index([isActive])
+}
+
+// Perfiles profesionales dinámicos por proyecto
+model project_professional_profiles {
+  id          String @id @default(cuid())
+  projectId   String
+  name        String                    // "Fotógrafo", "Camarógrafo", etc.
+  slug        String                    // "fotografo", "camarografo"
+  description String?                   // Descripción del perfil
+  color      String?                   // Color para UI (hex)
+  icon        String?                  // Icono para UI (lucide name)
+  isActive    Boolean @default(true)
+  isDefault   Boolean @default(false)  // Perfiles del sistema
+  order       Int @default(0)          // Orden de visualización
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userProfiles project_user_professional_profiles[]
+
+  @@unique([projectId, slug])
+  @@index([projectId, isActive])
+  @@index([isDefault])
+  @@index([order])
+}
+
+model project_user_professional_profiles {
+  id          String @id @default(cuid())
+  userId      String
+  profileId   String                    // ✅ Referencia a perfil dinámico
+  description String?                   // Descripción específica del usuario
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  user        project_users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile     project_professional_profiles @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, profileId])  // Un usuario no puede tener el mismo perfil dos veces
+  @@index([userId])
+  @@index([profileId])
+  @@index([isActive])
 }
 
 model project_user_profiles {
@@ -1060,7 +1092,7 @@ model project_user_profiles {
   email                  String                   @unique
   fullName               String?
   avatarUrl              String?
-  role                   String
+  role                   UserRole
   projectId              String?
   isActive               Boolean                  @default(true)
   createdAt              DateTime                 @default(now())
@@ -1081,7 +1113,7 @@ model subscriptions {
   stripe_subscription_id String                          @unique
   stripe_customer_id     String
   plan_id                String
-  status                 String
+  status                 SubscriptionStatus
   current_period_start   DateTime
   current_period_end     DateTime
   billing_cycle_anchor   DateTime
@@ -1159,22 +1191,22 @@ model project_horarios_atencion {
   @@index([projectId, dia_semana])
 }
 
-model platform_plataformas_redes_sociales {
+model platform_social_networks {
   id                     String                   @id @default(cuid())
-  nombre                 String                   @unique
+  name                   String                   @unique
   slug                   String                   @unique
-  descripcion            String?
+  description            String?
   color                  String?
-  icono                  String?
-  urlBase                String?
-  orden                  Int                      @default(0)
+  icon                   String?
+  baseUrl                String?
+  order                  Int                      @default(0)
   isActive               Boolean                  @default(true)
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
   project_redes_sociales project_redes_sociales[]
 
   @@index([isActive])
-  @@index([orden])
+  @@index([order])
 }
 
 model project_redes_sociales {
@@ -1185,7 +1217,7 @@ model project_redes_sociales {
   activo       Boolean                              @default(true)
   createdAt    DateTime                             @default(now())
   updatedAt    DateTime                             @updatedAt
-  plataforma   platform_plataformas_redes_sociales? @relation(fields: [plataformaId], references: [id])
+  plataforma   platform_social_networks? @relation(fields: [plataformaId], references: [id])
   projects     projects                             @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, plataformaId])
@@ -1220,4 +1252,43 @@ enum UnidadMedida {
   PROYECTOS
   COTIZACIONES
   LANDING_PAGES
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  AGENTE
+  SUSCRIPTOR
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  CANCELLED
+  PAUSED
+  EXPIRED
+}
+
+enum LeadStatus {
+  NUEVO
+  CONTACTADO
+  INTERESADO
+  COTIZACION
+  NEGOCIACION
+  CONVERTIDO
+  PERDIDO
+}
+
+enum PersonnelType {
+  EMPLEADO
+  PROVEEDOR
+}
+
+enum PersonnelProfile {
+  FOTOGRAFO
+  CAMAROGRAFO
+  EDITOR
+  RETOCADOR
+  OPERADOR_DRON
+  ASISTENTE
+  COORDINADOR
 }

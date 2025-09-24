@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { Bell, User, ChevronDown, LayoutDashboard, Settings } from 'lucide-react';
 import { useStudioData } from '@/hooks/useStudioData';
-import type { IdentidadData } from '../configuracion/cuenta/identidad/types';
 
 interface NavbarProps {
   className?: string;
@@ -15,18 +15,36 @@ export function Navbar({ className }: NavbarProps) {
   const params = useParams();
   const slug = params.slug as string;
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Usar hook simplificado para datos del studio
-  const { 
-    identidadData, 
-    loading, 
-    error 
+  const {
+    identidadData,
+    loading,
+    error
   } = useStudioData({
     studioSlug: slug,
     onUpdate: (data) => {
       console.log('🎯 [NAVBAR] Updated with new studio data:', data);
     }
   });
+
+  // Cerrar menú al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isUserMenuOpen]);
 
   // Función para renderizar el logo/isotipo
   const renderLogo = () => {
@@ -42,9 +60,11 @@ export function Navbar({ className }: NavbarProps) {
     if (identidadData?.isotipo_url) {
       return (
         <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-          <img
+          <Image
             src={identidadData.isotipo_url}
             alt="Isotipo"
+            width={32}
+            height={32}
             className="w-full h-full object-contain"
             onError={(e) => {
               // Fallback si falla la carga de imagen
@@ -69,9 +89,11 @@ export function Navbar({ className }: NavbarProps) {
     if (identidadData?.logoUrl) {
       return (
         <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-          <img
+          <Image
             src={identidadData.logoUrl}
             alt="Logo"
+            width={32}
+            height={32}
             className="w-full h-full object-contain"
             onError={(e) => {
               // Fallback si falla la carga de imagen
@@ -136,19 +158,18 @@ export function Navbar({ className }: NavbarProps) {
 
           {/* Indicador de estado de datos */}
           <div className="relative">
-            <div className={`w-2 h-2 rounded-full ${
-              loading ? 'bg-yellow-500' : error ? 'bg-red-500' : 'bg-green-500'
-            }`} title={
-              loading 
-                ? 'Cargando datos...' 
-                : error 
-                  ? 'Error al cargar datos' 
-                  : 'Datos cargados correctamente'
-            }></div>
+            <div className={`w-2 h-2 rounded-full ${loading ? 'bg-yellow-500' : error ? 'bg-red-500' : 'bg-green-500'
+              }`} title={
+                loading
+                  ? 'Cargando datos...'
+                  : error
+                    ? 'Error al cargar datos'
+                    : 'Datos cargados correctamente'
+              }></div>
           </div>
 
           {/* Usuario Menu */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="flex items-center space-x-2 p-2 text-zinc-400 hover:text-white transition-colors"
@@ -167,19 +188,24 @@ export function Navbar({ className }: NavbarProps) {
                   <Link
                     href={`/studio/${slug}/dashboard`}
                     className="flex items-center px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                    onClick={() => setIsUserMenuOpen(false)}
                   >
                     <LayoutDashboard className="h-4 w-4 mr-3" />
                     Dashboard
                   </Link>
                   <Link
-                    href={`/studio/${slug}/configuracion/cuenta`}
+                    href={`/studio/${slug}/configuracion/`}
                     className="flex items-center px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                    onClick={() => setIsUserMenuOpen(false)}
                   >
                     <Settings className="h-4 w-4 mr-3" />
                     Configurar
                   </Link>
                   <hr className="my-1 border-zinc-700" />
-                  <button className="flex items-center w-full px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white">
+                  <button
+                    className="flex items-center w-full px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white"
+                    onClick={() => setIsUserMenuOpen(false)}
+                  >
                     Cerrar Sesión
                   </button>
                 </div>

@@ -10,13 +10,13 @@ import { RedSocialIcon } from '@/components/ui/icons/RedSocialIcon';
 
 interface PlataformaRedSocial {
     id: string;
-    nombre: string;
+    name: string;
     slug: string;
-    descripcion: string | null;
+    description: string | null;
     color: string | null;
-    icono: string | null;
-    urlBase: string | null;
-    orden: number;
+    icon: string | null;
+    baseUrl: string | null;
+    order: number;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -133,12 +133,12 @@ export function RedesSocialesPageClient({ plataformas, onCreatePlataforma, onEdi
                                                 style={{ backgroundColor: plataforma.color || '#6B7280' }}
                                             >
                                                 <RedSocialIcon
-                                                    icono={plataforma.icono || 'default'}
+                                                    icono={plataforma.icon || 'default'}
                                                     className="w-6 h-6"
                                                 />
                                             </div>
                                             <div>
-                                                <CardTitle className="text-white text-base">{plataforma.nombre}</CardTitle>
+                                                <CardTitle className="text-white text-base">{plataforma.name}</CardTitle>
                                                 <p className="text-xs text-zinc-400">/{plataforma.slug}</p>
                                             </div>
                                         </div>
@@ -148,19 +148,19 @@ export function RedesSocialesPageClient({ plataformas, onCreatePlataforma, onEdi
                                     </div>
                                 </CardHeader>
                                 <CardContent className="pt-0">
-                                    {plataforma.descripcion && (
-                                        <p className="text-sm text-zinc-300 mb-3">{plataforma.descripcion}</p>
+                                    {plataforma.description && (
+                                        <p className="text-sm text-zinc-300 mb-3">{plataforma.description}</p>
                                     )}
 
-                                    {plataforma.urlBase && (
+                                    {plataforma.baseUrl && (
                                         <p className="text-xs text-zinc-400 mb-3">
-                                            URL Base: <span className="text-zinc-300">{plataforma.urlBase}</span>
+                                            URL Base: <span className="text-zinc-300">{plataforma.baseUrl}</span>
                                         </p>
                                     )}
 
                                     <div className="flex items-center justify-between">
                                         <span className="text-xs text-zinc-400">
-                                            Orden: {plataforma.orden}
+                                            Orden: {plataforma.order}
                                         </span>
                                         <div className="flex space-x-2">
                                             {onEditPlataforma && (
@@ -176,7 +176,7 @@ export function RedesSocialesPageClient({ plataformas, onCreatePlataforma, onEdi
                                             <Button
                                                 size="sm"
                                                 variant="outline"
-                                                onClick={() => handleDeletePlataforma(plataforma.id, plataforma.nombre)}
+                                                onClick={() => handleDeletePlataforma(plataforma.id, plataforma.name)}
                                                 className="border-red-700 text-red-300 hover:bg-red-900/20"
                                             >
                                                 <Trash2 className="h-3 w-3" />

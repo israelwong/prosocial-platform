@@ -5,18 +5,18 @@ import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper'
 export async function GET() {
   try {
     const plataformas = await withRetry(async () => {
-      return await prisma.platform_plataformas_redes_sociales.findMany({
+      return await prisma.platform_social_networks.findMany({
         where: { isActive: true },
-        orderBy: { orden: 'asc' },
+        orderBy: { order: 'asc' },
         select: {
           id: true,
-          nombre: true,
+          name: true,
           slug: true,
-          descripcion: true,
+          description: true,
           color: true,
-          icono: true,
-          urlBase: true,
-          orden: true,
+          icon: true,
+          baseUrl: true,
+          order: true,
         }
       });
     });

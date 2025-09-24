@@ -85,7 +85,16 @@ export async function crearRedSocial(
     // 2. Validar datos
     const validatedData = RedSocialCreateSchema.parse(data);
 
-    // 3. Verificar si ya existe una red social activa de la misma plataforma
+    // 3. Obtener información de la plataforma y verificar duplicados
+    const plataforma = await prisma.platform_social_networks.findUnique({
+      where: { id: validatedData.plataformaId },
+      select: { id: true, name: true }
+    });
+
+    if (!plataforma) {
+      throw new Error("Plataforma de red social no encontrada");
+    }
+
     const existingRed = await prisma.project_redes_sociales.findFirst({
       where: {
         projectId: studio.id,
@@ -95,7 +104,7 @@ export async function crearRedSocial(
     });
 
     if (existingRed) {
-      throw new Error("Ya tienes una red social activa de esta plataforma");
+      throw new Error(`Ya tienes una cuenta activa de ${plataforma.name}. Puedes editarla o desactivarla para crear una nueva.`);
     }
 
     // 4. Crear red social
@@ -137,7 +146,7 @@ export async function actualizarRedSocial(
     });
 
     if (!existingRedSocial) {
-      throw new Error("Red social no encontrada");
+      throw new Error("La red social que intentas actualizar no existe o no tienes permisos para modificarla");
     }
 
     // 3. Actualizar red social
@@ -184,7 +193,7 @@ export async function actualizarRedesSocialesBulk(
         try {
           new URL(red.url);
         } catch {
-          throw new Error(`URL inválida para red social ${red.id}`);
+          throw new Error(`La URL de tu red social no es válida. Por favor verifica que esté completa y correcta.`);
         }
       }
     }
@@ -225,7 +234,7 @@ export async function eliminarRedSocial(redSocialId: string) {
     });
 
     if (!existingRedSocial) {
-      throw new Error("Red social no encontrada");
+      throw new Error("La red social que intentas eliminar no existe o no tienes permisos para eliminarla");
     }
 
     // 2. Eliminar red social
