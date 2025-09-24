@@ -5,6 +5,7 @@ import { ConfiguracionPreciosForm } from './components/ConfiguracionPreciosForm'
 import { obtenerConfiguracionPrecios } from '@/lib/actions/studio/config/configuracion-precios.actions';
 import { Percent } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
 
 export default function ConfiguracionPreciosPage() {
   const params = useParams();
@@ -65,17 +66,12 @@ export default function ConfiguracionPreciosPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header simple sin subsecciones */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-        <div className="flex items-center space-x-3 mb-2">
-          <Percent className="h-6 w-6 text-blue-500" />
-          <h1 className="text-2xl font-bold text-white">Configuración de Precios</h1>
-        </div>
-        <p className="text-zinc-400">
-          Define los porcentajes de utilidad, comisiones y configuraciones de precios para tu negocio
-        </p>
-      </div>
+    <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
+
+      <HeaderNavigation
+        title="Configuración de Precios"
+        description="Define los porcentajes de utilidad, comisiones y configuraciones de precios para tu negocio"
+      />
 
       {/* Formulario principal */}
       {initialData && (

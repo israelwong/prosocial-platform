@@ -16,11 +16,11 @@ interface IdentidadFormProps {
   loading?: boolean;
 }
 
-export function IdentidadForm({ 
-  data, 
-  onUpdate, 
+export function IdentidadForm({
+  data,
+  onUpdate,
   onLocalUpdate,
-  loading = false 
+  loading = false
 }: IdentidadFormProps) {
   const [formData, setFormData] = useState({
     nombre: data.name || '',
@@ -63,7 +63,7 @@ export function IdentidadForm({
     }
   };
 
-  const hasChanges = 
+  const hasChanges =
     formData.nombre !== data.name ||
     formData.slogan !== (data.slogan || '') ||
     formData.descripcion !== (data.descripcion || '');

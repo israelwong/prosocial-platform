@@ -37,10 +37,10 @@ export default function ConfiguracionPage({ params }: ConfiguracionPageProps) {
                 projectName={setupStatus.project.name}
             />
 
-            <SetupRecommendations
+            {/* <SetupRecommendations
                 sections={setupStatus.sections}
                 studioSlug={slug}
-            />
+            /> */}
 
             <SetupSectionsGrid
                 sections={setupStatus.sections}

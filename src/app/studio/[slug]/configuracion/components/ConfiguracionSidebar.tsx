@@ -221,36 +221,36 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                     },
                 ],
             },
-            {
-                id: 'integraciones',
-                title: 'Integraciones',
-                description: 'Conecta ZENPro con otras herramientas',
-                icon: Plug,
-                items: [
-                    {
-                        id: 'integraciones',
-                        name: 'Integraciones',
-                        description: 'Gestiona tus conexiones',
-                        href: `/studio/${studioSlug}/configuracion/integraciones`,
-                        icon: Plug,
-                    },
-                ],
-            },
-            {
-                id: 'avanzado',
-                title: 'Avanzado',
-                description: 'Configuraciones para usuarios avanzados',
-                icon: SlidersHorizontal,
-                items: [
-                    {
-                        id: 'avanzado',
-                        name: 'Avanzado',
-                        description: 'Herramientas y configuraciones avanzadas',
-                        href: `/studio/${studioSlug}/configuracion/avanzado`,
-                        icon: SlidersHorizontal,
-                    },
-                ],
-            },
+            // {
+            //     id: 'integraciones',
+            //     title: 'Integraciones',
+            //     description: 'Conecta ZENPro con otras herramientas',
+            //     icon: Plug,
+            //     items: [
+            //         {
+            //             id: 'integraciones',
+            //             name: 'Integraciones',
+            //             description: 'Gestiona tus conexiones',
+            //             href: `/studio/${studioSlug}/configuracion/integraciones`,
+            //             icon: Plug,
+            //         },
+            //     ],
+            // },
+            // {
+            //     id: 'avanzado',
+            //     title: 'Avanzado',
+            //     description: 'Configuraciones para usuarios avanzados',
+            //     icon: SlidersHorizontal,
+            //     items: [
+            //         {
+            //             id: 'avanzado',
+            //             name: 'Avanzado',
+            //             description: 'Herramientas y configuraciones avanzadas',
+            //             href: `/studio/${studioSlug}/configuracion/avanzado`,
+            //             icon: SlidersHorizontal,
+            //         },
+            //     ],
+            // },
         ];
 
         if (!searchQuery.trim()) return configSections;

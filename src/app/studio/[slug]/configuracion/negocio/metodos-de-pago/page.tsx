@@ -11,7 +11,7 @@ export default function MetodosPagoPage() {
     const slug = params.slug as string;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
             {/* Header simplificado */}
             <HeaderNavigation
                 title="Métodos de Pago"

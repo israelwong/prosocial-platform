@@ -18,6 +18,7 @@ import {
     toggleRedSocialEstado
 } from '@/lib/actions/studio/config/redes-sociales.actions';
 import { obtenerPlataformasRedesSociales } from '@/lib/actions/shared/plataformas.actions';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
 
 export default function RedesSocialesPage() {
     const params = useParams();
@@ -202,7 +203,12 @@ export default function RedesSocialesPage() {
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
+
+            <HeaderNavigation
+                title="Redes Sociales"
+                description="Gestiona tus redes sociales y sitios web"
+            />
 
             {/* Estadísticas */}
             <RedSocialStats redes={redes} />

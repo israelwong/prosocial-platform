@@ -122,7 +122,7 @@ export default function IdentidadPage() {
     }
 
     return (
-        <div className="p-6 pb-12 space-y-6">
+        <div className="p-6 pb-12 space-y-6 max-w-screen-lg mx-auto">
             <HeaderNavigation
                 title="Identidad del Estudio"
                 description="Define la identidad visual y la información básica de tu estudio"
@@ -208,7 +208,7 @@ export default function IdentidadPage() {
             </div>
 
             {/* Información de uso */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-800 border-zinc-700 mb-14">
                 <CardHeader>
                     <CardTitle className="text-white">¿Dónde se usa esta información?</CardTitle>
                 </CardHeader>

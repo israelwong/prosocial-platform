@@ -17,6 +17,7 @@ import {
     obtenerEstadisticasHorarios,
     inicializarHorariosPorDefecto
 } from '@/lib/actions/studio/config/horarios.actions';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
 
 export default function HorariosPage() {
     const params = useParams();
@@ -187,7 +188,13 @@ export default function HorariosPage() {
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
+
+            <HeaderNavigation
+                title="Horarios de Atención"
+                description="Gestiona tus horarios de atención"
+            />
+
             {/* Estadísticas */}
             <HorariosStats horarios={horarios} loading={loading} />
 
