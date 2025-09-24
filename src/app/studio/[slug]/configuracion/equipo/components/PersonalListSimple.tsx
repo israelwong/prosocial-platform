@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
     PERSONNEL_TYPE_LABELS,
-    PERSONNEL_PROFILE_LABELS,
+    // PERSONNEL_PROFILE_LABELS, // Removido porque no existe
     type PersonnelType,
 } from '@/lib/actions/schemas/personal-schemas';
 import type { Personal } from '../types';
@@ -216,7 +216,7 @@ export function PersonalListSimple({
                                                                 variant="outline"
                                                                 className="text-xs border-zinc-600 text-zinc-300"
                                                             >
-                                                                {PERSONNEL_PROFILE_LABELS[profile.profile]}
+                                                                {profile.profile}
                                                             </Badge>
                                                         ))}
                                                     {person.professional_profiles.filter(p => p.isActive).length > 3 && (
