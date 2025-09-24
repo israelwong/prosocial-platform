@@ -47,7 +47,7 @@ export const PersonalFiltersSchema = z.object({
 export const ProfessionalProfileSchema = z.object({
     id: IdSchema.optional(),
     userId: IdSchema,
-    profile: PersonnelProfileSchema,
+    profileId: IdSchema, // Referencia al perfil dinámico
     description: z.string().optional(),
     isActive: z.boolean().default(true),
 });
@@ -66,22 +66,5 @@ export const PERSONNEL_TYPE_LABELS: Record<PersonnelType, string> = {
     PROVEEDOR: "Proveedor",
 };
 
-export const PERSONNEL_PROFILE_LABELS: Record<PersonnelProfile, string> = {
-    FOTOGRAFO: "Fotógrafo",
-    CAMAROGRAFO: "Camarógrafo",
-    EDITOR: "Editor",
-    RETOCADOR: "Retocador",
-    OPERADOR_DRON: "Operador de Dron",
-    ASISTENTE: "Asistente",
-    COORDINADOR: "Coordinador",
-};
-
-export const PERSONNEL_PROFILE_DESCRIPTIONS: Record<PersonnelProfile, string> = {
-    FOTOGRAFO: "Especialista en captura de imágenes fotográficas",
-    CAMAROGRAFO: "Especialista en grabación de video",
-    EDITOR: "Especialista en edición y postproducción",
-    RETOCADOR: "Especialista en retoque fotográfico",
-    OPERADOR_DRON: "Piloto certificado de drones para tomas aéreas",
-    ASISTENTE: "Apoyo general en producciones",
-    COORDINADOR: "Coordinación de equipos y producciones",
-};
+// Las etiquetas y descripciones ahora se manejan dinámicamente
+// a través de la tabla project_professional_profiles

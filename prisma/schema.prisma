@@ -444,6 +444,7 @@ model projects {
   user_profiles            project_user_profiles[]
   studio_users             project_users[]
   professional_profiles    project_professional_profiles[]   // ✅ Perfiles profesionales dinámicos
+  setup_status             studio_setup_status?             // ✅ Estado de configuración del estudio
   plans                    platform_plans?                   @relation(fields: [planId], references: [id])
   subscriptions            subscriptions[]
 
@@ -1071,7 +1072,7 @@ model project_professional_profiles {
 model project_user_professional_profiles {
   id          String @id @default(cuid())
   userId      String
-  profileId   String                    // ✅ Referencia a perfil dinámico
+  profileId   String?                   // ✅ Referencia a perfil dinámico (opcional)
   description String?                   // Descripción específica del usuario
   isActive    Boolean @default(true)
   createdAt   DateTime @default(now())
@@ -1079,7 +1080,7 @@ model project_user_professional_profiles {
 
   // Relaciones
   user        project_users @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profile     project_professional_profiles @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile     project_professional_profiles? @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([userId, profileId])  // Un usuario no puede tener el mismo perfil dos veces
   @@index([userId])
@@ -1283,12 +1284,87 @@ enum PersonnelType {
   PROVEEDOR
 }
 
-enum PersonnelProfile {
-  FOTOGRAFO
-  CAMAROGRAFO
-  EDITOR
-  RETOCADOR
-  OPERADOR_DRON
-  ASISTENTE
-  COORDINADOR
+// ========================================
+// SISTEMA DE PROGRESO DE CONFIGURACIÓN
+// ========================================
+
+// Estado general de configuración del estudio
+model studio_setup_status {
+  id                String   @id @default(cuid())
+  projectId         String   @unique
+  overallProgress   Int      @default(0) // 0-100
+  isFullyConfigured Boolean  @default(false)
+  lastValidatedAt   DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relación con proyecto
+  project           projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  // Relación con secciones
+  sections          setup_section_progress[]
+  
+  @@index([projectId])
+  @@index([isFullyConfigured])
+  @@index([overallProgress])
 }
+
+// Progreso de cada sección específica
+model setup_section_progress {
+  id                    String   @id @default(cuid())
+  setupStatusId         String
+  sectionId             String
+  sectionName           String
+  status                String   // 'pending' | 'in_progress' | 'completed' | 'error'
+  completionPercentage  Int      @default(0) // 0-100
+  completedFields       Json     // Array de campos completados
+  missingFields         Json     // Array de campos faltantes
+  errors                Json?    // Array de errores
+  completedAt           DateTime?
+  lastUpdatedAt         DateTime @default(now())
+  
+  // Relación con estado general
+  setupStatus           studio_setup_status @relation(fields: [setupStatusId], references: [id], onDelete: Cascade)
+  
+  @@unique([setupStatusId, sectionId])
+  @@index([sectionId])
+  @@index([status])
+  @@index([completionPercentage])
+}
+
+// Configuración de secciones (tabla de configuración)
+model setup_section_config {
+  id              String   @id @default(cuid())
+  sectionId       String   @unique
+  sectionName     String
+  description     String
+  requiredFields  Json     // Array de campos requeridos
+  optionalFields  Json     // Array de campos opcionales
+  dependencies    Json     // Array de secciones que deben completarse antes
+  weight          Int      @default(10) // Peso para calcular progreso general
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([sectionId])
+  @@index([isActive])
+}
+
+// Log de cambios para trazabilidad
+model setup_progress_log {
+  id              String   @id @default(cuid())
+  projectId       String
+  sectionId       String?
+  action          String   // 'created' | 'updated' | 'completed' | 'error'
+  oldStatus       String?
+  newStatus       String?
+  details         Json?    // Detalles adicionales del cambio
+  source          String   // 'manual' | 'ai' | 'system'
+  createdAt       DateTime @default(now())
+  
+  @@index([projectId])
+  @@index([sectionId])
+  @@index([action])
+  @@index([createdAt])
+}
+

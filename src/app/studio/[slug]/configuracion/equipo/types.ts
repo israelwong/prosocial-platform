@@ -11,7 +11,7 @@ export interface Personal {
     updatedAt: Date;
     professional_profiles: Array<{
         id: string;
-        profile: PersonnelProfile;
+        profile: PersonnelProfile; // Ahora es un objeto con id, name, slug, etc.
         description: string | null;
         isActive: boolean;
     }>;

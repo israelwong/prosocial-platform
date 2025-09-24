@@ -202,12 +202,43 @@ async function main() {
             });
             console.log(`✅ Usuarios: ${photographer.fullName}, ${editor.fullName}`);
 
-            console.log('🎯 Creando perfiles profesionales...');
+            console.log('🎯 Creando perfiles profesionales dinámicos...');
+            const fotografoProfile = await tx.project_professional_profiles.create({
+                data: {
+                    id: 'profile-fotografo',
+                    projectId: demoStudio.id,
+                    name: 'Fotógrafo',
+                    slug: 'fotografo',
+                    description: 'Especialista en captura de imágenes fotográficas',
+                    color: '#3B82F6',
+                    icon: 'Camera',
+                    isActive: true,
+                    isDefault: true,
+                    order: 1
+                }
+            });
+
+            const editorProfile = await tx.project_professional_profiles.create({
+                data: {
+                    id: 'profile-editor',
+                    projectId: demoStudio.id,
+                    name: 'Editor',
+                    slug: 'editor',
+                    description: 'Especialista en edición y postproducción',
+                    color: '#8B5CF6',
+                    icon: 'Scissors',
+                    isActive: true,
+                    isDefault: true,
+                    order: 2
+                }
+            });
+
+            console.log('🎯 Asignando perfiles a usuarios...');
             await tx.project_user_professional_profiles.create({
                 data: {
-                    id: 'profile-photographer',
+                    id: 'user-profile-photographer',
                     userId: photographer.id,
-                    profile: 'FOTOGRAFO',
+                    profileId: fotografoProfile.id,
                     description: 'Perfil profesional de Juan Pérez',
                     isActive: true,
                     updatedAt: new Date()
@@ -216,15 +247,15 @@ async function main() {
 
             await tx.project_user_professional_profiles.create({
                 data: {
-                    id: 'profile-editor',
+                    id: 'user-profile-editor',
                     userId: editor.id,
-                    profile: 'EDITOR',
+                    profileId: editorProfile.id,
                     description: 'Perfil profesional de María García',
                     isActive: true,
                     updatedAt: new Date()
                 }
             });
-            console.log('✅ Perfiles profesionales creados');
+            console.log('✅ Perfiles profesionales creados y asignados');
 
             console.log('📈 Creando leads...');
             await tx.platform_leads.create({
