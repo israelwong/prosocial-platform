@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, UserPlus, RefreshCw, Tag } from 'lucide-react';
+import { RefreshCw, Tag } from 'lucide-react';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
 import { toast } from 'sonner';
 import { useParams, useRouter } from 'next/navigation';
 import { PersonalModal } from '../components/PersonalModal';
@@ -42,7 +42,7 @@ export default function EmpleadosPage() {
     const [editingEmpleado, setEditingEmpleado] = useState<Personal | null>(null);
 
     // Cargar empleados y estadísticas
-    const loadData = async () => {
+    const loadData = React.useCallback(async () => {
         try {
             setLoading(true);
             const [personalData, statsData] = await Promise.all([
@@ -50,6 +50,7 @@ export default function EmpleadosPage() {
                 obtenerEstadisticasPersonal(slug),
             ]);
 
+            // @ts-ignore - Los tipos de la API no coinciden exactamente con Personal
             setEmpleados(personalData);
             setStats(statsData);
         } catch (error) {
@@ -58,11 +59,11 @@ export default function EmpleadosPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [slug]);
 
     useEffect(() => {
         loadData();
-    }, [slug]);
+    }, [loadData]);
 
     // Funciones del modal
     const handleOpenModal = (empleado?: Personal) => {
@@ -158,52 +159,42 @@ export default function EmpleadosPage() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
             {/* Header con estadísticas */}
             <PersonalStats stats={stats} loading={loading} />
 
             {/* Header de la sección */}
-            <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader className="flex flex-row items-start justify-between">
-                    <div>
-                        <CardTitle className="text-white flex items-center gap-2">
-                            <Users className="h-5 w-5" />
-                            Empleados
-                        </CardTitle>
-                        <CardDescription className="text-zinc-400">
-                            Gestiona la información de tu equipo de trabajo
-                        </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            onClick={navigateToPerfiles}
-                            disabled={loading}
-                            className="border-purple-600 text-purple-300 hover:bg-purple-800"
-                        >
-                            <Tag className="h-4 w-4 mr-2" />
-                            Perfiles
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={handleRefresh}
-                            disabled={loading}
-                            className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
-                        >
-                            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                            Actualizar
-                        </Button>
-                        <Button
-                            onClick={() => handleOpenModal()}
-                            className="bg-blue-600 hover:bg-blue-700"
-                            disabled={loading}
-                        >
-                            <UserPlus className="h-4 w-4 mr-2" />
-                            Crear Empleado
-                        </Button>
-                    </div>
-                </CardHeader>
-            </Card>
+            <HeaderNavigation
+                title="Empleados"
+                description="Gestiona la información de tu equipo de trabajo"
+                actionButton={{
+                    label: "Crear Empleado",
+                    icon: "UserPlus",
+                    onClick: () => handleOpenModal()
+                }}
+            />
+            
+            {/* Botones de acción */}
+            <div className="flex gap-2 justify-end">
+                <Button
+                    variant="outline"
+                    onClick={navigateToPerfiles}
+                    disabled={loading}
+                    className="border-purple-600 text-purple-300 hover:bg-purple-800"
+                >
+                    <Tag className="h-4 w-4 mr-2" />
+                    Perfiles
+                </Button>
+                <Button
+                    variant="outline"
+                    onClick={handleRefresh}
+                    disabled={loading}
+                    className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+                >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                    Actualizar
+                </Button>
+            </div>
 
             {/* Lista de empleados */}
             <PersonalListSimple
