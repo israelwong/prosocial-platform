@@ -54,7 +54,7 @@ export function PersonalModal({
                 // Modo edición
                 const profileDescriptions: Record<string, string> = {};
                 personal.professional_profiles.forEach(p => {
-                    if (p.description) {
+                    if (p.description && p.profile) {
                         profileDescriptions[p.profile.id] = p.description;
                     }
                 });
@@ -65,7 +65,7 @@ export function PersonalModal({
                     phone: personal.phone || '',
                     type: personal.type || 'EMPLEADO',
                     isActive: personal.isActive,
-                    profileIds: personal.professional_profiles.map(p => p.profile.id),
+                    profileIds: personal.professional_profiles.filter(p => p.profile).map(p => p.profile!.id),
                     profileDescriptions,
                 });
             } else {
