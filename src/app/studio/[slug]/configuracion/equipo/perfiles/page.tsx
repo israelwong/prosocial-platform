@@ -71,7 +71,7 @@ export default function ProfessionalProfilesPage() {
         setEditingPerfil(null);
     };
 
-    const handleSavePerfil = async (data: any) => {
+    const handleSavePerfil = async (data: { name: string }) => {
         setModalLoading(true);
 
         try {
