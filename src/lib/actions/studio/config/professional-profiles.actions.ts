@@ -302,10 +302,11 @@ export async function inicializarPerfilesSistema(studioSlug: string) {
 
         const perfilesIniciales = [
             { name: "Fotógrafo", slug: "fotografo", color: "#3B82F6", icon: "Camera", order: 1 },
-            { name: "Editor", slug: "editor", color: "#8B5CF6", icon: "Edit", order: 2 },
-            { name: "Asistente", slug: "asistente", color: "#10B981", icon: "User", order: 3 },
-            { name: "Coordinador", slug: "coordinador", color: "#F59E0B", icon: "Users", order: 4 },
-            { name: "Productor", slug: "productor", color: "#EF4444", icon: "Video", order: 5 },
+            { name: "Asistente de Producción", slug: "asistente-produccion", color: "#10B981", icon: "User", order: 2 },
+            { name: "Camarógrafo", slug: "camarografo", color: "#8B5CF6", icon: "Video", order: 3 },
+            { name: "Editor de Video", slug: "editor-video", color: "#F59E0B", icon: "Edit", order: 4 },
+            { name: "Retocador de Fotos", slug: "retocador-fotos", color: "#EF4444", icon: "Image", order: 5 },
+            { name: "Operador de Dron", slug: "operador-dron", color: "#06B6D4", icon: "Zap", order: 6 },
         ];
 
         const perfilesCreados = await prisma.project_professional_profiles.createMany({

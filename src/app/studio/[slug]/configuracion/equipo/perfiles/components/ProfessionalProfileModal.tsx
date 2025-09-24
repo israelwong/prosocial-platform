@@ -38,7 +38,8 @@ const COLORES_PREDEFINIDOS = [
 
 const ICONOS_PREDEFINIDOS = [
     'Camera', 'Edit', 'User', 'Users', 'Video', 'Image', 'Settings', 'Star',
-    'Heart', 'Zap', 'Target', 'Award', 'Shield', 'Book', 'Code', 'Palette'
+    'Heart', 'Zap', 'Target', 'Award', 'Shield', 'Book', 'Code', 'Palette',
+    'Film', 'Monitor', 'Headphones', 'Mic', 'Lightbulb', 'Scissors', 'Brush'
 ];
 
 export function ProfessionalProfileModal({
