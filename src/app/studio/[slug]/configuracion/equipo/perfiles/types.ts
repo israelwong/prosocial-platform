@@ -1,6 +1,6 @@
-// Tipos para perfiles profesionales
 export interface ProfessionalProfile {
     id: string;
+    projectId: string;
     name: string;
     slug: string;
     description: string | null;
@@ -11,35 +11,32 @@ export interface ProfessionalProfile {
     order: number;
     createdAt: Date;
     updatedAt: Date;
-    _count?: {
-        userProfiles: number;
-    };
 }
 
 export interface ProfessionalProfileStats {
     totalPerfiles: number;
     perfilesActivos: number;
-    perfilesPorDefecto: number;
-    perfilesPersonalizados: number;
-    asignacionesPorPerfil: Array<{
-        id: string;
-        name: string;
-        count: number;
-    }>;
+    totalInactivos: number;
+    asignacionesPorPerfil: Record<string, number>;
 }
 
-export interface ProfessionalProfileForm {
+export interface ProfessionalProfileCreateForm {
     name: string;
     slug: string;
     description?: string;
     color?: string;
     icon?: string;
-    isActive: boolean;
-    order: number;
+    isActive?: boolean;
+    order?: number;
 }
 
-export interface ProfessionalProfileFilters {
+export interface ProfessionalProfileUpdateForm {
+    id: string;
+    name?: string;
+    slug?: string;
+    description?: string;
+    color?: string;
+    icon?: string;
     isActive?: boolean;
-    isDefault?: boolean;
-    search?: string;
+    order?: number;
 }

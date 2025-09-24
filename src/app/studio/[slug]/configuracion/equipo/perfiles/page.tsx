@@ -1,136 +1,233 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Settings, Tag } from 'lucide-react';
-import type { ProfessionalProfile, ProfessionalProfileStats } from './types';
+'use client';
 
-interface ProfessionalProfilesPageProps {
-    params: {
-        slug: string;
-    };
-}
+import React, { useState, useEffect } from 'react';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { toast } from 'sonner';
+import { useParams } from 'next/navigation';
+import { ProfessionalProfileModal } from './components/ProfessionalProfileModal';
+import { ProfessionalProfileList } from './components/ProfessionalProfileList';
+import { ProfessionalProfileStats } from './components/ProfessionalProfileStats';
+import {
+    obtenerPerfilesProfesionalesStudio,
+    crearPerfilProfesional,
+    actualizarPerfilProfesional,
+    eliminarPerfilProfesional,
+    obtenerEstadisticasPerfilesProfesionales,
+    togglePerfilProfesionalEstado,
+    inicializarPerfilesSistema,
+} from '@/lib/actions/studio/config/professional-profiles.actions';
+import {
+    type ProfessionalProfileCreateForm,
+    type ProfessionalProfileUpdateForm,
+} from '@/lib/actions/studio/config/professional-profiles.actions';
+import type { ProfessionalProfile, ProfessionalProfileStats as ProfessionalProfileStatsType } from './types';
 
-export default async function ProfessionalProfilesPage({ params }: ProfessionalProfilesPageProps) {
-    // TODO: Implementar Server Actions cuando el schema esté listo
-    const { slug } = await params;
-    console.log('Studio slug:', slug);
-    const perfiles: ProfessionalProfile[] = [];
-    const estadisticas: ProfessionalProfileStats = {
+export default function ProfessionalProfilesPage() {
+    const params = useParams();
+    const slug = params.slug as string;
+
+    const [perfiles, setPerfiles] = useState<ProfessionalProfile[]>([]);
+    const [stats, setStats] = useState<ProfessionalProfileStatsType>({
         totalPerfiles: 0,
         perfilesActivos: 0,
-        perfilesPorDefecto: 0,
-        perfilesPersonalizados: 0,
-        asignacionesPorPerfil: [],
+        totalInactivos: 0,
+        asignacionesPorPerfil: {},
+    });
+    const [loading, setLoading] = useState(true);
+    const [modalLoading, setModalLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingPerfil, setEditingPerfil] = useState<ProfessionalProfile | null>(null);
+
+    // Cargar perfiles y estadísticas
+    const loadData = React.useCallback(async () => {
+        try {
+            setLoading(true);
+            const [perfilesData, statsData] = await Promise.all([
+                obtenerPerfilesProfesionalesStudio(slug),
+                obtenerEstadisticasPerfilesProfesionales(slug),
+            ]);
+
+            setPerfiles(perfilesData);
+            setStats(statsData);
+        } catch (error) {
+            console.error('Error loading perfiles:', error);
+            toast.error('Error al cargar la información de perfiles');
+        } finally {
+            setLoading(false);
+        }
+    }, [slug]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
+
+    // Funciones del modal
+    const handleOpenModal = (perfil?: ProfessionalProfile) => {
+        setEditingPerfil(perfil || null);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingPerfil(null);
+    };
+
+    const handleSavePerfil = async (data: ProfessionalProfileCreateForm | ProfessionalProfileUpdateForm) => {
+        setModalLoading(true);
+
+        try {
+            if (editingPerfil) {
+                // Actualizar perfil existente
+                const perfilActualizado = await actualizarPerfilProfesional(
+                    slug,
+                    editingPerfil.id,
+                    data as ProfessionalProfileUpdateForm
+                );
+
+                setPerfiles(prev =>
+                    prev.map(perfil =>
+                        perfil.id === editingPerfil.id ? perfilActualizado : perfil
+                    )
+                );
+                toast.success('Perfil actualizado exitosamente');
+            } else {
+                // Crear nuevo perfil
+                const nuevoPerfil = await crearPerfilProfesional(slug, data as ProfessionalProfileCreateForm);
+
+                setPerfiles(prev => [nuevoPerfil, ...prev]);
+                toast.success('Perfil creado exitosamente');
+            }
+
+            // Recargar estadísticas
+            const newStats = await obtenerEstadisticasPerfilesProfesionales(slug);
+            setStats(newStats);
+
+            handleCloseModal();
+        } catch (error) {
+            console.error('Error saving perfil:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+            toast.error(errorMessage);
+            throw error; // Re-throw para que el modal maneje el error
+        } finally {
+            setModalLoading(false);
+        }
+    };
+
+    const handleDeletePerfil = async (perfilId: string) => {
+        try {
+            const result = await eliminarPerfilProfesional(slug, perfilId);
+
+            if (result.deleted) {
+                setPerfiles(prev => prev.filter(perfil => perfil.id !== perfilId));
+                toast.success(result.message);
+            } else if (result.deactivated) {
+                setPerfiles(prev =>
+                    prev.map(perfil =>
+                        perfil.id === perfilId ? { ...perfil, isActive: false } : perfil
+                    )
+                );
+                toast.success(result.message);
+            }
+
+            // Recargar estadísticas
+            const newStats = await obtenerEstadisticasPerfilesProfesionales(slug);
+            setStats(newStats);
+
+        } catch (error) {
+            console.error('Error al eliminar perfil:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Error al eliminar el perfil';
+            toast.error(errorMessage);
+        }
+    };
+
+    const handleToggleActive = async (perfilId: string, isActive: boolean) => {
+        try {
+            const perfilActualizado = await togglePerfilProfesionalEstado(slug, perfilId);
+
+            setPerfiles(prev =>
+                prev.map(perfil =>
+                    perfil.id === perfilId ? perfilActualizado : perfil
+                )
+            );
+
+            // Recargar estadísticas
+            const newStats = await obtenerEstadisticasPerfilesProfesionales(slug);
+            setStats(newStats);
+
+            toast.success(`Perfil ${isActive ? 'desactivado' : 'activado'} exitosamente`);
+        } catch (error) {
+            console.error('Error al cambiar estado del perfil:', error);
+            toast.error('Error al cambiar el estado del perfil');
+        }
+    };
+
+    const handleRefresh = () => {
+        loadData();
+        toast.success('Información actualizada');
+    };
+
+    const handleInicializarSistema = async () => {
+        try {
+            const result = await inicializarPerfilesSistema(slug);
+            toast.success(`${result.count} perfiles del sistema inicializados`);
+            loadData(); // Recargar datos
+        } catch (error) {
+            console.error('Error al inicializar perfiles del sistema:', error);
+            const errorMessage = error instanceof Error ? error.message : 'Error al inicializar perfiles';
+            toast.error(errorMessage);
+        }
     };
 
     return (
         <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Perfiles Profesionales</h1>
-                    <p className="text-zinc-400">
-                        Gestiona los perfiles profesionales de tu equipo como etiquetas personalizables
-                    </p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" className="border-zinc-600 text-zinc-300 hover:bg-zinc-800">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configurar
-                    </Button>
-                    <Button className="bg-blue-600 hover:bg-blue-700">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Nuevo Perfil
-                    </Button>
-                </div>
-            </div>
+            <HeaderNavigation
+                title="Perfiles Profesionales"
+                description="Gestiona los perfiles profesionales de tu equipo como etiquetas personalizables"
+                actionButton={{
+                    label: "Nuevo Perfil",
+                    icon: "Plus",
+                    onClick: () => handleOpenModal()
+                }}
+                secondaryButtons={[
+                    {
+                        label: "Inicializar Sistema",
+                        icon: "Settings",
+                        onClick: handleInicializarSistema,
+                        variant: "outline",
+                        className: "border-yellow-600 text-yellow-300 hover:bg-yellow-800"
+                    },
+                    {
+                        label: "Actualizar",
+                        icon: "RefreshCw",
+                        onClick: handleRefresh,
+                        variant: "outline",
+                        className: "border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+                    }
+                ]}
+            />
 
             {/* Estadísticas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-zinc-900 border-zinc-800">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-400">Total Perfiles</CardTitle>
-                        <Tag className="h-4 w-4 text-blue-400" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">{estadisticas.totalPerfiles}</div>
-                        <p className="text-xs text-zinc-500">
-                            {estadisticas.perfilesActivos} activos
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-zinc-900 border-zinc-800">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-400">Sistema</CardTitle>
-                        <Tag className="h-4 w-4 text-yellow-400" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">{estadisticas.perfilesPorDefecto}</div>
-                        <p className="text-xs text-zinc-500">
-                            Perfiles del sistema
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-zinc-900 border-zinc-800">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-400">Personalizados</CardTitle>
-                        <Tag className="h-4 w-4 text-purple-400" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">{estadisticas.perfilesPersonalizados}</div>
-                        <p className="text-xs text-zinc-500">
-                            Creados por ti
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-zinc-900 border-zinc-800">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-400">Asignaciones</CardTitle>
-                        <Tag className="h-4 w-4 text-green-400" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-white">
-                            {estadisticas.asignacionesPorPerfil.length}
-                        </div>
-                        <p className="text-xs text-zinc-500">
-                            En uso activo
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
+            <ProfessionalProfileStats stats={stats} loading={loading} />
 
             {/* Lista de perfiles */}
-            <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                        <Tag className="h-5 w-5" />
-                        Perfiles Profesionales
-                        <Badge variant="secondary" className="bg-zinc-700 text-zinc-200">
-                            {perfiles.length} perfiles
-                        </Badge>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-center py-8">
-                        <Tag className="h-16 w-16 mx-auto mb-4 text-zinc-600" />
-                        <h3 className="text-lg font-medium text-white mb-2">
-                            Perfiles Profesionales
-                        </h3>
-                        <p className="text-zinc-400 mb-6 max-w-md mx-auto">
-                            Gestiona los perfiles profesionales de tu equipo como etiquetas personalizables.
-                            Crea perfiles como &quot;Fotógrafo&quot;, &quot;Editor&quot;, &quot;Coordinador&quot;, etc.
-                        </p>
-                        <Button className="bg-blue-600 hover:bg-blue-700">
-                            <Plus className="h-4 w-4 mr-2" />
-                            Crear Primer Perfil
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+            <ProfessionalProfileList
+                perfiles={perfiles}
+                onEdit={handleOpenModal}
+                onDelete={handleDeletePerfil}
+                onToggleActive={handleToggleActive}
+                loading={loading}
+                stats={stats.asignacionesPorPerfil}
+            />
+
+            {/* Modal para crear/editar perfil */}
+            <ProfessionalProfileModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                onSave={handleSavePerfil}
+                perfil={editingPerfil}
+                loading={modalLoading}
+            />
         </div>
     );
 }

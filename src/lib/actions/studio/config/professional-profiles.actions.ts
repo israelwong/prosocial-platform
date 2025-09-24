@@ -3,17 +3,40 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { retryDatabaseOperation } from "@/lib/actions/utils/database-retry";
-import {
-    ProfessionalProfileCreateSchema,
-    ProfessionalProfileUpdateSchema,
-    ProfessionalProfileFiltersSchema,
-    UserProfileAssignmentSchema,
-    DEFAULT_PROFESSIONAL_PROFILES,
-    type ProfessionalProfileCreateForm,
-    type ProfessionalProfileUpdateForm,
-    type ProfessionalProfileFiltersForm,
-    type UserProfileAssignmentForm,
-} from "@/lib/actions/schemas/professional-profiles-schemas";
+import { z } from "zod";
+
+// Schema para crear perfil profesional
+const ProfessionalProfileCreateSchema = z.object({
+    name: z.string().min(1, "El nombre es requerido").max(50, "El nombre es muy largo"),
+    slug: z.string().min(1, "El slug es requerido").max(50, "El slug es muy largo"),
+    description: z.string().optional(),
+    color: z.string().regex(/^#[0-9A-F]{6}$/i, "Color debe ser un hex válido").optional(),
+    icon: z.string().optional(),
+    isActive: z.boolean().default(true),
+    order: z.number().default(0),
+});
+
+// Schema para actualizar perfil profesional
+const ProfessionalProfileUpdateSchema = z.object({
+    id: z.string().min(1, "ID requerido"),
+    name: z.string().min(1, "El nombre es requerido").max(50, "El nombre es muy largo").optional(),
+    slug: z.string().min(1, "El slug es requerido").max(50, "El slug es muy largo").optional(),
+    description: z.string().optional(),
+    color: z.string().regex(/^#[0-9A-F]{6}$/i, "Color debe ser un hex válido").optional(),
+    icon: z.string().optional(),
+    isActive: z.boolean().optional(),
+    order: z.number().optional(),
+});
+
+// Schema para eliminar perfil profesional
+const ProfessionalProfileDeleteSchema = z.object({
+    id: z.string().min(1, "ID requerido"),
+});
+
+// Tipos TypeScript
+export type ProfessionalProfileCreateForm = z.infer<typeof ProfessionalProfileCreateSchema>;
+export type ProfessionalProfileUpdateForm = z.infer<typeof ProfessionalProfileUpdateSchema>;
+export type ProfessionalProfileDeleteForm = z.infer<typeof ProfessionalProfileDeleteSchema>;
 
 // Función auxiliar para obtener el studio por slug
 async function getStudioBySlug(studioSlug: string) {
@@ -30,48 +53,54 @@ async function getStudioBySlug(studioSlug: string) {
 }
 
 // Obtener todos los perfiles profesionales de un studio
-export async function obtenerPerfilesProfesionalesStudio(
-    studioSlug: string,
-    filters?: ProfessionalProfileFiltersForm
-) {
+export async function obtenerPerfilesProfesionalesStudio(studioSlug: string) {
     return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
         const studio = await getStudioBySlug(studioSlug);
 
-        // 2. Validar filtros si se proporcionan
-        const validatedFilters = filters ? ProfessionalProfileFiltersSchema.parse(filters) : {};
-
-        // 3. Construir where clause
-        const whereClause: any = {
-            projectId: studio.id,
-        };
-
-        if (validatedFilters.isActive !== undefined) {
-            whereClause.isActive = validatedFilters.isActive;
-        }
-
-        if (validatedFilters.isDefault !== undefined) {
-            whereClause.isDefault = validatedFilters.isDefault;
-        }
-
-        if (validatedFilters.search) {
-            whereClause.OR = [
-                { name: { contains: validatedFilters.search, mode: "insensitive" } },
-                { description: { contains: validatedFilters.search, mode: "insensitive" } },
-            ];
-        }
-
-        // 4. Obtener perfiles
         const perfiles = await prisma.project_professional_profiles.findMany({
-            where: whereClause,
+            where: { projectId: studio.id },
             orderBy: [
-                { isDefault: "desc" },
-                { order: "asc" },
-                { name: "asc" },
+                { isDefault: 'desc' }, // Perfiles del sistema primero
+                { order: 'asc' },
+                { name: 'asc' }
             ],
         });
 
         return perfiles;
+    });
+}
+
+// Obtener estadísticas de perfiles profesionales
+export async function obtenerEstadisticasPerfilesProfesionales(studioSlug: string) {
+    return await retryDatabaseOperation(async () => {
+        const studio = await getStudioBySlug(studioSlug);
+
+        const [totalPerfiles, perfilesActivos, asignacionesPorPerfil] = await Promise.all([
+            prisma.project_professional_profiles.count({
+                where: { projectId: studio.id },
+            }),
+            prisma.project_professional_profiles.count({
+                where: { projectId: studio.id, isActive: true },
+            }),
+            prisma.project_user_professional_profiles.groupBy({
+                by: ["profileId"],
+                where: {
+                    user: { projectId: studio.id },
+                    isActive: true,
+                },
+                _count: { profileId: true },
+            }),
+        ]);
+
+        return {
+            totalPerfiles,
+            perfilesActivos,
+            totalInactivos: totalPerfiles - perfilesActivos,
+            asignacionesPorPerfil: asignacionesPorPerfil.reduce((acc, item) => {
+                acc[item.profileId] = item._count.profileId;
+                return acc;
+            }, {} as Record<string, number>),
+        };
     });
 }
 
@@ -81,13 +110,10 @@ export async function crearPerfilProfesional(
     data: ProfessionalProfileCreateForm
 ) {
     return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
         const studio = await getStudioBySlug(studioSlug);
-
-        // 2. Validar datos
         const validatedData = ProfessionalProfileCreateSchema.parse(data);
 
-        // 3. Verificar que no existe otro perfil con el mismo slug en este proyecto
+        // Verificar que el slug no exista
         const existingProfile = await prisma.project_professional_profiles.findFirst({
             where: {
                 projectId: studio.id,
@@ -96,23 +122,21 @@ export async function crearPerfilProfesional(
         });
 
         if (existingProfile) {
-            throw new Error(`Ya existe un perfil profesional con el slug "${validatedData.slug}" en tu proyecto`);
+            throw new Error("Ya existe un perfil con ese slug");
         }
 
-        // 4. Crear perfil
-        const nuevoPerfil = await prisma.project_professional_profiles.create({
+        const perfil = await prisma.project_professional_profiles.create({
             data: {
                 ...validatedData,
                 projectId: studio.id,
+                isDefault: false, // Los perfiles creados por el usuario no son del sistema
             },
         });
 
-        // 5. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/empleados`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/proveedores`);
+        // Revalidar cache
+        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/perfiles`);
 
-        return nuevoPerfil;
+        return perfil;
     });
 }
 
@@ -123,27 +147,24 @@ export async function actualizarPerfilProfesional(
     data: ProfessionalProfileUpdateForm
 ) {
     return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
         const studio = await getStudioBySlug(studioSlug);
+        const validatedData = ProfessionalProfileUpdateSchema.parse({ ...data, id: perfilId });
 
-        // 2. Validar datos
-        const validatedData = ProfessionalProfileUpdateSchema.parse(data);
-
-        // 3. Verificar que el perfil existe y pertenece al studio
-        const existingPerfil = await prisma.project_professional_profiles.findFirst({
+        // Verificar que el perfil existe y pertenece al studio
+        const existingProfile = await prisma.project_professional_profiles.findFirst({
             where: {
                 id: perfilId,
                 projectId: studio.id,
             },
         });
 
-        if (!existingPerfil) {
-            throw new Error("El perfil profesional que intentas actualizar no existe o no tienes permisos para modificarlo");
+        if (!existingProfile) {
+            throw new Error("El perfil que intentas actualizar no existe o no tienes permisos para modificarlo");
         }
 
-        // 4. Si se proporciona slug, verificar que no esté en uso por otro perfil
-        if (validatedData.slug && validatedData.slug !== existingPerfil.slug) {
-            const existingSlug = await prisma.project_professional_profiles.findFirst({
+        // Si se está cambiando el slug, verificar que no exista otro
+        if (validatedData.slug && validatedData.slug !== existingProfile.slug) {
+            const duplicateSlug = await prisma.project_professional_profiles.findFirst({
                 where: {
                     projectId: studio.id,
                     slug: validatedData.slug,
@@ -151,13 +172,12 @@ export async function actualizarPerfilProfesional(
                 },
             });
 
-            if (existingSlug) {
-                throw new Error(`Ya existe otro perfil profesional con el slug "${validatedData.slug}" en tu proyecto`);
+            if (duplicateSlug) {
+                throw new Error("Ya existe un perfil con ese slug");
             }
         }
 
-        // 5. Actualizar perfil
-        const perfilActualizado = await prisma.project_professional_profiles.update({
+        const perfil = await prisma.project_professional_profiles.update({
             where: { id: perfilId },
             data: {
                 ...validatedData,
@@ -165,243 +185,145 @@ export async function actualizarPerfilProfesional(
             },
         });
 
-        // 6. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/empleados`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/proveedores`);
+        // Revalidar cache
+        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/perfiles`);
+
+        return perfil;
+    });
+}
+
+// Eliminar perfil profesional
+export async function eliminarPerfilProfesional(studioSlug: string, perfilId: string) {
+    return await retryDatabaseOperation(async () => {
+        const studio = await getStudioBySlug(studioSlug);
+
+        // Verificar que el perfil existe y pertenece al studio
+        const existingProfile = await prisma.project_professional_profiles.findFirst({
+            where: {
+                id: perfilId,
+                projectId: studio.id,
+            },
+        });
+
+        if (!existingProfile) {
+            throw new Error("El perfil que intentas eliminar no existe o no tienes permisos para eliminarlo");
+        }
+
+        // Verificar si tiene asignaciones activas
+        const asignacionesActivas = await prisma.project_user_professional_profiles.count({
+            where: {
+                profileId: perfilId,
+                isActive: true,
+            },
+        });
+
+        if (asignacionesActivas > 0) {
+            // En lugar de eliminar, desactivar
+            const perfilDesactivado = await prisma.project_professional_profiles.update({
+                where: { id: perfilId },
+                data: {
+                    isActive: false,
+                    updatedAt: new Date(),
+                },
+            });
+
+            return {
+                deleted: false,
+                deactivated: true,
+                perfil: perfilDesactivado,
+                message: `El perfil ha sido desactivado porque tiene ${asignacionesActivas} asignaciones activas`,
+            };
+        }
+
+        // Si no tiene asignaciones, eliminar completamente
+        await prisma.project_professional_profiles.delete({
+            where: { id: perfilId },
+        });
+
+        // Revalidar cache
+        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/perfiles`);
+
+        return {
+            deleted: true,
+            deactivated: false,
+            perfil: existingProfile,
+            message: "Perfil eliminado exitosamente",
+        };
+    });
+}
+
+// Toggle estado activo/inactivo
+export async function togglePerfilProfesionalEstado(studioSlug: string, perfilId: string) {
+    return await retryDatabaseOperation(async () => {
+        const studio = await getStudioBySlug(studioSlug);
+
+        const perfil = await prisma.project_professional_profiles.findFirst({
+            where: {
+                id: perfilId,
+                projectId: studio.id,
+            },
+        });
+
+        if (!perfil) {
+            throw new Error("Perfil no encontrado");
+        }
+
+        const perfilActualizado = await prisma.project_professional_profiles.update({
+            where: { id: perfilId },
+            data: {
+                isActive: !perfil.isActive,
+                updatedAt: new Date(),
+            },
+        });
+
+        // Revalidar cache
+        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/perfiles`);
 
         return perfilActualizado;
     });
 }
 
-// Eliminar perfil profesional
-export async function eliminarPerfilProfesional(
-    studioSlug: string,
-    perfilId: string
-) {
+// Inicializar perfiles del sistema
+export async function inicializarPerfilesSistema(studioSlug: string) {
     return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
         const studio = await getStudioBySlug(studioSlug);
 
-        // 2. Verificar que el perfil existe y pertenece al studio
-        const existingPerfil = await prisma.project_professional_profiles.findFirst({
+        // Verificar si ya existen perfiles del sistema
+        const perfilesExistentes = await prisma.project_professional_profiles.count({
             where: {
-                id: perfilId,
                 projectId: studio.id,
-            },
-            include: {
-                userProfiles: {
-                    where: { isActive: true },
-                },
+                isDefault: true,
             },
         });
 
-        if (!existingPerfil) {
-            throw new Error("El perfil profesional que intentas eliminar no existe o no tienes permisos para eliminarlo");
+        if (perfilesExistentes > 0) {
+            throw new Error("Los perfiles del sistema ya han sido inicializados");
         }
 
-        // 3. Verificar si es un perfil por defecto
-        if (existingPerfil.isDefault) {
-            throw new Error("No se pueden eliminar los perfiles profesionales del sistema");
-        }
+        const perfilesIniciales = [
+            { name: "Fotógrafo", slug: "fotografo", color: "#3B82F6", icon: "Camera", order: 1 },
+            { name: "Editor", slug: "editor", color: "#8B5CF6", icon: "Edit", order: 2 },
+            { name: "Asistente", slug: "asistente", color: "#10B981", icon: "User", order: 3 },
+            { name: "Coordinador", slug: "coordinador", color: "#F59E0B", icon: "Users", order: 4 },
+            { name: "Productor", slug: "productor", color: "#EF4444", icon: "Video", order: 5 },
+        ];
 
-        // 4. Verificar si tiene usuarios asignados
-        if (existingPerfil.userProfiles.length > 0) {
-            throw new Error(`No se puede eliminar el perfil porque tiene ${existingPerfil.userProfiles.length} usuario(s) asignado(s). Primero desasigna los usuarios de este perfil.`);
-        }
-
-        // 5. Eliminar perfil
-        await prisma.project_professional_profiles.delete({
-            where: { id: perfilId },
-        });
-
-        // 6. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/empleados`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/proveedores`);
-
-        return { deleted: true };
-    });
-}
-
-// Inicializar perfiles por defecto para un studio
-export async function inicializarPerfilesPorDefecto(studioSlug: string) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
-
-        // 2. Verificar si ya tiene perfiles
-        const existingProfiles = await prisma.project_professional_profiles.count({
-            where: { projectId: studio.id },
-        });
-
-        if (existingProfiles > 0) {
-            throw new Error("Este proyecto ya tiene perfiles profesionales configurados");
-        }
-
-        // 3. Crear perfiles por defecto
         const perfilesCreados = await prisma.project_professional_profiles.createMany({
-            data: DEFAULT_PROFESSIONAL_PROFILES.map(perfil => ({
+            data: perfilesIniciales.map(perfil => ({
                 ...perfil,
                 projectId: studio.id,
-            })),
-        });
-
-        // 4. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-
-        return {
-            created: perfilesCreados.count,
-            profiles: DEFAULT_PROFESSIONAL_PROFILES.length
-        };
-    });
-}
-
-// Asignar perfiles a un usuario
-export async function asignarPerfilesAUsuario(
-    studioSlug: string,
-    data: UserProfileAssignmentForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
-
-        // 2. Validar datos
-        const validatedData = UserProfileAssignmentSchema.parse(data);
-
-        // 3. Verificar que el usuario existe y pertenece al studio
-        const existingUser = await prisma.project_users.findFirst({
-            where: {
-                id: validatedData.userId,
-                projectId: studio.id,
-            },
-        });
-
-        if (!existingUser) {
-            throw new Error("El usuario no existe o no tienes permisos para modificarlo");
-        }
-
-        // 4. Verificar que todos los perfiles existen y pertenecen al studio
-        const perfiles = await prisma.project_professional_profiles.findMany({
-            where: {
-                id: { in: validatedData.profileIds },
-                projectId: studio.id,
+                isDefault: true,
                 isActive: true,
-            },
+                description: `Perfil profesional de ${perfil.name.toLowerCase()}`,
+            })),
         });
 
-        if (perfiles.length !== validatedData.profileIds.length) {
-            throw new Error("Uno o más perfiles no existen o no están disponibles");
-        }
-
-        // 5. Actualizar asignaciones en transacción
-        const resultado = await prisma.$transaction(async (tx) => {
-            // Desactivar perfiles existentes del usuario
-            await tx.project_user_professional_profiles.updateMany({
-                where: { userId: validatedData.userId },
-                data: { isActive: false },
-            });
-
-            // Crear o reactivar perfiles asignados
-            const asignaciones = await Promise.all(
-                validatedData.profileIds.map(async (profileId) => {
-                    const existingAssignment = await tx.project_user_professional_profiles.findFirst({
-                        where: {
-                            userId: validatedData.userId,
-                            profileId: profileId,
-                        },
-                    });
-
-                    if (existingAssignment) {
-                        // Reactivar asignación existente
-                        return await tx.project_user_professional_profiles.update({
-                            where: { id: existingAssignment.id },
-                            data: {
-                                isActive: true,
-                                description: validatedData.descriptions?.[profileId] || existingAssignment.description,
-                                updatedAt: new Date(),
-                            },
-                        });
-                    } else {
-                        // Crear nueva asignación
-                        return await tx.project_user_professional_profiles.create({
-                            data: {
-                                userId: validatedData.userId,
-                                profileId: profileId,
-                                description: validatedData.descriptions?.[profileId] || null,
-                                isActive: true,
-                            },
-                        });
-                    }
-                })
-            );
-
-            return asignaciones;
-        });
-
-        // 6. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/empleados`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/proveedores`);
-
-        return resultado;
-    });
-}
-
-// Obtener estadísticas de perfiles profesionales
-export async function obtenerEstadisticasPerfilesProfesionales(studioSlug: string) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
-
-        // 2. Obtener estadísticas
-        const [
-            totalPerfiles,
-            perfilesActivos,
-            perfilesPorDefecto,
-            perfilesPersonalizados,
-            asignacionesPorPerfil,
-        ] = await Promise.all([
-            prisma.project_professional_profiles.count({
-                where: { projectId: studio.id },
-            }),
-            prisma.project_professional_profiles.count({
-                where: { projectId: studio.id, isActive: true },
-            }),
-            prisma.project_professional_profiles.count({
-                where: { projectId: studio.id, isDefault: true },
-            }),
-            prisma.project_professional_profiles.count({
-                where: { projectId: studio.id, isDefault: false },
-            }),
-            prisma.project_professional_profiles.groupBy({
-                by: ["id", "name"],
-                where: {
-                    projectId: studio.id,
-                    isActive: true,
-                    userProfiles: {
-                        some: { isActive: true },
-                    },
-                },
-                _count: {
-                    userProfiles: {
-                        where: { isActive: true },
-                    },
-                },
-                orderBy: { name: "asc" },
-            }),
-        ]);
+        // Revalidar cache
+        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/perfiles`);
 
         return {
-            totalPerfiles,
-            perfilesActivos,
-            perfilesPorDefecto,
-            perfilesPersonalizados,
-            asignacionesPorPerfil: asignacionesPorPerfil.map(item => ({
-                id: item.id,
-                name: item.name,
-                count: item._count.userProfiles,
-            })),
+            count: perfilesCreados.count,
+            perfiles: perfilesIniciales,
         };
     });
 }
