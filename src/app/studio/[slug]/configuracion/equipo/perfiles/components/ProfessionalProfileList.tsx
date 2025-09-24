@@ -125,7 +125,10 @@ export function ProfessionalProfileList({
                             Crea perfiles profesionales como "Fotógrafo", "Editor", "Coordinador", etc.
                             para organizar mejor tu equipo.
                         </p>
-                        <Button className="bg-blue-600 hover:bg-blue-700">
+                        <Button 
+                            className="bg-blue-600 hover:bg-blue-700"
+                            onClick={() => onEdit()}
+                        >
                             <Plus className="h-4 w-4 mr-2" />
                             Crear Primer Perfil
                         </Button>
