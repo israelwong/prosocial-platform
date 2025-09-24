@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Building2, UserCheck, UserX, Briefcase } from 'lucide-react';
-import { PERSONNEL_PROFILE_LABELS } from '@/lib/actions/schemas/personal-schemas';
+// import { PERSONNEL_PROFILE_LABELS } from '@/lib/actions/schemas/personal-schemas';
 import type { PersonalStats } from '../types';
 
 interface PersonalStatsProps {
@@ -113,7 +113,7 @@ export function PersonalStats({ stats, loading = false }: PersonalStatsProps) {
                                     >
                                         <div className="flex-1 min-w-0">
                                             <p className="text-sm font-medium text-white truncate">
-                                                {PERSONNEL_PROFILE_LABELS[profile as keyof typeof PERSONNEL_PROFILE_LABELS] || profile}
+                                                {profile}
                                             </p>
                                             <p className="text-xs text-zinc-400">
                                                 {count === 1 ? '1 persona' : `${count} personas`}
