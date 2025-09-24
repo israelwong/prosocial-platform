@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { Edit, Trash2, Star, Building2, CreditCard, User } from 'lucide-react';
 import { ConfirmModal } from '@/app/studio/[slug]/components/ConfirmModal';
 import { CuentaBancaria } from '../types';
@@ -43,7 +44,7 @@ export function CuentaBancariaItem({ cuenta, onEdit, onDelete, onToggleActive }:
     };
 
     const formatNumeroCuenta = (numero: string) => {
-        // Mostrar solo los últimos 4 dígitos por seguridad
+        // Mostrar solo los últimos 4 dígitos por seguridad para CLABE
         return `****${numero.slice(-4)}`;
     };
 
@@ -84,8 +85,6 @@ export function CuentaBancariaItem({ cuenta, onEdit, onDelete, onToggleActive }:
                             <div className="flex items-center space-x-2 text-zinc-400 text-xs">
                                 <CreditCard className="h-3 w-3" />
                                 <span>{formatNumeroCuenta(cuenta.numeroCuenta)}</span>
-                                <span>•</span>
-                                <span className="capitalize">{cuenta.tipoCuenta}</span>
                             </div>
                             
                             <div className="flex items-center space-x-2 text-zinc-400 text-xs">
@@ -95,44 +94,44 @@ export function CuentaBancariaItem({ cuenta, onEdit, onDelete, onToggleActive }:
                         </div>
                     </div>
 
-                    {/* Botones de acción */}
-                    <div className="flex items-center space-x-1">
-                        {/* Botón de toggle activo/inactivo */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleToggleActive}
-                            className={`h-8 px-3 text-xs ${
-                                cuenta.activo 
-                                    ? 'border-red-600 text-red-400 hover:bg-red-900/20' 
-                                    : 'border-green-600 text-green-400 hover:bg-green-900/20'
-                            }`}
-                            title={cuenta.activo ? 'Desactivar cuenta' : 'Activar cuenta'}
-                        >
-                            {cuenta.activo ? 'Desactivar' : 'Activar'}
-                        </Button>
+                    {/* Controles de acción */}
+                    <div className="flex items-center space-x-3">
+                        {/* Switch para activar/desactivar */}
+                        <div className="flex items-center space-x-2">
+                            <Switch
+                                checked={cuenta.activo}
+                                onCheckedChange={handleToggleActive}
+                                className="data-[state=checked]:bg-green-600"
+                            />
+                            <span className="text-xs text-zinc-400">
+                                {cuenta.activo ? 'Activa' : 'Inactiva'}
+                            </span>
+                        </div>
 
-                        {/* Botón de editar */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEdit(cuenta)}
-                            className="h-8 w-8 p-0 border-blue-600 text-blue-400 hover:bg-blue-900/20"
-                            title="Editar cuenta bancaria"
-                        >
-                            <Edit className="h-3 w-3" />
-                        </Button>
+                        {/* Botones de acción */}
+                        <div className="flex items-center space-x-1">
+                            {/* Botón de editar */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onEdit(cuenta)}
+                                className="h-8 w-8 p-0 border-blue-600 text-blue-400 hover:bg-blue-900/20"
+                                title="Editar cuenta bancaria"
+                            >
+                                <Edit className="h-3 w-3" />
+                            </Button>
 
-                        {/* Botón de eliminar */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleDeleteClick}
-                            className="h-8 w-8 p-0 border-red-600 text-red-400 hover:bg-red-900/20"
-                            title="Eliminar cuenta bancaria"
-                        >
-                            <Trash2 className="h-3 w-3" />
-                        </Button>
+                            {/* Botón de eliminar */}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleDeleteClick}
+                                className="h-8 w-8 p-0 border-red-600 text-red-400 hover:bg-red-900/20"
+                                title="Eliminar cuenta bancaria"
+                            >
+                                <Trash2 className="h-3 w-3" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             </div>

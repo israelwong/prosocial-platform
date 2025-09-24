@@ -20,9 +20,16 @@ import { CuentaBancaria } from '../types';
 interface CuentaBancariaModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: Partial<CuentaBancaria>) => Promise<void>;
+    onSave: (data: CuentaBancariaFormData) => Promise<void>;
     editingCuenta?: CuentaBancaria | null;
     loading?: boolean;
+}
+
+interface CuentaBancariaFormData {
+    banco: string;
+    numeroCuenta: string;
+    titular: string;
+    activo: boolean;
 }
 
 export function CuentaBancariaModal({
@@ -35,10 +42,8 @@ export function CuentaBancariaModal({
     const [formData, setFormData] = useState({
         banco: '',
         numeroCuenta: '',
-        tipoCuenta: 'corriente' as 'corriente' | 'ahorro',
         titular: '',
-        activo: true,
-        esPrincipal: false
+        activo: true
     });
     const [saving, setSaving] = useState(false);
 
@@ -47,19 +52,15 @@ export function CuentaBancariaModal({
             setFormData({
                 banco: editingCuenta.banco || '',
                 numeroCuenta: editingCuenta.numeroCuenta || '',
-                tipoCuenta: editingCuenta.tipoCuenta || 'corriente',
                 titular: editingCuenta.titular || '',
-                activo: editingCuenta.activo ?? true,
-                esPrincipal: editingCuenta.esPrincipal ?? false
+                activo: editingCuenta.activo ?? true
             });
         } else {
             setFormData({
                 banco: '',
                 numeroCuenta: '',
-                tipoCuenta: 'corriente',
                 titular: '',
-                activo: true,
-                esPrincipal: false
+                activo: true
             });
         }
     }, [editingCuenta, isOpen]);
@@ -117,39 +118,27 @@ export function CuentaBancariaModal({
 
                     <div className="space-y-2">
                         <Label htmlFor="numeroCuenta" className="text-zinc-300">
-                            Número de Cuenta *
+                            CLABE (18 dígitos) *
                         </Label>
                         <Input
                             id="numeroCuenta"
                             value={formData.numeroCuenta}
-                            onChange={(e) => setFormData(prev => ({ ...prev, numeroCuenta: e.target.value }))}
-                            placeholder="Número de cuenta completo"
+                            onChange={(e) => {
+                                // Solo permitir números y máximo 18 dígitos
+                                const value = e.target.value.replace(/\D/g, '').slice(0, 18);
+                                setFormData(prev => ({ ...prev, numeroCuenta: value }));
+                            }}
+                            placeholder="123456789012345678"
                             className="bg-zinc-800 border-zinc-600 text-white"
+                            maxLength={18}
                             required
                             disabled={saving}
                         />
+                        <p className="text-xs text-zinc-500">
+                            Ingresa la CLABE de 18 dígitos (solo números)
+                        </p>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="tipoCuenta" className="text-zinc-300">
-                            Tipo de Cuenta *
-                        </Label>
-                        <Select
-                            value={formData.tipoCuenta}
-                            onValueChange={(value: 'corriente' | 'ahorro') => 
-                                setFormData(prev => ({ ...prev, tipoCuenta: value }))
-                            }
-                            disabled={saving}
-                        >
-                            <SelectTrigger className="bg-zinc-800 border-zinc-600 text-white">
-                                <SelectValue placeholder="Selecciona el tipo de cuenta" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="corriente">Cuenta Corriente</SelectItem>
-                                <SelectItem value="ahorro">Cuenta de Ahorro</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="titular" className="text-zinc-300">
@@ -178,17 +167,6 @@ export function CuentaBancariaModal({
                         </Label>
                     </div>
 
-                    <div className="flex items-center space-x-2">
-                        <Switch
-                            id="esPrincipal"
-                            checked={formData.esPrincipal}
-                            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, esPrincipal: checked }))}
-                            disabled={saving}
-                        />
-                        <Label htmlFor="esPrincipal" className="text-zinc-300">
-                            Cuenta Principal
-                        </Label>
-                    </div>
 
                     <DialogFooter className="flex-col sm:flex-row gap-2">
                         <Button

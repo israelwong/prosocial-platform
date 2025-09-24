@@ -31,7 +31,7 @@ export function CuentaBancariaList({
                     <div>
                         <CardTitle className="text-white">Cuentas Bancarias</CardTitle>
                         <CardDescription className="text-zinc-400">
-                            Gestiona las cuentas donde recibirás los pagos
+                            Gestiona las cuentas CLABE donde recibirás los pagos
                         </CardDescription>
                     </div>
                     <Button
@@ -55,7 +55,7 @@ export function CuentaBancariaList({
                 ) : cuentas.length === 0 ? (
                     <div className="text-center py-8">
                         <Building2 className="h-12 w-12 mx-auto mb-4 text-zinc-600" />
-                        <p className="text-zinc-400">No hay cuentas bancarias configuradas</p>
+                        <p className="text-zinc-400">No hay cuentas CLABE configuradas</p>
                         <p className="text-zinc-500 text-sm mt-2">
                             Usa el botón "Agregar Cuenta" para comenzar
                         </p>

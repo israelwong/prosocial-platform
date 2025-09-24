@@ -3,7 +3,7 @@ export interface CuentaBancaria {
     projectId: string;
     banco: string;
     numeroCuenta: string;
-    tipoCuenta: 'corriente' | 'ahorro';
+    tipoCuenta: string; // 'corriente' | 'ahorro' en la base de datos
     titular: string;
     activo: boolean;
     esPrincipal: boolean;
@@ -14,7 +14,7 @@ export interface CuentaBancaria {
 export interface CuentaBancariaCreate {
     banco: string;
     numeroCuenta: string;
-    tipoCuenta: 'corriente' | 'ahorro';
+    tipoCuenta: string; // 'corriente' | 'ahorro'
     titular: string;
     activo?: boolean;
     esPrincipal?: boolean;
@@ -23,7 +23,7 @@ export interface CuentaBancariaCreate {
 export interface CuentaBancariaUpdate {
     banco?: string;
     numeroCuenta?: string;
-    tipoCuenta?: 'corriente' | 'ahorro';
+    tipoCuenta?: string; // 'corriente' | 'ahorro'
     titular?: string;
     activo?: boolean;
     esPrincipal?: boolean;
