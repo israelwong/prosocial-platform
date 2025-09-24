@@ -28,8 +28,15 @@ export default function IdentidadPage() {
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await obtenerIdentidadStudio(slug);
-            setIdentidadData(data);
+            const response = await obtenerIdentidadStudio(slug);
+
+            // Verificar si es un error response
+            if ('success' in response && response.success === false) {
+                throw new Error(response.error || 'Error al cargar datos');
+            }
+
+            // Asumir que es IdentidadData y hacer type assertion
+            setIdentidadData(response as IdentidadData);
             setRetryCount(0);
         } catch (error) {
             console.error('Error loading identidad data:', error);
@@ -115,7 +122,7 @@ export default function IdentidadPage() {
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="p-6 pb-12 space-y-6">
             <HeaderNavigation
                 title="Identidad del Estudio"
                 description="Define la identidad visual y la información básica de tu estudio"
