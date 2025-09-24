@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation';
 
 // Página raíz del studio - redirige al dashboard
-export default function StudioRootPage({
+export default async function StudioRootPage({
     params,
 }: {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 }) {
     // Redirigir al dashboard por defecto
-    redirect(`/studio/${params.slug}/dashboard`);
+    const { slug } = await params;
+    redirect(`/studio/${slug}/dashboard`);
 }

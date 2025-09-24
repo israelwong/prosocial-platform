@@ -271,8 +271,11 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
         setExpandedSections(prev => {
             const newSet = new Set(prev);
             if (newSet.has(sectionId)) {
+                // Si la sección está abierta, la cerramos
                 newSet.delete(sectionId);
             } else {
+                // Si la sección está cerrada, la abrimos y cerramos todas las demás
+                newSet.clear();
                 newSet.add(sectionId);
             }
             return newSet;
