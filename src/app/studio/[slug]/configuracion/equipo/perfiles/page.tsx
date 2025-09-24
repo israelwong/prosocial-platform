@@ -189,22 +189,6 @@ export default function ProfessionalProfilesPage() {
                     icon: "Plus",
                     onClick: () => handleOpenModal()
                 }}
-                secondaryButtons={[
-                    {
-                        label: "Inicializar Sistema",
-                        icon: "Settings",
-                        onClick: handleInicializarSistema,
-                        variant: "outline",
-                        className: "border-yellow-600 text-yellow-300 hover:bg-yellow-800"
-                    },
-                    {
-                        label: "Actualizar",
-                        icon: "RefreshCw",
-                        onClick: handleRefresh,
-                        variant: "outline",
-                        className: "border-zinc-600 text-zinc-300 hover:bg-zinc-800"
-                    }
-                ]}
             />
 
             {/* Estadísticas */}

@@ -121,16 +121,6 @@ export function ProfessionalProfileModal({
             newErrors.name = 'El nombre es requerido';
         }
 
-        if (!formData.slug.trim()) {
-            newErrors.slug = 'El slug es requerido';
-        } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-            newErrors.slug = 'El slug solo puede contener letras minúsculas, números y guiones';
-        }
-
-        if (formData.color && !/^#[0-9A-F]{6}$/i.test(formData.color)) {
-            newErrors.color = 'El color debe ser un código hex válido (ej: #3B82F6)';
-        }
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -192,114 +182,6 @@ export function ProfessionalProfileModal({
                         {errors.name && <p className="text-red-400 text-xs">{errors.name}</p>}
                     </div>
 
-                    {/* Slug */}
-                    <div className="space-y-2">
-                        <Label htmlFor="slug" className="text-white">
-                            Slug (URL) *
-                        </Label>
-                        <div className="relative">
-                            <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                            <Input
-                                id="slug"
-                                value={formData.slug}
-                                onChange={(e) => handleInputChange('slug', e.target.value)}
-                                placeholder="fotografo, editor, coordinador"
-                                className="pl-10 bg-zinc-800 border-zinc-600 text-white"
-                                required
-                                disabled={saving || loading}
-                            />
-                        </div>
-                        {errors.slug && <p className="text-red-400 text-xs">{errors.slug}</p>}
-                        <p className="text-xs text-zinc-500">
-                            Se genera automáticamente desde el nombre. Solo letras minúsculas, números y guiones.
-                        </p>
-                    </div>
-
-                    {/* Descripción */}
-                    <div className="space-y-2">
-                        <Label htmlFor="description" className="text-white">
-                            Descripción
-                        </Label>
-                        <Textarea
-                            id="description"
-                            value={formData.description}
-                            onChange={(e) => handleInputChange('description', e.target.value)}
-                            placeholder="Describe las responsabilidades de este perfil..."
-                            className="bg-zinc-800 border-zinc-600 text-white"
-                            rows={3}
-                            disabled={saving || loading}
-                        />
-                    </div>
-
-                    {/* Color */}
-                    <div className="space-y-2">
-                        <Label className="text-white">Color del perfil</Label>
-                        <div className="flex items-center space-x-2">
-                            <div className="flex space-x-1">
-                                {COLORES_PREDEFINIDOS.map((color) => (
-                                    <button
-                                        key={color}
-                                        type="button"
-                                        onClick={() => handleInputChange('color', color)}
-                                        className={`w-8 h-8 rounded-full border-2 ${
-                                            formData.color === color 
-                                                ? 'border-white' 
-                                                : 'border-zinc-600 hover:border-zinc-400'
-                                        }`}
-                                        style={{ backgroundColor: color }}
-                                        disabled={saving || loading}
-                                    />
-                                ))}
-                            </div>
-                            <div className="flex-1">
-                                <Input
-                                    value={formData.color}
-                                    onChange={(e) => handleInputChange('color', e.target.value)}
-                                    placeholder="#3B82F6"
-                                    className="bg-zinc-800 border-zinc-600 text-white"
-                                    disabled={saving || loading}
-                                />
-                            </div>
-                        </div>
-                        {errors.color && <p className="text-red-400 text-xs">{errors.color}</p>}
-                    </div>
-
-                    {/* Icono */}
-                    <div className="space-y-2">
-                        <Label className="text-white">Icono</Label>
-                        <div className="grid grid-cols-8 gap-2">
-                            {ICONOS_PREDEFINIDOS.map((icono) => (
-                                <button
-                                    key={icono}
-                                    type="button"
-                                    onClick={() => handleInputChange('icon', icono)}
-                                    className={`p-2 rounded-lg border ${
-                                        formData.icon === icono
-                                            ? 'border-blue-500 bg-blue-900/20'
-                                            : 'border-zinc-600 hover:border-zinc-400'
-                                    }`}
-                                    disabled={saving || loading}
-                                >
-                                    <Tag className="h-4 w-4 text-zinc-400" />
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Estado activo */}
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <Label className="text-white">Perfil Activo</Label>
-                            <p className="text-xs text-zinc-500">
-                                Los perfiles inactivos no aparecerán en las opciones de asignación
-                            </p>
-                        </div>
-                        <Switch
-                            checked={formData.isActive}
-                            onCheckedChange={(checked) => handleInputChange('isActive', checked)}
-                            disabled={saving || loading}
-                        />
-                    </div>
 
                     <DialogFooter>
                         <Button

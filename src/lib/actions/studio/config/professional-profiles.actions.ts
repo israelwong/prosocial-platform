@@ -130,6 +130,10 @@ export async function crearPerfilProfesional(
                 ...validatedData,
                 projectId: studio.id,
                 isDefault: false, // Los perfiles creados por el usuario no son del sistema
+                // Valores por defecto si no se proporcionan
+                slug: validatedData.slug || validatedData.name.toLowerCase().replace(/\s+/g, '-'),
+                color: validatedData.color || '#3B82F6',
+                icon: validatedData.icon || 'Tag',
             },
         });
 
@@ -218,21 +222,18 @@ export async function eliminarPerfilProfesional(studioSlug: string, perfilId: st
         });
 
         if (asignacionesActivas > 0) {
-            // En lugar de eliminar, desactivar
-            const perfilDesactivado = await prisma.project_professional_profiles.update({
-                where: { id: perfilId },
+            // Eliminar las asignaciones y establecer como "no definido" (profileId = null)
+            await prisma.project_user_professional_profiles.updateMany({
+                where: {
+                    profileId: perfilId,
+                    isActive: true,
+                },
                 data: {
-                    isActive: false,
+                    profileId: null,
+                    description: 'Perfil eliminado - sin definir',
                     updatedAt: new Date(),
                 },
             });
-
-            return {
-                deleted: false,
-                deactivated: true,
-                perfil: perfilDesactivado,
-                message: `El perfil ha sido desactivado porque tiene ${asignacionesActivas} asignaciones activas`,
-            };
         }
 
         // Si no tiene asignaciones, eliminar completamente

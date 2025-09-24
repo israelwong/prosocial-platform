@@ -163,97 +163,65 @@ export function ProfessionalProfileList({
                         </div>
                     </div>
 
-                    {/* Lista de perfiles */}
-                    <div className="space-y-3">
+                    {/* Lista de perfiles - estilo palabras clave */}
+                    <div className="flex flex-wrap gap-2">
                         {filteredPerfiles.map((perfil) => {
                             const asignaciones = stats[perfil.id] || 0;
                             return (
                                 <div
                                     key={perfil.id}
-                                    className="p-4 bg-zinc-800 rounded-lg border border-zinc-700"
+                                    className={`inline-flex items-center space-x-2 px-3 py-2 rounded-full border transition-colors ${
+                                        perfil.isActive 
+                                            ? 'bg-zinc-800 border-zinc-600 hover:bg-zinc-700' 
+                                            : 'bg-zinc-900 border-zinc-700 opacity-50'
+                                    }`}
                                 >
-                                    <div className="flex items-center justify-between">
-                                        {/* Información del perfil */}
-                                        <div className="flex items-center space-x-4">
-                                            <div className="flex-shrink-0">
-                                                <div
-                                                    className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold"
-                                                    style={{ backgroundColor: perfil.color || '#6B7280' }}
-                                                >
-                                                    {perfil.icon ? (
-                                                        <Tag className="h-5 w-5" />
-                                                    ) : (
-                                                        perfil.name.charAt(0).toUpperCase()
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center space-x-2 mb-1">
-                                                    <h4 className="text-white text-base font-semibold truncate">
-                                                        {perfil.name}
-                                                    </h4>
-                                                    {perfil.isDefault && (
-                                                        <Badge variant="secondary" className="bg-yellow-600 text-white text-xs px-2 py-0.5">
-                                                            <Crown className="h-3 w-3 mr-1" />
-                                                            Sistema
-                                                        </Badge>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center space-x-2 text-zinc-400 text-xs mb-1">
-                                                    <span>Slug: {perfil.slug}</span>
-                                                    {asignaciones > 0 && (
-                                                        <span>• {asignaciones} asignaciones</span>
-                                                    )}
-                                                </div>
-                                                {perfil.description && (
-                                                    <p className="text-zinc-400 text-xs truncate">
-                                                        {perfil.description}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
+                                    
+                                    {/* Nombre del perfil */}
+                                    <span className="text-white text-sm font-medium">
+                                        {perfil.name}
+                                    </span>
+                                    
+                                    {/* Badge de asignaciones */}
+                                    {asignaciones > 0 && (
+                                        <Badge variant="secondary" className="bg-blue-600 text-white text-xs px-2 py-0.5">
+                                            {asignaciones}
+                                        </Badge>
+                                    )}
+                                    
+                                    {/* Badge de sistema */}
+                                    {perfil.isDefault && (
+                                        <Badge variant="secondary" className="bg-yellow-600 text-white text-xs px-2 py-0.5">
+                                            <Crown className="h-3 w-3 mr-1" />
+                                            Sistema
+                                        </Badge>
+                                    )}
 
-                                        {/* Controles de acción */}
-                                        <div className="flex items-center space-x-3">
-                                            {/* Switch para activar/desactivar */}
-                                            <div className="flex items-center space-x-2">
-                                                <Switch
-                                                    checked={perfil.isActive}
-                                                    onCheckedChange={() => handleToggleActive(perfil.id, perfil.isActive)}
-                                                    className="data-[state=checked]:bg-green-600"
-                                                />
-                                                <span className="text-xs text-zinc-400">
-                                                    {perfil.isActive ? 'Activo' : 'Inactivo'}
-                                                </span>
-                                            </div>
+                                    {/* Controles de acción */}
+                                    <div className="flex items-center space-x-1">
+                                        {/* Botón de editar */}
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => onEdit(perfil)}
+                                            className="h-6 w-6 p-0 text-zinc-400 hover:text-blue-400 hover:bg-blue-900/20"
+                                            title="Editar perfil"
+                                        >
+                                            <Edit className="h-3 w-3" />
+                                        </Button>
 
-                                            {/* Botones de acción */}
-                                            <div className="flex items-center space-x-1">
-                                                {/* Botón de editar */}
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => onEdit(perfil)}
-                                                    className="h-8 w-8 p-0 border-blue-600 text-blue-400 hover:bg-blue-900/20"
-                                                    title="Editar perfil"
-                                                >
-                                                    <Edit className="h-3 w-3" />
-                                                </Button>
-
-                                                {/* Botón de eliminar (solo si no es del sistema) */}
-                                                {!perfil.isDefault && (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleDeleteClick(perfil.id)}
-                                                        className="h-8 w-8 p-0 border-red-600 text-red-400 hover:bg-red-900/20"
-                                                        title="Eliminar perfil"
-                                                    >
-                                                        <Trash2 className="h-3 w-3" />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </div>
+                                        {/* Botón de eliminar (solo si no es del sistema) */}
+                                        {!perfil.isDefault && (
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleDeleteClick(perfil.id)}
+                                                className="h-6 w-6 p-0 text-zinc-400 hover:text-red-400 hover:bg-red-900/20"
+                                                title="Eliminar perfil"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </Button>
+                                        )}
                                     </div>
                                 </div>
                             );
