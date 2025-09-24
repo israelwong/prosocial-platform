@@ -91,7 +91,12 @@ export default function ProfessionalProfilesPage() {
                 toast.success('Perfil actualizado exitosamente');
             } else {
                 // Crear nuevo perfil
-                const nuevoPerfil = await crearPerfilProfesional(slug, data);
+                const nuevoPerfil = await crearPerfilProfesional(slug, {
+                    ...data,
+                    slug: data.name.toLowerCase().replace(/\s+/g, '-'),
+                    isActive: true,
+                    order: 0
+                });
 
                 setPerfiles(prev => [nuevoPerfil, ...prev]);
                 toast.success('Perfil creado exitosamente');
