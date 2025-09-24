@@ -394,12 +394,12 @@ export async function obtenerEstadisticasPersonal(studioSlug: string) {
                 where: { projectId: studio.id, isActive: false },
             }),
             prisma.project_user_professional_profiles.groupBy({
-                by: ["profile"],
+                by: ["profileId"],
                 where: {
                     user: { projectId: studio.id },
                     isActive: true,
                 },
-                _count: { profile: true },
+                _count: { profileId: true },
             }),
         ]);
 
@@ -410,7 +410,7 @@ export async function obtenerEstadisticasPersonal(studioSlug: string) {
             totalActivos,
             totalInactivos,
             perfilesProfesionales: perfilesPorTipo.reduce((acc, item) => {
-                acc[item.profile] = item._count.profile;
+                acc[item.profileId] = item._count.profileId;
                 return acc;
             }, {} as Record<string, number>),
         };
