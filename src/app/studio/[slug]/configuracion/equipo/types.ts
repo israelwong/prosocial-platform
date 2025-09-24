@@ -1,5 +1,6 @@
 import type { PersonnelType, PersonnelProfile } from '@/lib/actions/schemas/personal-schemas';
 
+// Tipo base para Personal
 export interface Personal {
     id: string;
     fullName: string | null;
@@ -25,6 +26,24 @@ export interface Personal {
             createdAt: Date;
             updatedAt: Date;
         } | null;
+        description: string | null;
+        isActive: boolean;
+    }>;
+}
+
+// Tipo más flexible para datos de la API
+export interface PersonalFromAPI {
+    id: string;
+    fullName: string | null;
+    email: string;
+    phone: string | null;
+    type: PersonnelType | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    professional_profiles: Array<{
+        id: string;
+        profile: any; // Estructura flexible de la API
         description: string | null;
         isActive: boolean;
     }>;

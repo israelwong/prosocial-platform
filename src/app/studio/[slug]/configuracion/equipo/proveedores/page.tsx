@@ -49,8 +49,8 @@ export default function ProveedoresPage() {
                 obtenerEstadisticasPersonal(slug),
             ]);
 
-            // @ts-expect-error - Los tipos de la API no coinciden exactamente con Personal
-            setProveedores(personalData);
+            // La API devuelve una estructura compatible con Personal
+            setProveedores(personalData as Personal[]);
             setStats(statsData);
         } catch (error) {
             console.error('Error loading proveedores:', error);

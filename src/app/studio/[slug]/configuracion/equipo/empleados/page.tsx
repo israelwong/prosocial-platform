@@ -49,8 +49,8 @@ export default function EmpleadosPage() {
                 obtenerEstadisticasPersonal(slug),
             ]);
 
-            // @ts-expect-error - Los tipos de la API no coinciden exactamente con Personal
-            setEmpleados(personalData);
+            // La API devuelve una estructura compatible con Personal
+            setEmpleados(personalData as Personal[]);
             setStats(statsData);
         } catch (error) {
             console.error('Error loading empleados:', error);
@@ -148,16 +148,11 @@ export default function EmpleadosPage() {
         }
     };
 
-    const handleRefresh = () => {
-        loadData();
-        toast.success('Información actualizada');
-    };
-
     const navigateToPerfiles = () => {
         router.push(`/studio/${slug}/configuracion/negocio/personal/perfiles`);
     };
 
-    
+
 
     return (
         <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
@@ -178,13 +173,6 @@ export default function EmpleadosPage() {
                         onClick: navigateToPerfiles,
                         variant: "outline",
                         className: "border-purple-600 text-purple-300 hover:bg-purple-800"
-                    },
-                    {
-                        label: "Actualizar",
-                        icon: "RefreshCw",
-                        onClick: handleRefresh,
-                        variant: "outline",
-                        className: "border-zinc-600 text-zinc-300 hover:bg-zinc-800"
                     }
                 ]}
             />
