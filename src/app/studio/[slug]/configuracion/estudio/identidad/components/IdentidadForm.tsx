@@ -68,6 +68,11 @@ export function IdentidadForm({
     formData.slogan !== (data.slogan || '') ||
     formData.descripcion !== (data.descripcion || '');
 
+  // Debug: mostrar estado de cambios
+  console.log('IdentidadForm - hasChanges:', hasChanges);
+  console.log('IdentidadForm - formData:', formData);
+  console.log('IdentidadForm - data:', data);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
@@ -114,24 +119,22 @@ export function IdentidadForm({
         />
       </div>
 
-      {hasChanges && (
-        <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={!formData.nombre.trim() || saving || loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {saving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Guardando...
-              </>
-            ) : (
-              'Guardar Cambios'
-            )}
-          </Button>
-        </div>
-      )}
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          disabled={!formData.nombre.trim() || saving || loading}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Guardando...
+            </>
+          ) : (
+            'Guardar Cambios'
+          )}
+        </Button>
+      </div>
     </form>
   );
 }
