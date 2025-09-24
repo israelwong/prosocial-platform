@@ -2,11 +2,14 @@ export interface Plataforma {
     id: string;
     name: string;
     slug: string;
-    description: string;
-    color: string;
-    icon: string;
-    baseUrl: string;
+    description: string | null;
+    color: string | null;
+    icon: string | null;
+    baseUrl: string | null;
     order: number;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface RedSocial {

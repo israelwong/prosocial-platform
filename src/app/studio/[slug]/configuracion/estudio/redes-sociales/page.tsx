@@ -15,8 +15,7 @@ import {
     crearRedSocial,
     actualizarRedSocial,
     eliminarRedSocial,
-    toggleRedSocialEstado,
-    obtenerEstadisticasRedesSociales
+    toggleRedSocialEstado
 } from '@/lib/actions/studio/config/redes-sociales.actions';
 import { obtenerPlataformasRedesSociales } from '@/lib/actions/shared/plataformas.actions';
 
