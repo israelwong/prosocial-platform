@@ -72,7 +72,7 @@ export default function ProfessionalProfilesPage() {
         setEditingPerfil(null);
     };
 
-    const handleSavePerfil = async (data: ProfessionalProfileCreateForm | ProfessionalProfileUpdateForm) => {
+    const handleSavePerfil = async (data: any) => {
         setModalLoading(true);
 
         try {
@@ -81,7 +81,7 @@ export default function ProfessionalProfilesPage() {
                 const perfilActualizado = await actualizarPerfilProfesional(
                     slug,
                     editingPerfil.id,
-                    data as ProfessionalProfileUpdateForm
+                    { id: editingPerfil.id, ...data }
                 );
 
                 setPerfiles(prev =>
@@ -92,7 +92,7 @@ export default function ProfessionalProfilesPage() {
                 toast.success('Perfil actualizado exitosamente');
             } else {
                 // Crear nuevo perfil
-                const nuevoPerfil = await crearPerfilProfesional(slug, data as ProfessionalProfileCreateForm);
+                const nuevoPerfil = await crearPerfilProfesional(slug, data);
 
                 setPerfiles(prev => [nuevoPerfil, ...prev]);
                 toast.success('Perfil creado exitosamente');

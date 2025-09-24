@@ -239,21 +239,24 @@ export function ProfessionalProfileList({
 
             {/* Modal de confirmación de eliminación */}
             <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-                <AlertDialogContent>
+                <AlertDialogContent className="bg-zinc-900 border-zinc-700">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Eliminar perfil profesional</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <AlertDialogTitle className="text-white">Eliminar perfil profesional</AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-400">
                             ¿Estás seguro de que quieres eliminar este perfil? Esta acción no se puede deshacer.
                             Si el perfil tiene asignaciones activas, será desactivado en lugar de eliminado.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleDeleteCancel}>
+                        <AlertDialogCancel 
+                            onClick={handleDeleteCancel}
+                            className="bg-zinc-800 border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                        >
                             Cancelar
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDeleteConfirm}
-                            className="bg-red-600 hover:bg-red-700"
+                            className="bg-red-600 hover:bg-red-700 text-white"
                             disabled={deleting}
                         >
                             {deleting ? 'Eliminando...' : 'Eliminar'}
