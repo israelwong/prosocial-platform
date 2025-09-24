@@ -18,7 +18,6 @@ import {
 } from '@/lib/actions/studio/config/professional-profiles.actions';
 import {
     type ProfessionalProfileCreateForm,
-    type ProfessionalProfileUpdateForm,
 } from '@/lib/actions/studio/config/professional-profiles.actions';
 import type { ProfessionalProfile, ProfessionalProfileStats as ProfessionalProfileStatsType } from './types';
 
