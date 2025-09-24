@@ -437,6 +437,7 @@ model projects {
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
   redes_sociales           project_redes_sociales[]
+  cuentas_bancarias        project_cuentas_bancarias[]      // ✅ Cuentas bancarias del estudio
   revenue_transactions     project_revenue_transactions[]
   servicios                project_servicios[]
   studio_revenue_products  project_studio_revenue_products[]
@@ -1224,6 +1225,24 @@ model project_redes_sociales {
   @@unique([projectId, plataformaId])
   @@index([projectId])
   @@index([plataformaId])
+}
+
+model project_cuentas_bancarias {
+  id            String    @id @default(cuid())
+  projectId     String
+  banco         String
+  numeroCuenta  String
+  tipoCuenta    String    // 'corriente' | 'ahorro'
+  titular       String
+  activo        Boolean   @default(true)
+  esPrincipal   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  projects      projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([activo])
+  @@index([esPrincipal])
 }
 
 enum PlatformLeadBitacoraTipo {
