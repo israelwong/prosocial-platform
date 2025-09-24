@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, Tag } from 'lucide-react';
+// Imports removidos - ahora se usan a través de HeaderNavigation
 import { HeaderNavigation } from '@/components/ui/header-navigation';
 import { toast } from 'sonner';
 import { useParams, useRouter } from 'next/navigation';
@@ -50,7 +49,7 @@ export default function ProveedoresPage() {
                 obtenerEstadisticasPersonal(slug),
             ]);
 
-            // @ts-ignore - Los tipos de la API no coinciden exactamente con Personal
+            // @ts-expect-error - Los tipos de la API no coinciden exactamente con Personal
             setProveedores(personalData);
             setStats(statsData);
         } catch (error) {
@@ -172,29 +171,23 @@ export default function ProveedoresPage() {
                     icon: "Plus",
                     onClick: () => handleOpenModal()
                 }}
+                secondaryButtons={[
+                    {
+                        label: "Perfiles",
+                        icon: "Tag",
+                        onClick: navigateToPerfiles,
+                        variant: "outline",
+                        className: "border-purple-600 text-purple-300 hover:bg-purple-800"
+                    },
+                    {
+                        label: "Actualizar",
+                        icon: "RefreshCw",
+                        onClick: handleRefresh,
+                        variant: "outline",
+                        className: "border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+                    }
+                ]}
             />
-            
-            {/* Botones de acción */}
-            <div className="flex gap-2 justify-end">
-                <Button
-                    variant="outline"
-                    onClick={navigateToPerfiles}
-                    disabled={loading}
-                    className="border-purple-600 text-purple-300 hover:bg-purple-800"
-                >
-                    <Tag className="h-4 w-4 mr-2" />
-                    Perfiles
-                </Button>
-                <Button
-                    variant="outline"
-                    onClick={handleRefresh}
-                    disabled={loading}
-                    className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
-                >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                    Actualizar
-                </Button>
-            </div>
 
             {/* Lista de proveedores */}
             <PersonalListSimple
