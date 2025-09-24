@@ -51,12 +51,6 @@ export function ProfessionalProfileModal({
 }: ProfessionalProfileModalProps) {
     const [formData, setFormData] = useState<ProfessionalProfileCreateForm>({
         name: '',
-        slug: '',
-        description: '',
-        color: '#3B82F6',
-        icon: 'Tag',
-        isActive: true,
-        order: 0,
     });
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -68,23 +62,11 @@ export function ProfessionalProfileModal({
                 // Modo edición
                 setFormData({
                     name: perfil.name,
-                    slug: perfil.slug,
-                    description: perfil.description || '',
-                    color: perfil.color || '#3B82F6',
-                    icon: perfil.icon || 'Tag',
-                    isActive: perfil.isActive,
-                    order: perfil.order,
                 });
             } else {
                 // Modo creación
                 setFormData({
                     name: '',
-                    slug: '',
-                    description: '',
-                    color: '#3B82F6',
-                    icon: 'Tag',
-                    isActive: true,
-                    order: 0,
                 });
             }
             setErrors({});
@@ -93,20 +75,6 @@ export function ProfessionalProfileModal({
 
     const handleInputChange = (field: keyof ProfessionalProfileCreateForm, value: string | boolean | number) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        
-        // Auto-generar slug desde el nombre
-        if (field === 'name' && typeof value === 'string') {
-            const slug = value
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '') // Remover acentos
-                .replace(/[^a-z0-9\s-]/g, '') // Solo letras, números, espacios y guiones
-                .replace(/\s+/g, '-') // Espacios a guiones
-                .replace(/-+/g, '-') // Múltiples guiones a uno
-                .trim();
-            
-            setFormData(prev => ({ ...prev, slug }));
-        }
         
         // Limpiar error del campo
         if (errors[field]) {

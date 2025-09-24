@@ -22,7 +22,7 @@ export interface ProfessionalProfileStats {
 
 export interface ProfessionalProfileCreateForm {
     name: string;
-    slug: string;
+    slug?: string;
     description?: string;
     color?: string;
     icon?: string;
