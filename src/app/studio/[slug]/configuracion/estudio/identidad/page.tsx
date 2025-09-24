@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
@@ -115,9 +116,10 @@ export default function IdentidadPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-white">Identidad del Estudio</h1>
-            </div>
+            <HeaderNavigation
+                title="Identidad del Estudio"
+                description="Define la identidad visual y la información básica de tu estudio"
+            />
 
             {/* Información Básica */}
             <Card className="bg-zinc-800 border-zinc-700">
