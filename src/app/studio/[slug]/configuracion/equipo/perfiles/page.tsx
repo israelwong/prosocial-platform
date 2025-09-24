@@ -25,7 +25,7 @@ export default async function ProfessionalProfilesPage({ params }: ProfessionalP
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>

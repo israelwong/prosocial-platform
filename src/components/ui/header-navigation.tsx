@@ -73,8 +73,8 @@ export function HeaderNavigation({
                                 href={button.href}
                                 className={cn(
                                     "inline-flex items-center px-3 py-2 rounded-lg transition-colors",
-                                    button.variant === 'outline' 
-                                        ? "border border-zinc-600 text-zinc-300 hover:bg-zinc-800" 
+                                    button.variant === 'outline'
+                                        ? "border border-zinc-600 text-zinc-300 hover:bg-zinc-800"
                                         : "bg-zinc-700 text-white hover:bg-zinc-600",
                                     button.className
                                 )}
@@ -88,8 +88,8 @@ export function HeaderNavigation({
                                 onClick={button.onClick}
                                 className={cn(
                                     "inline-flex items-center px-3 py-2 rounded-lg transition-colors",
-                                    button.variant === 'outline' 
-                                        ? "border border-zinc-600 text-zinc-300 hover:bg-zinc-800" 
+                                    button.variant === 'outline'
+                                        ? "border border-zinc-600 text-zinc-300 hover:bg-zinc-800"
                                         : "bg-zinc-700 text-white hover:bg-zinc-600",
                                     button.className
                                 )}
@@ -99,7 +99,7 @@ export function HeaderNavigation({
                             </button>
                         )
                     ))}
-                    
+
                     {/* Botón principal */}
                     {actionButton && (
                         actionButton.href ? (

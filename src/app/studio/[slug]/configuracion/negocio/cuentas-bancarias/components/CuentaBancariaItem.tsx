@@ -69,24 +69,23 @@ export function CuentaBancariaItem({ cuenta, onEdit, onDelete, onToggleActive }:
                                     Principal
                                 </Badge>
                             )}
-                            <Badge 
-                                variant="outline" 
-                                className={`text-xs ${
-                                    cuenta.activo 
-                                        ? 'border-green-500 text-green-400' 
+                            <Badge
+                                variant="outline"
+                                className={`text-xs ${cuenta.activo
+                                        ? 'border-green-500 text-green-400'
                                         : 'border-red-500 text-red-400'
-                                }`}
+                                    }`}
                             >
                                 {cuenta.activo ? 'Activa' : 'Inactiva'}
                             </Badge>
                         </div>
-                        
+
                         <div className="space-y-1">
                             <div className="flex items-center space-x-2 text-zinc-400 text-xs">
                                 <CreditCard className="h-3 w-3" />
                                 <span>{formatNumeroCuenta(cuenta.numeroCuenta)}</span>
                             </div>
-                            
+
                             <div className="flex items-center space-x-2 text-zinc-400 text-xs">
                                 <User className="h-3 w-3" />
                                 <span>{cuenta.titular}</span>

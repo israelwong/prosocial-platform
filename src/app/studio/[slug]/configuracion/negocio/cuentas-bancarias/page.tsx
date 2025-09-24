@@ -12,10 +12,10 @@ import { CuentaBancariaModal } from './components/CuentaBancariaModal';
 import { CuentaBancaria } from './types';
 
 interface CuentaBancariaFormData {
-    banco: string;
-    numeroCuenta: string;
-    titular: string;
-    activo: boolean;
+  banco: string;
+  numeroCuenta: string;
+  titular: string;
+  activo: boolean;
 }
 import {
   obtenerCuentasBancariasStudio,
@@ -99,54 +99,54 @@ export default function CuentasBancariasPage() {
     setEditingCuenta(null);
   };
 
-    const handleSaveCuenta = async (data: CuentaBancariaFormData) => {
-        setModalLoading(true);
+  const handleSaveCuenta = async (data: CuentaBancariaFormData) => {
+    setModalLoading(true);
 
-        try {
-            if (editingCuenta) {
-                // Actualizar cuenta bancaria existente usando Server Action
-                const cuentaActualizada = await actualizarCuentaBancaria(editingCuenta.id, {
-                    id: editingCuenta.id,
-                    banco: data.banco,
-                    numeroCuenta: data.numeroCuenta,
-                    titular: data.titular,
-                    activo: data.activo,
-                });
+    try {
+      if (editingCuenta) {
+        // Actualizar cuenta bancaria existente usando Server Action
+        const cuentaActualizada = await actualizarCuentaBancaria(editingCuenta.id, {
+          id: editingCuenta.id,
+          banco: data.banco,
+          numeroCuenta: data.numeroCuenta,
+          titular: data.titular,
+          activo: data.activo,
+        });
 
-                setCuentas(prev => prev.map(c => c.id === editingCuenta.id ? cuentaActualizada : c));
-                toast.success('Cuenta bancaria actualizada exitosamente');
-            } else {
-                // Lógica automática de cuenta principal:
-                // - Si no hay cuentas, la primera es principal
-                // - Si hay cuentas, la nueva NO es principal
-                const esPrincipal = cuentas.length === 0;
+        setCuentas(prev => prev.map(c => c.id === editingCuenta.id ? cuentaActualizada : c));
+        toast.success('Cuenta bancaria actualizada exitosamente');
+      } else {
+        // Lógica automática de cuenta principal:
+        // - Si no hay cuentas, la primera es principal
+        // - Si hay cuentas, la nueva NO es principal
+        const esPrincipal = cuentas.length === 0;
 
-                // Crear nueva cuenta bancaria usando Server Action
-                const nuevaCuenta = await crearCuentaBancaria(slug, {
-                    banco: data.banco,
-                    numeroCuenta: data.numeroCuenta,
-                    tipoCuenta: 'corriente', // Valor por defecto para CLABE
-                    titular: data.titular,
-                    activo: data.activo,
-                    esPrincipal: esPrincipal,
-                });
+        // Crear nueva cuenta bancaria usando Server Action
+        const nuevaCuenta = await crearCuentaBancaria(slug, {
+          banco: data.banco,
+          numeroCuenta: data.numeroCuenta,
+          tipoCuenta: 'corriente', // Valor por defecto para CLABE
+          titular: data.titular,
+          activo: data.activo,
+          esPrincipal: esPrincipal,
+        });
 
-                setCuentas(prev => [...prev, nuevaCuenta]);
-                toast.success('Cuenta bancaria agregada exitosamente');
-            }
+        setCuentas(prev => [...prev, nuevaCuenta]);
+        toast.success('Cuenta bancaria agregada exitosamente');
+      }
 
-            // Recargar estadísticas
-            const statsData = await obtenerEstadisticasCuentasBancarias(slug);
-            setStats(statsData);
-        } catch (err) {
-            console.error('Error saving cuenta bancaria:', err);
-            const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-            toast.error(errorMessage);
-            throw err; // Re-throw para que el modal maneje el error
-        } finally {
-            setModalLoading(false);
-        }
-    };
+      // Recargar estadísticas
+      const statsData = await obtenerEstadisticasCuentasBancarias(slug);
+      setStats(statsData);
+    } catch (err) {
+      console.error('Error saving cuenta bancaria:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      toast.error(errorMessage);
+      throw err; // Re-throw para que el modal maneje el error
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   const handleDeleteCuenta = async (id: string) => {
     try {
@@ -224,10 +224,10 @@ export default function CuentasBancariasPage() {
   return (
     <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
       {/* Header */}
-            <HeaderNavigation
-                title="Cuentas Bancarias"
-                description="Registra las cuentas CLABE donde recibirás los pagos de tus clientes"
-            />
+      <HeaderNavigation
+        title="Cuentas Bancarias"
+        description="Registra las cuentas CLABE donde recibirás los pagos de tus clientes"
+      />
 
       {/* Estadísticas */}
       <CuentaBancariaStats stats={stats} loading={loading} />

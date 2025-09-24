@@ -172,8 +172,15 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                     {
                         id: 'empleados',
                         name: 'Miembros del Equipo',
-                        description: 'Gestiona empleados y proveedores',
+                        description: 'Gestiona empleados',
                         href: `/studio/${studioSlug}/configuracion/equipo/empleados`,
+                        icon: Users2,
+                    },
+                    {
+                        id: 'proveedores',
+                        name: 'Proveedores y Colaboradores',
+                        description: 'Gestiona proveedores',
+                        href: `/studio/${studioSlug}/configuracion/equipo/proveedores`,
                         icon: Users2,
                     },
                     {
