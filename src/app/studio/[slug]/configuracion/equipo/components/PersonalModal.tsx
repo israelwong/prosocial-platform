@@ -135,6 +135,7 @@ export function PersonalModal({
                 fullName: formData.fullName.trim(),
                 email: formData.email.trim().toLowerCase(),
                 phone: formData.phone.trim() || undefined,
+                profileDescriptions: {}, // Agregar profileDescriptions vacío
                 ...(personal && { id: personal.id }),
             };
 
