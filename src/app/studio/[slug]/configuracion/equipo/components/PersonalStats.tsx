@@ -94,7 +94,7 @@ export function PersonalStats({ stats, loading = false }: PersonalStatsProps) {
             </div>
 
             {/* Distribución por perfiles profesionales */}
-            {Object.keys(stats.perfilesProfesionales).length > 0 && (
+            {/* {Object.keys(stats.perfilesProfesionales).length > 0 && (
                 <Card className="bg-zinc-900 border-zinc-800">
                     <CardHeader>
                         <CardTitle className="text-white flex items-center gap-2">
@@ -137,7 +137,7 @@ export function PersonalStats({ stats, loading = false }: PersonalStatsProps) {
                         )}
                     </CardContent>
                 </Card>
-            )}
+            )} */}
         </div>
     );
 }

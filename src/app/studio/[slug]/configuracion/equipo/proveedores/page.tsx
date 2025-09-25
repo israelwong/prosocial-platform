@@ -153,6 +153,22 @@ export default function ProveedoresPage() {
         router.push(`/studio/${slug}/configuracion/negocio/personal/perfiles`);
     };
 
+    const handleToggleActive = async (proveedorId: string, isActive: boolean) => {
+        try {
+            // TODO: Implementar toggle de estado en el backend
+            // Por ahora, solo actualizar localmente
+            setProveedores(prev => 
+                prev.map(prov => 
+                    prov.id === proveedorId ? { ...prov, isActive } : prov
+                )
+            );
+            toast.success(`Proveedor ${isActive ? 'activado' : 'desactivado'} exitosamente`);
+        } catch (error) {
+            console.error('Error al cambiar estado del proveedor:', error);
+            toast.error('Error al cambiar el estado del proveedor');
+        }
+    };
+
     return (
         <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
 
@@ -182,6 +198,7 @@ export default function ProveedoresPage() {
                 personal={proveedores}
                 onEdit={handleOpenModal}
                 onDelete={handleDeleteProveedor}
+                onToggleActive={handleToggleActive}
                 loading={loading}
                 filterType="PROVEEDOR"
             />

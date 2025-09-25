@@ -28,7 +28,8 @@ import {
     Plug,
     SlidersHorizontal,
     ChevronDown,
-    ChevronRight
+    ChevronRight,
+    BarChart3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -226,6 +227,42 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                         href: `/studio/${studioSlug}/configuracion/cuenta/seguridad`,
                         icon: Lock,
                     },
+                ],
+            },
+            {
+                id: 'lagales',
+                title: 'Legales',
+                description: 'Gestiona tus legales',
+                icon: FileText,
+                items: [
+                    {
+                        id: 'contrato-servicio',
+                        name: 'Contrato de Servicio',
+                        description: 'Gestiona tu contrato de servicio',
+                        href: `/studio/${studioSlug}/configuracion/legales/contrato-servicio`,
+                        icon: FileText,
+                    },
+                    {
+                        id: 'politicas-generales',
+                        name: 'Políticas Generales',
+                        description: 'Gestiona tu política general',
+                        href: `/studio/${studioSlug}/configuracion/legales/politicas-generales`,
+                        icon: FileText,
+                    },
+                    {
+                        id: 'politicas-cancelacion',
+                        name: 'Políticas de Cancelación',
+                        description: 'Gestiona tu política de cancelación',
+                        href: `/studio/${studioSlug}/configuracion/legales/politicas-cancelacion`,
+                        icon: FileText,
+                    },
+                    {
+                        id: 'garantias',
+                        name: 'Garantías',
+                        description: 'Gestiona tu garantía',
+                        href: `/studio/${studioSlug}/configuracion/legales/garantias`,
+                        icon: FileText,
+                    }
                 ],
             },
             // {

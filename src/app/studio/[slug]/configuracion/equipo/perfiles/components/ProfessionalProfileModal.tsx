@@ -75,7 +75,7 @@ export function ProfessionalProfileModal({
 
     const handleInputChange = (field: keyof ProfessionalProfileCreateForm, value: string | boolean | number) => {
         setFormData(prev => ({ ...prev, [field]: value }));
-        
+
         // Limpiar error del campo
         if (errors[field]) {
             setErrors(prev => ({ ...prev, [field]: '' }));
@@ -95,7 +95,7 @@ export function ProfessionalProfileModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!validateForm()) {
             return;
         }
@@ -122,7 +122,7 @@ export function ProfessionalProfileModal({
                         {perfil ? 'Editar Perfil Profesional' : 'Crear Perfil Profesional'}
                     </DialogTitle>
                     <DialogDescription className="text-zinc-400">
-                        {perfil 
+                        {perfil
                             ? 'Modifica la información del perfil profesional'
                             : 'Crea un nuevo perfil profesional para tu equipo'
                         }

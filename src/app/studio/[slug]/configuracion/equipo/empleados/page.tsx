@@ -143,6 +143,22 @@ export default function EmpleadosPage() {
         router.push(`/studio/${slug}/configuracion/negocio/personal/perfiles`);
     };
 
+    const handleToggleActive = async (empleadoId: string, isActive: boolean) => {
+        try {
+            // TODO: Implementar toggle de estado en el backend
+            // Por ahora, solo actualizar localmente
+            setEmpleados(prev => 
+                prev.map(emp => 
+                    emp.id === empleadoId ? { ...emp, isActive } : emp
+                )
+            );
+            toast.success(`Empleado ${isActive ? 'activado' : 'desactivado'} exitosamente`);
+        } catch (error) {
+            console.error('Error al cambiar estado del empleado:', error);
+            toast.error('Error al cambiar el estado del empleado');
+        }
+    };
+
 
 
     return (
@@ -174,6 +190,7 @@ export default function EmpleadosPage() {
                 personal={empleados}
                 onEdit={handleOpenModal}
                 onDelete={handleDeleteEmpleado}
+                onToggleActive={handleToggleActive}
                 loading={loading}
                 filterType="EMPLEADO"
             />
