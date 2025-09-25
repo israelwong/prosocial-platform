@@ -160,16 +160,16 @@ export function PersonalModal({
         try {
             setProfilesLoading(true);
             const perfiles = await obtenerPerfilesProfesionalesStudio(studioSlug);
-            
+
             // Transformar los datos para el formato esperado
             const perfilesFormateados = perfiles.map(perfil => ({
                 id: perfil.id,
                 name: perfil.name,
                 slug: perfil.slug,
-                color: perfil.color,
-                icon: perfil.icon,
+                color: perfil.color || undefined,
+                icon: perfil.icon || undefined,
             }));
-            
+
             setAllProfiles(perfilesFormateados);
         } catch (error) {
             console.error('Error loading profiles:', error);
