@@ -168,7 +168,34 @@ export function PersonalModal({
     };
 
     // TODO: Obtener perfiles dinámicos desde Server Action
-    const allProfiles: Array<{ id: string; name: string; slug: string; color?: string; icon?: string }> = [];
+    const [allProfiles, setAllProfiles] = useState<Array<{ id: string; name: string; slug: string; color?: string; icon?: string }>>([]);
+    const [profilesLoading, setProfilesLoading] = useState(false);
+
+    // Cargar perfiles profesionales cuando se abre el modal
+    useEffect(() => {
+        if (isOpen) {
+            loadProfiles();
+        }
+    }, [isOpen]);
+
+    const loadProfiles = async () => {
+        try {
+            setProfilesLoading(true);
+            // TODO: Implementar Server Action para obtener perfiles
+            // Por ahora, usar datos de ejemplo
+            const mockProfiles = [
+                { id: '1', name: 'Fotógrafo', slug: 'fotografo', color: '#3B82F6', icon: 'Camera' },
+                { id: '2', name: 'Camarógrafo', slug: 'camarografo', color: '#8B5CF6', icon: 'Video' },
+                { id: '3', name: 'Editor de Video', slug: 'editor-video', color: '#F59E0B', icon: 'Edit' },
+            ];
+            setAllProfiles(mockProfiles);
+        } catch (error) {
+            console.error('Error loading profiles:', error);
+            toast.error('Error al cargar perfiles profesionales');
+        } finally {
+            setProfilesLoading(false);
+        }
+    };
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -285,7 +312,11 @@ export function PersonalModal({
                         )}
 
                         <div className="space-y-3">
-                            {allProfiles.length === 0 ? (
+                            {profilesLoading ? (
+                                <div className="text-center py-8 text-zinc-400">
+                                    <p>Cargando perfiles profesionales...</p>
+                                </div>
+                            ) : allProfiles.length === 0 ? (
                                 <div className="text-center py-8 text-zinc-400">
                                     <p>No hay perfiles profesionales disponibles.</p>
                                     <p className="text-sm mt-1">Contacta al administrador para configurar perfiles.</p>
