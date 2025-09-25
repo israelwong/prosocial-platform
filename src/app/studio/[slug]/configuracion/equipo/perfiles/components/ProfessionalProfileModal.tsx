@@ -111,7 +111,7 @@ export function ProfessionalProfileModal({
         }
     };
 
-    const isFormValid = formData.name.trim() && formData.slug.trim() && !saving && !loading;
+    const isFormValid = formData.name.trim() && !saving && !loading;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
