@@ -19,30 +19,73 @@ import {
     type PersonalCreateForm,
     type PersonalUpdateForm,
 } from '@/lib/actions/schemas/personal-schemas';
-import type { Personal } from '../types';
+import type { Personal, PersonalFromAPI } from '../types';
 
-// Tipo para datos de la API que pueden no coincidir exactamente con Personal
-type PersonalFromAPI = {
+// Tipos específicos para los resultados de las acciones de la API
+interface ApiProfessionalProfile {
+    id: string;
+    userId: string;
+    profileId: string | null;
+    description: string | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface ApiPersonalResult {
     id: string;
     fullName: string | null;
     email: string;
     phone: string | null;
-    type: 'EMPLEADO' | 'PROVEEDOR' | null;
+    type: import('@/lib/actions/schemas/personal-schemas').PersonnelType | null;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
-    professional_profiles: Array<{
-        id: string;
-        profile: {
-            id: string;
-            name: string;
-            slug: string;
-            color: string | null;
-            icon: string | null;
-        } | null;
-        description: string | null;
-        isActive: boolean;
-    }>;
+    professional_profiles: ApiProfessionalProfile[];
+}
+
+// Función para convertir PersonalFromAPI a Personal para compatibilidad con componentes
+const convertPersonalFromAPI = (personalFromAPI: PersonalFromAPI): Personal => {
+    return {
+        ...personalFromAPI,
+        professional_profiles: personalFromAPI.professional_profiles.map(pp => ({
+            ...pp,
+            profile: pp.profile ? {
+                id: pp.profile.id || '',
+                name: pp.profile.name || '',
+                slug: pp.profile.slug || '',
+                color: pp.profile.color || null,
+                icon: pp.profile.icon || null,
+                description: pp.profile.description || null,
+                projectId: pp.profile.projectId || '',
+                isActive: pp.profile.isActive ?? true,
+                isDefault: pp.profile.isDefault ?? false,
+                order: pp.profile.order || 0,
+                createdAt: pp.profile.createdAt || new Date(),
+                updatedAt: pp.profile.updatedAt || new Date(),
+            } : null,
+        })),
+    };
+};
+
+// Función para convertir el resultado de las acciones de la API a PersonalFromAPI
+const convertApiResultToPersonalFromAPI = (apiResult: ApiPersonalResult): PersonalFromAPI => {
+    return {
+        id: apiResult.id,
+        fullName: apiResult.fullName,
+        email: apiResult.email,
+        phone: apiResult.phone,
+        type: apiResult.type,
+        isActive: apiResult.isActive,
+        createdAt: apiResult.createdAt,
+        updatedAt: apiResult.updatedAt,
+        professional_profiles: (apiResult.professional_profiles || []).map((pp) => ({
+            id: pp.id,
+            profile: null, // Las funciones de API no incluyen el profile completo
+            description: pp.description,
+            isActive: pp.isActive,
+        })),
+    };
 };
 
 export default function EmpleadosPage() {
@@ -100,7 +143,7 @@ export default function EmpleadosPage() {
                 // Actualizar localmente
                 setEmpleados(prev =>
                     prev.map(emp =>
-                        emp.id === editingEmpleado.id ? empleadoActualizado : emp
+                        emp.id === editingEmpleado.id ? convertApiResultToPersonalFromAPI(empleadoActualizado) : emp
                     )
                 );
                 toast.success('Empleado actualizado exitosamente');
@@ -112,7 +155,7 @@ export default function EmpleadosPage() {
                 });
 
                 // Actualizar localmente
-                setEmpleados(prev => [nuevoEmpleado, ...prev]);
+                setEmpleados(prev => [convertApiResultToPersonalFromAPI(nuevoEmpleado), ...prev]);
                 toast.success('Empleado creado exitosamente');
             }
 
@@ -191,8 +234,14 @@ export default function EmpleadosPage() {
 
             {/* Lista de empleados */}
             <PersonalListSimple
-                personal={empleados}
-                onEdit={handleOpenModal}
+                personal={empleados.map(convertPersonalFromAPI)}
+                onEdit={(personal: Personal) => {
+                    // Buscar el empleado original por ID para mantener la referencia correcta
+                    const originalEmpleado = empleados.find(emp => emp.id === personal.id);
+                    if (originalEmpleado) {
+                        handleOpenModal(originalEmpleado);
+                    }
+                }}
                 onDelete={handleDeleteEmpleado}
                 onToggleActive={handleToggleActive}
                 loading={loading}
@@ -204,7 +253,7 @@ export default function EmpleadosPage() {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSave={handleSaveEmpleado}
-                personal={editingEmpleado as Personal}
+                personal={editingEmpleado ? convertPersonalFromAPI(editingEmpleado) : null}
                 loading={modalLoading}
                 defaultType="EMPLEADO"
                 studioSlug={slug}
