@@ -126,15 +126,6 @@ export default function EmpleadosPage() {
             if (result.deleted) {
                 setEmpleados(prev => prev.filter(emp => emp.id !== empleadoId));
                 toast.success(`${empleadoName} ha sido eliminado exitosamente`);
-            } else if (result.deactivated) {
-                setEmpleados(prev =>
-                    prev.map(emp =>
-                        emp.id === empleadoId ? { ...emp, isActive: false } : emp
-                    )
-                );
-                toast.success(
-                    `${empleadoName} ha sido desactivado debido a registros asociados (${result.relatedDataCount} registros)`
-                );
             }
 
             // Recargar estadísticas
