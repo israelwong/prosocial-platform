@@ -245,8 +245,8 @@ export function PersonalModal({
                             />
                         </div>
 
-                        {/* Solo mostrar tipo en modo creación */}
-                        {!personal && (
+                        {/* Solo mostrar tipo en modo creación sin defaultType */}
+                        {!personal && !defaultType && (
                             <div>
                                 <Label htmlFor="type" className="text-white mb-2">
                                     Tipo *
