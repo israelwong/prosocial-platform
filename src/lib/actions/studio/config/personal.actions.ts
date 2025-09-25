@@ -67,7 +67,15 @@ export async function obtenerPersonalStudio(
                     where: { isActive: true },
                     select: {
                         id: true,
-                        profile: true,
+                        profile: {
+                            select: {
+                                id: true,
+                                name: true,
+                                slug: true,
+                                color: true,
+                                icon: true,
+                            }
+                        },
                         description: true,
                         isActive: true,
                     },
@@ -135,12 +143,12 @@ export async function crearPersonal(
 
             // Crear perfiles profesionales
             const perfilesProfesionales = await Promise.all(
-                validatedData.profiles.map(profile =>
+                validatedData.profiles.map(profileId =>
                     tx.project_user_professional_profiles.create({
                         data: {
                             userId: usuario.id,
-                            profile: profile,
-                            description: validatedData.profileDescriptions?.[profile] || null,
+                            profileId: profileId,
+                            description: validatedData.profileDescriptions?.[profileId] || null,
                             isActive: true,
                         },
                     })
@@ -235,7 +243,7 @@ export async function actualizarPersonal(
                         const existingProfile = await tx.project_user_professional_profiles.findFirst({
                             where: {
                                 userId: personalId,
-                                profile: profile,
+                                profileId: profile,
                             },
                         });
 
@@ -254,7 +262,7 @@ export async function actualizarPersonal(
                             return await tx.project_user_professional_profiles.create({
                                 data: {
                                     userId: personalId,
-                                    profile: profile,
+                                    profileId: profile,
                                     description: validatedData.profileDescriptions?.[profile] || null,
                                     isActive: true,
                                 },
