@@ -108,9 +108,10 @@ export function PersonalModal({
             newErrors.fullName = 'El nombre completo es requerido';
         }
 
-        if (!formData.email.trim()) {
+        const emailTrimmed = formData.email.trim();
+        if (!emailTrimmed) {
             newErrors.email = 'El email es requerido';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
             newErrors.email = 'El formato del email no es válido';
         }
 
