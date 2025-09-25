@@ -352,49 +352,46 @@ export function PersonalModal({
                                                 )}
                                             </div>
 
-                                                    {/* Descripción personalizada para el perfil */}
-                                                    {isSelected && (
-                                                        <div className="mt-3">
-                                                            <Label className="text-sm text-zinc-300">
-                                                                Descripción específica (opcional)
-                                                            </Label>
-                                                            <Textarea
-                                                                value={formData.profileDescriptions[profile.id] || ''}
-                                                                onChange={(e) => handleProfileDescriptionChange(profile.id, e.target.value)}
-                                                                className="bg-zinc-800 border-zinc-600 text-white text-sm mt-1"
-                                                                placeholder={`Describe la experiencia específica en ${profile.name.toLowerCase()}...`}
-                                                                rows={2}
-                                                                disabled={loading}
-                                                            />
-                                                        </div>
-                                                    )}
+                                            {/* Descripción personalizada para el perfil */}
+                                            {isSelected && (
+                                                <div className="mt-3">
+                                                    <Label className="text-sm text-zinc-300">
+                                                        Descripción específica (opcional)
+                                                    </Label>
+                                                    <Textarea
+                                                        value={formData.profileDescriptions[profile.id] || ''}
+                                                        onChange={(e) => handleProfileDescriptionChange(profile.id, e.target.value)}
+                                                        className="bg-zinc-800 border-zinc-600 text-white text-sm mt-1"
+                                                        placeholder={`Describe la experiencia específica en ${profile.name.toLowerCase()}...`}
+                                                        rows={2}
+                                                        disabled={loading}
+                                                    />
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
-                                    );
-                                })
-                            )}
+                                );
+                            })}
                         </div>
                     </div>
-                </div>
 
-                {/* Botones */}
-                <div className="flex justify-end space-x-3 pt-4 border-t border-zinc-800">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        disabled={loading}
-                        className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
-                    >
-                        Cancelar
-                    </Button>
-                    <Button
-                        onClick={handleSave}
-                        disabled={loading}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                        {loading ? 'Guardando...' : (personal ? 'Actualizar' : 'Crear')}
-                    </Button>
+                    {/* Botones */}
+                    <div className="flex justify-end space-x-3 pt-4 border-t border-zinc-800">
+                        <Button
+                            variant="outline"
+                            onClick={onClose}
+                            disabled={loading}
+                            className="border-zinc-600 text-zinc-300 hover:bg-zinc-800"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            onClick={handleSave}
+                            disabled={loading}
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            {loading ? 'Guardando...' : (personal ? 'Actualizar' : 'Crear')}
+                        </Button>
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>
