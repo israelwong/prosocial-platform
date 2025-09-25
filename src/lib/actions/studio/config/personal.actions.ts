@@ -320,8 +320,8 @@ export async function eliminarPersonal(
 
         // 3. Verificar si el usuario tiene datos relacionados que impidan la eliminación
         const relatedData = await prisma.$transaction(async (tx) => {
-            const [agenda, eventos, gastos, nominas, pagos, sesiones] = await Promise.all([
-                tx.project_agenda.count({ where: { userId: personalId } }),
+            // Solo verificar tablas que sabemos que tienen userId
+            const [eventos, gastos, nominas, pagos, sesiones] = await Promise.all([
                 tx.project_eventos.count({ where: { userId: personalId } }),
                 tx.project_gastos.count({ where: { userId: personalId } }),
                 tx.project_nominas.count({
@@ -337,7 +337,7 @@ export async function eliminarPersonal(
                 tx.project_sesiones.count({ where: { userId: personalId } }),
             ]);
 
-            return { agenda, eventos, gastos, nominas, pagos, sesiones };
+            return { eventos, gastos, nominas, pagos, sesiones };
         });
 
         const totalRelations = Object.values(relatedData).reduce((sum, count) => sum + count, 0);
