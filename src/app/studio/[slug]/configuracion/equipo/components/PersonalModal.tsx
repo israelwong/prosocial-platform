@@ -190,7 +190,8 @@ export function PersonalModal({
 
                 <div className="space-y-6">
                     {/* Información básica */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                        {/* Nombre completo - fila completa */}
                         <div>
                             <Label htmlFor="fullName" className="text-white mb-2">
                                 Nombre completo *
@@ -208,41 +209,44 @@ export function PersonalModal({
                             )}
                         </div>
 
-                        <div>
-                            <Label htmlFor="email" className="text-white mb-2">
-                                Email *
-                            </Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={formData.email}
-                                onChange={(e) => handleInputChange('email', e.target.value)}
-                                className="bg-zinc-800 border-zinc-700 text-white"
-                                placeholder="email@ejemplo.com"
-                                disabled={loading}
-                            />
-                            {errors.email && (
-                                <p className="text-sm text-red-400 mt-1">{errors.email}</p>
-                            )}
-                        </div>
+                        {/* Teléfono y Email - misma fila */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="phone" className="text-white mb-2">
+                                    Teléfono
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    value={formData.phone}
+                                    onChange={(e) => {
+                                        // Solo permitir números y máximo 10 dígitos
+                                        const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                        handleInputChange('phone', value);
+                                    }}
+                                    className="bg-zinc-800 border-zinc-700 text-white"
+                                    placeholder="10 dígitos"
+                                    maxLength={10}
+                                    disabled={loading}
+                                />
+                            </div>
 
-                        <div>
-                            <Label htmlFor="phone" className="text-white mb-2">
-                                Teléfono
-                            </Label>
-                            <Input
-                                id="phone"
-                                value={formData.phone}
-                                onChange={(e) => {
-                                    // Solo permitir números y máximo 10 dígitos
-                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                    handleInputChange('phone', value);
-                                }}
-                                className="bg-zinc-800 border-zinc-700 text-white"
-                                placeholder="10 dígitos"
-                                maxLength={10}
-                                disabled={loading}
-                            />
+                            <div>
+                                <Label htmlFor="email" className="text-white mb-2">
+                                    Email *
+                                </Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={(e) => handleInputChange('email', e.target.value)}
+                                    className="bg-zinc-800 border-zinc-700 text-white"
+                                    placeholder="email@ejemplo.com"
+                                    disabled={loading}
+                                />
+                                {errors.email && (
+                                    <p className="text-sm text-red-400 mt-1">{errors.email}</p>
+                                )}
+                            </div>
                         </div>
 
                         {/* Solo mostrar tipo en modo creación sin defaultType */}
