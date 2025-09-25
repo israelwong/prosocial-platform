@@ -20,7 +20,7 @@ import { ProfessionalProfile, ProfessionalProfileCreateForm, ProfessionalProfile
 interface ProfessionalProfileModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (data: ProfessionalProfileCreateForm | ProfessionalProfileUpdateForm) => Promise<void>;
+    onSave: (data: { name: string; slug?: string; isActive?: boolean; order?: number }) => Promise<void>;
     perfil?: ProfessionalProfile | null;
     loading?: boolean;
 }
