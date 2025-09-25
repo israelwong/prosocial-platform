@@ -216,7 +216,7 @@ export function PersonalListSimple({
                                                                 variant="outline"
                                                                 className="text-xs border-zinc-600 text-zinc-300"
                                                             >
-                                                                {profile.profile}
+                                                                {profile.profile?.name || 'Sin perfil'}
                                                             </Badge>
                                                         ))}
                                                     {person.professional_profiles.filter(p => p.isActive).length > 3 && (

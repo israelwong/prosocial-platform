@@ -264,31 +264,34 @@ export function PersonalModal({
                             />
                         </div>
 
-                        <div>
-                            <Label htmlFor="type" className="text-white mb-2">
-                                Tipo *
-                            </Label>
-                            <Select
-                                value={formData.type}
-                                onValueChange={(value: PersonnelType) => handleInputChange('type', value)}
-                                disabled={loading}
-                            >
-                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                                    <SelectValue placeholder="Seleccionar tipo" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-zinc-800 border-zinc-700">
-                                    {Object.entries(PERSONNEL_TYPE_LABELS).map(([value, label]) => (
-                                        <SelectItem
-                                            key={value}
-                                            value={value}
-                                            className="text-white hover:bg-zinc-700"
-                                        >
-                                            {label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        {/* Solo mostrar tipo en modo creación */}
+                        {!personal && (
+                            <div>
+                                <Label htmlFor="type" className="text-white mb-2">
+                                    Tipo *
+                                </Label>
+                                <Select
+                                    value={formData.type}
+                                    onValueChange={(value: PersonnelType) => handleInputChange('type', value)}
+                                    disabled={loading}
+                                >
+                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                        <SelectValue placeholder="Seleccionar tipo" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                                        {Object.entries(PERSONNEL_TYPE_LABELS).map(([value, label]) => (
+                                            <SelectItem
+                                                key={value}
+                                                value={value}
+                                                className="text-white hover:bg-zinc-700"
+                                            >
+                                                {label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
                     </div>
 
                     {/* Estado activo */}
@@ -345,11 +348,6 @@ export function PersonalModal({
                                                 >
                                                     {profile.name}
                                                 </Label>
-                                                {isSelected && (
-                                                    <Badge variant="secondary" className="bg-blue-600 text-white text-xs">
-                                                        ✓
-                                                    </Badge>
-                                                )}
                                             </div>
 
                                             {/* Descripción personalizada para el perfil */}
@@ -369,8 +367,9 @@ export function PersonalModal({
                                                 </div>
                                             )}
                                         </div>
-                                );
-                            })}
+                                    );
+                                })
+                            )}
                         </div>
                     </div>
 
