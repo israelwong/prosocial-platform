@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
@@ -210,7 +211,7 @@ export function PersonalModal({
                     {/* Información básica */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="fullName" className="text-white">
+                            <Label htmlFor="fullName" className="text-white mb-2">
                                 Nombre completo *
                             </Label>
                             <Input
@@ -227,7 +228,7 @@ export function PersonalModal({
                         </div>
 
                         <div>
-                            <Label htmlFor="email" className="text-white">
+                            <Label htmlFor="email" className="text-white mb-2">
                                 Email *
                             </Label>
                             <Input
@@ -245,21 +246,26 @@ export function PersonalModal({
                         </div>
 
                         <div>
-                            <Label htmlFor="phone" className="text-white">
+                            <Label htmlFor="phone" className="text-white mb-2">
                                 Teléfono
                             </Label>
                             <Input
                                 id="phone"
                                 value={formData.phone}
-                                onChange={(e) => handleInputChange('phone', e.target.value)}
+                                onChange={(e) => {
+                                    // Solo permitir números y máximo 10 dígitos
+                                    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                    handleInputChange('phone', value);
+                                }}
                                 className="bg-zinc-800 border-zinc-700 text-white"
-                                placeholder="+52 55 1234 5678"
+                                placeholder="10 dígitos"
+                                maxLength={10}
                                 disabled={loading}
                             />
                         </div>
 
                         <div>
-                            <Label htmlFor="type" className="text-white">
+                            <Label htmlFor="type" className="text-white mb-2">
                                 Tipo *
                             </Label>
                             <Select
@@ -287,7 +293,7 @@ export function PersonalModal({
 
                     {/* Estado activo */}
                     <div className="flex items-center space-x-2">
-                        <Checkbox
+                        <Switch
                             id="isActive"
                             checked={formData.isActive}
                             onCheckedChange={(checked) => handleInputChange('isActive', checked)}
@@ -325,32 +331,26 @@ export function PersonalModal({
                                 allProfiles.map((profile) => {
                                     const isSelected = formData.profileIds.includes(profile.id);
                                     return (
-                                        <div key={profile.id} className="border border-zinc-700 rounded-lg p-4">
-                                            <div className="flex items-start space-x-3">
+                                        <div key={profile.id} className="border border-zinc-700 rounded-lg p-3">
+                                            <div className="flex items-center space-x-3">
                                                 <Checkbox
                                                     id={`profile-${profile.id}`}
                                                     checked={isSelected}
                                                     onCheckedChange={() => handleProfileToggle(profile.id)}
                                                     disabled={loading}
-                                                    className="mt-1"
                                                 />
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
-                                                        <Label
-                                                            htmlFor={`profile-${profile.id}`}
-                                                            className="text-white font-medium cursor-pointer"
-                                                        >
-                                                            {profile.name}
-                                                        </Label>
-                                                        {isSelected && (
-                                                            <Badge variant="secondary" className="bg-blue-600 text-white">
-                                                                Seleccionado
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-sm text-zinc-400 mt-1">
-                                                        {profile.slug}
-                                                    </p>
+                                                <Label
+                                                    htmlFor={`profile-${profile.id}`}
+                                                    className="text-white font-medium cursor-pointer flex-1"
+                                                >
+                                                    {profile.name}
+                                                </Label>
+                                                {isSelected && (
+                                                    <Badge variant="secondary" className="bg-blue-600 text-white text-xs">
+                                                        ✓
+                                                    </Badge>
+                                                )}
+                                            </div>
 
                                                     {/* Descripción personalizada para el perfil */}
                                                     {isSelected && (
