@@ -17,6 +17,7 @@ import {
     type PersonalCreateForm,
     type PersonalUpdateForm,
 } from '@/lib/actions/schemas/personal-schemas';
+import { obtenerPerfilesProfesionalesStudio } from '@/lib/actions/studio/config/professional-profiles.actions';
 import type { Personal } from '../types';
 
 interface PersonalModalProps {
@@ -26,6 +27,7 @@ interface PersonalModalProps {
     personal?: Personal | null;
     loading: boolean;
     defaultType?: PersonnelType;
+    studioSlug: string;
 }
 
 export function PersonalModal({
@@ -34,7 +36,8 @@ export function PersonalModal({
     onSave,
     personal,
     loading,
-    defaultType
+    defaultType,
+    studioSlug
 }: PersonalModalProps) {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -43,7 +46,6 @@ export function PersonalModal({
         type: defaultType || 'EMPLEADO' as PersonnelType,
         isActive: true,
         profileIds: [] as string[],
-        profileDescriptions: {} as Record<string, string>,
     });
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -53,13 +55,6 @@ export function PersonalModal({
         if (isOpen) {
             if (personal) {
                 // Modo edición
-                const profileDescriptions: Record<string, string> = {};
-                personal.professional_profiles.forEach(p => {
-                    if (p.description && p.profile) {
-                        profileDescriptions[p.profile.id] = p.description;
-                    }
-                });
-
                 setFormData({
                     fullName: personal.fullName || '',
                     email: personal.email,
@@ -67,7 +62,6 @@ export function PersonalModal({
                     type: personal.type || 'EMPLEADO',
                     isActive: personal.isActive,
                     profileIds: personal.professional_profiles.filter(p => p.profile).map(p => p.profile!.id),
-                    profileDescriptions,
                 });
             } else {
                 // Modo creación
@@ -78,7 +72,6 @@ export function PersonalModal({
                     type: defaultType || 'EMPLEADO',
                     isActive: true,
                     profileIds: [],
-                    profileDescriptions: {},
                 });
             }
             setErrors({});
@@ -100,29 +93,13 @@ export function PersonalModal({
                 ? prev.profileIds.filter(id => id !== profileId)
                 : [...prev.profileIds, profileId];
 
-            // Si se deselecciona, limpiar la descripción
-            const newDescriptions = { ...prev.profileDescriptions };
-            if (isSelected) {
-                delete newDescriptions[profileId];
-            }
-
             return {
                 ...prev,
                 profileIds: newProfileIds,
-                profileDescriptions: newDescriptions,
             };
         });
     };
 
-    const handleProfileDescriptionChange = (profileId: string, description: string) => {
-        setFormData(prev => ({
-            ...prev,
-            profileDescriptions: {
-                ...prev.profileDescriptions,
-                [profileId]: description,
-            },
-        }));
-    };
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -182,14 +159,18 @@ export function PersonalModal({
     const loadProfiles = async () => {
         try {
             setProfilesLoading(true);
-            // TODO: Implementar Server Action para obtener perfiles
-            // Por ahora, usar datos de ejemplo
-            const mockProfiles = [
-                { id: '1', name: 'Fotógrafo', slug: 'fotografo', color: '#3B82F6', icon: 'Camera' },
-                { id: '2', name: 'Camarógrafo', slug: 'camarografo', color: '#8B5CF6', icon: 'Video' },
-                { id: '3', name: 'Editor de Video', slug: 'editor-video', color: '#F59E0B', icon: 'Edit' },
-            ];
-            setAllProfiles(mockProfiles);
+            const perfiles = await obtenerPerfilesProfesionalesStudio(studioSlug);
+            
+            // Transformar los datos para el formato esperado
+            const perfilesFormateados = perfiles.map(perfil => ({
+                id: perfil.id,
+                name: perfil.name,
+                slug: perfil.slug,
+                color: perfil.color,
+                icon: perfil.icon,
+            }));
+            
+            setAllProfiles(perfilesFormateados);
         } catch (error) {
             console.error('Error loading profiles:', error);
             toast.error('Error al cargar perfiles profesionales');
@@ -349,23 +330,6 @@ export function PersonalModal({
                                                     {profile.name}
                                                 </Label>
                                             </div>
-
-                                            {/* Descripción personalizada para el perfil */}
-                                            {isSelected && (
-                                                <div className="mt-3">
-                                                    <Label className="text-sm text-zinc-300">
-                                                        Descripción específica (opcional)
-                                                    </Label>
-                                                    <Textarea
-                                                        value={formData.profileDescriptions[profile.id] || ''}
-                                                        onChange={(e) => handleProfileDescriptionChange(profile.id, e.target.value)}
-                                                        className="bg-zinc-800 border-zinc-600 text-white text-sm mt-1"
-                                                        placeholder={`Describe la experiencia específica en ${profile.name.toLowerCase()}...`}
-                                                        rows={2}
-                                                        disabled={loading}
-                                                    />
-                                                </div>
-                                            )}
                                         </div>
                                     );
                                 })

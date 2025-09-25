@@ -148,10 +148,6 @@ export default function ProveedoresPage() {
         }
     };
 
-    const handleRefresh = () => {
-        loadData();
-        toast.success('Información actualizada');
-    };
 
     const navigateToPerfiles = () => {
         router.push(`/studio/${slug}/configuracion/negocio/personal/perfiles`);
@@ -159,8 +155,7 @@ export default function ProveedoresPage() {
 
     return (
         <div className="space-y-6 mt-16 max-w-screen-lg mx-auto mb-16">
-            {/* Header con estadísticas */}
-            <PersonalStats stats={stats} loading={loading} />
+
 
             {/* Header de la sección */}
             <HeaderNavigation
@@ -178,13 +173,6 @@ export default function ProveedoresPage() {
                         onClick: navigateToPerfiles,
                         variant: "outline",
                         className: "border-purple-600 text-purple-300 hover:bg-purple-800"
-                    },
-                    {
-                        label: "Actualizar",
-                        icon: "RefreshCw",
-                        onClick: handleRefresh,
-                        variant: "outline",
-                        className: "border-zinc-600 text-zinc-300 hover:bg-zinc-800"
                     }
                 ]}
             />
@@ -206,6 +194,7 @@ export default function ProveedoresPage() {
                 personal={editingProveedor}
                 loading={modalLoading}
                 defaultType="PROVEEDOR"
+                studioSlug={slug}
             />
         </div>
     );

@@ -177,9 +177,6 @@ export default function EmpleadosPage() {
                 ]}
             />
 
-            {/* Header con estadísticas */}
-            <PersonalStats stats={stats} loading={loading} />
-
 
             {/* Lista de empleados */}
             <PersonalListSimple
@@ -198,6 +195,7 @@ export default function EmpleadosPage() {
                 personal={editingEmpleado}
                 loading={modalLoading}
                 defaultType="EMPLEADO"
+                studioSlug={slug}
             />
         </div>
     );
