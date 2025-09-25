@@ -3,7 +3,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tag, Users, UserCheck, UserX } from 'lucide-react';
-import { ProfessionalProfileStats } from '../types';
+import type { ProfessionalProfileStats } from '../types';
 
 interface ProfessionalProfileStatsProps {
     stats: ProfessionalProfileStats;
