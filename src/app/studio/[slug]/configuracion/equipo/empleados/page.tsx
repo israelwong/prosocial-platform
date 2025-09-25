@@ -19,18 +19,42 @@ import {
     type PersonalCreateForm,
     type PersonalUpdateForm,
 } from '@/lib/actions/schemas/personal-schemas';
-// import type { Personal } from '../types'; // Removido porque no se usa
+import type { Personal } from '../types';
+
+// Tipo para datos de la API que pueden no coincidir exactamente con Personal
+type PersonalFromAPI = {
+    id: string;
+    fullName: string | null;
+    email: string;
+    phone: string | null;
+    type: 'EMPLEADO' | 'PROVEEDOR' | null;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    professional_profiles: Array<{
+        id: string;
+        profile: {
+            id: string;
+            name: string;
+            slug: string;
+            color: string | null;
+            icon: string | null;
+        } | null;
+        description: string | null;
+        isActive: boolean;
+    }>;
+};
 
 export default function EmpleadosPage() {
     const params = useParams();
     const router = useRouter();
     const slug = params.slug as string;
 
-    const [empleados, setEmpleados] = useState<any[]>([]);
+    const [empleados, setEmpleados] = useState<PersonalFromAPI[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalLoading, setModalLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingEmpleado, setEditingEmpleado] = useState<any | null>(null);
+    const [editingEmpleado, setEditingEmpleado] = useState<PersonalFromAPI | null>(null);
 
     // Cargar empleados
     const loadData = React.useCallback(async () => {
@@ -51,7 +75,7 @@ export default function EmpleadosPage() {
     }, [loadData]);
 
     // Funciones del modal
-    const handleOpenModal = (empleado?: any) => {
+    const handleOpenModal = (empleado?: PersonalFromAPI) => {
         setEditingEmpleado(empleado || null);
         setIsModalOpen(true);
     };
@@ -180,7 +204,7 @@ export default function EmpleadosPage() {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 onSave={handleSaveEmpleado}
-                personal={editingEmpleado}
+                personal={editingEmpleado as Personal}
                 loading={modalLoading}
                 defaultType="EMPLEADO"
                 studioSlug={slug}
