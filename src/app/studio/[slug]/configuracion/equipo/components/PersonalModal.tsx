@@ -111,7 +111,7 @@ export function PersonalModal({
         const emailTrimmed = formData.email.trim();
         if (!emailTrimmed) {
             newErrors.email = 'El email es requerido';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+        } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(emailTrimmed)) {
             newErrors.email = 'El formato del email no es válido';
         }
 
