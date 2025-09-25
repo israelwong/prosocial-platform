@@ -16,6 +16,7 @@
     "db:create-profiles": "tsx prisma/create-user-profiles.ts",
     "db:seed-plans": "tsx prisma/seed-plans.ts",
     "db:seed-agents": "tsx prisma/seed-agents.ts",
+    "db:seed-profiles": "node scripts/seed-professional-profiles.js",
     "db:reset": "prisma migrate reset --force && npm run db:seed",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook"
   },
