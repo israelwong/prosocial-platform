@@ -20,7 +20,7 @@ export function ContactoStats({ telefonos, contactoData, loading }: ContactoStat
         return (
             <div className="grid gap-4 md:grid-cols-3">
                 {[...Array(3)].map((_, i) => (
-                    <Card key={i} className="bg-zinc-800 border-zinc-700">
+                    <Card key={i} className="bg-zinc-900/50 border-zinc-800">
                         <CardHeader className="pb-2">
                             <div className="h-4 w-24 bg-zinc-700 rounded animate-pulse" />
                         </CardHeader>
@@ -36,7 +36,7 @@ export function ContactoStats({ telefonos, contactoData, loading }: ContactoStat
     return (
         <div className="grid gap-4 md:grid-cols-3">
             {/* Teléfonos Activos */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-zinc-300">
                         Teléfonos Activos
@@ -52,7 +52,7 @@ export function ContactoStats({ telefonos, contactoData, loading }: ContactoStat
             </Card>
 
             {/* Dirección */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-zinc-300">
                         Dirección
@@ -70,7 +70,7 @@ export function ContactoStats({ telefonos, contactoData, loading }: ContactoStat
             </Card>
 
             {/* Página Web */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-zinc-300">
                         Página Web

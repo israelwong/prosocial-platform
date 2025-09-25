@@ -32,7 +32,7 @@ export function HorariosItem({
     const isTimeValid = validateTime(horario.hora_inicio, horario.hora_fin);
 
     return (
-        <div className={`p-4 bg-zinc-800 rounded-lg border transition-colors ${horario.activo ? 'border-zinc-700' : 'border-zinc-800 opacity-60'
+        <div className={`p-4 bg-zinc-900/50 rounded-lg border transition-colors ${horario.activo ? 'border-zinc-800' : 'border-zinc-800 opacity-60'
             }`}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -45,7 +45,7 @@ export function HorariosItem({
                             type="time"
                             value={horario.hora_inicio}
                             onChange={(e) => onUpdateHorario(horario.id, 'hora_inicio', e.target.value)}
-                            className={`bg-zinc-700 border-zinc-600 text-white w-32 ${!isTimeValid ? 'border-red-500' : ''
+                            className={`w-32 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:hue-rotate-0 [&::-webkit-calendar-picker-indicator]:contrast-100 ${!isTimeValid ? 'border-red-500' : ''
                                 }`}
                             disabled={!horario.activo}
                         />
@@ -54,7 +54,7 @@ export function HorariosItem({
                             type="time"
                             value={horario.hora_fin}
                             onChange={(e) => onUpdateHorario(horario.id, 'hora_fin', e.target.value)}
-                            className={`bg-zinc-700 border-zinc-600 text-white w-32 ${!isTimeValid ? 'border-red-500' : ''
+                            className={`w-32 [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:brightness-0 [&::-webkit-calendar-picker-indicator]:saturate-100 [&::-webkit-calendar-picker-indicator]:hue-rotate-0 [&::-webkit-calendar-picker-indicator]:contrast-100 ${!isTimeValid ? 'border-red-500' : ''
                                 }`}
                             disabled={!horario.activo}
                         />

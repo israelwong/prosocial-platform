@@ -56,7 +56,7 @@ export function ContactoItem({ telefono, onDelete, onEdit, onToggleActive }: Con
 
     return (
         <>
-            <div className={`p-3 bg-zinc-800 rounded-lg border transition-colors ${telefono.activo ? 'border-zinc-700' : 'border-zinc-800 opacity-60'}`}>
+            <div className={`p-3 bg-zinc-900/50 rounded-lg border transition-colors ${telefono.activo ? 'border-zinc-700' : 'border-zinc-800 opacity-60'}`}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                         <div className={`w-3 h-3 rounded-full ${tipoInfo.color}`}></div>

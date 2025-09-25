@@ -30,7 +30,7 @@ export default function ConfiguracionPage({ params }: ConfiguracionPageProps) {
     }
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 max-w-screen-lg mx-auto mt-16">
             <SetupProgressHeader
                 overallProgress={setupStatus.overallProgress}
                 isFullyConfigured={setupStatus.isFullyConfigured}

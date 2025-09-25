@@ -14,18 +14,18 @@ interface PalabrasClaveManagerProps {
   loading?: boolean;
 }
 
-export function PalabrasClaveManager({ 
-  palabrasClave, 
-  onUpdate, 
+export function PalabrasClaveManager({
+  palabrasClave,
+  onUpdate,
   onLocalUpdate,
-  loading = false 
+  loading = false
 }: PalabrasClaveManagerProps) {
   const [nuevaPalabra, setNuevaPalabra] = useState('');
   const [updating, setUpdating] = useState(false);
 
   const handleAddPalabra = async () => {
     if (!nuevaPalabra.trim()) return;
-    
+
     const palabraTrimmed = nuevaPalabra.trim();
     if (palabrasClave.includes(palabraTrimmed)) {
       toast.error('Esta palabra clave ya existe');
@@ -34,11 +34,11 @@ export function PalabrasClaveManager({
 
     const nuevasPalabras = [...palabrasClave, palabraTrimmed];
     setUpdating(true);
-    
+
     // Actualización optimista - actualizar UI inmediatamente
     onLocalUpdate(nuevasPalabras);
     setNuevaPalabra('');
-    
+
     try {
       await onUpdate(nuevasPalabras);
       toast.success('Palabra clave agregada');
@@ -55,10 +55,10 @@ export function PalabrasClaveManager({
   const handleRemovePalabra = async (palabra: string) => {
     const nuevasPalabras = palabrasClave.filter(p => p !== palabra);
     setUpdating(true);
-    
+
     // Actualización optimista - actualizar UI inmediatamente
     onLocalUpdate(nuevasPalabras);
-    
+
     try {
       await onUpdate(nuevasPalabras);
       toast.success('Palabra clave eliminada');
@@ -82,9 +82,9 @@ export function PalabrasClaveManager({
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         {palabrasClave.map((palabra, index) => (
-          <Badge 
-            key={index} 
-            variant="secondary" 
+          <Badge
+            key={index}
+            variant="secondary"
             className="bg-zinc-800 text-zinc-300"
           >
             {palabra}
@@ -103,7 +103,6 @@ export function PalabrasClaveManager({
         <Input
           value={nuevaPalabra}
           onChange={(e) => setNuevaPalabra(e.target.value)}
-          className="bg-zinc-800 border-zinc-700 text-white"
           placeholder="Agregar palabra clave"
           onKeyPress={handleKeyPress}
           disabled={updating || loading}

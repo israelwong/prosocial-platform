@@ -54,7 +54,7 @@ export function RedSocialItem({
 
     return (
         <>
-            <div className={`p-3 bg-zinc-800 rounded-lg border transition-colors ${red.activo ? 'border-zinc-700' : 'border-zinc-800 opacity-60'}`}>
+            <div className={`p-3 bg-zinc-900/50 rounded-lg border transition-colors ${red.activo ? 'border-zinc-800' : 'border-zinc-800 opacity-60'}`}>
                 <div className="flex items-center space-x-3">
                     {/* Ícono de la plataforma */}
                     <div

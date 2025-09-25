@@ -35,7 +35,6 @@ export default function ContactoPage() {
     const [retryCount, setRetryCount] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTelefono, setEditingTelefono] = useState<Telefono | null>(null);
-    const [modalLoading, setModalLoading] = useState(false);
 
     // Los datos se cargan desde la base de datos, no hay datos hardcodeados
 
@@ -108,8 +107,6 @@ export default function ContactoPage() {
     };
 
     const handleSaveTelefono = async (data: TelefonoCreate, editingTelefono?: Telefono) => {
-        setModalLoading(true);
-
         try {
             if (editingTelefono) {
                 // Actualizar teléfono existente usando Server Actions
@@ -145,7 +142,7 @@ export default function ContactoPage() {
             const errorMessage = err instanceof Error ? err.message : 'Error al guardar teléfono';
             toast.error(errorMessage);
         } finally {
-            setModalLoading(false);
+            // Modal loading handled internally
         }
     };
 
@@ -235,6 +232,111 @@ export default function ContactoPage() {
         );
     }
 
+    if (loading) {
+        return (
+            <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
+                {/* Header Navigation Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                    </div>
+                </div>
+
+                {/* Estadísticas Skeleton */}
+                <div className="grid gap-4 md:grid-cols-3">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
+                        <div className="animate-pulse">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-5 w-5 bg-zinc-700 rounded"></div>
+                                <div>
+                                    <div className="h-6 bg-zinc-700 rounded w-8 mb-1"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
+                        <div className="animate-pulse">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-5 w-5 bg-zinc-700 rounded"></div>
+                                <div>
+                                    <div className="h-6 bg-zinc-700 rounded w-8 mb-1"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
+                        <div className="animate-pulse">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-5 w-5 bg-zinc-700 rounded"></div>
+                                <div>
+                                    <div className="h-6 bg-zinc-700 rounded w-8 mb-1"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Lista de Contacto Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                                <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                            </div>
+                            <div className="h-10 bg-zinc-700 rounded w-32"></div>
+                        </div>
+
+                        {/* Datos de contacto skeleton */}
+                        <div className="space-y-4 mb-6">
+                            <div className="h-16 bg-zinc-700 rounded"></div>
+                            <div className="h-16 bg-zinc-700 rounded"></div>
+                        </div>
+
+                        {/* Teléfonos skeleton */}
+                        <div className="space-y-3">
+                            <div className="h-4 bg-zinc-700 rounded w-1/4 mb-4"></div>
+                            <div className="space-y-2">
+                                <div className="h-12 bg-zinc-700 rounded"></div>
+                                <div className="h-12 bg-zinc-700 rounded"></div>
+                                <div className="h-12 bg-zinc-700 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Información de uso Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-6 bg-zinc-700 rounded w-1/3 mb-4"></div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
 
@@ -269,11 +371,10 @@ export default function ContactoPage() {
                 onClose={handleCloseModal}
                 onSave={handleSaveTelefono}
                 editingTelefono={editingTelefono}
-                loading={modalLoading}
             />
 
             {/* Información de uso */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <CardTitle className="text-white">¿Dónde se usa esta información?</CardTitle>
                 </CardHeader>

@@ -62,7 +62,7 @@ export function ContactoList({
     return (
         <div className="space-y-6">
             {/* Teléfonos */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
@@ -113,7 +113,7 @@ export function ContactoList({
             </Card>
 
             {/* Dirección */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
@@ -143,7 +143,7 @@ export function ContactoList({
                             id="direccion"
                             value={localData.direccion}
                             onChange={(e) => setLocalData(prev => ({ ...prev, direccion: e.target.value }))}
-                            className="bg-zinc-800 border-zinc-700 text-white min-h-[100px]"
+                            className="min-h-[100px]"
                             placeholder="Calle, número, colonia, ciudad, estado, código postal"
                         />
                     </div>
@@ -156,7 +156,7 @@ export function ContactoList({
             </Card>
 
             {/* Página Web */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div>
@@ -181,12 +181,11 @@ export function ContactoList({
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="website" className="text-zinc-300">URL del Sitio Web</Label>
+                        <Label htmlFor="website" >URL del Sitio Web</Label>
                         <Input
                             id="website"
                             value={localData.website}
                             onChange={(e) => setLocalData(prev => ({ ...prev, website: e.target.value }))}
-                            className="bg-zinc-800 border-zinc-700 text-white"
                             placeholder="https://www.tu-estudio.com"
                         />
                     </div>

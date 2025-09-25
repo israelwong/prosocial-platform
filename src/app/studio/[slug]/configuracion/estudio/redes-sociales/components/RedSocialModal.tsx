@@ -125,7 +125,7 @@ export function RedSocialModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[500px] bg-card border-border">
+            <DialogContent className="sm:max-w-[500px] bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
                 <DialogHeader>
                     <DialogTitle className="text-white flex items-center gap-2">
                         {isEditing ? (
@@ -162,7 +162,7 @@ export function RedSocialModal({
                                 }}
                                 disabled={loading || isEditing}
                             >
-                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
                                     <SelectValue placeholder="Selecciona una plataforma" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-zinc-800 border-zinc-700">
@@ -202,7 +202,6 @@ export function RedSocialModal({
                                         setErrors(prev => ({ ...prev, url: '' }));
                                     }
                                 }}
-                                className="bg-zinc-800 border-zinc-700 text-white"
                                 placeholder="https://..."
                                 disabled={loading}
                             />

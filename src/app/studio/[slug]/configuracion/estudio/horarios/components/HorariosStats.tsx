@@ -15,7 +15,7 @@ export function HorariosStats({ horarios, loading }: HorariosStatsProps) {
         return (
             <div className="grid gap-4 md:grid-cols-3">
                 {[...Array(3)].map((_, i) => (
-                    <Card key={i} className="bg-zinc-800 border-zinc-700">
+                    <Card key={i} className="bg-zinc-900/50 border-zinc-800">
                         <CardContent className="p-4">
                             <div className="animate-pulse">
                                 <div className="flex items-center space-x-2">
@@ -39,10 +39,10 @@ export function HorariosStats({ horarios, loading }: HorariosStatsProps) {
 
     return (
         <div className="grid gap-4 md:grid-cols-3">
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardContent className="p-4">
                     <div className="flex items-center space-x-2">
-                        <Clock className="h-5 w-5 text-green-400" />
+                        <Clock className="h-5 w-5 text-zinc-500" />
                         <div>
                             <p className="text-2xl font-bold text-white">{horariosActivos}</p>
                             <p className="text-sm text-zinc-400">Días Activos</p>
@@ -51,10 +51,10 @@ export function HorariosStats({ horarios, loading }: HorariosStatsProps) {
                 </CardContent>
             </Card>
 
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardContent className="p-4">
                     <div className="flex items-center space-x-2">
-                        <Clock className="h-5 w-5 text-zinc-400" />
+                        <Clock className="h-5 w-5 text-zinc-500" />
                         <div>
                             <p className="text-2xl font-bold text-white">{horariosInactivos}</p>
                             <p className="text-sm text-zinc-400">Días Inactivos</p>
@@ -63,10 +63,10 @@ export function HorariosStats({ horarios, loading }: HorariosStatsProps) {
                 </CardContent>
             </Card>
 
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardContent className="p-4">
                     <div className="flex items-center space-x-2">
-                        <Calendar className="h-5 w-5 text-blue-400" />
+                        <Calendar className="h-5 w-5 text-zinc-500" />
                         <div>
                             <p className="text-2xl font-bold text-white">{totalHorarios}</p>
                             <p className="text-sm text-zinc-400">Total Días</p>

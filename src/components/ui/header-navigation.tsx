@@ -10,22 +10,24 @@ export interface HeaderNavigationProps {
     description: string;
     actionButton?: {
         label: string;
-        href?: string; // ✅ Opcional para links
-        onClick?: () => void; // ✅ Opcional para botones
-        icon: LucideIcon | string; // ✅ Acepta componente o nombre
+        href?: string;
+        onClick?: () => void;
+        icon: LucideIcon | string;
+        variant?: 'primary' | 'secondary';
     };
     secondaryButtons?: Array<{
         label: string;
         href?: string;
         onClick?: () => void;
         icon: LucideIcon | string;
-        variant?: 'outline' | 'default';
+        variant?: 'outline' | 'ghost' | 'secondary';
         className?: string;
     }>;
     className?: string;
+    showBorder?: boolean; // Nueva prop para controlar el borde
 }
 
-// ✅ Helper para obtener icono por nombre
+// Helper para obtener icono por nombre
 const getIcon = (icon: LucideIcon | string): LucideIcon => {
     if (typeof icon === 'string') {
         const iconMap: Record<string, LucideIcon> = {
@@ -45,9 +47,17 @@ const getIcon = (icon: LucideIcon | string): LucideIcon => {
             'Tag': Tag,
             'RefreshCw': RefreshCw,
         };
-        return iconMap[icon] || Plus; // Fallback a Plus si no se encuentra
+        return iconMap[icon] || Plus;
     }
     return icon;
+};
+
+// Estilos para variantes de botones
+const buttonVariants = {
+    primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-600/25",
+    secondary: "bg-zinc-700 text-zinc-200 hover:bg-zinc-600 border border-zinc-600",
+    outline: "border border-zinc-600 text-zinc-300 hover:bg-zinc-800/50 hover:border-zinc-500",
+    ghost: "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/30",
 };
 
 export function HeaderNavigation({
@@ -55,70 +65,87 @@ export function HeaderNavigation({
     description,
     actionButton,
     secondaryButtons,
-    className
+    className,
+    showBorder = true
 }: HeaderNavigationProps) {
     return (
-        <div className={cn("bg-zinc-900 border border-zinc-800 rounded-lg p-6", className)}>
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">{title}</h1>
-                    <p className="text-zinc-400 mt-1">{description}</p>
+        <div className={cn(
+            "relative overflow-hidden",
+            // Fondo con gradiente sutil
+            "bg-gradient-to-r from-zinc-900/40 via-zinc-900/20 to-zinc-900/40",
+            // Backdrop blur para efecto moderno
+            "backdrop-blur-sm",
+            // Bordes y sombras
+            showBorder && "border border-zinc-800/60",
+            "rounded-xl shadow-2xl shadow-black/10",
+            // Padding responsive
+            "p-6 md:p-8",
+            className
+        )}>
+            {/* Efecto de brillo sutil en la parte superior */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-zinc-600/50 to-transparent" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                {/* Sección de título */}
+                <div className="space-y-2">
+                    <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+                        {title}
+                    </h1>
+                    <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-2xl">
+                        {description}
+                    </p>
                 </div>
-                <div className="flex items-center gap-2">
+
+                {/* Sección de botones */}
+                <div className="flex items-center gap-3 flex-shrink-0">
                     {/* Botones secundarios */}
-                    {secondaryButtons && secondaryButtons.map((button, index) => (
-                        button.href ? (
-                            <Link
-                                key={index}
-                                href={button.href}
-                                className={cn(
-                                    "inline-flex items-center px-3 py-2 rounded-lg transition-colors",
-                                    button.variant === 'outline'
-                                        ? "border border-zinc-600 text-zinc-300 hover:bg-zinc-800"
-                                        : "bg-zinc-700 text-white hover:bg-zinc-600",
-                                    button.className
-                                )}
-                            >
-                                {React.createElement(getIcon(button.icon), { className: "h-4 w-4 mr-2" })}
-                                {button.label}
+                    {secondaryButtons && secondaryButtons.map((button, index) => {
+                        const IconComponent = getIcon(button.icon);
+                        const baseClasses = "inline-flex items-center px-4 py-2.5 rounded-lg font-medium transition-all duration-200 text-sm";
+                        const variantClasses = buttonVariants[button.variant || 'outline'];
+
+                        const buttonElement = (
+                            <div className={cn(baseClasses, variantClasses, button.className)}>
+                                <IconComponent className="h-4 w-4 mr-2 flex-shrink-0" />
+                                <span className="whitespace-nowrap">{button.label}</span>
+                            </div>
+                        );
+
+                        return button.href ? (
+                            <Link key={index} href={button.href}>
+                                {buttonElement}
                             </Link>
                         ) : (
-                            <button
-                                key={index}
-                                onClick={button.onClick}
-                                className={cn(
-                                    "inline-flex items-center px-3 py-2 rounded-lg transition-colors",
-                                    button.variant === 'outline'
-                                        ? "border border-zinc-600 text-zinc-300 hover:bg-zinc-800"
-                                        : "bg-zinc-700 text-white hover:bg-zinc-600",
-                                    button.className
-                                )}
-                            >
-                                {React.createElement(getIcon(button.icon), { className: "h-4 w-4 mr-2" })}
-                                {button.label}
+                            <button key={index} onClick={button.onClick}>
+                                {buttonElement}
                             </button>
-                        )
-                    ))}
+                        );
+                    })}
 
                     {/* Botón principal */}
                     {actionButton && (
-                        actionButton.href ? (
-                            <Link
-                                href={actionButton.href}
-                                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            >
-                                {React.createElement(getIcon(actionButton.icon), { className: "h-4 w-4 mr-2" })}
-                                {actionButton.label}
-                            </Link>
-                        ) : (
-                            <button
-                                onClick={actionButton.onClick}
-                                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            >
-                                {React.createElement(getIcon(actionButton.icon), { className: "h-4 w-4 mr-2" })}
-                                {actionButton.label}
-                            </button>
-                        )
+                        (() => {
+                            const IconComponent = getIcon(actionButton.icon);
+                            const baseClasses = "inline-flex items-center px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 text-sm transform hover:scale-[1.02] active:scale-[0.98]";
+                            const variantClasses = buttonVariants[actionButton.variant || 'primary'];
+
+                            const buttonElement = (
+                                <div className={cn(baseClasses, variantClasses)}>
+                                    <IconComponent className="h-4 w-4 mr-2 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">{actionButton.label}</span>
+                                </div>
+                            );
+
+                            return actionButton.href ? (
+                                <Link href={actionButton.href}>
+                                    {buttonElement}
+                                </Link>
+                            ) : (
+                                <button onClick={actionButton.onClick}>
+                                    {buttonElement}
+                                </button>
+                            );
+                        })()
                     )}
                 </div>
             </div>

@@ -42,7 +42,7 @@ export function SimpleSidebar({ className }: SimpleSidebarProps) {
     };
 
     return (
-        <div className={cn('flex flex-col h-[calc(100vh-4rem)] bg-zinc-900 border-r border-zinc-800 w-64', className)}>
+        <div className={cn('flex flex-col h-[calc(100vh-4rem)] bg-zinc-950 border-r border-zinc-900 w-64', className)}>
             {/* Navigation */}
             <nav className="flex-1 p-4 space-y-2">
                 {navigationItems.map((item) => {

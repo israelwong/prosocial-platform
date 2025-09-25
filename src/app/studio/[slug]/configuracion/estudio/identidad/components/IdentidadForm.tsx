@@ -77,28 +77,26 @@ export function IdentidadForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="nombre" className="text-zinc-300">
+          <Label htmlFor="nombre">
             Nombre del Negocio *
           </Label>
           <Input
             id="nombre"
             value={formData.nombre}
             onChange={(e) => handleInputChange('nombre', e.target.value)}
-            className="bg-zinc-800 border-zinc-700 text-white"
             placeholder="Ej: Studio Fotografía María"
             required
             disabled={saving || loading}
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="slogan" className="text-zinc-300">
+          <Label htmlFor="slogan" className="">
             Slogan
           </Label>
           <Input
             id="slogan"
             value={formData.slogan}
             onChange={(e) => handleInputChange('slogan', e.target.value)}
-            className="bg-zinc-800 border-zinc-700 text-white"
             placeholder="Ej: Capturando momentos únicos"
             disabled={saving || loading}
           />
@@ -106,14 +104,14 @@ export function IdentidadForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="descripcion" className="text-zinc-300">
+        <Label htmlFor="descripcion" className="">
           Descripción
         </Label>
         <Textarea
           id="descripcion"
           value={formData.descripcion}
           onChange={(e) => handleInputChange('descripcion', e.target.value)}
-          className="bg-zinc-800 border-zinc-700 text-white min-h-[100px]"
+          className="min-h-[100px]"
           placeholder="Describe tu estudio, servicios y experiencia..."
           disabled={saving || loading}
         />

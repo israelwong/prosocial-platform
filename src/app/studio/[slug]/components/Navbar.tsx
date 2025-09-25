@@ -140,7 +140,7 @@ export function Navbar({ className }: NavbarProps) {
   };
 
   return (
-    <nav className={`bg-zinc-900 border-b border-zinc-800 px-6 py-4 ${className || ''}`}>
+    <nav className={`bg-zinc-950 border-b border-zinc-900 px-6 py-4 ${className || ''}`}>
       <div className="flex items-center justify-between">
         {/* Logo + Nombre Estudio */}
         <div className="flex items-center space-x-3">

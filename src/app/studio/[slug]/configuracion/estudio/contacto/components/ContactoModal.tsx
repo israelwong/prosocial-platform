@@ -9,15 +9,16 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Loader2 } from 'lucide-react';
 import { Telefono, TelefonoCreate, TIPOS_TELEFONO } from '../types';
 
+type TipoTelefono = TelefonoCreate['tipo'];
+
 interface ContactoModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSave: (data: TelefonoCreate, editingTelefono?: Telefono) => Promise<void>;
     editingTelefono?: Telefono | null;
-    loading?: boolean;
 }
 
-export function ContactoModal({ isOpen, onClose, onSave, editingTelefono, loading }: ContactoModalProps) {
+export function ContactoModal({ isOpen, onClose, onSave, editingTelefono }: ContactoModalProps) {
     const [formData, setFormData] = useState<TelefonoCreate>({
         numero: '',
         tipo: 'principal',
@@ -52,7 +53,7 @@ export function ContactoModal({ isOpen, onClose, onSave, editingTelefono, loadin
         try {
             await onSave(formData, editingTelefono || undefined);
             onClose();
-        } catch (error) {
+        } catch {
             // El error ya se maneja en la función padre
         } finally {
             setSaving(false);
@@ -75,8 +76,8 @@ export function ContactoModal({ isOpen, onClose, onSave, editingTelefono, loadin
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="sm:max-w-[425px] bg-zinc-800 border-zinc-700">
-                <DialogHeader>
+            <DialogContent className="sm:max-w-[425px] bg-zinc-900/50 border-zinc-800 backdrop-blur-sm">
+                <DialogHeader >
                     <DialogTitle className="text-white">
                         {editingTelefono ? 'Editar Teléfono' : 'Agregar Teléfono'}
                     </DialogTitle>
@@ -94,7 +95,6 @@ export function ContactoModal({ isOpen, onClose, onSave, editingTelefono, loadin
                             id="numero"
                             value={formData.numero}
                             onChange={(e) => setFormData(prev => ({ ...prev, numero: e.target.value }))}
-                            className="bg-zinc-700 border-zinc-600 text-white"
                             placeholder="+52 55 1234 5678"
                             disabled={saving}
                         />
@@ -111,10 +111,10 @@ export function ContactoModal({ isOpen, onClose, onSave, editingTelefono, loadin
                         </Label>
                         <Select
                             value={formData.tipo}
-                            onValueChange={(value: any) => setFormData(prev => ({ ...prev, tipo: value }))}
+                            onValueChange={(value: TipoTelefono) => setFormData(prev => ({ ...prev, tipo: value }))}
                             disabled={saving}
                         >
-                            <SelectTrigger className="bg-zinc-700 border-zinc-600 text-white">
+                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -133,7 +133,7 @@ export function ContactoModal({ isOpen, onClose, onSave, editingTelefono, loadin
                             variant="outline"
                             onClick={handleClose}
                             disabled={saving}
-                            className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                            className="border-zinc-800 text-zinc-300 hover:bg-zinc-700"
                         >
                             Cancelar
                         </Button>

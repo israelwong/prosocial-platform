@@ -40,7 +40,7 @@ export function HorariosList({
     });
 
     return (
-        <Card className="bg-zinc-800 border-zinc-700">
+        <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
                 <CardTitle className="text-white">Horarios por Día de la Semana</CardTitle>
                 <CardDescription className="text-zinc-400">

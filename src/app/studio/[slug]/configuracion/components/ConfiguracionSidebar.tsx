@@ -331,9 +331,9 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
     };
 
     return (
-        <div className={cn('flex flex-col h-full bg-zinc-900 border-r border-zinc-800 w-80', className)}>
+        <div className={cn('flex flex-col h-full bg-zinc-950 border-r border-zinc-900 w-80', className)}>
             {/* Header */}
-            <div className="p-4 border-b border-zinc-800">
+            <div className="p-4 border-b border-zinc-900">
                 <h2 className="text-lg font-semibold text-white mb-1">Configuración</h2>
                 <p className="text-sm text-zinc-400 mb-3">Gestiona tu estudio en un solo lugar</p>
 
@@ -345,14 +345,14 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                         placeholder="Buscar configuración..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 pr-10 bg-zinc-800 border-zinc-700 text-white placeholder-zinc-400 focus:border-blue-500"
+                        className="pl-10 pr-10 bg-zinc-900/50 border-zinc-800 text-white placeholder-zinc-400 focus:border-blue-500"
                     />
                     {searchQuery && (
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setSearchQuery('')}
-                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-zinc-700"
+                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-zinc-800"
                         >
                             <X className="h-3 w-3 text-zinc-400" />
                         </Button>
@@ -370,7 +370,7 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                         <div key={section.id} className="space-y-1">
                             {/* División visual entre grupos */}
                             {index > 0 && (
-                                <div className="border-t border-zinc-800 my-4"></div>
+                                <div className="border-t border-zinc-900 my-4"></div>
                             )}
                             {/* Section Header */}
                             <Button

@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { HeaderNavigation } from '@/components/ui/header-navigation';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import {
@@ -97,9 +96,85 @@ export default function IdentidadPage() {
 
     if (loading) {
         return (
-            <div className="p-6 space-y-6">
-                <div className="flex items-center justify-center h-64">
-                    <Loader2 className="h-8 w-8 animate-spin text-zinc-400" />
+            <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
+                {/* Header Navigation Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                    </div>
+                </div>
+
+                {/* Información Básica Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-6 bg-zinc-700 rounded w-1/4 mb-2"></div>
+                        <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
+                        <div className="space-y-3">
+                            <div className="h-10 bg-zinc-700 rounded"></div>
+                            <div className="h-10 bg-zinc-700 rounded"></div>
+                            <div className="h-10 bg-zinc-700 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Palabras Clave Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-6 bg-zinc-700 rounded w-1/4 mb-2"></div>
+                        <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            <div className="h-8 bg-zinc-700 rounded w-20"></div>
+                            <div className="h-8 bg-zinc-700 rounded w-24"></div>
+                            <div className="h-8 bg-zinc-700 rounded w-16"></div>
+                        </div>
+                        <div className="h-10 bg-zinc-700 rounded"></div>
+                    </div>
+                </div>
+
+                {/* Logos Skeleton */}
+                <div className="grid gap-6 md:grid-cols-2">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                        <div className="animate-pulse">
+                            <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                            <div className="h-4 bg-zinc-700 rounded w-2/3 mb-4"></div>
+                            <div className="h-32 bg-zinc-700 rounded mb-4"></div>
+                            <div className="h-10 bg-zinc-700 rounded"></div>
+                        </div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                        <div className="animate-pulse">
+                            <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                            <div className="h-4 bg-zinc-700 rounded w-2/3 mb-4"></div>
+                            <div className="h-32 bg-zinc-700 rounded mb-4"></div>
+                            <div className="h-10 bg-zinc-700 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Información de uso Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-6 bg-zinc-700 rounded w-1/3 mb-4"></div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -129,7 +204,7 @@ export default function IdentidadPage() {
             />
 
             {/* Información Básica */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <CardTitle className="text-white">Información Básica</CardTitle>
                     <CardDescription className="text-zinc-400">
@@ -147,7 +222,7 @@ export default function IdentidadPage() {
             </Card>
 
             {/* Palabras Clave */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <CardTitle className="text-white">Palabras Clave</CardTitle>
                     <CardDescription className="text-zinc-400">
@@ -167,7 +242,7 @@ export default function IdentidadPage() {
             {/* Logos */}
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Logo Principal */}
-                <Card className="bg-zinc-800 border-zinc-700">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                     <CardHeader>
                         <CardTitle className="text-white">Logo Principal</CardTitle>
                         <CardDescription className="text-zinc-400">
@@ -187,7 +262,7 @@ export default function IdentidadPage() {
                 </Card>
 
                 {/* Isotipo */}
-                <Card className="bg-zinc-800 border-zinc-700">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                     <CardHeader>
                         <CardTitle className="text-white">Isotipo</CardTitle>
                         <CardDescription className="text-zinc-400">
@@ -208,7 +283,7 @@ export default function IdentidadPage() {
             </div>
 
             {/* Información de uso */}
-            <Card className="bg-zinc-800 border-zinc-700 mb-14">
+            <Card className="bg-zinc-900/50 border-zinc-800 mb-14">
                 <CardHeader>
                     <CardTitle className="text-white">¿Dónde se usa esta información?</CardTitle>
                 </CardHeader>

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Loader2 } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { HorariosStats } from './components/HorariosStats';
 import { HorariosList } from './components/HorariosList';
@@ -14,7 +14,6 @@ import {
     toggleHorarioEstado,
     actualizarHorario,
     crearHorario,
-    obtenerEstadisticasHorarios,
     inicializarHorariosPorDefecto
 } from '@/lib/actions/studio/config/horarios.actions';
 import { HeaderNavigation } from '@/components/ui/header-navigation';
@@ -163,7 +162,7 @@ export default function HorariosPage() {
     if (error && !loading) {
         return (
             <div className="p-6">
-                <Card className="bg-zinc-800 border-zinc-700">
+                <Card className="bg-zinc-900/50 border-zinc-800">
                     <CardContent className="p-6 text-center">
                         <div className="space-y-4">
                             <div className="text-red-400">
@@ -207,7 +206,7 @@ export default function HorariosPage() {
             />
 
             {/* Información de uso */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <CardTitle className="text-white">¿Dónde se usan estos horarios?</CardTitle>
                 </CardHeader>

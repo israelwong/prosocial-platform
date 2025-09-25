@@ -262,13 +262,13 @@ export function CondicionComercialForm({ studioSlug, condicion, onClose, onSucce
 
                 {/* Preview */}
                 {(watchedValues.porcentaje_descuento || watchedValues.porcentaje_anticipo) && (
-                    <div className="bg-zinc-800 rounded-lg p-4 space-y-3">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 space-y-3">
                         <h4 className="font-medium text-white flex items-center space-x-2">
                             <span>Vista Previa</span>
                         </h4>
 
                         {/* Información de sobreprecio */}
-                        <div className="bg-zinc-700 rounded p-3">
+                        <div className="bg-zinc-800/50 border border-zinc-700 rounded p-3">
                             <p className="text-sm text-zinc-300">
                                 <span className="text-yellow-400 font-medium">Sobreprecio configurado:</span> {Math.round(sobreprecio * 100)}%
                             </p>

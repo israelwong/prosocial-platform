@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
 import {
     ConfiguracionPreciosSchema,
     type ConfiguracionPreciosForm as ConfiguracionPreciosFormType
@@ -58,8 +58,6 @@ function PorcentajeField({ label, name, description, register, errors, placehold
     );
 }
 import {
-    Percent,
-    Save,
     AlertTriangle,
     Calculator,
     TrendingUp
@@ -77,12 +75,11 @@ export function ConfiguracionPreciosForm({
     onUpdate
 }: ConfiguracionPreciosFormProps) {
     const [serviciosExistentes, setServiciosExistentes] = useState<ServiciosExistentes | null>(null);
-    const [loading, setLoading] = useState(false);
 
     const {
         register,
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors },
         watch,
     } = useForm<ConfiguracionPreciosFormType>({
         resolver: zodResolver(ConfiguracionPreciosSchema),
@@ -111,7 +108,6 @@ export function ConfiguracionPreciosForm({
     }, [studioSlug]);
 
     const onSubmit = async (data: ConfiguracionPreciosFormType) => {
-        setLoading(true);
         const loadingToast = toast.loading('Guardando configuración de precios...');
 
         try {
@@ -156,8 +152,6 @@ export function ConfiguracionPreciosForm({
             // Cerrar toast de loading en caso de error
             toast.dismiss(loadingToast);
             toast.error('Error interno del servidor. Inténtalo de nuevo.');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -197,77 +191,80 @@ export function ConfiguracionPreciosForm({
                 </Card>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Porcentajes de Utilidad */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Percent className="h-5 w-5" />
-                            Porcentajes de Utilidad
-                        </CardTitle>
-                        <CardDescription>
-                            Define los márgenes de utilidad para tus servicios y productos
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <PorcentajeField
-                                label="Utilidad en Servicios"
-                                name="utilidad_servicio"
-                                description="Margen de utilidad para servicios"
-                                register={register}
-                                errors={errors}
-                                placeholder="30"
-                            />
-                            <PorcentajeField
-                                label="Utilidad en Productos"
-                                name="utilidad_producto"
-                                description="Margen de utilidad para productos físicos"
-                                register={register}
-                                errors={errors}
-                                placeholder="40"
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
+            <HeaderNavigation
+                title="Configuración de Precios"
+                description="Define los porcentajes de utilidad, comisiones y configuraciones de precios para tu negocio"
+                actionButton={{
+                    label: "Guardar Cambios",
+                    onClick: () => handleSubmit(onSubmit)(),
+                    icon: "Save"
+                }}
+            />
 
-                {/* Comisiones y Sobreprecio */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <TrendingUp className="h-5 w-5" />
-                            Comisiones y Sobreprecio
-                        </CardTitle>
-                        <CardDescription>
-                            Configura las comisiones de venta y el sobreprecio para aplicar descuentos seguros
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <PorcentajeField
-                                label="Comisión de Venta"
-                                name="comision_venta"
-                                description="Comisión aplicada sobre el precio final"
-                                register={register}
-                                errors={errors}
-                                placeholder="10"
-                            />
-                            <PorcentajeField
-                                label="Sobreprecio aplicado al precio final"
-                                name="sobreprecio"
-                                description="Porcentaje que se suma al precio final para crear una reserva de descuento (no se podrá aplicar un descuento mayor al sobreprecio)"
-                                register={register}
-                                errors={errors}
-                                placeholder="5"
-                            />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Configuración de Precios */}
+                <Card className="bg-zinc-900/50 border-zinc-800">
+
+                    <CardContent className="space-y-6">
+                        {/* Porcentajes de Utilidad */}
+                        <div>
+                            <h4 className="text-lg font-medium text-white mb-3 flex items-center gap-2">
+                                <TrendingUp className="h-4 w-4" />
+                                Porcentajes de Utilidad
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <PorcentajeField
+                                    label="Utilidad en Servicios"
+                                    name="utilidad_servicio"
+                                    description="Margen de utilidad para servicios"
+                                    register={register}
+                                    errors={errors}
+                                    placeholder="30"
+                                />
+                                <PorcentajeField
+                                    label="Utilidad en Productos"
+                                    name="utilidad_producto"
+                                    description="Margen de utilidad para productos físicos"
+                                    register={register}
+                                    errors={errors}
+                                    placeholder="40"
+                                />
+                            </div>
                         </div>
+
+                        {/* Comisiones y Sobreprecio */}
+                        <div>
+                            <h4 className="text-lg font-medium text-white mb-3 flex items-center gap-2">
+                                <TrendingUp className="h-4 w-4" />
+                                Comisiones y Sobreprecio
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <PorcentajeField
+                                    label="Comisión de Venta"
+                                    name="comision_venta"
+                                    description="Comisión aplicada sobre el precio final"
+                                    register={register}
+                                    errors={errors}
+                                    placeholder="10"
+                                />
+                                <PorcentajeField
+                                    label="Sobreprecio aplicado al precio final"
+                                    name="sobreprecio"
+                                    description="Porcentaje que se suma al precio final para crear una reserva de descuento (no se podrá aplicar un descuento mayor al sobreprecio)"
+                                    register={register}
+                                    errors={errors}
+                                    placeholder="5"
+                                />
+                            </div>
+                        </div>
+
                     </CardContent>
                 </Card>
 
                 {/* Configuración Avanzada - ELIMINADA */}
 
                 {/* Preview de Cálculo */}
-                <Card>
+                <Card className="bg-zinc-900/50 border-zinc-800">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <Calculator className="h-5 w-5" />
@@ -280,7 +277,7 @@ export function ConfiguracionPreciosForm({
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Ejemplo Servicio */}
-                            <div className="p-4 bg-zinc-800 rounded-lg">
+                            <div className="p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
                                 <h4 className="font-medium text-zinc-300 mb-2">Servicio</h4>
                                 <div className="text-sm space-y-1">
                                     {(() => {
@@ -344,7 +341,7 @@ export function ConfiguracionPreciosForm({
                             </div>
 
                             {/* Ejemplo Producto */}
-                            <div className="p-4 bg-zinc-800 rounded-lg">
+                            <div className="p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
                                 <h4 className="font-medium text-zinc-300 mb-2">Producto</h4>
                                 <div className="text-sm space-y-1">
                                     {(() => {
@@ -412,17 +409,6 @@ export function ConfiguracionPreciosForm({
                     </CardContent>
                 </Card>
 
-                {/* Botón de Guardar */}
-                <div className="flex justify-end pt-6 border-t border-zinc-700/50">
-                    <Button
-                        type="submit"
-                        disabled={isSubmitting || loading}
-                        className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Save className="mr-2 h-5 w-5" />
-                        {isSubmitting || loading ? 'Guardando...' : 'Guardar Configuración'}
-                    </Button>
-                </div>
             </form>
         </div>
     );

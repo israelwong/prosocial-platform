@@ -32,7 +32,7 @@ export function RedSocialList({
     };
 
     return (
-        <Card className="bg-zinc-800 border-zinc-700">
+        <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <div>

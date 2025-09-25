@@ -169,33 +169,115 @@ export default function RedesSocialesPage() {
     // Mostrar loading
     if (loading) {
         return (
-            <div className="p-6 flex items-center justify-center min-h-[400px]">
-                <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
-                    <p className="text-zinc-400">Cargando redes sociales...</p>
+            <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
+                {/* Header Navigation Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                    </div>
+                </div>
+
+                {/* Estadísticas Skeleton */}
+                <div className="grid gap-4 md:grid-cols-3">
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
+                        <div className="animate-pulse">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-5 w-5 bg-zinc-700 rounded"></div>
+                                <div>
+                                    <div className="h-6 bg-zinc-700 rounded w-8 mb-1"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
+                        <div className="animate-pulse">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-5 w-5 bg-zinc-700 rounded"></div>
+                                <div>
+                                    <div className="h-6 bg-zinc-700 rounded w-8 mb-1"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
+                        <div className="animate-pulse">
+                            <div className="flex items-center space-x-2">
+                                <div className="h-5 w-5 bg-zinc-700 rounded"></div>
+                                <div>
+                                    <div className="h-6 bg-zinc-700 rounded w-8 mb-1"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-20"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Lista de Redes Sociales Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                                <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                            </div>
+                            <div className="h-10 bg-zinc-700 rounded w-36"></div>
+                        </div>
+
+                        {/* Redes sociales skeleton */}
+                        <div className="space-y-3">
+                            <div className="h-12 bg-zinc-700 rounded"></div>
+                            <div className="h-12 bg-zinc-700 rounded"></div>
+                            <div className="h-12 bg-zinc-700 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Información de uso Skeleton */}
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                    <div className="animate-pulse">
+                        <div className="h-6 bg-zinc-700 rounded w-1/3 mb-4"></div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
     }
 
     // Mostrar error
-    if (error) {
+    if (error && !loading) {
         return (
             <div className="p-6">
-                <Card className="bg-red-900/20 border-red-500">
-                    <CardContent className="p-6">
-                        <div className="text-center">
-                            <p className="text-red-400 mb-2">{error}</p>
-                            {retryCount > 0 && (
-                                <p className="text-zinc-500 text-sm mb-4">
-                                    Reintentos: {retryCount}/3
-                                </p>
-                            )}
-                            <Button onClick={() => loadData(false)} variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800">
-                                <Globe className="h-4 w-4 mr-2" />
-                                Reintentar
-                            </Button>
-                        </div>
+                <Card className="bg-zinc-800 border-zinc-700">
+                    <CardContent className="p-6 text-center">
+                        <p className="text-red-400 mb-4">{error}</p>
+                        <Button
+                            onClick={() => loadData(false)}
+                            variant="outline"
+                            disabled={retryCount >= 3}
+                        >
+                            <Globe className="h-4 w-4 mr-2" />
+                            {retryCount >= 3 ? 'Máximo de reintentos alcanzado' : 'Reintentar'}
+                        </Button>
                     </CardContent>
                 </Card>
             </div>
@@ -225,7 +307,7 @@ export default function RedesSocialesPage() {
             />
 
             {/* Información de uso */}
-            <Card className="bg-zinc-800 border-zinc-700">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <CardTitle className="text-white">¿Dónde se usan estas redes sociales?</CardTitle>
                 </CardHeader>
