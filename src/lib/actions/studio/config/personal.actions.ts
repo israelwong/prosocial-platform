@@ -143,7 +143,7 @@ export async function crearPersonal(
 
             // Crear perfiles profesionales
             const perfilesProfesionales = await Promise.all(
-                validatedData.profiles.map(profileId =>
+                (validatedData.profileIds || []).map(profileId =>
                     tx.project_user_professional_profiles.create({
                         data: {
                             userId: usuario.id,
@@ -229,7 +229,7 @@ export async function actualizarPersonal(
             });
 
             // Si se proporcionan nuevos perfiles, actualizar
-            if (validatedData.profiles) {
+            if (validatedData.profileIds) {
                 // Desactivar perfiles existentes
                 await tx.project_user_professional_profiles.updateMany({
                     where: { userId: personalId },
@@ -238,7 +238,7 @@ export async function actualizarPersonal(
 
                 // Crear o reactivar perfiles
                 const perfilesProfesionales = await Promise.all(
-                    validatedData.profiles.map(async (profile) => {
+                    validatedData.profileIds.map(async (profile) => {
                         // Buscar si ya existe el perfil
                         const existingProfile = await tx.project_user_professional_profiles.findFirst({
                             where: {
