@@ -19,35 +19,25 @@ import {
     type PersonalCreateForm,
     type PersonalUpdateForm,
 } from '@/lib/actions/schemas/personal-schemas';
-import type { Personal } from '../types';
+// import type { Personal } from '../types'; // Removido porque no se usa
 
 export default function EmpleadosPage() {
     const params = useParams();
     const router = useRouter();
     const slug = params.slug as string;
 
-    const [empleados, setEmpleados] = useState<any[]>([]);
-    // const [stats, setStats] = useState<PersonalStatsType>({ // Removido porque no se usa
-    //     totalEmpleados: 0,
-    //     totalProveedores: 0,
-    //     totalPersonal: 0,
-    //     totalActivos: 0,
-    //     totalInactivos: 0,
-    //     perfilesProfesionales: {},
-    // });
+    const [empleados, setEmpleados] = useState<unknown[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalLoading, setModalLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingEmpleado, setEditingEmpleado] = useState<any | null>(null);
+    const [editingEmpleado, setEditingEmpleado] = useState<unknown | null>(null);
 
-    // Cargar empleados y estadísticas
+    // Cargar empleados
     const loadData = React.useCallback(async () => {
         try {
             setLoading(true);
             const personalData = await obtenerPersonalStudio(slug, { type: 'EMPLEADO' });
-
-            // La API devuelve una estructura compatible con Personal
-            setEmpleados(personalData as any[]);
+            setEmpleados(personalData);
         } catch (error) {
             console.error('Error loading empleados:', error);
             toast.error('Error al cargar la información de empleados');
@@ -61,7 +51,7 @@ export default function EmpleadosPage() {
     }, [loadData]);
 
     // Funciones del modal
-    const handleOpenModal = (empleado?: any) => {
+    const handleOpenModal = (empleado?: unknown) => {
         setEditingEmpleado(empleado || null);
         setIsModalOpen(true);
     };
@@ -83,10 +73,10 @@ export default function EmpleadosPage() {
                     data as PersonalUpdateForm
                 );
 
-                // @ts-ignore - Temporal fix for type mismatch
+                // Actualizar localmente
                 setEmpleados(prev =>
                     prev.map(emp =>
-                        emp.id === editingEmpleado.id ? { ...emp, ...empleadoActualizado } : emp
+                        emp.id === editingEmpleado.id ? empleadoActualizado : emp
                     )
                 );
                 toast.success('Empleado actualizado exitosamente');
@@ -97,13 +87,10 @@ export default function EmpleadosPage() {
                     type: 'EMPLEADO', // Forzar tipo empleado
                 });
 
-                // @ts-ignore - Temporal fix for type mismatch
+                // Actualizar localmente
                 setEmpleados(prev => [nuevoEmpleado, ...prev]);
                 toast.success('Empleado creado exitosamente');
             }
-
-            // Recargar datos
-            await loadData();
 
             handleCloseModal();
         } catch (error) {
@@ -121,13 +108,10 @@ export default function EmpleadosPage() {
             const result = await eliminarPersonal(slug, empleadoId);
 
             if (result.deleted) {
+                // Actualizar localmente
                 setEmpleados(prev => prev.filter(emp => emp.id !== empleadoId));
                 toast.success(`${empleadoName} ha sido eliminado exitosamente`);
             }
-
-            // Recargar datos
-            await loadData();
-
         } catch (error) {
             console.error('Error al eliminar empleado:', error);
             const errorMessage = error instanceof Error ? error.message : 'Error al eliminar el empleado';
