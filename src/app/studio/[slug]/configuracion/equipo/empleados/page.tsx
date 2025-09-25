@@ -26,11 +26,11 @@ export default function EmpleadosPage() {
     const router = useRouter();
     const slug = params.slug as string;
 
-    const [empleados, setEmpleados] = useState<unknown[]>([]);
+    const [empleados, setEmpleados] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [modalLoading, setModalLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingEmpleado, setEditingEmpleado] = useState<unknown | null>(null);
+    const [editingEmpleado, setEditingEmpleado] = useState<any | null>(null);
 
     // Cargar empleados
     const loadData = React.useCallback(async () => {
@@ -51,7 +51,7 @@ export default function EmpleadosPage() {
     }, [loadData]);
 
     // Funciones del modal
-    const handleOpenModal = (empleado?: unknown) => {
+    const handleOpenModal = (empleado?: any) => {
         setEditingEmpleado(empleado || null);
         setIsModalOpen(true);
     };
