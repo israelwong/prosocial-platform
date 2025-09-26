@@ -6,7 +6,7 @@ ProSocial Platform es una plataforma SaaS multi-tenant para gestión de estudios
 
 - **Next.js 15.5.2** (App Router) + **TypeScript 5** + **Tailwind CSS 4**
 - **React 19.1.0** + **Supabase** (Auth + Database) + **Prisma 6.15.0** (ORM)
-- **Stripe** (Pagos) + **Shadcn/ui** (Componentes)
+- **Stripe** (Pagos) + **ZEN Design System** (Componentes UI) + **Shadcn/ui** (Base)
 - **Arquitectura Multi-tenant** con roles: Super Admin, Asesor, Suscriptor
 
 ### **Estado de Versiones**
@@ -30,6 +30,10 @@ src/
 │   ├── api/               # API Routes
 │   └── studio/            # Landing pages de estudios
 ├── components/            # Componentes reutilizables
+│   ├── ui/                # Componentes UI
+│   │   ├── zen/          # ZEN Design System (USAR ESTOS)
+│   │   └── shadcn/       # Componentes Shadcn base
+│   └── ...
 ├── lib/                   # Utilidades y configuraciones
 └── types/                 # Definiciones TypeScript
 ```
@@ -68,17 +72,20 @@ text-zinc-300  /* Texto secundario */
 
 ### **Componentes UI**
 
-- **Shadcn/ui** como base de componentes
+- **ZEN Design System** - Componentes unificados (USAR ESTOS PRIMERO)
+- **Shadcn/ui** - Componentes base (solo si no existe en ZEN)
 - **Lucide React** para iconos
 - **Tailwind CSS** para estilos
 - **Sonner** para notificaciones toast
 
-### **Patrones de Diseño**
+### **Patrones de Diseño ZEN**
 
-- **Cards** con `bg-zinc-900 border-zinc-800`
-- **Botones** con colores semánticos (blue-600, red-600, etc.)
-- **Formularios** con validación y estados de carga
-- **Modales** para acciones CRUD
+- **ZenCard** - Contenedores con tema zinc unificado
+- **ZenButton** - Botones con variantes (primary, secondary, destructive, outline, ghost)
+- **ZenInput** - Inputs con label integrado y estados
+- **ZenTextarea** - Textarea con contador de caracteres
+- **Formularios** con validación y estados de carga ZEN
+- **Modales** con ZenModal para acciones CRUD
 
 ## 🔧 **DESARROLLO Y CÓDIGO**
 
@@ -182,7 +189,13 @@ export async function GET(request: Request) {
 import React from "react";
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { Button } from "@/components/ui/button";
+
+// ✅ CORRECTO - Usar ZEN Design System PRIMERO
+import { ZenButton, ZenInput, ZenCard } from "@/components/ui/zen";
+
+// ❌ Solo si no existe en ZEN
+import { Button } from "@/components/ui/shadcn/button";
+
 import { LeadForm } from "./components/LeadForm";
 ```
 
@@ -394,11 +407,13 @@ try {
 
 ### **Al crear componentes:**
 
-1. **Usar** el tema oscuro zinc consistente
-2. **Implementar** estados de loading y error
-3. **Tipar** todas las props e interfaces (NUNCA usar `any`)
-4. **Seguir** los patrones de diseño establecidos
-5. **Optimizar** para performance desde el inicio
+1. **USAR ZEN DESIGN SYSTEM PRIMERO** - Verificar si existe componente ZEN
+2. **Importar desde ZEN**: `import { ZenButton, ZenInput } from "@/components/ui/zen"`
+3. **Solo usar Shadcn** si no existe equivalente en ZEN: `import { Button } from "@/components/ui/shadcn/button"`
+4. **Tipar** todas las props e interfaces (NUNCA usar `any`)
+5. **Seguir** los design tokens ZEN (colores, espaciado, tipografía)
+6. **Implementar** estados de loading y error con patrones ZEN
+7. **Optimizar** para performance desde el inicio
 
 ### **Al modificar APIs:**
 
@@ -453,4 +468,133 @@ Formato: [tipo de dato esperado]"
 
 ---
 
-**¡Mantén el código limpio, tipado y siguiendo estas convenciones para un desarrollo eficiente! 🚀**
+## 🎨 **ZEN DESIGN SYSTEM - REGLAS ESPECÍFICAS**
+
+### **🚀 PRIORIDAD DE COMPONENTES**
+
+```typescript
+// ✅ ORDEN DE PREFERENCIA:
+1. ZEN Design System    → import { ZenButton } from "@/components/ui/zen"
+2. Shadcn (si no existe) → import { Button } from "@/components/ui/shadcn/button"
+3. Custom (último recurso) → Solo si es absolutamente necesario
+```
+
+### **📋 COMPONENTES ZEN DISPONIBLES**
+
+#### **Base Components**
+- `ZenButton` - Botón unificado con loading states
+- `ZenInput` - Input con label integrado y estados
+- `ZenCard` - Contenedor con tema zinc
+- `ZenBadge` - Badges semánticos
+
+#### **Form Components**
+- `ZenTextarea` - Textarea con contador de caracteres
+- `ZenFormSection` - Sección de formulario
+- `ZenSelect` - Select con búsqueda (próximamente)
+- `ZenCheckbox` - Checkbox mejorado (próximamente)
+
+#### **Layout Components**
+- `ZenSidebar` - Sidebar unificado (próximamente)
+- `ZenNavbar` - Navbar consistente (próximamente)
+- `ZenModal` - Modal estándar (próximamente)
+
+### **🎯 PATRONES DE USO ZEN**
+
+#### **Formularios**
+```typescript
+// ✅ CORRECTO - Patrón ZEN
+import { ZenInput, ZenTextarea, ZenButton } from "@/components/ui/zen";
+
+<form className="space-y-6">
+  <ZenInput 
+    label="Nombre"
+    required
+    error={errors.name}
+    hint="Este nombre aparecerá públicamente"
+  />
+  <ZenTextarea 
+    label="Descripción"
+    maxLength={500}
+    minRows={3}
+  />
+  <ZenButton variant="primary" loading={saving}>
+    Guardar
+  </ZenButton>
+</form>
+```
+
+#### **Cards y Contenedores**
+```typescript
+// ✅ CORRECTO - Patrón ZEN
+import { 
+  ZenCard, 
+  ZenCardHeader, 
+  ZenCardTitle, 
+  ZenCardDescription, 
+  ZenCardContent 
+} from "@/components/ui/zen";
+
+<ZenCard variant="default" padding="none">
+  <ZenCardHeader>
+    <ZenCardTitle>Título de la Sección</ZenCardTitle>
+    <ZenCardDescription>
+      Descripción clara de la funcionalidad
+    </ZenCardDescription>
+  </ZenCardHeader>
+  <ZenCardContent>
+    {/* Contenido */}
+  </ZenCardContent>
+</ZenCard>
+```
+
+### **⚠️ REGLAS ESTRICTAS ZEN**
+
+#### **❌ PROHIBIDO**
+```typescript
+// ❌ NO mezclar Shadcn directo cuando existe ZEN
+import { Button } from "@/components/ui/button"; // Usar ZenButton
+import { Input } from "@/components/ui/input";   // Usar ZenInput
+import { Card } from "@/components/ui/card";     // Usar ZenCard
+
+// ❌ NO hardcodear estilos que están en tokens
+<div className="bg-zinc-900 p-6"> // Usar ZenCard
+<button className="bg-blue-600">  // Usar ZenButton
+```
+
+#### **✅ PERMITIDO**
+```typescript
+// ✅ OK - Componentes que no existen en ZEN (aún)
+import { Dialog } from "@/components/ui/shadcn/dialog";
+import { Select } from "@/components/ui/shadcn/select";
+import { Calendar } from "@/components/ui/shadcn/calendar";
+
+// ✅ OK - Usar design tokens directamente
+import { ZEN_COLORS, ZEN_SPACING } from "@/components/ui/zen";
+```
+
+### **🔄 MIGRACIÓN A ZEN**
+
+#### **Proceso Recomendado**
+1. **Identificar** sección a migrar (ej: identidad)
+2. **Analizar** componentes usados
+3. **Crear** componentes ZEN faltantes
+4. **Refactorizar** usando ZEN
+5. **Probar** funcionalidad
+6. **Commit** y crear branch específico
+
+#### **Naming Convention Branches**
+```bash
+# Para migración de UI con ZEN
+v1.1.ui.{seccion}     # ej: v1.1.ui.identidad
+v1.1.ui.{componente}  # ej: v1.1.ui.sidebar
+```
+
+### **📚 DOCUMENTACIÓN ZEN**
+
+- **README**: `/src/components/ui/zen/README.md`
+- **Listado**: `/docs/04-best-practices/ZEN_COMPONENTS_LISTADO.md`
+- **Tokens**: `/src/components/ui/zen/tokens/`
+
+---
+
+**¡Mantén el código limpio, tipado y siguiendo ZEN Design System para consistencia máxima! 🚀**
