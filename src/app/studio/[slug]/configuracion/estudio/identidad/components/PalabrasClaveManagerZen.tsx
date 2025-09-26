@@ -71,7 +71,7 @@ export function PalabrasClaveManagerZen({
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
+    const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             handleAddPalabra();
@@ -133,7 +133,7 @@ export function PalabrasClaveManagerZen({
                         value={nuevaPalabra}
                         onChange={(e) => setNuevaPalabra(e.target.value)}
                         placeholder="Ej: fotografía, bodas, eventos..."
-                        onKeyPress={handleKeyPress}
+                        onKeyDown={handleKeyDown}
                         disabled={updating || loading}
                         className="flex-1 h-10 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                     />

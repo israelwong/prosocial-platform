@@ -134,6 +134,13 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                         href: `/${studioSlug}/configuracion/negocio/cuentas-bancarias`,
                         icon: Banknote,
                     },
+                    {
+                        id: 'control-agenda',
+                        name: 'Control de Agendamiento',
+                        description: 'Gestiona tu control de agendamiento',
+                        href: `/${studioSlug}/configuracion/control-agenda`,
+                        icon: Calendar,
+                    }
                 ],
             },
             {
@@ -265,22 +272,7 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                         icon: FileText,
                     }
                 ],
-            },
-            {
-                id: 'control-agendamiento',
-                title: 'Control de Agenda',
-                description: 'Gestiona tu control de agenda',
-                icon: Calendar,
-                items: [
-                    {
-                        id: 'control-agenda',
-                        name: 'Control de Agendamiento',
-                        description: 'Gestiona tu control de agendamiento',
-                        href: `/${studioSlug}/configuracion/control-agenda`,
-                        icon: Calendar,
-                    }
-                ],
-            },
+            }
         ];
 
         if (!searchQuery.trim()) return configSections;

@@ -59,7 +59,7 @@ export async function obtenerRedesSocialesStudio(
       include: {
         plataforma: true,
       },
-      orderBy: { createdAt: "asc" },
+      orderBy: { order: "asc" },
     });
 
     return redesSociales;
@@ -318,6 +318,42 @@ export async function obtenerEstadisticasRedesSociales(studioSlug: string) {
       activas,
       inactivas,
       porcentajeActivas: total > 0 ? Math.round((activas / total) * 100) : 0,
+    };
+  });
+}
+
+// Reordenar redes sociales
+export async function reordenarRedesSociales(studioSlug: string, redes: Array<{ id: string; order: number }>) {
+  return await retryDatabaseOperation(async () => {
+    // 1. Verificar que el studio existe
+    const studio = await prisma.projects.findUnique({
+      where: { slug: studioSlug },
+      select: { id: true },
+    });
+
+    if (!studio) {
+      throw new Error("Studio no encontrado");
+    }
+
+    // 2. Actualizar el orden de cada red social
+    const updatePromises = redes.map(({ id, order }) =>
+      prisma.project_redes_sociales.update({
+        where: {
+          id,
+          projectId: studio.id // Asegurar que pertenece al studio
+        },
+        data: { order },
+      })
+    );
+
+    await Promise.all(updatePromises);
+
+    // 3. Revalidar la página
+    revalidatePath(`/studio/${studioSlug}/configuracion/estudio/redes-sociales`);
+
+    return {
+      success: true,
+      message: "Orden de redes sociales actualizado exitosamente",
     };
   });
 }

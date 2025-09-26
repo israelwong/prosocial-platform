@@ -1,17 +1,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
-import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
-import { Label } from '@/components/ui/shadcn/label';
-import { Textarea } from '@/components/ui/shadcn/textarea';
+import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
+import { ZenButton } from '@/components/ui/zen';
+import { ZenInput } from '@/components/ui/zen';
+import { ZenTextarea } from '@/components/ui/zen';
 import { Plus, MapPin, Globe, Loader2 } from 'lucide-react';
-import { ContactoItem } from './ContactoItem';
+import { ContactoItemZen } from './ContactoItemZen';
 import { Telefono, ContactoData } from '../types';
 import { toast } from 'sonner';
 
-interface ContactoListProps {
+interface ContactoListZenProps {
     telefonos: Telefono[];
     contactoData: ContactoData;
     onAddTelefono: () => void;
@@ -23,7 +22,7 @@ interface ContactoListProps {
     loading?: boolean;
 }
 
-export function ContactoList({
+export function ContactoListZen({
     telefonos,
     contactoData,
     onAddTelefono,
@@ -33,7 +32,7 @@ export function ContactoList({
     onUpdateContactoData,
     onSaveContactoData,
     loading
-}: ContactoListProps) {
+}: ContactoListZenProps) {
     const [savingField, setSavingField] = useState<string | null>(null);
     const [localData, setLocalData] = useState<ContactoData>(contactoData);
 
@@ -59,28 +58,30 @@ export function ContactoList({
             setSavingField(null);
         }
     };
+
     return (
         <div className="space-y-6">
             {/* Teléfonos */}
-            <Card className="bg-zinc-900/50 border-zinc-800">
-                <CardHeader>
+            <ZenCard variant="default" padding="none">
+                <ZenCardHeader>
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle className="text-white">Teléfonos de Contacto</CardTitle>
-                            <CardDescription className="text-zinc-400">
+                            <ZenCardTitle>Teléfonos de Contacto</ZenCardTitle>
+                            <ZenCardDescription>
                                 Gestiona los números de teléfono de tu estudio
-                            </CardDescription>
+                            </ZenCardDescription>
                         </div>
-                        <Button
+                        <ZenButton
                             onClick={onAddTelefono}
+                            variant="primary"
                             className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Agregar Teléfono
-                        </Button>
+                        </ZenButton>
                     </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
+                </ZenCardHeader>
+                <ZenCardContent className="space-y-4">
                     {loading ? (
                         <div className="space-y-3">
                             {[...Array(2)].map((_, i) => (
@@ -91,15 +92,18 @@ export function ContactoList({
                         </div>
                     ) : telefonos.length === 0 ? (
                         <div className="text-center py-8">
-                            <p className="text-zinc-400">No hay teléfonos configurados</p>
-                            <p className="text-zinc-500 text-sm mt-2">
+                            <div className="w-16 h-16 mx-auto mb-4 bg-zinc-800 rounded-full flex items-center justify-center">
+                                <Plus className="h-8 w-8 text-zinc-500" />
+                            </div>
+                            <p className="text-zinc-400 mb-2">No hay teléfonos configurados</p>
+                            <p className="text-zinc-500 text-sm">
                                 Agrega números de teléfono para que los clientes puedan contactarte
                             </p>
                         </div>
                     ) : (
                         <div className="space-y-3">
                             {telefonos.map((telefono) => (
-                                <ContactoItem
+                                <ContactoItemZen
                                     key={telefono.id}
                                     telefono={telefono}
                                     onDelete={onDeleteTelefono}
@@ -109,93 +113,92 @@ export function ContactoList({
                             ))}
                         </div>
                     )}
-                </CardContent>
-            </Card>
+                </ZenCardContent>
+            </ZenCard>
 
             {/* Dirección */}
-            <Card className="bg-zinc-900/50 border-zinc-800">
-                <CardHeader>
+            <ZenCard variant="default" padding="none">
+                <ZenCardHeader>
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle className="text-white">Dirección</CardTitle>
-                            <CardDescription className="text-zinc-400">
+                            <ZenCardTitle>Dirección</ZenCardTitle>
+                            <ZenCardDescription>
                                 Ubicación física de tu estudio
-                            </CardDescription>
+                            </ZenCardDescription>
                         </div>
-                        <Button
+                        <ZenButton
                             onClick={() => handleFieldBlur('direccion')}
                             disabled={savingField === 'direccion'}
                             size="sm"
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            variant="outline"
+                            className="hover:bg-blue-600 hover:text-white transition-colors"
                         >
                             {savingField === 'direccion' ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                                 'Actualizar'
                             )}
-                        </Button>
+                        </ZenButton>
                     </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="direccion" className="text-zinc-300">Dirección Completa</Label>
-                        <Textarea
-                            id="direccion"
+                </ZenCardHeader>
+                <ZenCardContent className="space-y-4">
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm text-zinc-300">
+                            <MapPin className="h-4 w-4" />
+                            <span>Dirección Completa</span>
+                        </div>
+                        <ZenTextarea
+                            label=""
                             value={localData.direccion}
                             onChange={(e) => setLocalData(prev => ({ ...prev, direccion: e.target.value }))}
                             className="min-h-[100px]"
                             placeholder="Calle, número, colonia, ciudad, estado, código postal"
                         />
                     </div>
-
-                    <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                        <MapPin className="h-4 w-4" />
-                        <span>Esta dirección aparecerá en tu landing page y documentos oficiales</span>
-                    </div>
-                </CardContent>
-            </Card>
+                </ZenCardContent>
+            </ZenCard>
 
             {/* Página Web */}
-            <Card className="bg-zinc-900/50 border-zinc-800">
-                <CardHeader>
+            <ZenCard variant="default" padding="none">
+                <ZenCardHeader>
                     <div className="flex items-center justify-between">
                         <div>
-                            <CardTitle className="text-white">Página Web</CardTitle>
-                            <CardDescription className="text-zinc-400">
+                            <ZenCardTitle>Página Web</ZenCardTitle>
+                            <ZenCardDescription>
                                 Sitio web oficial de tu estudio
-                            </CardDescription>
+                            </ZenCardDescription>
                         </div>
-                        <Button
+                        <ZenButton
                             onClick={() => handleFieldBlur('website')}
                             disabled={savingField === 'website'}
                             size="sm"
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            variant="outline"
+                            className="hover:bg-blue-600 hover:text-white transition-colors"
                         >
                             {savingField === 'website' ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                                 'Actualizar'
                             )}
-                        </Button>
+                        </ZenButton>
                     </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="website" >URL del Sitio Web</Label>
-                        <Input
-                            id="website"
+                </ZenCardHeader>
+                <ZenCardContent className="space-y-4">
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm text-zinc-300">
+                            <Globe className="h-4 w-4" />
+                            <span>URL del Sitio Web</span>
+                        </div>
+                        <ZenInput
+                            label=""
                             value={localData.website}
                             onChange={(e) => setLocalData(prev => ({ ...prev, website: e.target.value }))}
                             placeholder="https://www.tu-estudio.com"
+                            type="url"
                         />
                     </div>
-
-                    <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                        <Globe className="h-4 w-4" />
-                        <span>Este enlace aparecerá en tu landing page y perfiles de redes sociales</span>
-                    </div>
-                </CardContent>
-            </Card>
+                </ZenCardContent>
+            </ZenCard>
         </div>
     );
 }

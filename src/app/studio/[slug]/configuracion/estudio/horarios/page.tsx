@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
-import { Button } from '@/components/ui/shadcn/button';
-import { RefreshCw } from 'lucide-react';
+import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
+import { ZenButton } from '@/components/ui/zen';
+import { RefreshCw, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { HorariosStats } from './components/HorariosStats';
-import { HorariosList } from './components/HorariosList';
+import { HorariosStatsZen } from './components/HorariosStatsZen';
+import { HorariosListZen } from './components/HorariosListZen';
 import { Horario } from './types';
 import {
     obtenerHorariosStudio,
@@ -18,7 +18,17 @@ import {
 } from '@/lib/actions/studio/config/horarios.actions';
 import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 
-export default function HorariosPage() {
+/**
+ * HorariosPageZen - Página refactorizada usando ZEN Design System
+ * 
+ * Mejoras sobre la versión original:
+ * - ✅ ZenCard unificados en lugar de Card de Shadcn
+ * - ✅ Consistencia visual con tema ZEN
+ * - ✅ Componentes refactorizados con ZEN
+ * - ✅ Espaciado consistente con design tokens
+ * - ✅ Mejor organización de componentes
+ */
+export default function HorariosPageZen() {
     const params = useParams();
     const slug = params.slug as string;
 
@@ -26,9 +36,6 @@ export default function HorariosPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
-
-    // Datos iniciales de horarios (ya no se usan, se cargan desde la base de datos)
-    // const initialHorarios: Horario[] = [];
 
     useEffect(() => {
         loadData();
@@ -54,8 +61,8 @@ export default function HorariosPage() {
                 setHorarios(horariosData);
             }
         } catch (err) {
-            console.error('Error al cargar horarios:', err);
-            const errorMessage = err instanceof Error ? err.message : 'Error desconocido al cargar los horarios';
+            console.error('❌ Error loading horarios data:', err);
+            const errorMessage = err instanceof Error ? err.message : 'Error desconocido al cargar los datos de horarios';
 
             // Si es un error de conexión y no hemos reintentado mucho, intentar de nuevo
             if (retryCount < 3 && (errorMessage.includes('conexión') || errorMessage.includes('database') || errorMessage.includes('server'))) {
@@ -77,34 +84,15 @@ export default function HorariosPage() {
         }
     };
 
-
-    const handleToggleActive = async (id: string, activo: boolean) => {
+    const handleToggleHorario = async (id: string, activo: boolean) => {
         try {
             // Actualizar optimísticamente
             setHorarios(prev => prev.map(h =>
                 h.id === id ? { ...h, activo } : h
             ));
 
-            // Si es un horario temporal, crear uno nuevo
-            if (id.startsWith('temp-')) {
-                const horario = horarios.find(h => h.id === id);
-                if (horario) {
-                    const nuevoHorario = await crearHorario(slug, {
-                        dia_semana: horario.dia_semana as "lunes" | "martes" | "miercoles" | "jueves" | "viernes" | "sabado" | "domingo",
-                        hora_inicio: horario.hora_inicio,
-                        hora_fin: horario.hora_fin,
-                        activo: activo,
-                    });
-
-                    // Reemplazar el horario temporal con el real
-                    setHorarios(prev => prev.map(h =>
-                        h.id === id ? { ...nuevoHorario } : h
-                    ));
-                }
-            } else {
-                // Llamar Server Action para horarios existentes
-                await toggleHorarioEstado(id, { id, activo });
-            }
+            // Llamar Server Action
+            await toggleHorarioEstado(id, { id, activo });
 
             toast.success(`Horario ${activo ? 'activado' : 'desactivado'} exitosamente`);
         } catch (err) {
@@ -119,33 +107,15 @@ export default function HorariosPage() {
         }
     };
 
-    const handleUpdateHorario = async (id: string, field: string, value: string) => {
+    const handleUpdateHorario = async (id: string, data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => {
         try {
             // Actualizar optimísticamente
             setHorarios(prev => prev.map(h =>
-                h.id === id ? { ...h, [field]: value } : h
+                h.id === id ? { ...h, ...data } : h
             ));
 
-            // Si es un horario temporal, crear uno nuevo
-            if (id.startsWith('temp-')) {
-                const horario = horarios.find(h => h.id === id);
-                if (horario) {
-                    const nuevoHorario = await crearHorario(slug, {
-                        dia_semana: horario.dia_semana as "lunes" | "martes" | "miercoles" | "jueves" | "viernes" | "sabado" | "domingo",
-                        hora_inicio: horario.hora_inicio,
-                        hora_fin: horario.hora_fin,
-                        activo: horario.activo,
-                    });
-
-                    // Reemplazar el horario temporal con el real
-                    setHorarios(prev => prev.map(h =>
-                        h.id === id ? { ...nuevoHorario } : h
-                    ));
-                }
-            } else {
-                // Llamar Server Action para horarios existentes
-                await actualizarHorario(id, { id, [field]: value });
-            }
+            // Llamar Server Action
+            await actualizarHorario(id, { id, ...data });
 
             toast.success('Horario actualizado exitosamente');
         } catch (err) {
@@ -153,84 +123,166 @@ export default function HorariosPage() {
             const errorMessage = err instanceof Error ? err.message : 'Error al actualizar horario';
             toast.error(errorMessage);
 
-            // Recargar datos para revertir cambios
+            // Revertir cambio optimístico
             loadData();
         }
     };
 
+    const handleAddHorario = async (data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => {
+        try {
+            // Crear nuevo horario
+            const nuevoHorario = await crearHorario(slug, data);
+            setHorarios(prev => [...prev, nuevoHorario]);
+            toast.success('Horario agregado exitosamente');
+        } catch (err) {
+            console.error('Error creating horario:', err);
+            const errorMessage = err instanceof Error ? err.message : 'Error al crear horario';
+            toast.error(errorMessage);
+        }
+    };
 
     if (error && !loading) {
         return (
             <div className="p-6">
-                <Card className="bg-zinc-900/50 border-zinc-800">
-                    <CardContent className="p-6 text-center">
-                        <div className="space-y-4">
-                            <div className="text-red-400">
-                                <RefreshCw className="h-12 w-12 mx-auto mb-4" />
-                                <h3 className="text-lg font-semibold mb-2">Error al cargar horarios</h3>
-                                <p className="text-zinc-400">{error}</p>
+                <ZenCard variant="default" padding="lg">
+                    <div className="text-center">
+                        <p className="text-red-400 mb-4">{error}</p>
+                        <ZenButton
+                            onClick={() => loadData(false)}
+                            variant="outline"
+                            disabled={retryCount >= 3}
+                        >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            {retryCount >= 3 ? 'Máximo de reintentos alcanzado' : 'Reintentar'}
+                        </ZenButton>
+                    </div>
+                </ZenCard>
+            </div>
+        );
+    }
+
+    if (loading) {
+        return (
+            <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
+                {/* Header Navigation Skeleton */}
+                <ZenCard variant="default" padding="lg">
+                    <div className="animate-pulse">
+                        <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                        <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                    </div>
+                </ZenCard>
+
+                {/* Estadísticas Skeleton */}
+                <div className="grid gap-4 md:grid-cols-3">
+                    {[1, 2, 3].map((i) => (
+                        <ZenCard key={i} variant="default" padding="md">
+                            <div className="animate-pulse">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="h-4 w-24 bg-zinc-700 rounded" />
+                                    <div className="h-4 w-4 bg-zinc-700 rounded" />
+                                </div>
+                                <div className="h-8 w-16 bg-zinc-700 rounded mb-2" />
+                                <div className="h-3 w-20 bg-zinc-700 rounded" />
                             </div>
-                            <Button
-                                onClick={() => loadData(true)}
-                                variant="outline"
-                                className="border-zinc-600 text-zinc-300 hover:bg-zinc-700"
-                                disabled={retryCount >= 3}
-                            >
-                                <RefreshCw className="h-4 w-4 mr-2" />
-                                {retryCount >= 3 ? 'Máximo de reintentos alcanzado' : 'Reintentar'}
-                            </Button>
+                        </ZenCard>
+                    ))}
+                </div>
+
+                {/* Lista de Horarios Skeleton */}
+                <ZenCard variant="default" padding="lg">
+                    <div className="animate-pulse">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
+                                <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                            </div>
+                            <div className="h-10 bg-zinc-700 rounded w-32"></div>
                         </div>
-                    </CardContent>
-                </Card>
+
+                        <div className="space-y-3">
+                            <div className="h-16 bg-zinc-700 rounded"></div>
+                            <div className="h-16 bg-zinc-700 rounded"></div>
+                            <div className="h-16 bg-zinc-700 rounded"></div>
+                        </div>
+                    </div>
+                </ZenCard>
+
+                {/* Información de uso Skeleton */}
+                <ZenCard variant="default" padding="lg">
+                    <div className="animate-pulse">
+                        <div className="h-6 bg-zinc-700 rounded w-1/3 mb-4"></div>
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                                <div className="space-y-1">
+                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ZenCard>
             </div>
         );
     }
 
     return (
         <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
-
             <HeaderNavigation
                 title="Horarios de Atención"
-                description="Gestiona tus horarios de atención"
+                description="Configura los horarios de atención de tu estudio"
             />
 
             {/* Estadísticas */}
-            <HorariosStats horarios={horarios} loading={loading} />
+            <HorariosStatsZen
+                horarios={horarios}
+                loading={loading}
+            />
 
             {/* Lista de horarios */}
-            <HorariosList
+            <HorariosListZen
                 horarios={horarios}
-                onToggleActive={handleToggleActive}
+                onToggleHorario={handleToggleHorario}
                 onUpdateHorario={handleUpdateHorario}
+                onAddHorario={handleAddHorario}
                 loading={loading}
             />
 
             {/* Información de uso */}
-            <Card className="bg-zinc-900/50 border-zinc-800">
-                <CardHeader>
-                    <CardTitle className="text-white">¿Dónde se usan estos horarios?</CardTitle>
-                </CardHeader>
-                <CardContent>
+            <ZenCard variant="default" padding="lg">
+                <ZenCardHeader>
+                    <ZenCardTitle>¿Dónde se usa esta información?</ZenCardTitle>
+                </ZenCardHeader>
+                <ZenCardContent>
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <h4 className="text-white font-medium">Landing Page</h4>
                             <ul className="text-sm text-zinc-400 space-y-1">
                                 <li>• Sección de horarios de atención</li>
-                                <li>• Footer con información de contacto</li>
-                                <li>• Formularios de contacto</li>
+                                <li>• Información de contacto</li>
+                                <li>• Footer con horarios</li>
                             </ul>
                         </div>
                         <div className="space-y-2">
                             <h4 className="text-white font-medium">Portales y Comunicación</h4>
                             <ul className="text-sm text-zinc-400 space-y-1">
-                                <li>• Calendario de disponibilidad</li>
-                                <li>• Programación de citas</li>
-                                <li>• Notificaciones automáticas</li>
+                                <li>• Perfil público del estudio</li>
+                                <li>• Formularios de contacto</li>
+                                <li>• Integración con CRM</li>
                             </ul>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </ZenCardContent>
+            </ZenCard>
         </div>
     );
 }

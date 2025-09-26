@@ -1185,6 +1185,7 @@ model project_telefonos {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   projects  projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  order     Int      @default(0)
 
   @@index([projectId])
   @@index([projectId, activo])
@@ -1230,6 +1231,7 @@ model project_redes_sociales {
   plataformaId String?
   url          String
   activo       Boolean                              @default(true)
+  order        Int                                  @default(0)
   createdAt    DateTime                             @default(now())
   updatedAt    DateTime                             @updatedAt
   plataforma   platform_social_networks? @relation(fields: [plataformaId], references: [id])

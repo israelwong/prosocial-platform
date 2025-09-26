@@ -39,10 +39,11 @@ export async function obtenerContactoStudio(studioSlug: string) {
                         numero: true,
                         tipo: true,
                         activo: true,
+                        order: true,
                         createdAt: true,
                         updatedAt: true,
                     },
-                    orderBy: { createdAt: "asc" },
+                    orderBy: { order: "asc" },
                 },
             },
         });
@@ -434,6 +435,42 @@ export async function validarTelefono(numero: string) {
                 "El número debe tener entre 7 y 20 caracteres",
                 "Considera agregar el código de país (+52 para México)"
             ],
+        };
+    });
+}
+
+// Reordenar teléfonos
+export async function reordenarTelefonos(studioSlug: string, telefonos: Array<{ id: string; order: number }>) {
+    return await retryDatabaseOperation(async () => {
+        // 1. Verificar que el studio existe
+        const studio = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true },
+        });
+
+        if (!studio) {
+            throw new Error("Studio no encontrado");
+        }
+
+        // 2. Actualizar el orden de cada teléfono
+        const updatePromises = telefonos.map(({ id, order }) =>
+            prisma.project_telefonos.update({
+                where: { 
+                    id,
+                    projectId: studio.id // Asegurar que pertenece al studio
+                },
+                data: { order },
+            })
+        );
+
+        await Promise.all(updatePromises);
+
+        // 3. Revalidar la página
+        revalidatePath(`/studio/${studioSlug}/configuracion/estudio/contacto`);
+
+        return {
+            success: true,
+            message: "Orden de teléfonos actualizado exitosamente",
         };
     });
 }
