@@ -58,7 +58,7 @@ export function PersonalListSimple({
         return (
             <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                    <Card key={i} className="bg-zinc-900 border-zinc-800 animate-pulse">
+                    <Card key={i} className="bg-zinc-900/50 border-zinc-800 animate-pulse">
                         <CardContent className="p-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export function PersonalListSimple({
                         placeholder="Buscar por nombre, email o teléfono..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="bg-zinc-800 border-zinc-700 text-white pl-10"
+                        className="pl-10"
                     />
                 </div>
             </div>
@@ -98,7 +98,7 @@ export function PersonalListSimple({
             {/* Lista simplificada */}
             <div className="space-y-3">
                 {filteredPersonal.length === 0 ? (
-                    <Card className="bg-zinc-900 border-zinc-800">
+                    <Card className="bg-zinc-900/50 border-zinc-800">
                         <CardContent className="p-8 text-center">
                             <div className="text-zinc-400">
                                 {personal.length === 0 ? (

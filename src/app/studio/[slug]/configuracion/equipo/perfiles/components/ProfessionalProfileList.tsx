@@ -122,12 +122,12 @@ export function ProfessionalProfileList({
                             No hay perfiles configurados
                         </h3>
                         <p className="text-zinc-400 mb-6 max-w-md mx-auto">
-                            Crea perfiles profesionales como "Fotógrafo", "Editor", "Coordinador", etc.
+                            Crea perfiles profesionales como &quot;Fotógrafo&quot;, &quot;Editor&quot;, &quot;Coordinador&quot;, etc.
                             para organizar mejor tu equipo.
                         </p>
-                        <Button 
+                        <Button
                             className="bg-blue-600 hover:bg-blue-700"
-                            onClick={() => onEdit()}
+                            onClick={() => onEdit({} as ProfessionalProfile)}
                         >
                             <Plus className="h-4 w-4 mr-2" />
                             Crear Primer Perfil
@@ -140,7 +140,7 @@ export function ProfessionalProfileList({
 
     return (
         <>
-            <Card className="bg-zinc-900 border-zinc-800">
+            <Card className="bg-zinc-900/50 border-zinc-800">
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-white flex items-center gap-2">
@@ -173,25 +173,24 @@ export function ProfessionalProfileList({
                             return (
                                 <div
                                     key={perfil.id}
-                                    className={`inline-flex items-center space-x-2 px-3 py-2 rounded-full border transition-colors ${
-                                        perfil.isActive 
-                                            ? 'bg-zinc-800 border-zinc-600 hover:bg-zinc-700' 
-                                            : 'bg-zinc-900 border-zinc-700 opacity-50'
-                                    }`}
+                                    className={`inline-flex items-center space-x-2 px-3 py-2 rounded-full border transition-colors ${perfil.isActive
+                                        ? 'bg-zinc-900/50 border-zinc-800 hover:bg-zinc-700'
+                                        : 'bg-zinc-900 border-zinc-700 opacity-50'
+                                        }`}
                                 >
-                                    
+
                                     {/* Nombre del perfil */}
                                     <span className="text-white text-sm font-medium">
                                         {perfil.name}
                                     </span>
-                                    
+
                                     {/* Badge de asignaciones */}
                                     {asignaciones > 0 && (
                                         <Badge variant="secondary" className="bg-blue-600 text-white text-xs px-2 py-0.5">
                                             {asignaciones}
                                         </Badge>
                                     )}
-                                    
+
                                     {/* Badge de sistema */}
                                     {perfil.isDefault && (
                                         <Badge variant="secondary" className="bg-yellow-600 text-white text-xs px-2 py-0.5">
@@ -216,10 +215,10 @@ export function ProfessionalProfileList({
                                         {/* Botón de eliminar (solo si no es del sistema) */}
                                         {!perfil.isDefault && (
                                             <Button
-                                                variant="ghost"
+                                                variant="destructive"
                                                 size="sm"
                                                 onClick={() => handleDeleteClick(perfil.id)}
-                                                className="h-6 w-6 p-0 text-zinc-400 hover:text-red-400 hover:bg-red-900/20"
+                                                className="h-6 w-6 p-0 text-zinc-800 hover:text-red-400 hover:bg-red-900/20"
                                                 title="Eliminar perfil"
                                             >
                                                 <Trash2 className="h-3 w-3" />
@@ -234,7 +233,7 @@ export function ProfessionalProfileList({
                     {filteredPerfiles.length === 0 && searchTerm && (
                         <div className="text-center py-8">
                             <Search className="h-12 w-12 mx-auto mb-4 text-zinc-600" />
-                            <p className="text-zinc-400">No se encontraron perfiles que coincidan con "{searchTerm}"</p>
+                            <p className="text-zinc-400">No se encontraron perfiles que coincidan con &quot;{searchTerm}&quot;</p>
                         </div>
                     )}
                 </CardContent>
@@ -251,7 +250,7 @@ export function ProfessionalProfileList({
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel 
+                        <AlertDialogCancel
                             onClick={handleDeleteCancel}
                             className="bg-zinc-800 border-zinc-600 text-zinc-300 hover:bg-zinc-700"
                         >

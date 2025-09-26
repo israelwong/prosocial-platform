@@ -16,12 +16,12 @@ interface PersonalItemProps {
     loading?: boolean;
 }
 
-export function PersonalItem({ 
-    personal, 
-    onEdit, 
-    onDelete, 
-    onToggleActive, 
-    loading = false 
+export function PersonalItem({
+    personal,
+    onEdit,
+    onDelete,
+    onToggleActive,
+    loading = false
 }: PersonalItemProps) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -60,7 +60,7 @@ export function PersonalItem({
 
     return (
         <>
-            <div className="p-4 bg-zinc-800 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors">
+            <div className="p-4 bg-zinc-900/50 rounded-lg border border-zinc-800 hover:border-zinc-600 transition-colors">
                 <div className="flex items-center justify-between">
                     {/* Información principal */}
                     <div className="flex-1 min-w-0">

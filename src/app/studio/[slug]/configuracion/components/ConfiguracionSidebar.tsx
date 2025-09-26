@@ -29,7 +29,8 @@ import {
     SlidersHorizontal,
     ChevronDown,
     ChevronRight,
-    BarChart3
+    BarChart3,
+    Calendar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -172,14 +173,14 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                 items: [
                     {
                         id: 'empleados',
-                        name: 'Miembros del Equipo',
+                        name: 'Personal interno',
                         description: 'Gestiona empleados',
                         href: `/studio/${studioSlug}/configuracion/equipo/empleados`,
                         icon: Users2,
                     },
                     {
                         id: 'proveedores',
-                        name: 'Proveedores y Colaboradores',
+                        name: 'Proveedores externos',
                         description: 'Gestiona proveedores',
                         href: `/studio/${studioSlug}/configuracion/equipo/proveedores`,
                         icon: Users2,
@@ -187,7 +188,7 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                     {
                         id: 'perfiles',
                         name: 'Perfiles Profesionales',
-                        description: 'Define roles y permisos',
+                        description: 'Nombres de perfiles',
                         href: `/studio/${studioSlug}/configuracion/equipo/perfiles`,
                         icon: Tag,
                     },
@@ -265,36 +266,21 @@ export function ConfiguracionSidebar({ studioSlug, className }: ConfiguracionSid
                     }
                 ],
             },
-            // {
-            //     id: 'integraciones',
-            //     title: 'Integraciones',
-            //     description: 'Conecta ZENPro con otras herramientas',
-            //     icon: Plug,
-            //     items: [
-            //         {
-            //             id: 'integraciones',
-            //             name: 'Integraciones',
-            //             description: 'Gestiona tus conexiones',
-            //             href: `/studio/${studioSlug}/configuracion/integraciones`,
-            //             icon: Plug,
-            //         },
-            //     ],
-            // },
-            // {
-            //     id: 'avanzado',
-            //     title: 'Avanzado',
-            //     description: 'Configuraciones para usuarios avanzados',
-            //     icon: SlidersHorizontal,
-            //     items: [
-            //         {
-            //             id: 'avanzado',
-            //             name: 'Avanzado',
-            //             description: 'Herramientas y configuraciones avanzadas',
-            //             href: `/studio/${studioSlug}/configuracion/avanzado`,
-            //             icon: SlidersHorizontal,
-            //         },
-            //     ],
-            // },
+            {
+                id: 'control-agendamiento',
+                title: 'Control de Agenda',
+                description: 'Gestiona tu control de agenda',
+                icon: Calendar,
+                items: [
+                    {
+                        id: 'control-agenda',
+                        name: 'Control de Agendamiento',
+                        description: 'Gestiona tu control de agendamiento',
+                        href: `/studio/${studioSlug}/configuracion/control-agenda`,
+                        icon: Calendar,
+                    }
+                ],
+            },
         ];
 
         if (!searchQuery.trim()) return configSections;

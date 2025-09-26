@@ -80,7 +80,7 @@ export function PerfilFormSimple({
     };
 
     return (
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
                 <CardTitle className="text-white flex items-center space-x-2">
                     <User className="h-5 w-5" />

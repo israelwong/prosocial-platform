@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { obtenerPerfil } from '@/lib/actions/studio/config/perfil.actions';
 import { PerfilData } from './types';
 import { PerfilFormSimple, PerfilSkeleton } from './components';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
 
 export default function PerfilPage() {
   const params = useParams();
@@ -53,14 +54,13 @@ export default function PerfilPage() {
 
   if (error) {
     return (
-      <div className="space-y-6 max-w-screen-lg mx-auto">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">Perfil</h1>
-          <p className="text-zinc-400">
-            Gestiona tu información personal y de contacto
-          </p>
-        </div>
-        
+      <div className="space-y-6 max-w-screen-lg mx-auto my-16">
+
+        <HeaderNavigation
+          title="Perfil"
+          description="Gestiona tu información personal y de contacto"
+        />
+
         <Card className="bg-zinc-900 border-zinc-800">
           <CardContent className="p-6">
             <div className="text-center py-8">
@@ -86,14 +86,14 @@ export default function PerfilPage() {
 
   if (!perfil) {
     return (
-      <div className="space-y-6 max-w-screen-lg mx-auto">
+      <div className="space-y-6 max-w-screen-lg mx-auto my-16">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-white">Perfil</h1>
           <p className="text-zinc-400">
             Gestiona tu información personal y de contacto
           </p>
         </div>
-        
+
         <Card className="bg-zinc-900 border-zinc-800">
           <CardContent className="p-6">
             <div className="text-center py-8">
@@ -112,13 +112,12 @@ export default function PerfilPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-screen-lg mx-auto">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-white">Perfil</h1>
-        <p className="text-zinc-400">
-          Gestiona tu información personal y de contacto
-        </p>
-      </div>
+    <div className="space-y-6 max-w-screen-lg mx-auto mt-16">
+
+      <HeaderNavigation
+        title="Perfil"
+        description="Gestiona tu información personal y de contacto"
+      />
 
       <PerfilFormSimple
         studioSlug={slug}

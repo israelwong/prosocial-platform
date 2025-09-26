@@ -114,13 +114,14 @@ model platform_leads {
   studioSlug                   String?
   lastContactDate              DateTime?
   interestedPlan               String?
-  monthlyBudget                Decimal?
+  monthlyBudget                Decimal? //no va
+  avatarUrl                   String? //fot de perfi 
   probableStartDate            DateTime?
   agentId                      String?
   score                        Int?
   priority                     String                          @default("medium")
   conversionDate               DateTime?
-  studioId                     String?                         @unique
+  studioId                     String?                         @unique //dería projectid
   createdAt                    DateTime                        @default(now())
   updatedAt                    DateTime
   stageId                      String?
