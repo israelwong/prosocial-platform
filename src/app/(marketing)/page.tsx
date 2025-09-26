@@ -6,27 +6,33 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-black/20"></div>
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
                     <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                        ProSocial Platform
+                        zen.pro
                     </h1>
                     <p className="text-xl md:text-2xl text-gray-300 mb-8">
-                        La plataforma integral para gestión de estudios creativos
+                        Plataforma integral para estudios creativos
                     </p>
                     <p className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto">
-                        Gestiona tu estudio, clientes, proyectos y finanzas desde una sola plataforma.
-                        Diseñada para fotógrafos, videógrafos y creativos profesionales.
+                        Gestiona tu estudio, encuentra nuevos clientes y haz crecer tu negocio creativo.
+                        Cada estudio tiene su propio espacio personalizado.
                     </p>
+
+                    {/* Ejemplos de estudios */}
+                    <div className="mb-12 text-sm text-gray-500">
+                        <p>Ejemplos: zen.pro/fotografia-luna • zen.pro/video-pro • zen.pro/estudio-creativo</p>
+                    </div>
+
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <a
                             href="/sign-up"
                             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
                         >
-                            Comenzar Gratis
+                            Crear Mi Estudio
                         </a>
                         <a
-                            href="/demo"
+                            href="/about"
                             className="border border-gray-600 hover:border-gray-500 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
                         >
-                            Ver Demo
+                            Conocer Más
                         </a>
                     </div>
                 </div>
@@ -35,6 +41,29 @@ export default function HomePage() {
             {/* Features Section */}
             <section className="py-20 px-4">
                 <div className="container mx-auto max-w-6xl">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl font-bold mb-4">Estudios en zen.pro</h2>
+                        <p className="text-xl text-gray-300">
+                            Cada estudio tiene su propio espacio personalizado
+                        </p>
+                    </div>
+
+                    {/* Grid de ejemplos de estudios */}
+                    <div className="grid md:grid-cols-3 gap-8 mb-16">
+                        <div className="bg-zinc-800 p-6 rounded-lg">
+                            <h3 className="text-xl font-bold mb-2">zen.pro/mi-estudio</h3>
+                            <p className="text-gray-300">URL limpia y profesional para tu estudio</p>
+                        </div>
+                        <div className="bg-zinc-800 p-6 rounded-lg">
+                            <h3 className="text-xl font-bold mb-2">Gestión Completa</h3>
+                            <p className="text-gray-300">CRM, proyectos, finanzas y más</p>
+                        </div>
+                        <div className="bg-zinc-800 p-6 rounded-lg">
+                            <h3 className="text-xl font-bold mb-2">Branding Personalizado</h3>
+                            <p className="text-gray-300">Tu identidad, tu espacio</p>
+                        </div>
+                    </div>
+
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold mb-4">Todo lo que necesitas para tu estudio</h2>
                         <p className="text-xl text-gray-300">

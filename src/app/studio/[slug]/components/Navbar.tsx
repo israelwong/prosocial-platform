@@ -186,7 +186,7 @@ export function Navbar({ className }: NavbarProps) {
               <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg z-50">
                 <div className="py-1">
                   <Link
-                    href={`/studio/${slug}/dashboard`}
+                    href={`/${slug}/dashboard`}
                     className="flex items-center px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white"
                     onClick={() => setIsUserMenuOpen(false)}
                   >
@@ -194,7 +194,7 @@ export function Navbar({ className }: NavbarProps) {
                     Dashboard
                   </Link>
                   <Link
-                    href={`/studio/${slug}/configuracion/`}
+                    href={`/${slug}/configuracion/`}
                     className="flex items-center px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white"
                     onClick={() => setIsUserMenuOpen(false)}
                   >

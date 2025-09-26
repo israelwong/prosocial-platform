@@ -1,110 +1,145 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from "@/lib/supabase/server";
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Rutas que requieren autenticación
-  const protectedRoutes = ['/admin', '/agente', '/studio'];
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  const protectedRoutes = ["/admin", "/agente", "/studio"];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
 
   if (isProtectedRoute) {
     const supabase = await createClient();
 
     // Verificar autenticación
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      // console.log('🔒 Usuario no autenticado, redirigiendo a login');
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL("/login", request.url));
     }
-
-    // console.log('🔒 Usuario autenticado:', user.email);
-    // console.log('🔒 User metadata:', user.user_metadata);
 
     // Obtener el rol del usuario desde user_metadata
     const userRole = user.user_metadata?.role;
 
     if (!userRole) {
-      // console.log('🔒 No se encontró rol en metadata, redirigiendo a login');
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL("/login", request.url));
     }
-
-    // console.log('🔒 Rol del usuario:', userRole);
-    // console.log('🔒 Ruta solicitada:', pathname);
 
     // Verificar permisos según el rol
     const hasAccess = checkRouteAccess(userRole, pathname);
 
     if (!hasAccess) {
-      // console.log('🔒 Acceso denegado para rol:', userRole, 'a ruta:', pathname);
-      return NextResponse.redirect(new URL('/unauthorized', request.url));
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
-
-    // console.log('🔒 Acceso permitido para rol:', userRole, 'a ruta:', pathname);
   }
 
   // Rutas reservadas para marketing (no redirigir)
   const marketingRoutes = [
-    '/about',
-    '/pricing',
-    '/contact',
-    '/features',
-    '/blog',
-    '/login',
-    '/sign-up',
-    '/signin',
-    '/signup',
-    '/forgot-password',
-    '/update-password',
-    '/error',
-    '/redirect',
-    '/sign-up-success',
-    '/complete-profile',
-    '/confirm',
-    '/unauthorized'
+    "/about",
+    "/pricing",
+    "/contact",
+    "/features",
+    "/blog",
+    "/login",
+    "/sign-up",
+    "/signin",
+    "/signup",
+    "/forgot-password",
+    "/update-password",
+    "/error",
+    "/redirect",
+    "/sign-up-success",
+    "/complete-profile",
+    "/confirm",
+    "/unauthorized",
   ];
 
-  // Si es una ruta de marketing o ya tiene prefijo, permitir
-  if (marketingRoutes.some(route => pathname.startsWith(route))) {
+  // Si es una ruta de marketing, permitir
+  if (marketingRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
-  // Si es /[slug] y no es una ruta reservada, redirigir a /studio/[slug]
-  // Excluir rutas de autenticación y administración
-  const reservedPaths = ['/admin', '/agente', '/login', '/sign-up', '/signin', '/signup', '/forgot-password', '/update-password', '/error', '/redirect', '/sign-up-success', '/complete-profile', '/confirm', '/unauthorized'];
-  if (pathname.match(/^\/[a-zA-Z0-9-]+$/) && pathname !== '/' && !reservedPaths.some(path => pathname.startsWith(path))) {
-    const slug = pathname.slice(1);
-    return NextResponse.redirect(new URL(`/studio/${slug}`, request.url));
+  // Rutas reservadas para sistema
+  const reservedPaths = [
+    "/admin",
+    "/agente",
+    "/api",
+    "/login",
+    "/sign-up",
+    "/signin",
+    "/signup",
+    "/forgot-password",
+    "/update-password",
+    "/error",
+    "/redirect",
+    "/sign-up-success",
+    "/complete-profile",
+    "/confirm",
+    "/unauthorized",
+    "/protected",
+    "/about",
+    "/pricing",
+    "/contact",
+    "/features",
+    "/blog",
+    "/help",
+    "/docs",
+    "/demo",
+    "/terms",
+    "/privacy",
+    "/_next",
+    "/favicon.ico",
+    "/robots.txt",
+    "/sitemap.xml",
+  ];
+
+  // Función para verificar rutas reservadas
+  const isReservedPath = (path: string) => {
+    return reservedPaths.some((reserved) => {
+      // Para rutas exactas como /demo, solo coincidir si es exacto o si empieza con /demo/
+      if (reserved === "/demo") {
+        return path === "/demo" || path.startsWith("/demo/");
+      }
+      return path.startsWith(reserved);
+    });
+  };
+
+  // Si es /[slug] o /[slug]/[...path] y no es ruta reservada → Rewrite a /studio/[slug][...path]
+  const slugMatch = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
+  if (slugMatch && pathname !== "/" && !isReservedPath(pathname)) {
+    const [, slug, subPath = ""] = slugMatch;
+    const studioPath = `/studio/${slug}${subPath}`;
+    console.log(`🔄 [ZEN.PRO] Rewriting ${pathname} to ${studioPath}`);
+    return NextResponse.rewrite(new URL(studioPath, request.url));
   }
 
   return NextResponse.next();
 }
 
 function checkRouteAccess(userRole: string, pathname: string): boolean {
-  // console.log('🔍 Verificando acceso - Rol:', userRole, 'Ruta:', pathname);
-
   switch (userRole) {
-    case 'super_admin':
+    case "super_admin":
       // Super admin puede acceder a todo
       return true;
 
-    case 'agente':
+    case "agente":
       // Agente solo puede acceder a rutas de agente
-      return pathname.startsWith('/agente');
+      return pathname.startsWith("/agente");
 
-    case 'suscriptor':
+    case "suscriptor":
       // Suscriptor solo puede acceder a rutas de studio
-      return pathname.startsWith('/studio/');
+      return pathname.startsWith("/studio/");
 
     default:
-      // console.log('🔍 Rol no reconocido:', userRole);
       return false;
   }
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

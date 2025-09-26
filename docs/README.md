@@ -28,6 +28,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **GUIA_MIGRACION_API_REST.md** - **NUEVA** Guía de migración API REST → Server Actions
 - **GUIA_IMPLEMENTACION_PASO_A_PASO.md** - **NUEVA** Guía de implementación paso a paso
 - **CONFIGURACION_PRECIOS_SOBREPRECIO.md** - **NUEVA** Documentación del sobreprecio para descuentos
+- **MIGRACION_ZEN_PRO_DOMAIN.md** - **NUEVA** Plan de migración completo a dominio zen.pro
 
 ### 🔧 **03-troubleshooting/** - Solución de Problemas
 
@@ -46,6 +47,8 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **COMANDOS_AUTOMATIZACION.md** - Comandos para automatización de desarrollo
 - **REGLAS_AGENTE_AUTOMATIZACION.md** - Reglas específicas para el agente IA
 - **AUTOMATIZACION_GIT_AVANZADA.md** - Automatización avanzada con gestión de ramas Git
+- **PLAN_CONSISTENCIA_DISENO.md** - **NUEVA** Plan de consistencia de diseño ProSocial
+- **AUDITORIA_COMPONENTES.md** - **NUEVA** Auditoría detallada de componentes existentes
 
 ### 🗂️ **05-legacy/** - Código Legacy y Migración
 
@@ -74,15 +77,18 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 2. **[Estructura de Server Actions](./01-architecture/ESTRUCTURA_SERVER_ACTIONS.md)** - **NUEVA** Organización por roles
 3. **[Guía de Migración API REST](./02-implementation/GUIA_MIGRACION_API_REST.md)** - **NUEVA** Migración paso a paso
 4. **[Guía de Implementación](./02-implementation/GUIA_IMPLEMENTACION_PASO_A_PASO.md)** - **NUEVA** Implementación detallada
-5. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
-6. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
-7. **[Drag & Drop Anidado](./02-implementation/NESTED_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento anidado
-8. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
-9. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
-10. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
-11. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
-12. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
-13. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
+5. **[Migración a zen.pro](./02-implementation/MIGRACION_ZEN_PRO_DOMAIN.md)** - **NUEVA** Plan completo de migración de dominio
+6. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
+7. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
+8. **[Drag & Drop Anidado](./02-implementation/NESTED_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento anidado
+9. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
+10. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
+11. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
+12. **[Plan de Consistencia de Diseño](./04-best-practices/PLAN_CONSISTENCIA_DISENO.md)** - **NUEVA** Plan para unificar el diseño entre admin, agente y studio
+13. **[Auditoría de Componentes](./04-best-practices/AUDITORIA_COMPONENTES.md)** - **NUEVA** Análisis detallado de inconsistencias actuales
+14. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
+15. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
+16. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
 
 ### 🔧 **Para Troubleshooting**
 

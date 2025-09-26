@@ -150,15 +150,15 @@ export default function ProveedoresPage() {
 
 
     const navigateToPerfiles = () => {
-        router.push(`/studio/${slug}/configuracion/negocio/personal/perfiles`);
+        router.push(`/${slug}/configuracion/negocio/personal/perfiles`);
     };
 
     const handleToggleActive = async (proveedorId: string, isActive: boolean) => {
         try {
             // TODO: Implementar toggle de estado en el backend
             // Por ahora, solo actualizar localmente
-            setProveedores(prev => 
-                prev.map(prov => 
+            setProveedores(prev =>
+                prev.map(prov =>
                     prov.id === proveedorId ? { ...prov, isActive } : prov
                 )
             );

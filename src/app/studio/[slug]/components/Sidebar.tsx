@@ -38,17 +38,17 @@ export function Sidebar({ className }: SidebarProps) {
         {
             title: 'PRINCIPAL',
             items: [
-                { name: 'Dashboard', href: `/studio/${slug}/dashboard`, icon: LayoutDashboard },
-                { name: 'Kanban', href: `/studio/${slug}/kanban`, icon: Kanban },
-                { name: 'Agenda', href: `/studio/${slug}/agenda`, icon: Calendar },
-                { name: 'Contactos', href: `/studio/${slug}/contactos`, icon: Users },
-                { name: 'Finanzas', href: `/studio/${slug}/finanzas`, icon: DollarSign }
+                { name: 'Dashboard', href: `/${slug}/dashboard`, icon: LayoutDashboard },
+                { name: 'Kanban', href: `/${slug}/kanban`, icon: Kanban },
+                { name: 'Agenda', href: `/${slug}/agenda`, icon: Calendar },
+                { name: 'Contactos', href: `/${slug}/contactos`, icon: Users },
+                { name: 'Finanzas', href: `/${slug}/finanzas`, icon: DollarSign }
             ]
         },
         {
             title: 'CONFIGURACIÓN',
             items: [
-                { name: 'Configuración', href: `/studio/${slug}/configuracion`, icon: Shield }
+                { name: 'Configuración', href: `/${slug}/configuracion`, icon: Shield }
             ]
         }
     ];

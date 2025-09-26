@@ -187,7 +187,7 @@ export default function EmpleadosPage() {
     };
 
     const navigateToPerfiles = () => {
-        router.push(`/studio/${slug}/configuracion/negocio/personal/perfiles`);
+        router.push(`/${slug}/configuracion/negocio/personal/perfiles`);
     };
 
     const handleToggleActive = async (empleadoId: string, isActive: boolean) => {
