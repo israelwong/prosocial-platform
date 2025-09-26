@@ -4,11 +4,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { HeaderNavigation } from '@/components/ui/header-navigation';
-import { User, AlertCircle, Loader2 } from 'lucide-react';
+import { User, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { obtenerPerfil } from '@/lib/actions/studio/config/perfil.actions';
 import { PerfilData } from './types';
-import { PerfilFormSimple } from './components';
+import { PerfilFormSimple, PerfilSkeleton } from './components';
 
 export default function PerfilPage() {
   const params = useParams();
@@ -49,37 +49,17 @@ export default function PerfilPage() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6 max-w-screen-lg mx-auto">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">Perfil</h1>
-          <p className="text-zinc-400">
-            Tu información personal y de contacto
-          </p>
-        </div>
-
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
-              <span className="ml-2 text-zinc-400">Cargando perfil...</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <PerfilSkeleton />;
   }
 
   if (error) {
     return (
       <div className="space-y-6 max-w-screen-lg mx-auto">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">Perfil</h1>
-          <p className="text-zinc-400">
-            Tu información personal y de contacto
-          </p>
-        </div>
-
+        <HeaderNavigation
+          title="Perfil"
+          description="Gestiona tu información personal y de contacto"
+        />
+        
         <Card className="bg-zinc-900 border-zinc-800">
           <CardContent className="p-6">
             <div className="text-center py-8">
@@ -92,7 +72,7 @@ export default function PerfilPage() {
               </p>
               <button
                 onClick={cargarPerfil}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
               >
                 Reintentar
               </button>
@@ -106,13 +86,11 @@ export default function PerfilPage() {
   if (!perfil) {
     return (
       <div className="space-y-6 max-w-screen-lg mx-auto">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white">Perfil</h1>
-          <p className="text-zinc-400">
-            Tu información personal y de contacto
-          </p>
-        </div>
-
+        <HeaderNavigation
+          title="Perfil"
+          description="Gestiona tu información personal y de contacto"
+        />
+        
         <Card className="bg-zinc-900 border-zinc-800">
           <CardContent className="p-6">
             <div className="text-center py-8">
@@ -132,7 +110,6 @@ export default function PerfilPage() {
 
   return (
     <div className="space-y-6 max-w-screen-lg mx-auto">
-      {/* Header Navigation */}
       <HeaderNavigation
         title="Perfil"
         description="Gestiona tu información personal y de contacto"
@@ -143,7 +120,6 @@ export default function PerfilPage() {
         }}
       />
 
-      {/* Formulario del perfil */}
       <PerfilFormSimple
         studioSlug={slug}
         perfil={perfil}
