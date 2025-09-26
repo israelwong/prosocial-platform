@@ -49,6 +49,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **AUTOMATIZACION_GIT_AVANZADA.md** - Automatización avanzada con gestión de ramas Git
 - **PLAN_CONSISTENCIA_DISENO.md** - **NUEVA** Plan de consistencia de diseño ProSocial
 - **AUDITORIA_COMPONENTES.md** - **NUEVA** Auditoría detallada de componentes existentes
+- **MCP_ZEN_WORKFLOW.md** - **NUEVA** Flujo de trabajo MCP + ZEN Design System
 
 ### 🗂️ **05-legacy/** - Código Legacy y Migración
 
@@ -89,6 +90,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 14. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
 15. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
 16. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
+17. **[Flujo MCP + ZEN](./04-best-practices/MCP_ZEN_WORKFLOW.md)** - **NUEVA** Integración MCP con ZEN Design System
 
 ### 🔧 **Para Troubleshooting**
 
