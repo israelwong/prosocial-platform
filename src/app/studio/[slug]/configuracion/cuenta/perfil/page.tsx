@@ -1,93 +1,154 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { User, Mail, Lock, Settings } from 'lucide-react';
+'use client';
 
-interface PerfilPageProps {
-  params: {
-    slug: string;
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import { Card, CardContent } from '@/components/ui/card';
+import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { User, AlertCircle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { obtenerPerfil } from '@/lib/actions/studio/config/perfil.actions';
+import { PerfilData } from './types';
+import { PerfilFormSimple } from './components';
+
+export default function PerfilPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+
+  const [perfil, setPerfil] = useState<PerfilData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const cargarPerfil = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await obtenerPerfil(slug);
+
+      if (result.success && result.data) {
+        setPerfil(result.data);
+        setError(null);
+      } else {
+        const errorMessage = typeof result.error === 'string' ? result.error : 'Error al cargar el perfil';
+        setError(errorMessage);
+        toast.error(errorMessage);
+      }
+    } catch (error) {
+      console.error('Error al cargar perfil:', error);
+      setError('Error interno del servidor');
+      toast.error('Error al cargar el perfil');
+    } finally {
+      setLoading(false);
+    }
+  }, [slug]);
+
+  useEffect(() => {
+    cargarPerfil();
+  }, [slug, cargarPerfil]);
+
+  const handlePerfilUpdate = (updatedPerfil: PerfilData) => {
+    setPerfil(updatedPerfil);
   };
-}
 
-export default async function PerfilPage({ params }: PerfilPageProps) {
-  const { slug } = await params;
+  if (loading) {
+    return (
+      <div className="space-y-6 max-w-screen-lg mx-auto">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-white">Perfil</h1>
+          <p className="text-zinc-400">
+            Tu información personal y de contacto
+          </p>
+        </div>
+
+        <Card className="bg-zinc-900 border-zinc-800">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-400" />
+              <span className="ml-2 text-zinc-400">Cargando perfil...</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6 max-w-screen-lg mx-auto">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-white">Perfil</h1>
+          <p className="text-zinc-400">
+            Tu información personal y de contacto
+          </p>
+        </div>
+
+        <Card className="bg-zinc-900 border-zinc-800">
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-400" />
+              <h3 className="text-lg font-medium text-white mb-2">
+                Error al cargar el perfil
+              </h3>
+              <p className="text-zinc-400 mb-6 max-w-md mx-auto">
+                {error}
+              </p>
+              <button
+                onClick={cargarPerfil}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+              >
+                Reintentar
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!perfil) {
+    return (
+      <div className="space-y-6 max-w-screen-lg mx-auto">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-white">Perfil</h1>
+          <p className="text-zinc-400">
+            Tu información personal y de contacto
+          </p>
+        </div>
+
+        <Card className="bg-zinc-900 border-zinc-800">
+          <CardContent className="p-6">
+            <div className="text-center py-8">
+              <User className="h-16 w-16 mx-auto mb-4 text-zinc-600" />
+              <h3 className="text-lg font-medium text-white mb-2">
+                No se encontró información del perfil
+              </h3>
+              <p className="text-zinc-400 mb-6 max-w-md mx-auto">
+                No se pudo cargar la información de tu perfil. Contacta al soporte si el problema persiste.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-white">Perfil</h1>
-        <p className="text-zinc-400">
-          Tu nombre, correo de inicio de sesión y contraseña
-        </p>
-      </div>
+    <div className="space-y-6 max-w-screen-lg mx-auto">
+      {/* Header Navigation */}
+      <HeaderNavigation
+        title="Perfil"
+        description="Gestiona tu información personal y de contacto"
+        actionButton={{
+          label: "Guardar Cambios",
+          icon: "User",
+          variant: "primary"
+        }}
+      />
 
-      {/* Perfil principal */}
-      <Card className="bg-zinc-900 border-zinc-800">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <User className="h-5 w-5" />
-            Información Personal
-          </CardTitle>
-          <CardDescription className="text-zinc-400">
-            Gestiona tu información personal y de contacto
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <User className="h-16 w-16 mx-auto mb-4 text-zinc-600" />
-            <h3 className="text-lg font-medium text-white mb-2">
-              Perfil de Usuario
-            </h3>
-            <p className="text-zinc-400 mb-6 max-w-md mx-auto">
-              Actualiza tu nombre, correo de inicio de sesión y contraseña.
-            </p>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Settings className="h-4 w-4 mr-2" />
-              Editar Perfil
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Configuraciones adicionales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Mail className="h-5 w-5" />
-              Correo Electrónico
-            </CardTitle>
-            <CardDescription className="text-zinc-400">
-              Cambia tu correo de inicio de sesión
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-6">
-              <Mail className="h-8 w-8 mx-auto mb-2 text-zinc-600" />
-              <p className="text-sm text-zinc-400">Correo no configurado</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Lock className="h-5 w-5" />
-              Contraseña
-            </CardTitle>
-            <CardDescription className="text-zinc-400">
-              Cambia tu contraseña
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-6">
-              <Lock className="h-8 w-8 mx-auto mb-2 text-zinc-600" />
-              <p className="text-sm text-zinc-400">Contraseña configurada</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Formulario del perfil */}
+      <PerfilFormSimple
+        studioSlug={slug}
+        perfil={perfil}
+        onPerfilUpdate={handlePerfilUpdate}
+      />
     </div>
   );
 }

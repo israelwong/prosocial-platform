@@ -1,0 +1,1 @@
+export { PerfilFormSimple } from './PerfilFormSimple';
