@@ -4,8 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
-import { Badge } from '@/components/ui/shadcn/badge';
+import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
+import { ZenInput } from '@/components/ui/zen';
+import { ZenButton } from '@/components/ui/zen';
+import { ZenBadge } from '@/components/ui/zen';
+import { ZenLabel } from '@/components/ui/zen';
 import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import {
     ConfiguracionPreciosSchema,
@@ -17,9 +20,15 @@ import {
     verificarServiciosExistentes
 } from '@/lib/actions/studio/config/configuracion-precios.actions';
 import { type ServiciosExistentes } from '@/lib/actions/schemas/configuracion-precios-schemas';
+import {
+    AlertTriangle,
+    Calculator,
+    TrendingUp,
+    Save
+} from 'lucide-react';
 
-// Componente reutilizable para campos de porcentaje
-interface PorcentajeFieldProps {
+// Componente reutilizable para campos de porcentaje con ZEN
+interface PorcentajeFieldZenProps {
     label: string;
     name: keyof ConfiguracionPreciosFormType;
     description: string;
@@ -28,21 +37,22 @@ interface PorcentajeFieldProps {
     placeholder?: string;
 }
 
-function PorcentajeField({ label, name, description, register, errors, placeholder = "0" }: PorcentajeFieldProps) {
+function PorcentajeFieldZen({ label, name, description, register, errors, placeholder = "0" }: PorcentajeFieldZenProps) {
     return (
         <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">
+            <ZenLabel htmlFor={name}>
                 {label} (%)
-            </label>
+            </ZenLabel>
             <div className="relative">
-                <input
+                <ZenInput
                     {...register(name)}
                     type="number"
                     min="0"
                     max="100"
                     step="1"
                     placeholder={placeholder}
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    label="" // Added to satisfy ZenInputProps
+                    className="pr-8"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <span className="text-zinc-400 text-sm">%</span>
@@ -57,23 +67,18 @@ function PorcentajeField({ label, name, description, register, errors, placehold
         </div>
     );
 }
-import {
-    AlertTriangle,
-    Calculator,
-    TrendingUp
-} from 'lucide-react';
 
-interface ConfiguracionPreciosFormProps {
+interface ConfiguracionPreciosFormZenProps {
     studioSlug: string;
     initialData: ConfiguracionPreciosData;
     onUpdate?: (data: ConfiguracionPreciosData) => void;
 }
 
-export function ConfiguracionPreciosForm({
+export function ConfiguracionPreciosFormZen({
     studioSlug,
     initialData,
     onUpdate
-}: ConfiguracionPreciosFormProps) {
+}: ConfiguracionPreciosFormZenProps) {
     const [serviciosExistentes, setServiciosExistentes] = useState<ServiciosExistentes | null>(null);
 
     const {
@@ -86,10 +91,8 @@ export function ConfiguracionPreciosForm({
         defaultValues: {
             utilidad_servicio: initialData?.utilidad_servicio || '30',
             utilidad_producto: initialData?.utilidad_producto || '40',
-            // utilidad_paquete eliminada - no está en la base de datos
             comision_venta: initialData?.comision_venta || '10',
             sobreprecio: initialData?.sobreprecio || '5',
-            // Campos eliminados: incluir_iva, redondear_precios, aplicar_descuentos_automaticos, numero_maximo_servicios_por_dia
         },
     });
 
@@ -162,8 +165,8 @@ export function ConfiguracionPreciosForm({
         <div className="space-y-6">
             {/* Alerta de servicios existentes */}
             {serviciosExistentes?.requiere_actualizacion_masiva && (
-                <Card className="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
-                    <CardContent className="pt-6">
+                <ZenCard variant="default" padding="lg" className="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
+                    <ZenCardContent className="pt-6">
                         <div className="flex items-start gap-3">
                             <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
                             <div>
@@ -175,20 +178,20 @@ export function ConfiguracionPreciosForm({
                                     automáticamente con los nuevos porcentajes de utilidad.
                                 </p>
                                 <div className="flex gap-2 mt-2">
-                                    <Badge variant="outline" className="text-yellow-700 border-yellow-300">
+                                    <ZenBadge variant="secondary" className="text-yellow-700 border-yellow-300">
                                         {serviciosExistentes.servicios_por_tipo.servicios} Servicios
-                                    </Badge>
-                                    <Badge variant="outline" className="text-yellow-700 border-yellow-300">
+                                    </ZenBadge>
+                                    <ZenBadge variant="secondary" className="text-yellow-700 border-yellow-300">
                                         {serviciosExistentes.servicios_por_tipo.productos} Productos
-                                    </Badge>
-                                    <Badge variant="outline" className="text-yellow-700 border-yellow-300">
+                                    </ZenBadge>
+                                    <ZenBadge variant="secondary" className="text-yellow-700 border-yellow-300">
                                         {serviciosExistentes.servicios_por_tipo.paquetes} Paquetes
-                                    </Badge>
+                                    </ZenBadge>
                                 </div>
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
+                    </ZenCardContent>
+                </ZenCard>
             )}
 
             <HeaderNavigation
@@ -203,9 +206,8 @@ export function ConfiguracionPreciosForm({
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Configuración de Precios */}
-                <Card className="bg-zinc-900/50 border-zinc-800">
-
-                    <CardContent className="space-y-6">
+                <ZenCard variant="default" padding="lg">
+                    <ZenCardContent className="space-y-6">
                         {/* Porcentajes de Utilidad */}
                         <div>
                             <h4 className="text-lg font-medium text-white mb-3 flex items-center gap-2">
@@ -213,7 +215,7 @@ export function ConfiguracionPreciosForm({
                                 Porcentajes de Utilidad
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <PorcentajeField
+                                <PorcentajeFieldZen
                                     label="Utilidad en Servicios"
                                     name="utilidad_servicio"
                                     description="Margen de utilidad para servicios"
@@ -221,7 +223,7 @@ export function ConfiguracionPreciosForm({
                                     errors={errors}
                                     placeholder="30"
                                 />
-                                <PorcentajeField
+                                <PorcentajeFieldZen
                                     label="Utilidad en Productos"
                                     name="utilidad_producto"
                                     description="Margen de utilidad para productos físicos"
@@ -239,7 +241,7 @@ export function ConfiguracionPreciosForm({
                                 Comisiones y Sobreprecio
                             </h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <PorcentajeField
+                                <PorcentajeFieldZen
                                     label="Comisión de Venta"
                                     name="comision_venta"
                                     description="Comisión aplicada sobre el precio final"
@@ -247,7 +249,7 @@ export function ConfiguracionPreciosForm({
                                     errors={errors}
                                     placeholder="10"
                                 />
-                                <PorcentajeField
+                                <PorcentajeFieldZen
                                     label="Sobreprecio aplicado al precio final"
                                     name="sobreprecio"
                                     description="Porcentaje que se suma al precio final para crear una reserva de descuento (no se podrá aplicar un descuento mayor al sobreprecio)"
@@ -257,24 +259,21 @@ export function ConfiguracionPreciosForm({
                                 />
                             </div>
                         </div>
-
-                    </CardContent>
-                </Card>
-
-                {/* Configuración Avanzada - ELIMINADA */}
+                    </ZenCardContent>
+                </ZenCard>
 
                 {/* Preview de Cálculo */}
-                <Card className="bg-zinc-900/50 border-zinc-800">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                <ZenCard variant="default" padding="lg">
+                    <ZenCardHeader>
+                        <ZenCardTitle className="flex items-center gap-2">
                             <Calculator className="h-5 w-5" />
                             Preview de Cálculo
-                        </CardTitle>
-                        <CardDescription>
+                        </ZenCardTitle>
+                        <ZenCardDescription>
                             Ejemplo de cómo se calcularían los precios con la configuración actual
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                        </ZenCardDescription>
+                    </ZenCardHeader>
+                    <ZenCardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {/* Ejemplo Servicio */}
                             <div className="p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
@@ -403,12 +402,9 @@ export function ConfiguracionPreciosForm({
                                     })()}
                                 </div>
                             </div>
-
-                            {/* Ejemplo Paquete - ELIMINADO (no hay utilidad_paquete) */}
                         </div>
-                    </CardContent>
-                </Card>
-
+                    </ZenCardContent>
+                </ZenCard>
             </form>
         </div>
     );
