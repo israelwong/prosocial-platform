@@ -114,7 +114,7 @@ model platform_leads {
   studioSlug                   String?
   lastContactDate              DateTime?
   interestedPlan               String?
-  monthlyBudget                Decimal? //no va
+  // monthlyBudget                Decimal? //no va
   avatarUrl                   String? //fot de perfi 
   probableStartDate            DateTime?
   agentId                      String?
@@ -449,6 +449,7 @@ model projects {
   setup_status             studio_setup_status?             // ✅ Estado de configuración del estudio
   plans                    platform_plans?                   @relation(fields: [planId], references: [id])
   subscriptions            subscriptions[]
+  platform_user_profiles   platform_user_profiles[]         // Usuarios del proyecto
 
   @@index([planId])
   @@index([slug])
@@ -500,29 +501,28 @@ model project_agenda_tipos {
   updatedAt DateTime
 }
 
-
 model project_clientes {
   id            String            @id @default(cuid())
   projectId     String
+  platformUserId String?         // FK a platform_user_profiles (opcional)
   nombre        String
   email         String
   telefono      String
   direccion     String?
   status        String            @default("activo")
-  userId        String?
-  passwordHash  String?
-  emailVerified Boolean           @default(false)
   isActive      Boolean           @default(true)
   lastLogin     DateTime?
   createdAt     DateTime          @default(now())
   updatedAt     DateTime
   projects      projects          @relation(fields: [projectId], references: [id])
+  platform_user_profiles platform_user_profiles? @relation(fields: [platformUserId], references: [id])
   eventos       project_eventos[]
   pagos         project_pagos[]
 
   @@index([projectId, email])
   @@index([projectId, status])
   @@index([projectId, telefono])
+  @@index([platformUserId])
 }
 
 model project_condiciones_comerciales {
@@ -981,15 +981,7 @@ model project_servicios {
   @@index([projectId, status])
 }
 
-model project_sesiones {
-  id           String        @id @default(cuid())
-  userId       String
-  token        String        @unique
-  status       String        @default("active")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime
-  studio_users project_users @relation(fields: [userId], references: [id])
-}
+// project_sesiones eliminado - Supabase Auth maneja las sesiones
 
 model project_studio_revenue_products {
   id                  String                   @id @default(cuid())
@@ -1012,16 +1004,14 @@ model project_studio_revenue_products {
 
 model project_users {
   id                                            String                         @id @default(cuid())
-  username                                      String?
-  email                                         String                         @unique
-  password                                      String?                        // Opcional para personal sin login
-  fullName                                      String?                        // Nombre completo
-  phone                                         String?                        // Teléfono (renombrado de telefono)
-  type                                          PersonnelType?                 // EMPLEADO | PROVEEDOR
+  projectId                                     String
+  platformUserId                                String?                        // FK a platform_user_profiles (opcional)
+  fullName                                      String
+  phone                                         String?
+  type                                          PersonnelType                  // EMPLEADO | PROVEEDOR
   role                                          String                         @default("user")
   status                                        String                         @default("inactive")
   isActive                                      Boolean                        @default(true)
-  projectId                                     String
   createdAt                                     DateTime                       @default(now())
   updatedAt                                     DateTime                       @updatedAt
 
@@ -1034,16 +1024,16 @@ model project_users {
   nominas_nominas_pagado_porToproject_users     project_nominas[]              @relation("nominas_pagado_porToproject_users")
   nominas_nominas_userIdToproject_users         project_nominas[]              @relation("nominas_userIdToproject_users")
   pagos                                         project_pagos[]
-  sesiones                                      project_sesiones[]
   projects                                      projects                       @relation(fields: [projectId], references: [id])
+  platform_user_profiles                        platform_user_profiles?        @relation(fields: [platformUserId], references: [id])
 
   // Nueva relación para perfiles profesionales
   professional_profiles                         project_user_professional_profiles[]
 
-  @@index([email])
   @@index([projectId, status])
   @@index([type])
   @@index([isActive])
+  @@index([platformUserId])
 }
 
 // Perfiles profesionales dinámicos por proyecto
@@ -1090,6 +1080,28 @@ model project_user_professional_profiles {
   @@index([isActive])
 }
 
+model platform_user_profiles {
+  id                     String                   @id @default(cuid())
+  supabaseUserId         String?                  @unique // FK a auth.users.id
+  email                  String                   @unique
+  role                   UserRole
+  fullName               String?
+  avatarUrl              String?
+  isActive               Boolean                  @default(true)
+  projectId              String?                 // FK a projects (para roles locales)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime
+  projects               projects?                @relation(fields: [projectId], references: [id])
+  project_users          project_users[]          // Personal del proyecto
+  project_clientes       project_clientes[]      // Clientes del proyecto
+
+  @@index([email])
+  @@index([role])
+  @@index([projectId])
+  @@index([supabaseUserId])
+}
+
+// Mantener project_user_profiles para compatibilidad temporal
 model project_user_profiles {
   id                     String                   @id @default(cuid())
   email                  String                   @unique
@@ -1279,6 +1291,8 @@ enum UserRole {
   SUPER_ADMIN
   AGENTE
   SUSCRIPTOR
+  PERSONAL_SUSCRIPTOR
+  CLIENTE_SUSCRIPTOR
 }
 
 enum SubscriptionStatus {
