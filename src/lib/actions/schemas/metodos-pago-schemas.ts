@@ -11,9 +11,6 @@ export const MetodoPagoSchema = z.object({
     comision_fija_monto: z.string().optional(),
 
     payment_method: z.string().optional(),
-    tipo: z.enum(['manual', 'stripe_automatico', 'msi']),
-    requiere_stripe: z.boolean(),
-
     status: z.enum(['active', 'inactive']),
     orden: z.number(),
 });

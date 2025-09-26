@@ -22,8 +22,6 @@ export interface MetodoPagoUpdate {
     comision_porcentaje_base?: number | null;
     comision_fija_monto?: number | null;
     payment_method?: string | null;
-    tipo: 'manual' | 'stripe_automatico' | 'msi';
-    requiere_stripe: boolean;
     status: 'active' | 'inactive';
     orden: number;
 }
@@ -33,8 +31,6 @@ export interface MetodoPagoFormData {
     comision_porcentaje_base?: string | null;
     comision_fija_monto?: string | null;
     payment_method?: string | null;
-    tipo: 'manual' | 'stripe_automatico' | 'msi';
-    requiere_stripe: boolean;
     status: 'active' | 'inactive';
     orden: number;
 }
