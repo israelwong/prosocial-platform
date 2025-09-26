@@ -1,8 +1,8 @@
 'use client'
 
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/shadcn/button'
+import { Avatar, AvatarFallback } from '@/components/ui/shadcn/avatar'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,9 +10,9 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/shadcn/dropdown-menu'
 import { LogOut, User, Settings, BarChart3, Building2, Users, DollarSign, Activity } from 'lucide-react'
-import { HeaderLogo } from '@/components/ui/logo'
+import { HeaderLogo } from '@/components/ui/shadcn/logo'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'

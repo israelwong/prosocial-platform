@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/shadcn/input';
+import { Switch } from '@/components/ui/shadcn/switch';
 import { Horario, DIAS_SEMANA } from '../types';
 
 interface HorariosItemProps {

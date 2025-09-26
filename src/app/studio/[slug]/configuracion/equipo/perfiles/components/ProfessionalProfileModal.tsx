@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/shadcn/button';
+import { Input } from '@/components/ui/shadcn/input';
+import { Label } from '@/components/ui/shadcn/label';
+import { Textarea } from '@/components/ui/shadcn/textarea';
+import { Switch } from '@/components/ui/shadcn/switch';
 import {
     Dialog,
     DialogContent,
@@ -13,7 +13,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/shadcn/dialog';
 import { Loader2, Tag, Palette, Type, Hash } from 'lucide-react';
 import { ProfessionalProfile, ProfessionalProfileCreateForm, ProfessionalProfileUpdateForm } from '../types';
 

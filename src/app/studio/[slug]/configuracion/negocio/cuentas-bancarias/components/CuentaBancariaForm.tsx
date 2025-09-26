@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Modal } from '@/components/ui/modal';
+import { Button } from '@/components/ui/shadcn/button';
+import { Input } from '@/components/ui/shadcn/input';
+import { Label } from '@/components/ui/shadcn/label';
+import { Switch } from '@/components/ui/shadcn/switch';
+import { Modal } from '@/components/ui/shadcn/modal';
 import { Save, CreditCard, Building2, User, Hash } from 'lucide-react';
 import { toast } from 'sonner';
 import {

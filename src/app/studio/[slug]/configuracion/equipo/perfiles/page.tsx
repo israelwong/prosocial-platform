@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
 import { ProfessionalProfileModal } from './components/ProfessionalProfileModal';

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import { Trash2, Edit } from 'lucide-react';
 import { ConfirmModal } from '@/app/studio/[slug]/components/ConfirmModal';
 import { Telefono, TIPOS_TELEFONO } from '../types';

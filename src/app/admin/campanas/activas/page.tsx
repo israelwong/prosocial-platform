@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/shadcn/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
+import { Badge } from '@/components/ui/shadcn/badge';
+import { Input } from '@/components/ui/shadcn/input';
+import { Dialog, DialogTrigger } from '@/components/ui/shadcn/dialog';
 import { Plus, Edit, Trash2, Play, Pause, Search, DollarSign, Users, Target, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { CampanaModal } from './components';

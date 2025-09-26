@@ -1,8 +1,8 @@
 'use client'
 import React from 'react'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import type { ButtonVariant, ButtonSize } from '@/components/ui/button'
+import { Button } from '@/components/ui/shadcn/button'
+import type { ButtonVariant, ButtonSize } from '@/components/ui/shadcn/button'
 
 /**
  * Componente HeroImage - Refactorizado siguiendo ESTILO_MAESTRO_MAIN.md

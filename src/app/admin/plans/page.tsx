@@ -1,6 +1,6 @@
 import React from 'react';
 import { prisma } from '@/lib/prisma';
-import { SectionNavigation } from '@/components/ui/section-navigation';
+import { SectionNavigation } from '@/components/ui/shadcn/section-navigation';
 import { PlansPageClient } from './components';
 import { Plan } from './types';
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Image, Video, FileText, File, X, ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import { cn } from '@/lib/utils';
 
 interface FilePreviewProps {

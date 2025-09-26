@@ -5,8 +5,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Lightbulb, ArrowRight, AlertTriangle, TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
+import { Button } from '@/components/ui/shadcn/button';
 import { SetupSectionProgress } from '@/types/setup-validation';
 
 interface SetupRecommendationsProps {

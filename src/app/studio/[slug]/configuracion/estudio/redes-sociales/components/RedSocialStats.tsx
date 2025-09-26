@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Share2, CheckCircle, XCircle } from 'lucide-react';
 import { RedSocial } from '../types';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Users, Building2, UserCheck, UserX, Briefcase } from 'lucide-react';
 // import { PERSONNEL_PROFILE_LABELS } from '@/lib/actions/schemas/personal-schemas';
 import type { PersonalStats } from '../types';

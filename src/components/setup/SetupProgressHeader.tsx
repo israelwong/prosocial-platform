@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { CheckCircle, AlertCircle, Clock } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/shadcn/badge';
 
 interface SetupProgressHeaderProps {
     overallProgress: number;

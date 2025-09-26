@@ -1,313 +1,308 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { HeaderNavigation } from '@/components/ui/header-navigation';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import {
-    obtenerIdentidadStudio,
-    actualizarIdentidadBasica,
-    actualizarPalabrasClave,
-    actualizarLogo
+  ZenCard,
+  ZenCardHeader,
+  ZenCardTitle,
+  ZenCardDescription,
+  ZenCardContent
+} from '@/components/ui/zen';
+import {
+  obtenerIdentidadStudio,
+  actualizarIdentidadBasica,
+  actualizarPalabrasClave,
+  actualizarLogo
 } from '@/lib/actions/studio/config/identidad.actions';
-import { IdentidadForm } from './components/IdentidadForm';
-import { PalabrasClaveManager } from './components/PalabrasClaveManager';
-import { LogoManager } from './components/LogoManager';
+import { IdentidadFormZen } from './components/IdentidadFormZen';
+import { PalabrasClaveManagerZen } from './components/PalabrasClaveManagerZen';
+import { LogoManagerZen } from './components/LogoManagerZen';
 import { IdentidadData, IdentidadUpdate } from './types';
 
-export default function IdentidadPage() {
-    const params = useParams();
-    const slug = params.slug as string;
+/**
+ * IdentidadPageZen - Página refactorizada usando ZEN Design System
+ * 
+ * Mejoras sobre la versión original:
+ * - ✅ ZenCard unificados en lugar de Card de Shadcn
+ * - ✅ Consistencia visual con tema ZEN
+ * - ✅ Formulario refactorizado con componentes ZEN
+ * - ✅ Espaciado consistente con design tokens
+ * - ✅ Mejor organización de componentes
+ */
+export default function IdentidadPageZen() {
+  const params = useParams();
+  const slug = params.slug as string;
 
-    const [identidadData, setIdentidadData] = useState<IdentidadData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [retryCount, setRetryCount] = useState(0);
+  const [identidadData, setIdentidadData] = useState<IdentidadData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
 
-    const loadData = useCallback(async () => {
-        try {
-            setLoading(true);
-            const response = await obtenerIdentidadStudio(slug);
+  const loadData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await obtenerIdentidadStudio(slug);
 
-            // Verificar si es un error response
-            if ('success' in response && response.success === false) {
-                throw new Error(response.error || 'Error al cargar datos');
-            }
+      // Verificar si es un error response
+      if ('success' in response && response.success === false) {
+        throw new Error(response.error || 'Error al cargar datos');
+      }
 
-            // Asumir que es IdentidadData y hacer type assertion
-            setIdentidadData(response as IdentidadData);
-            setRetryCount(0);
-        } catch (error) {
-            console.error('Error loading identidad data:', error);
-            if (retryCount < 3) {
-                setRetryCount(prev => prev + 1);
-                setTimeout(() => loadData(), 1000 * retryCount);
-            } else {
-                toast.error('Error al cargar datos de identidad');
-            }
-        } finally {
-            setLoading(false);
-        }
-    }, [slug, retryCount]);
-
-    useEffect(() => {
-        loadData();
-    }, [loadData]);
-
-    const handleUpdateIdentidad = async (data: IdentidadUpdate) => {
-        try {
-            await actualizarIdentidadBasica(slug, data);
-            // No recargar datos - la actualización optimista ya actualizó la UI
-        } catch (error) {
-            console.error('Error updating identidad:', error);
-            throw error;
-        }
-    };
-
-    const handleUpdatePalabrasClave = async (palabras: string[]) => {
-        try {
-            await actualizarPalabrasClave(slug, palabras);
-            // No recargar datos - la actualización optimista ya actualizó la UI
-        } catch (error) {
-            console.error('Error updating palabras clave:', error);
-            throw error;
-        }
-    };
-
-    const handleUpdateLogo = async (tipo: 'logo' | 'isotipo', url: string) => {
-        try {
-            await actualizarLogo(slug, { tipo, url });
-            // No recargar datos - la actualización optimista ya actualizó la UI
-        } catch (error) {
-            console.error('Error updating logo:', error);
-            // Recargar datos en caso de error para sincronizar con la base de datos
-            await loadData();
-            throw error;
-        }
-    };
-
-    // Función para actualizar el estado local
-    const handleLocalUpdate = (updates: Partial<IdentidadData>) => {
-        if (identidadData) {
-            setIdentidadData(prev => prev ? { ...prev, ...updates } : null);
-        }
-    };
-
-
-    if (loading) {
-        return (
-            <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
-                {/* Header Navigation Skeleton */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-                    <div className="animate-pulse">
-                        <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                        <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                    </div>
-                </div>
-
-                {/* Información Básica Skeleton */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-                    <div className="animate-pulse">
-                        <div className="h-6 bg-zinc-700 rounded w-1/4 mb-2"></div>
-                        <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
-                        <div className="space-y-3">
-                            <div className="h-10 bg-zinc-700 rounded"></div>
-                            <div className="h-10 bg-zinc-700 rounded"></div>
-                            <div className="h-10 bg-zinc-700 rounded"></div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Palabras Clave Skeleton */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-                    <div className="animate-pulse">
-                        <div className="h-6 bg-zinc-700 rounded w-1/4 mb-2"></div>
-                        <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            <div className="h-8 bg-zinc-700 rounded w-20"></div>
-                            <div className="h-8 bg-zinc-700 rounded w-24"></div>
-                            <div className="h-8 bg-zinc-700 rounded w-16"></div>
-                        </div>
-                        <div className="h-10 bg-zinc-700 rounded"></div>
-                    </div>
-                </div>
-
-                {/* Logos Skeleton */}
-                <div className="grid gap-6 md:grid-cols-2">
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-                        <div className="animate-pulse">
-                            <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                            <div className="h-4 bg-zinc-700 rounded w-2/3 mb-4"></div>
-                            <div className="h-32 bg-zinc-700 rounded mb-4"></div>
-                            <div className="h-10 bg-zinc-700 rounded"></div>
-                        </div>
-                    </div>
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-                        <div className="animate-pulse">
-                            <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                            <div className="h-4 bg-zinc-700 rounded w-2/3 mb-4"></div>
-                            <div className="h-32 bg-zinc-700 rounded mb-4"></div>
-                            <div className="h-10 bg-zinc-700 rounded"></div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Información de uso Skeleton */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-                    <div className="animate-pulse">
-                        <div className="h-6 bg-zinc-700 rounded w-1/3 mb-4"></div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
-                                <div className="space-y-1">
-                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
-                                <div className="space-y-1">
-                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+      // Asumir que es IdentidadData y hacer type assertion
+      setIdentidadData(response as IdentidadData);
+      setRetryCount(0);
+    } catch (error) {
+      console.error('Error loading identidad data:', error);
+      if (retryCount < 3) {
+        setRetryCount(prev => prev + 1);
+        setTimeout(() => loadData(), 1000 * retryCount);
+      } else {
+        toast.error('Error al cargar datos de identidad');
+      }
+    } finally {
+      setLoading(false);
     }
+  }, [slug, retryCount]);
 
-    if (!identidadData) {
-        return (
-            <div className="p-6 space-y-6">
-                <div className="text-center py-8">
-                    <p className="text-zinc-400">Error al cargar datos de identidad</p>
-                    <button
-                        onClick={loadData}
-                        className="mt-2 text-blue-400 hover:text-blue-300"
-                    >
-                        Reintentar
-                    </button>
-                </div>
-            </div>
-        );
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleUpdateIdentidad = async (data: IdentidadUpdate) => {
+    try {
+      await actualizarIdentidadBasica(slug, data);
+      // No recargar datos - la actualización optimista ya actualizó la UI
+    } catch (error) {
+      console.error('Error updating identidad:', error);
+      throw error;
     }
+  };
 
+  const handleUpdatePalabrasClave = async (palabras: string[]) => {
+    try {
+      await actualizarPalabrasClave(slug, palabras);
+      // No recargar datos - la actualización optimista ya actualizó la UI
+    } catch (error) {
+      console.error('Error updating palabras clave:', error);
+      throw error;
+    }
+  };
+
+  const handleUpdateLogo = async (tipo: 'logo' | 'isotipo', url: string) => {
+    try {
+      await actualizarLogo(slug, { tipo, url });
+      // No recargar datos - la actualización optimista ya actualizó la UI
+    } catch (error) {
+      console.error('Error updating logo:', error);
+      // Recargar datos en caso de error para sincronizar con la base de datos
+      await loadData();
+      throw error;
+    }
+  };
+
+  // Función para actualizar el estado local
+  const handleLocalUpdate = (updates: Partial<IdentidadData>) => {
+    if (identidadData) {
+      setIdentidadData(prev => prev ? { ...prev, ...updates } : null);
+    }
+  };
+
+  // Loading state con ZEN Cards
+  if (loading) {
     return (
-        <div className="p-6 pb-12 space-y-6 max-w-screen-lg mx-auto">
-            <HeaderNavigation
-                title="Identidad del Estudio"
-                description="Define la identidad visual y la información básica de tu estudio"
-            />
+      <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
+        {/* Header Navigation Skeleton */}
+        <ZenCard variant="default" padding="md">
+          <div className="animate-pulse">
+            <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
+            <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
+          </div>
+        </ZenCard>
 
-            {/* Información Básica */}
-            <Card className="bg-zinc-900/50 border-zinc-800">
-                <CardHeader>
-                    <CardTitle className="text-white">Información Básica</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Datos fundamentales de tu estudio
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <IdentidadForm
-                        data={identidadData}
-                        onUpdate={handleUpdateIdentidad}
-                        onLocalUpdate={handleLocalUpdate}
-                        loading={loading}
-                    />
-                </CardContent>
-            </Card>
-
-            {/* Palabras Clave */}
-            <Card className="bg-zinc-900/50 border-zinc-800">
-                <CardHeader>
-                    <CardTitle className="text-white">Palabras Clave</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Términos que describen tu negocio (SEO y búsquedas)
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <PalabrasClaveManager
-                        palabrasClave={identidadData.palabras_clave}
-                        onUpdate={handleUpdatePalabrasClave}
-                        onLocalUpdate={(palabras) => handleLocalUpdate({ palabras_clave: palabras })}
-                        loading={loading}
-                    />
-                </CardContent>
-            </Card>
-
-            {/* Logos */}
-            <div className="grid gap-6 md:grid-cols-2">
-                {/* Logo Principal */}
-                <Card className="bg-zinc-900/50 border-zinc-800">
-                    <CardHeader>
-                        <CardTitle className="text-white">Logo Principal</CardTitle>
-                        <CardDescription className="text-zinc-400">
-                            Logo completo con texto (header, tarjetas, documentos)
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <LogoManager
-                            tipo="logo"
-                            url={identidadData.logoUrl}
-                            onUpdate={(url) => handleUpdateLogo('logo', url)}
-                            onLocalUpdate={(url) => handleLocalUpdate({ logoUrl: url })}
-                            studioSlug={slug}
-                            loading={loading}
-                        />
-                    </CardContent>
-                </Card>
-
-                {/* Isotipo */}
-                <Card className="bg-zinc-900/50 border-zinc-800">
-                    <CardHeader>
-                        <CardTitle className="text-white">Isotipo</CardTitle>
-                        <CardDescription className="text-zinc-400">
-                            Símbolo o ícono sin texto (favicon, redes sociales)
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <LogoManager
-                            tipo="isotipo"
-                            url={identidadData.isotipo_url}
-                            onUpdate={(url) => handleUpdateLogo('isotipo', url)}
-                            onLocalUpdate={(url) => handleLocalUpdate({ isotipo_url: url })}
-                            studioSlug={slug}
-                            loading={loading}
-                        />
-                    </CardContent>
-                </Card>
+        {/* Información Básica Skeleton */}
+        <ZenCard variant="default" padding="md">
+          <div className="animate-pulse">
+            <div className="h-6 bg-zinc-700 rounded w-1/4 mb-2"></div>
+            <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
+            <div className="space-y-3">
+              <div className="h-10 bg-zinc-700 rounded"></div>
+              <div className="h-10 bg-zinc-700 rounded"></div>
+              <div className="h-20 bg-zinc-700 rounded"></div>
             </div>
+          </div>
+        </ZenCard>
 
-            {/* Información de uso */}
-            <Card className="bg-zinc-900/50 border-zinc-800 mb-14">
-                <CardHeader>
-                    <CardTitle className="text-white">¿Dónde se usa esta información?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                            <h4 className="text-white font-medium">Landing Page</h4>
-                            <ul className="text-sm text-zinc-400 space-y-1">
-                                <li>• Header con logo y nombre</li>
-                                <li>• Footer con información de contacto</li>
-                                <li>• Meta tags para SEO</li>
-                            </ul>
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="text-white font-medium">Portales y Comunicación</h4>
-                            <ul className="text-sm text-zinc-400 space-y-1">
-                                <li>• Cotizaciones y propuestas</li>
-                                <li>• Emails y notificaciones</li>
-                                <li>• Documentos oficiales</li>
-                            </ul>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+        {/* Palabras Clave Skeleton */}
+        <ZenCard variant="default" padding="md">
+          <div className="animate-pulse">
+            <div className="h-6 bg-zinc-700 rounded w-1/4 mb-2"></div>
+            <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
+            <div className="flex flex-wrap gap-2 mb-4">
+              <div className="h-8 bg-zinc-700 rounded w-20"></div>
+              <div className="h-8 bg-zinc-700 rounded w-24"></div>
+              <div className="h-8 bg-zinc-700 rounded w-16"></div>
+            </div>
+            <div className="h-10 bg-zinc-700 rounded"></div>
+          </div>
+        </ZenCard>
+
+        {/* Logos Skeleton */}
+        <div className="grid gap-6 md:grid-cols-2">
+          <ZenCard variant="default" padding="md">
+            <div className="animate-pulse">
+              <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
+              <div className="h-4 bg-zinc-700 rounded w-2/3 mb-4"></div>
+              <div className="h-32 bg-zinc-700 rounded mb-4"></div>
+              <div className="h-10 bg-zinc-700 rounded"></div>
+            </div>
+          </ZenCard>
+          <ZenCard variant="default" padding="md">
+            <div className="animate-pulse">
+              <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
+              <div className="h-4 bg-zinc-700 rounded w-2/3 mb-4"></div>
+              <div className="h-32 bg-zinc-700 rounded mb-4"></div>
+              <div className="h-10 bg-zinc-700 rounded"></div>
+            </div>
+          </ZenCard>
         </div>
+      </div>
     );
+  }
+
+  // Error state
+  if (!identidadData) {
+    return (
+      <div className="p-6 space-y-6">
+        <ZenCard variant="default" padding="lg">
+          <div className="text-center py-8">
+            <p className="text-zinc-400 mb-4">Error al cargar datos de identidad</p>
+            <button
+              onClick={loadData}
+              className="text-blue-400 hover:text-blue-300 underline"
+            >
+              Reintentar
+            </button>
+          </div>
+        </ZenCard>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 pb-12 space-y-6 max-w-screen-lg mx-auto">
+      {/* Header Navigation - Mantener Shadcn por ahora */}
+      <HeaderNavigation
+        title="Identidad del Estudio"
+        description="Define la identidad visual y la información básica de tu estudio"
+      />
+
+      {/* Información Básica - REFACTORIZADO CON ZEN */}
+      <ZenCard variant="default" padding="none">
+        <ZenCardHeader>
+          <ZenCardTitle>Información Básica</ZenCardTitle>
+          <ZenCardDescription>
+            Datos fundamentales de tu estudio que aparecerán en tu perfil público
+          </ZenCardDescription>
+        </ZenCardHeader>
+        <ZenCardContent>
+          <IdentidadFormZen
+            data={identidadData}
+            onUpdate={handleUpdateIdentidad}
+            onLocalUpdate={handleLocalUpdate}
+            loading={loading}
+          />
+        </ZenCardContent>
+      </ZenCard>
+
+      {/* Palabras Clave - ZEN CARD */}
+      <ZenCard variant="default" padding="none">
+        <ZenCardHeader>
+          <ZenCardTitle>Palabras Clave</ZenCardTitle>
+          <ZenCardDescription>
+            Términos que describen tu negocio para SEO y búsquedas
+          </ZenCardDescription>
+        </ZenCardHeader>
+        <ZenCardContent>
+          <PalabrasClaveManagerZen
+            palabrasClave={identidadData.palabras_clave}
+            onUpdate={handleUpdatePalabrasClave}
+            onLocalUpdate={(palabras) => handleLocalUpdate({ palabras_clave: palabras })}
+            loading={loading}
+          />
+        </ZenCardContent>
+      </ZenCard>
+
+      {/* Logos - ZEN CARDS */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Logo Principal */}
+        <ZenCard variant="default" padding="none">
+          <ZenCardHeader>
+            <ZenCardTitle>Logo Principal</ZenCardTitle>
+            <ZenCardDescription>
+              Logo completo con texto para header, tarjetas y documentos
+            </ZenCardDescription>
+          </ZenCardHeader>
+          <ZenCardContent>
+            <LogoManagerZen
+              tipo="logo"
+              url={identidadData.logoUrl}
+              onUpdate={(url) => handleUpdateLogo('logo', url)}
+              onLocalUpdate={(url) => handleLocalUpdate({ logoUrl: url })}
+              studioSlug={slug}
+              loading={loading}
+            />
+          </ZenCardContent>
+        </ZenCard>
+
+        {/* Isotipo */}
+        <ZenCard variant="default" padding="none">
+          <ZenCardHeader>
+            <ZenCardTitle>Isotipo</ZenCardTitle>
+            <ZenCardDescription>
+              Símbolo o ícono sin texto para favicon y redes sociales
+            </ZenCardDescription>
+          </ZenCardHeader>
+          <ZenCardContent>
+            <LogoManagerZen
+              tipo="isotipo"
+              url={identidadData.isotipo_url}
+              onUpdate={(url) => handleUpdateLogo('isotipo', url)}
+              onLocalUpdate={(url) => handleLocalUpdate({ isotipo_url: url })}
+              studioSlug={slug}
+              loading={loading}
+            />
+          </ZenCardContent>
+        </ZenCard>
+      </div>
+
+      {/* Información de uso - ZEN CARD */}
+      <ZenCard variant="default" padding="none" className="mb-14">
+        <ZenCardHeader>
+          <ZenCardTitle>¿Dónde se usa esta información?</ZenCardTitle>
+        </ZenCardHeader>
+        <ZenCardContent>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <h4 className="text-white font-medium">Landing Page</h4>
+              <ul className="text-sm text-zinc-400 space-y-1">
+                <li>• Header con logo y nombre</li>
+                <li>• Footer con información de contacto</li>
+                <li>• Meta tags para SEO</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="text-white font-medium">Portales y Comunicación</h4>
+              <ul className="text-sm text-zinc-400 space-y-1">
+                <li>• Cotizaciones y propuestas</li>
+                <li>• Emails y notificaciones</li>
+                <li>• Documentos oficiales</li>
+              </ul>
+            </div>
+          </div>
+        </ZenCardContent>
+      </ZenCard>
+    </div>
+  );
 }

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/shadcn/button';
+import { Switch } from '@/components/ui/shadcn/switch';
 import { Edit, Trash2 } from 'lucide-react';
-import { RedSocialIcon } from '@/components/ui/icons/RedSocialIcon';
+import { RedSocialIcon } from '@/components/ui/shadcn/icons/RedSocialIcon';
 import { ConfirmModal } from '@/app/studio/[slug]/components/ConfirmModal';
 import { Plataforma, RedSocial } from '../types';
 

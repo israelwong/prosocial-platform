@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 // Imports removidos - ahora se usan a través de HeaderNavigation
-import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import { toast } from 'sonner';
 import { useParams, useRouter } from 'next/navigation';
 import { PersonalModal } from '../components/PersonalModal';

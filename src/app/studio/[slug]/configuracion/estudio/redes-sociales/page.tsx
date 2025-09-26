@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/shadcn/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Globe, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { RedSocialStats } from './components/RedSocialStats';
@@ -18,7 +18,7 @@ import {
     toggleRedSocialEstado
 } from '@/lib/actions/studio/config/redes-sociales.actions';
 import { obtenerPlataformasRedesSociales } from '@/lib/actions/shared/plataformas.actions';
-import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 
 export default function RedesSocialesPage() {
     const params = useParams();

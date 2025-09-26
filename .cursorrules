@@ -482,18 +482,21 @@ Formato: [tipo de dato esperado]"
 ### **📋 COMPONENTES ZEN DISPONIBLES**
 
 #### **Base Components**
+
 - `ZenButton` - Botón unificado con loading states
 - `ZenInput` - Input con label integrado y estados
 - `ZenCard` - Contenedor con tema zinc
 - `ZenBadge` - Badges semánticos
 
 #### **Form Components**
+
 - `ZenTextarea` - Textarea con contador de caracteres
 - `ZenFormSection` - Sección de formulario
 - `ZenSelect` - Select con búsqueda (próximamente)
 - `ZenCheckbox` - Checkbox mejorado (próximamente)
 
 #### **Layout Components**
+
 - `ZenSidebar` - Sidebar unificado (próximamente)
 - `ZenNavbar` - Navbar consistente (próximamente)
 - `ZenModal` - Modal estándar (próximamente)
@@ -501,18 +504,19 @@ Formato: [tipo de dato esperado]"
 ### **🎯 PATRONES DE USO ZEN**
 
 #### **Formularios**
+
 ```typescript
 // ✅ CORRECTO - Patrón ZEN
 import { ZenInput, ZenTextarea, ZenButton } from "@/components/ui/zen";
 
 <form className="space-y-6">
-  <ZenInput 
+  <ZenInput
     label="Nombre"
     required
     error={errors.name}
     hint="Este nombre aparecerá públicamente"
   />
-  <ZenTextarea 
+  <ZenTextarea
     label="Descripción"
     maxLength={500}
     minRows={3}
@@ -524,14 +528,15 @@ import { ZenInput, ZenTextarea, ZenButton } from "@/components/ui/zen";
 ```
 
 #### **Cards y Contenedores**
+
 ```typescript
 // ✅ CORRECTO - Patrón ZEN
-import { 
-  ZenCard, 
-  ZenCardHeader, 
-  ZenCardTitle, 
-  ZenCardDescription, 
-  ZenCardContent 
+import {
+  ZenCard,
+  ZenCardHeader,
+  ZenCardTitle,
+  ZenCardDescription,
+  ZenCardContent
 } from "@/components/ui/zen";
 
 <ZenCard variant="default" padding="none">
@@ -550,6 +555,7 @@ import {
 ### **⚠️ REGLAS ESTRICTAS ZEN**
 
 #### **❌ PROHIBIDO**
+
 ```typescript
 // ❌ NO mezclar Shadcn directo cuando existe ZEN
 import { Button } from "@/components/ui/button"; // Usar ZenButton
@@ -562,6 +568,7 @@ import { Card } from "@/components/ui/card";     // Usar ZenCard
 ```
 
 #### **✅ PERMITIDO**
+
 ```typescript
 // ✅ OK - Componentes que no existen en ZEN (aún)
 import { Dialog } from "@/components/ui/shadcn/dialog";
@@ -575,6 +582,7 @@ import { ZEN_COLORS, ZEN_SPACING } from "@/components/ui/zen";
 ### **🔄 MIGRACIÓN A ZEN**
 
 #### **Proceso Recomendado**
+
 1. **Identificar** sección a migrar (ej: identidad)
 2. **Analizar** componentes usados
 3. **Crear** componentes ZEN faltantes
@@ -583,6 +591,7 @@ import { ZEN_COLORS, ZEN_SPACING } from "@/components/ui/zen";
 6. **Commit** y crear branch específico
 
 #### **Naming Convention Branches**
+
 ```bash
 # Para migración de UI con ZEN
 v1.1.ui.{seccion}     # ej: v1.1.ui.identidad

@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
+import { Badge } from '@/components/ui/shadcn/badge';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import {
     ConfiguracionPreciosSchema,
     type ConfiguracionPreciosForm as ConfiguracionPreciosFormType

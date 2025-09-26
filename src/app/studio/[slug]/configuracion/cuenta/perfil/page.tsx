@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/shadcn/card';
 import { User, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { obtenerPerfil } from '@/lib/actions/studio/config/perfil.actions';
 import { PerfilData } from './types';
 import { PerfilFormSimple, PerfilSkeleton } from './components';
-import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 
 export default function PerfilPage() {
   const params = useParams();

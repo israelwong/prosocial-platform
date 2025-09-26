@@ -1,5 +1,5 @@
 // Shared types for Hero components
-import type { ButtonVariant, ButtonSize } from '@/components/ui/button'
+import type { ButtonVariant, ButtonSize } from '@/components/ui/shadcn/button'
 
 // Re-export button types for convenience
 export type { ButtonVariant, ButtonSize }

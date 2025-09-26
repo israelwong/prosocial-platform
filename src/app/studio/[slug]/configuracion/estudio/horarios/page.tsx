@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
+import { Button } from '@/components/ui/shadcn/button';
 import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { HorariosStats } from './components/HorariosStats';
@@ -16,7 +16,7 @@ import {
     crearHorario,
     inicializarHorariosPorDefecto
 } from '@/lib/actions/studio/config/horarios.actions';
-import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 
 export default function HorariosPage() {
     const params = useParams();

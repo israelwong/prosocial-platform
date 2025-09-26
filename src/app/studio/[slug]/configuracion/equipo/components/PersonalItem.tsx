@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/shadcn/button';
+import { Badge } from '@/components/ui/shadcn/badge';
+import { Switch } from '@/components/ui/shadcn/switch';
 import { Edit, Trash2, User, Mail, Phone, Tag } from 'lucide-react';
 import { ConfirmModal } from '@/app/studio/[slug]/components/ConfirmModal';
 import type { Personal } from '../types';

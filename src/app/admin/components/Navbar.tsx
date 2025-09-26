@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import { User, Bell, LogOut, Settings, ChevronDown } from 'lucide-react';
 import { createClientSupabase } from '@/lib/supabase';
 import { PlatformIsotipo } from '@/components/platform';

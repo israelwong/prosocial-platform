@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { HeaderNavigation } from '@/components/ui/header-navigation';
+import { Card, CardContent } from '@/components/ui/shadcn/card';
+import { Button } from '@/components/ui/shadcn/button';
+import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import { Plus, CreditCard } from 'lucide-react';
 import {
     DndContext,

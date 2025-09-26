@@ -3,7 +3,7 @@
 import React from 'react';
 import { useSetupStatus } from '@/hooks/use-setup-status';
 import { SetupProgressHeader, SetupSectionsGrid, SetupRecommendations } from '@/components/setup';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import { RefreshCw } from 'lucide-react';
 
 interface ConfiguracionPageProps {
