@@ -18,12 +18,12 @@ export { ZenTextarea } from './forms/ZenTextarea';
 // =============================================================================
 // LAYOUT COMPONENTS (DISPONIBLES)
 // =============================================================================
-export { 
-  ZenSidebarProvider, 
-  ZenSidebar, 
-  ZenSidebarTrigger, 
-  ZenSidebarContent, 
-  ZenSidebarHeader, 
+export {
+  ZenSidebarProvider,
+  ZenSidebar,
+  ZenSidebarTrigger,
+  ZenSidebarContent,
+  ZenSidebarHeader,
   ZenSidebarFooter,
   ZenSidebarGroup,
   ZenSidebarGroupLabel,
@@ -31,9 +31,14 @@ export {
   ZenSidebarMenu,
   ZenSidebarMenuItem,
   ZenSidebarMenuButton,
+  ZenSidebarMenuSub,
+  ZenSidebarMenuSubItem,
+  ZenSidebarMenuSubButton,
   ZenSidebarOverlay,
   useZenSidebar
 } from './layout/ZenSidebar';
+
+export { ZenHeader } from './layout/ZenHeader';
 
 // =============================================================================
 // DESIGN TOKENS

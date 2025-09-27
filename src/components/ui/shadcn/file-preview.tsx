@@ -24,7 +24,7 @@ export function FilePreview({
   const fileUrl = isUrl ? file : URL.createObjectURL(file);
   const fileName = isUrl ? file.split('/').pop() || 'Archivo' : file.name;
   const fileSize = isUrl ? null : (file.size / 1024 / 1024).toFixed(2) + ' MB';
-  
+
   // Determinar tipo de archivo
   const getFileType = () => {
     if (isUrl) {
@@ -39,7 +39,7 @@ export function FilePreview({
       }
       return 'file';
     }
-    
+
     const type = file.type;
     if (type.startsWith('image/')) return 'image';
     if (type.startsWith('video/')) return 'video';
@@ -96,7 +96,7 @@ export function FilePreview({
               {getFileTypeText()}
             </span>
           </div>
-          
+
           {fileSize && (
             <p className="text-zinc-500 text-sm">
               {fileSize}
@@ -117,7 +117,7 @@ export function FilePreview({
                 <ExternalLink className="h-4 w-4" />
               </Button>
             )}
-            
+
             {onRemove && (
               <Button
                 variant="ghost"
@@ -139,7 +139,7 @@ export function FilePreview({
             <img
               src={fileUrl}
               alt={fileName}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               onError={(e) => {
                 // Si falla la carga, mostrar placeholder
                 e.currentTarget.style.display = 'none';
@@ -155,7 +155,7 @@ export function FilePreview({
           <div className="w-full h-32 bg-zinc-900 rounded-lg overflow-hidden border border-zinc-700">
             <video
               src={fileUrl}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               controls
               preload="metadata"
             />

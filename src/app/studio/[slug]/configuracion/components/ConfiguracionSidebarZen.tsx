@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     ZenInput,
-    ZenBadge,
     ZenSidebar,
     ZenSidebarContent,
     ZenSidebarHeader,
@@ -16,9 +15,13 @@ import {
     ZenSidebarMenu,
     ZenSidebarMenuItem,
     ZenSidebarMenuButton,
+    ZenSidebarMenuSub,
+    ZenSidebarMenuSubItem,
+    ZenSidebarMenuSubButton,
     ZenSidebarTrigger,
     ZenSidebarOverlay
 } from '@/components/ui/zen';
+import { StudioHeaderModal } from './StudioHeaderModal';
 
 // Re-exportar componentes para uso en layout
 export { ZenSidebarTrigger, ZenSidebarOverlay };
@@ -302,14 +305,6 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
         })).filter(section => section.items.length > 0);
     }, [searchTerm, configSections]);
 
-    // Calcular estadísticas
-    const stats = useMemo(() => {
-        const totalItems = configSections.reduce((acc, section) => acc + section.items.length, 0);
-        const completedItems = configSections.reduce((acc, section) =>
-            acc + section.items.filter(item => item.completed).length, 0
-        );
-        return { total: totalItems, completed: completedItems };
-    }, [configSections]);
 
     const toggleSection = (sectionId: string) => {
         setExpandedSection(prev => prev === sectionId ? '' : sectionId);
@@ -322,23 +317,12 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
     return (
         <ZenSidebar className={className}>
             <ZenSidebarHeader>
-                <div className="space-y-4">
-                    {/* Header con estadísticas */}
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold text-zinc-200">Configuración</h2>
-                            <p className="text-sm text-zinc-400">
-                                {stats.completed}/{stats.total} completado
-                            </p>
-                        </div>
-                        <ZenBadge variant="secondary">
-                            {Math.round((stats.completed / stats.total) * 100)}%
-                        </ZenBadge>
-                    </div>
+                <div className="space-y-4 mb-4">
+                    {/* Menú modal del estudio */}
+                    <StudioHeaderModal />
 
                     {/* Barra de búsqueda */}
                     <ZenInput
-                        label="Buscar configuración"
                         placeholder="Buscar configuración..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -370,31 +354,22 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                         {expandedSection === section.id && (
                             <ZenSidebarGroupContent>
                                 <ZenSidebarMenu>
-                                    {section.items.map((item) => (
-                                        <ZenSidebarMenuItem key={item.id}>
-                                            <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                <Link href={item.href} className="flex items-center gap-3">
-                                                    <item.icon className="w-4 h-4" />
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2">
+                                    <ZenSidebarMenuItem>
+                                        <ZenSidebarMenuSub>
+                                            {section.items.map((item) => (
+                                                <ZenSidebarMenuSubItem key={item.id}>
+                                                    <ZenSidebarMenuSubButton asChild isActive={isActive(item.href)}>
+                                                        <Link href={item.href} className="flex items-center gap-2">
                                                             <span className="truncate">{item.name}</span>
                                                             {item.completed && (
                                                                 <div className="w-2 h-2 bg-green-400 rounded-full" />
                                                             )}
-                                                        </div>
-                                                        <p className="text-xs text-zinc-400 truncate">
-                                                            {item.description}
-                                                        </p>
-                                                    </div>
-                                                    {item.badge && (
-                                                        <ZenBadge variant="outline" className="text-xs">
-                                                            {item.badge}
-                                                        </ZenBadge>
-                                                    )}
-                                                </Link>
-                                            </ZenSidebarMenuButton>
-                                        </ZenSidebarMenuItem>
-                                    ))}
+                                                        </Link>
+                                                    </ZenSidebarMenuSubButton>
+                                                </ZenSidebarMenuSubItem>
+                                            ))}
+                                        </ZenSidebarMenuSub>
+                                    </ZenSidebarMenuItem>
                                 </ZenSidebarMenu>
                             </ZenSidebarGroupContent>
                         )}

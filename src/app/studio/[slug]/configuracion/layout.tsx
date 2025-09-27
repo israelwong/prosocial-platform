@@ -1,6 +1,7 @@
 import React from 'react';
-import { ConfiguracionSidebarZen, ZenSidebarTrigger, ZenSidebarOverlay } from './components/ConfiguracionSidebarZen';
+import { ConfiguracionSidebarZen, ZenSidebarOverlay } from './components/ConfiguracionSidebarZen';
 import { ZenSidebarProvider } from '@/components/ui/zen/layout/ZenSidebar';
+import { BreadcrumbHeader } from './components/BreadcrumbHeader';
 
 // Este layout envuelve la página de configuración y sus sub-páginas
 // Ahora usa ZEN Design System con ZenSidebar
@@ -15,18 +16,16 @@ export default async function ConfigurationLayout({
 
     return (
         <ZenSidebarProvider>
-            <div className="flex min-h-screen bg-zinc-950 overflow-hidden">
+            <div className="flex h-full bg-zinc-950 overflow-hidden">
                 <ConfiguracionSidebarZen studioSlug={slug} />
                 <ZenSidebarOverlay />
 
                 <main className="flex-1 p-2 sm:p-4 lg:ml-0 overflow-y-auto">
-                    <div className="flex items-center gap-4 mb-6">
-                        <ZenSidebarTrigger />
-                        <div>
-                            <h1 className="text-2xl font-bold text-white">Configuración</h1>
-                            <p className="text-zinc-400">Gestiona la configuración de tu estudio</p>
-                        </div>
-                    </div>
+                    {/* Breadcrumb header dinámico */}
+                    <BreadcrumbHeader />
+
+                    {/* Separador */}
+                    <div className="h-px bg-zinc-800 mb-6"></div>
 
                     <div className="max-w-6xl mx-auto">
                         {children}

@@ -65,6 +65,22 @@ interface ZenSidebarMenuButtonProps extends React.ButtonHTMLAttributes<HTMLButto
   isActive?: boolean;
 }
 
+interface ZenSidebarMenuSubProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface ZenSidebarMenuSubItemProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface ZenSidebarMenuSubButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  asChild?: boolean;
+  isActive?: boolean;
+}
+
 // Context para el estado del sidebar
 const ZenSidebarContext = React.createContext<{
   isOpen: boolean;
@@ -135,10 +151,12 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
   return (
     <div
       className={cn(
-        "fixed left-0 top-0 z-50 h-full w-72 transform transition-transform duration-300 ease-in-out",
+        "fixed left-0 top-0 z-50 h-screen w-72 transform transition-transform duration-300 ease-in-out",
         "max-w-[80vw] sm:w-72",
         isOpen ? "translate-x-0" : "-translate-x-full",
         "lg:translate-x-0 lg:static lg:z-auto lg:max-w-none",
+        // Ajustar para header global - sidebar debe usar altura completa disponible
+        "lg:h-full",
         className
       )}
     >
@@ -259,6 +277,67 @@ export function ZenSidebarMenuButton({
   isActive = false,
   ...props
 }: ZenSidebarMenuButtonProps) {
+  if (asChild) {
+    return (
+      <div
+        className={cn(
+          "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+          "hover:bg-zinc-800 hover:text-white",
+          "focus:bg-zinc-800 focus:text-white focus:outline-none",
+          isActive && "bg-zinc-800 text-white",
+          !isActive && "text-zinc-400",
+          className
+        )}
+        {...(props as React.HTMLAttributes<HTMLDivElement>)}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      className={cn(
+        "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+        "hover:bg-zinc-800 hover:text-white",
+        "focus:bg-zinc-800 focus:text-white focus:outline-none",
+        isActive && "bg-zinc-800 text-white",
+        !isActive && "text-zinc-400",
+        className
+      )}
+      {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Submenú del sidebar
+export function ZenSidebarMenuSub({ children, className }: ZenSidebarMenuSubProps) {
+  return (
+    <div className={cn("ml-6 space-y-1 border-l border-zinc-800 pl-2", className)}>
+      {children}
+    </div>
+  );
+}
+
+// Item del submenú
+export function ZenSidebarMenuSubItem({ children, className }: ZenSidebarMenuSubItemProps) {
+  return (
+    <div className={cn("relative", className)}>
+      {children}
+    </div>
+  );
+}
+
+// Botón del submenú
+export function ZenSidebarMenuSubButton({
+  children,
+  className,
+  asChild = false,
+  isActive = false,
+  ...props
+}: ZenSidebarMenuSubButtonProps) {
   if (asChild) {
     return (
       <div

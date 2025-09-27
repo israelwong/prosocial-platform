@@ -147,13 +147,6 @@ export function LogoManagerZen({
               showActions={true}
             />
 
-            {/* Badge de estado */}
-            <div className="absolute top-2 right-2">
-              <ZenBadge variant="success" size="sm">
-                <ExternalLink className="h-3 w-3 mr-1" />
-                Activo
-              </ZenBadge>
-            </div>
           </div>
 
           {/* Botón para cambiar archivo con ZEN */}
