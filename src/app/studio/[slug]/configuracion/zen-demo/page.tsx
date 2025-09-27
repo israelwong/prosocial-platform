@@ -14,7 +14,7 @@ export default function ConfiguracionZenDemoPage() {
         <div className="flex min-h-screen bg-zinc-950">
             <ConfiguracionSidebarZen />
             <ZenSidebarOverlay />
-            
+
             <main className="flex-1 p-6">
                 <div className="flex items-center gap-4 mb-6">
                     <ZenSidebarTrigger />
@@ -23,9 +23,9 @@ export default function ConfiguracionZenDemoPage() {
                         <p className="text-zinc-400">Demostración del refactor ZEN en configuración</p>
                     </div>
                 </div>
-                
+
                 <div className="max-w-6xl mx-auto space-y-8">
-                    
+
                     {/* Header */}
                     <div className="text-center space-y-4">
                         <h2 className="text-3xl font-bold text-white">
@@ -38,7 +38,7 @@ export default function ConfiguracionZenDemoPage() {
 
                     {/* Grid de Cards */}
                     <div className="grid md:grid-cols-2 gap-6">
-                        
+
                         {/* Características ZEN */}
                         <ZenCard variant="default" padding="lg">
                             <ZenCardHeader>
@@ -132,7 +132,7 @@ export default function ConfiguracionZenDemoPage() {
                                             {section.completed}/{section.items} completado
                                         </p>
                                         <div className="w-full bg-zinc-700 rounded-full h-2">
-                                            <div 
+                                            <div
                                                 className="bg-green-400 h-2 rounded-full transition-all duration-300"
                                                 style={{ width: `${(section.completed / section.items) * 100}%` }}
                                             ></div>
@@ -166,7 +166,7 @@ export default function ConfiguracionZenDemoPage() {
                                         </code>
                                     </div>
                                 </div>
-                                
+
                                 <div className="space-y-2">
                                     <h4 className="font-semibold text-zinc-200">Instalación:</h4>
                                     <div className="bg-zinc-900 p-3 rounded-md">

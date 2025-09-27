@@ -21,6 +21,9 @@ import {
   ZenSidebarTrigger,
   ZenSidebarOverlay
 } from '@/components/ui/zen';
+
+// Re-exportar componentes para uso en layout
+export { ZenSidebarTrigger, ZenSidebarOverlay };
 import {
     Search,
     X,
@@ -69,6 +72,7 @@ interface ConfigItem {
 
 interface ConfiguracionSidebarZenProps {
     className?: string;
+    studioSlug?: string;
 }
 
 // Datos de configuración
@@ -292,7 +296,7 @@ const configSections: ConfigSection[] = [
 ];
 
 // Componente del Sidebar
-function ConfiguracionSidebarContent({ className }: ConfiguracionSidebarZenProps) {
+function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSidebarZenProps) {
     const pathname = usePathname();
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState<string[]>(['estudio', 'negocio']);
@@ -300,7 +304,7 @@ function ConfiguracionSidebarContent({ className }: ConfiguracionSidebarZenProps
     // Filtrar secciones basado en búsqueda
     const filteredSections = useMemo(() => {
         if (!searchTerm.trim()) return configSections;
-        
+
         return configSections.map(section => ({
             ...section,
             items: section.items.filter(item =>
@@ -313,7 +317,7 @@ function ConfiguracionSidebarContent({ className }: ConfiguracionSidebarZenProps
     // Calcular estadísticas
     const stats = useMemo(() => {
         const totalItems = configSections.reduce((acc, section) => acc + section.items.length, 0);
-        const completedItems = configSections.reduce((acc, section) => 
+        const completedItems = configSections.reduce((acc, section) =>
             acc + section.items.filter(item => item.completed).length, 0
         );
         return { total: totalItems, completed: completedItems };
@@ -328,7 +332,8 @@ function ConfiguracionSidebarContent({ className }: ConfiguracionSidebarZenProps
     };
 
     const isActive = (href: string) => {
-        return pathname === href.replace('[slug]', 'demo'); // Ajustar según el slug real
+        const actualHref = studioSlug ? href.replace('[slug]', studioSlug) : href;
+        return pathname === actualHref;
     };
 
     return (
@@ -350,6 +355,7 @@ function ConfiguracionSidebarContent({ className }: ConfiguracionSidebarZenProps
 
                     {/* Barra de búsqueda */}
                     <ZenInput
+                        label="Buscar configuración"
                         placeholder="Buscar configuración..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -377,14 +383,14 @@ function ConfiguracionSidebarContent({ className }: ConfiguracionSidebarZenProps
                                 )}
                             </button>
                         </ZenSidebarGroupLabel>
-                        
+
                         {expandedSections.includes(section.id) && (
                             <ZenSidebarGroupContent>
                                 <ZenSidebarMenu>
                                     {section.items.map((item) => (
                                         <ZenSidebarMenuItem key={item.id}>
                                             <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                <Link href={item.href} className="flex items-center gap-3">
+                                                <Link href={studioSlug ? item.href.replace('[slug]', studioSlug) : item.href} className="flex items-center gap-3">
                                                     <item.icon className="w-4 h-4" />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
@@ -430,10 +436,10 @@ function ConfiguracionSidebarContent({ className }: ConfiguracionSidebarZenProps
 }
 
 // Componente principal con provider
-export function ConfiguracionSidebarZen({ className }: ConfiguracionSidebarZenProps) {
+export function ConfiguracionSidebarZen({ className, studioSlug }: ConfiguracionSidebarZenProps) {
     return (
         <ZenSidebarProvider>
-            <ConfiguracionSidebarContent className={className} />
+            <ConfiguracionSidebarContent className={className} studioSlug={studioSlug} />
         </ZenSidebarProvider>
     );
 }

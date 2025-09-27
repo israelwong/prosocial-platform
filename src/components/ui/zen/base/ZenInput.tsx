@@ -9,8 +9,8 @@ import { ZEN_SPACING } from '../tokens/spacing';
 // TYPES
 // =============================================================================
 export interface ZenInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  /** Label del input (requerido para accesibilidad) */
-  label: string;
+  /** Label del input (opcional para casos como búsqueda) */
+  label?: string;
   /** Indica si el campo es requerido */
   required?: boolean;
   /** Mensaje de error a mostrar */

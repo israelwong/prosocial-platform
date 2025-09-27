@@ -11,7 +11,7 @@ export default function ConfiguracionLayoutZen({ children }: ConfiguracionLayout
         <div className="flex min-h-screen bg-zinc-950">
             <ConfiguracionSidebarZen />
             <ZenSidebarOverlay />
-            
+
             <main className="flex-1 p-6">
                 <div className="flex items-center gap-4 mb-6">
                     <ZenSidebarTrigger />
@@ -20,7 +20,7 @@ export default function ConfiguracionLayoutZen({ children }: ConfiguracionLayout
                         <p className="text-zinc-400">Gestiona la configuración de tu estudio</p>
                     </div>
                 </div>
-                
+
                 <div className="max-w-6xl mx-auto">
                     {children}
                 </div>
