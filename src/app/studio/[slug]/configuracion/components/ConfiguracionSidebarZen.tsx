@@ -423,7 +423,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                 <ZenSidebarMenu>
                     <ZenSidebarMenuItem>
                         <ZenSidebarMenuButton asChild>
-                            <Link href="/studio/[slug]/configuracion" className="flex items-center gap-3">
+                            <Link href={studioSlug ? `/studio/${studioSlug}/configuracion` : "/studio/demo/configuracion"} className="flex items-center gap-3">
                                 <BarChart3 className="w-4 h-4" />
                                 <span>Dashboard</span>
                             </Link>
