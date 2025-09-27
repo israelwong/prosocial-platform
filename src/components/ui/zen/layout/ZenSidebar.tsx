@@ -71,22 +71,43 @@ const ZenSidebarContext = React.createContext<{
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   toggleSidebar: () => void;
+  isMobile: boolean;
 }>({
   isOpen: false,
   setIsOpen: () => { },
   toggleSidebar: () => { },
+  isMobile: false,
 });
 
 // Provider del sidebar
 export function ZenSidebarProvider({ children, defaultOpen = false }: ZenSidebarProviderProps) {
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  // Detectar si es mobile
+  React.useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   const toggleSidebar = React.useCallback(() => {
     setIsOpen(prev => !prev);
   }, []);
 
+  // Cerrar sidebar en mobile cuando se redimensiona a desktop
+  React.useEffect(() => {
+    if (!isMobile && isOpen) {
+      setIsOpen(false);
+    }
+  }, [isMobile, isOpen]);
+
   return (
-    <ZenSidebarContext.Provider value={{ isOpen, setIsOpen, toggleSidebar }}>
+    <ZenSidebarContext.Provider value={{ isOpen, setIsOpen, toggleSidebar, isMobile }}>
       {children}
     </ZenSidebarContext.Provider>
   );
@@ -109,8 +130,9 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
     <div
       className={cn(
         "fixed left-0 top-0 z-50 h-full w-80 transform transition-transform duration-300 ease-in-out",
+        "max-w-[85vw] sm:w-80",
         isOpen ? "translate-x-0" : "-translate-x-full",
-        "lg:translate-x-0 lg:static lg:z-auto",
+        "lg:translate-x-0 lg:static lg:z-auto lg:max-w-none",
         className
       )}
     >
@@ -262,13 +284,13 @@ export function ZenSidebarMenuButton({
 
 // Overlay para mobile
 export function ZenSidebarOverlay() {
-  const { isOpen, setIsOpen } = useZenSidebar();
+  const { isOpen, setIsOpen, isMobile } = useZenSidebar();
 
-  if (!isOpen) return null;
+  if (!isOpen || !isMobile) return null;
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+      className="fixed inset-0 z-40 bg-black/50"
       onClick={() => setIsOpen(false)}
     />
   );
