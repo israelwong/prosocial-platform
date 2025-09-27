@@ -3,20 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
-import { Label } from '@/components/ui/shadcn/label';
-import { Textarea } from '@/components/ui/shadcn/textarea';
+import {
+    ZenButton,
+    ZenInput,
+    ZenTextarea
+} from '@/components/ui/zen';
 import { Switch } from '@/components/ui/shadcn/switch';
 import { Modal } from '@/components/ui/shadcn/modal';
-import { Save, Percent, Clock, AlertTriangle } from 'lucide-react';
+import { Save, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     crearCondicionComercial,
     actualizarCondicionComercial,
     obtenerConfiguracionPrecios
 } from '@/lib/actions/studio/config/condiciones-comerciales.actions';
-import { CondicionComercialSchema, type CondicionComercialForm as CondicionComercialFormType } from '@/lib/actions/schemas/condiciones-comerciales-schemas';
+import { createCondicionComercialSchema, type CondicionComercialForm as CondicionComercialFormType } from '@/lib/actions/schemas/condiciones-comerciales-schemas';
 import { CondicionComercialData } from '../types';
 
 interface CondicionComercialFormProps {
@@ -39,7 +40,7 @@ export function CondicionComercialForm({ studioSlug, condicion, onClose, onSucce
         watch,
         reset
     } = useForm<CondicionComercialFormType>({
-        resolver: zodResolver(CondicionComercialSchema),
+        resolver: zodResolver(createCondicionComercialSchema(sobreprecio)),
         defaultValues: {
             nombre: '',
             descripcion: '',
@@ -165,82 +166,56 @@ export function CondicionComercialForm({ studioSlug, condicion, onClose, onSucce
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Nombre */}
-                <div className="space-y-2">
-                    <Label htmlFor="nombre">Nombre *</Label>
-                    <Input
-                        id="nombre"
-                        {...register('nombre')}
-                        placeholder="Ej: Pago de contado, 50% anticipo"
-                        className={errors.nombre ? 'border-red-500' : ''}
-                    />
-                    {errors.nombre && (
-                        <p className="text-sm text-red-500">{errors.nombre.message}</p>
-                    )}
-                </div>
+                <ZenInput
+                    label="Nombre *"
+                    id="nombre"
+                    {...register('nombre')}
+                    placeholder="Ej: Pago de contado, 50% anticipo"
+                    error={errors.nombre?.message}
+                />
 
                 {/* Descripción */}
-                <div className="space-y-2">
-                    <Label htmlFor="descripcion">Descripción</Label>
-                    <Textarea
-                        id="descripcion"
-                        {...register('descripcion')}
-                        placeholder="Describe los términos de esta condición comercial"
-                        rows={3}
-                    />
-                </div>
+                <ZenTextarea
+                    label="Descripción"
+                    id="descripcion"
+                    {...register('descripcion')}
+                    placeholder="Describe los términos de esta condición comercial"
+                    minRows={3}
+                />
 
                 {/* Porcentajes */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Porcentaje de Descuento */}
-                    <div className="space-y-2">
-                        <Label htmlFor="porcentaje_descuento" className="flex items-center space-x-2">
-                            <Percent className="h-4 w-4" />
-                            <span>Descuento (%)</span>
-                        </Label>
-                        <Input
-                            id="porcentaje_descuento"
-                            type="number"
-                            min="0"
-                            max={sobreprecio > 0 ? (sobreprecio * 100) : 100}
-                            step="1"
-                            {...register('porcentaje_descuento')}
-                            placeholder="0"
-                            className={errors.porcentaje_descuento ? 'border-red-500' : ''}
-                        />
-                        <p className="text-xs text-zinc-500">
-                            {sobreprecio > 0
+                    <ZenInput
+                        label="Descuento (%)"
+                        id="porcentaje_descuento"
+                        type="number"
+                        min="0"
+                        max={sobreprecio > 0 ? (sobreprecio * 100) : 100}
+                        step="1"
+                        {...register('porcentaje_descuento')}
+                        placeholder="0"
+                        error={errors.porcentaje_descuento?.message}
+                        hint={
+                            sobreprecio > 0
                                 ? `Máximo descuento permitido: ${Math.round(sobreprecio * 100)}% (según sobreprecio configurado)`
                                 : 'No hay sobreprecio configurado. Configura el sobreprecio en Configuración de Precios para permitir descuentos.'
-                            }
-                        </p>
-                        {errors.porcentaje_descuento && (
-                            <p className="text-sm text-red-500">{errors.porcentaje_descuento.message}</p>
-                        )}
-                    </div>
+                        }
+                    />
 
                     {/* Porcentaje de Anticipo */}
-                    <div className="space-y-2">
-                        <Label htmlFor="porcentaje_anticipo" className="flex items-center space-x-2">
-                            <Clock className="h-4 w-4" />
-                            <span>Anticipo (%)</span>
-                        </Label>
-                        <Input
-                            id="porcentaje_anticipo"
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="1"
-                            {...register('porcentaje_anticipo')}
-                            placeholder="0"
-                            className={errors.porcentaje_anticipo ? 'border-red-500' : ''}
-                        />
-                        <p className="text-xs text-zinc-500">
-                            Máximo anticipo permitido: 100%
-                        </p>
-                        {errors.porcentaje_anticipo && (
-                            <p className="text-sm text-red-500">{errors.porcentaje_anticipo.message}</p>
-                        )}
-                    </div>
+                    <ZenInput
+                        label="Anticipo (%)"
+                        id="porcentaje_anticipo"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        {...register('porcentaje_anticipo')}
+                        placeholder="0"
+                        error={errors.porcentaje_anticipo?.message}
+                        hint="Máximo anticipo permitido: 100%"
+                    />
                 </div>
 
                 {/* Estatus */}
@@ -250,14 +225,14 @@ export function CondicionComercialForm({ studioSlug, condicion, onClose, onSucce
                         checked={watchedValues.status === 'active'}
                         onCheckedChange={(checked) => setValue('status', checked ? 'active' : 'inactive')}
                     />
-                    <Label htmlFor="status" className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2">
                         <span>Condición activa</span>
                         {watchedValues.status === 'active' ? (
                             <span className="text-green-400 text-sm">(Activa)</span>
                         ) : (
                             <span className="text-zinc-500 text-sm">(Inactiva)</span>
                         )}
-                    </Label>
+                    </div>
                 </div>
 
                 {/* Preview */}
@@ -311,13 +286,13 @@ export function CondicionComercialForm({ studioSlug, condicion, onClose, onSucce
 
                 {/* Botones */}
                 <div className="flex justify-end space-x-3 pt-4">
-                    <Button type="button" variant="outline" onClick={onClose}>
+                    <ZenButton type="button" variant="outline" onClick={onClose}>
                         Cancelar
-                    </Button>
-                    <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+                    </ZenButton>
+                    <ZenButton type="submit" variant="primary" loading={loading}>
                         <Save className="mr-2 h-4 w-4" />
                         {loading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear')}
-                    </Button>
+                    </ZenButton>
                 </div>
             </form>
         </Modal>

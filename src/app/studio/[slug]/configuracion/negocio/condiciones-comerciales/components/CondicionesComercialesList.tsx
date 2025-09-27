@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/shadcn/card';
-import { Button } from '@/components/ui/shadcn/button';
+import {
+    ZenCard,
+    ZenCardContent,
+    ZenButton,
+    ZenBadge
+} from '@/components/ui/zen';
 import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import { Plus, Percent } from 'lucide-react';
 import {
@@ -169,25 +173,6 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
         }
     };
 
-    // 🔥 Manejar movimiento hacia arriba (sin reload)
-    const handleMoveUp = (index: number) => {
-        if (index > 0 && !isUpdatingOrder) {
-            const newCondiciones = [...condiciones];
-            [newCondiciones[index], newCondiciones[index - 1]] = [newCondiciones[index - 1], newCondiciones[index]];
-
-            actualizarOrden(newCondiciones, true, 'button');
-        }
-    };
-
-    // 🔥 Manejar movimiento hacia abajo (sin reload)
-    const handleMoveDown = (index: number) => {
-        if (index < condiciones.length - 1 && !isUpdatingOrder) {
-            const newCondiciones = [...condiciones];
-            [newCondiciones[index], newCondiciones[index + 1]] = [newCondiciones[index + 1], newCondiciones[index]];
-
-            actualizarOrden(newCondiciones, true, 'button');
-        }
-    };
 
     // 🔥 Manejar drag & drop con @dnd-kit (optimizado)
     const handleDragEnd = (event: DragEndEvent) => {
@@ -208,17 +193,17 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
         return (
             <div className="space-y-6">
                 {/* Header Navigation Skeleton */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                <ZenCard variant="default" padding="lg">
                     <div className="animate-pulse">
                         <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
                         <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
                     </div>
-                </div>
+                </ZenCard>
 
                 {/* Lista de Condiciones Skeleton */}
                 <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                        <ZenCard key={i} variant="default" padding="lg">
                             <div className="animate-pulse">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="h-6 bg-zinc-700 rounded w-1/4"></div>
@@ -230,7 +215,7 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
                                     <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
                                 </div>
                             </div>
-                        </div>
+                        </ZenCard>
                     ))}
                 </div>
             </div>
@@ -251,23 +236,21 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
 
             {/* Lista de Condiciones */}
             {condiciones.length === 0 ? (
-                <Card className="bg-zinc-900/50 border-zinc-800">
-                    <CardContent className="p-6">
-                        <div className="text-center py-8">
-                            <Percent className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
-                            <h3 className="text-lg font-medium text-zinc-300 mb-2">
-                                No hay condiciones comerciales configuradas
-                            </h3>
-                            <p className="text-zinc-500 mb-4">
-                                Define los términos y condiciones comerciales para tu negocio
-                            </p>
-                            <Button onClick={handleCrear}>
-                                <Plus className="mr-2 h-4 w-4" />
-                                Crear Primera Condición
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                <ZenCard variant="default" padding="lg">
+                    <div className="text-center py-8">
+                        <Percent className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
+                        <h3 className="text-lg font-medium text-zinc-300 mb-2">
+                            No hay condiciones comerciales configuradas
+                        </h3>
+                        <p className="text-zinc-500 mb-4">
+                            Define los términos y condiciones comerciales para tu negocio
+                        </p>
+                        <ZenButton onClick={handleCrear} variant="primary">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Crear Primera Condición
+                        </ZenButton>
+                    </div>
+                </ZenCard>
             ) : (
                 <DndContext
                     sensors={sensors}
@@ -283,12 +266,8 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
                                 <CondicionComercialItem
                                     key={condicion.id}
                                     condicion={condicion}
-                                    index={index}
                                     onEditar={handleEditar}
                                     onEliminar={handleEliminar}
-                                    onMoveUp={() => handleMoveUp(index)}
-                                    onMoveDown={() => handleMoveDown(index)}
-                                    disabled={isUpdatingOrder} // 🔥 Deshabilitar botones durante actualización
                                 />
                             ))}
                         </div>

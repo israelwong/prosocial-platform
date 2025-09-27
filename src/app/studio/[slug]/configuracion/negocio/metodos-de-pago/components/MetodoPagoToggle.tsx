@@ -1,9 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/shadcn/card';
+import {
+    ZenCard,
+    ZenCardContent,
+    ZenBadge
+} from '@/components/ui/zen';
 import { Switch } from '@/components/ui/shadcn/switch';
-import { Badge } from '@/components/ui/shadcn/badge';
 import { CreditCard, DollarSign, Building, Smartphone } from 'lucide-react';
 import { MetodoPagoData } from '../types';
 
@@ -34,9 +37,9 @@ export function MetodoPagoToggle({ metodo, onToggle, disabled = false }: MetodoP
         }
     };
 
-    // Obtener color del badge según el estado
-    const getStatusBadgeColor = () => {
-        return isActive ? 'bg-green-600' : 'bg-zinc-600';
+    // Obtener variante del badge según el estado
+    const getStatusBadgeVariant = () => {
+        return isActive ? 'success' : 'secondary';
     };
 
     const handleToggle = (checked: boolean) => {
@@ -44,50 +47,56 @@ export function MetodoPagoToggle({ metodo, onToggle, disabled = false }: MetodoP
     };
 
     return (
-        <Card className={`bg-zinc-900/50 border-zinc-800 transition-all duration-200 ${isActive ? 'ring-2 ring-green-500/20' : ''
-            }`}>
-            <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                    {/* Información del método */}
-                    <div className="flex items-center space-x-4 flex-1">
-                        {/* Icono */}
-                        <div className="text-zinc-400">
-                            {getMethodIcon()}
-                        </div>
-
-                        {/* Contenido */}
-                        <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-1">
-                                <h3 className="text-lg font-semibold text-white">
-                                    {metodo.metodo_pago}
-                                </h3>
-                                <Badge
-                                    variant={isActive ? 'default' : 'secondary'}
-                                    className={getStatusBadgeColor()}
-                                >
-                                    {isActive ? 'Activo' : 'Inactivo'}
-                                </Badge>
-                            </div>
-
-                            {/* Descripción del método */}
-                            <p className="text-sm text-zinc-400">
-                                {getMethodDescription(metodo.payment_method)}
-                            </p>
-                        </div>
+        <ZenCard
+            variant="default"
+            padding="lg"
+            className={`transition-all duration-200 hover:shadow-lg ${isActive
+                    ? 'bg-zinc-900/80 border-zinc-700 shadow-md'
+                    : 'bg-zinc-900/50 border-zinc-800 hover:bg-zinc-900/70'
+                }`}
+        >
+            <div className="flex items-center justify-between">
+                {/* Información del método */}
+                <div className="flex items-center space-x-4 flex-1">
+                    {/* Icono */}
+                    <div className={`transition-colors duration-200 ${isActive ? 'text-zinc-300' : 'text-zinc-500'
+                        }`}>
+                        {getMethodIcon()}
                     </div>
 
-                    {/* Toggle Switch */}
-                    <div className="flex items-center space-x-3">
-                        <Switch
-                            checked={isActive}
-                            onCheckedChange={handleToggle}
-                            disabled={disabled}
-                            className="data-[state=checked]:bg-green-600"
-                        />
+                    {/* Contenido */}
+                    <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-1">
+                            <h3 className={`text-lg font-semibold transition-colors duration-200 ${isActive ? 'text-white' : 'text-zinc-400'
+                                }`}>
+                                {metodo.metodo_pago}
+                            </h3>
+                            <ZenBadge
+                                variant={getStatusBadgeVariant()}
+                            >
+                                {isActive ? 'Activo' : 'Inactivo'}
+                            </ZenBadge>
+                        </div>
+
+                        {/* Descripción del método */}
+                        <p className={`text-sm transition-colors duration-200 ${isActive ? 'text-zinc-400' : 'text-zinc-600'
+                            }`}>
+                            {getMethodDescription(metodo.payment_method)}
+                        </p>
                     </div>
                 </div>
-            </CardContent>
-        </Card>
+
+                {/* Toggle Switch */}
+                <div className="flex items-center space-x-3">
+                    <Switch
+                        checked={isActive}
+                        onCheckedChange={handleToggle}
+                        disabled={disabled}
+                        className="data-[state=checked]:bg-green-600"
+                    />
+                </div>
+            </div>
+        </ZenCard>
     );
 }
 

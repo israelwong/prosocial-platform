@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
-import { Label } from '@/components/ui/shadcn/label';
+import {
+    ZenButton,
+    ZenInput
+} from '@/components/ui/zen';
 import { Switch } from '@/components/ui/shadcn/switch';
 import { Modal } from '@/components/ui/shadcn/modal';
 import { Save, CreditCard, Building2, User, Hash } from 'lucide-react';
@@ -126,65 +127,39 @@ export function CuentaBancariaForm({ studioSlug, cuenta, onClose, onSuccess }: C
         >
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Banco */}
-                <div className="space-y-2">
-                    <Label htmlFor="banco" className="flex items-center space-x-2">
-                        <Building2 className="h-4 w-4" />
-                        <span>Banco *</span>
-                    </Label>
-                    <Input
-                        id="banco"
-                        {...register('banco')}
-                        placeholder="Ej: Banco Santander, BBVA, etc."
-                        className={errors.banco ? 'border-red-500' : ''}
-                    />
-                    {errors.banco && (
-                        <p className="text-sm text-red-500">{errors.banco.message}</p>
-                    )}
-                </div>
+                <ZenInput
+                    label="Banco *"
+                    id="banco"
+                    {...register('banco')}
+                    placeholder="Ej: Banco Santander, BBVA, etc."
+                    error={errors.banco?.message}
+                />
 
                 {/* Número de Cuenta */}
-                <div className="space-y-2">
-                    <Label htmlFor="numeroCuenta" className="flex items-center space-x-2">
-                        <Hash className="h-4 w-4" />
-                        <span>CLABE (18 dígitos) *</span>
-                    </Label>
-                    <Input
-                        id="numeroCuenta"
-                        {...register('numeroCuenta')}
-                        placeholder="123456789012345678"
-                        maxLength={18}
-                        onChange={(e) => {
-                            // Solo permitir números y máximo 18 dígitos
-                            const value = e.target.value.replace(/\D/g, '').slice(0, 18);
-                            e.target.value = value;
-                            register('numeroCuenta').onChange(e);
-                        }}
-                        className={errors.numeroCuenta ? 'border-red-500' : ''}
-                    />
-                    <p className="text-xs text-zinc-500">
-                        Ingresa la CLABE de 18 dígitos (solo números)
-                    </p>
-                    {errors.numeroCuenta && (
-                        <p className="text-sm text-red-500">{errors.numeroCuenta.message}</p>
-                    )}
-                </div>
+                <ZenInput
+                    label="CLABE (18 dígitos) *"
+                    id="numeroCuenta"
+                    {...register('numeroCuenta')}
+                    placeholder="123456789012345678"
+                    maxLength={18}
+                    onChange={(e) => {
+                        // Solo permitir números y máximo 18 dígitos
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 18);
+                        e.target.value = value;
+                        register('numeroCuenta').onChange(e);
+                    }}
+                    error={errors.numeroCuenta?.message}
+                    hint="Ingresa la CLABE de 18 dígitos (solo números)"
+                />
 
                 {/* Titular */}
-                <div className="space-y-2">
-                    <Label htmlFor="titular" className="flex items-center space-x-2">
-                        <User className="h-4 w-4" />
-                        <span>Titular *</span>
-                    </Label>
-                    <Input
-                        id="titular"
-                        {...register('titular')}
-                        placeholder="Nombre del titular de la cuenta"
-                        className={errors.titular ? 'border-red-500' : ''}
-                    />
-                    {errors.titular && (
-                        <p className="text-sm text-red-500">{errors.titular.message}</p>
-                    )}
-                </div>
+                <ZenInput
+                    label="Titular *"
+                    id="titular"
+                    {...register('titular')}
+                    placeholder="Nombre del titular de la cuenta"
+                    error={errors.titular?.message}
+                />
 
                 {/* Estado Activo */}
                 <div className="flex items-center space-x-3">
@@ -193,14 +168,14 @@ export function CuentaBancariaForm({ studioSlug, cuenta, onClose, onSuccess }: C
                         checked={watchedValues.activo}
                         onCheckedChange={(checked) => setValue('activo', checked)}
                     />
-                    <Label htmlFor="activo" className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2">
                         <span>Cuenta activa</span>
                         {watchedValues.activo ? (
                             <span className="text-green-400 text-sm">(Activa)</span>
                         ) : (
                             <span className="text-zinc-500 text-sm">(Inactiva)</span>
                         )}
-                    </Label>
+                    </div>
                 </div>
 
                 {/* Preview */}
@@ -245,13 +220,17 @@ export function CuentaBancariaForm({ studioSlug, cuenta, onClose, onSuccess }: C
 
                 {/* Botones */}
                 <div className="flex justify-end space-x-3 pt-4">
-                    <Button type="button" variant="outline" onClick={onClose}>
+                    <ZenButton type="button" variant="outline" onClick={onClose}>
                         Cancelar
-                    </Button>
-                    <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">
+                    </ZenButton>
+                    <ZenButton
+                        type="submit"
+                        variant="primary"
+                        loading={loading}
+                    >
                         <Save className="mr-2 h-4 w-4" />
                         {loading ? 'Guardando...' : (isEditing ? 'Actualizar' : 'Crear')}
-                    </Button>
+                    </ZenButton>
                 </div>
             </form>
         </Modal>

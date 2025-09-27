@@ -439,6 +439,7 @@ model projects {
   paquetes                 project_paquetes[]
   redes_sociales           project_redes_sociales[]
   cuentas_bancarias        project_cuentas_bancarias[]      // ✅ Cuentas bancarias del estudio
+  reglas_agendamiento      project_reglas_agendamiento[]    // ✅ Reglas de agendamiento
   revenue_transactions     project_revenue_transactions[]
   servicios                project_servicios[]
   studio_revenue_products  project_studio_revenue_products[]
@@ -1402,5 +1403,25 @@ model setup_progress_log {
   @@index([sectionId])
   @@index([action])
   @@index([createdAt])
+}
+
+model project_reglas_agendamiento {
+  id                  String   @id @default(cuid())
+  projectId           String
+  nombre              String
+  descripcion         String?
+  recurrencia         String   // 'por_dia' | 'por_hora'
+  capacidadOperativa  Int      @default(1)
+  status              String   @default("active") // 'active' | 'inactive'
+  orden               Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relaciones
+  projects            projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+  @@index([orden])
 }
 

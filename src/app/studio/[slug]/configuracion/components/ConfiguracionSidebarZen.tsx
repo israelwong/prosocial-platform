@@ -45,7 +45,8 @@ import {
     SlidersHorizontal,
     ChevronDown,
     ChevronRight,
-    BarChart3
+    BarChart3,
+    Calendar
 } from 'lucide-react';
 
 interface ConfigSection {
@@ -149,6 +150,14 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
                 description: 'Información bancaria',
                 href: `/${studioSlug}/configuracion/negocio/cuentas-bancarias`,
                 icon: CreditCard,
+                completed: false
+            },
+            {
+                id: 'reglas-agendamiento',
+                name: 'Reglas de Agendamiento',
+                description: 'Tipos de servicios agendables',
+                href: `/${studioSlug}/configuracion/negocio/reglas-agendamiento`,
+                icon: Calendar,
                 completed: false
             }
         ]

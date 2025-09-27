@@ -9,8 +9,8 @@ export default function CondicionesComercialesPage() {
   const slug = params.slug as string;
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
-      {/* Contenido principal */}
+    <div className="space-y-6">
+      {/* Contenido principal con ZEN Design System */}
       <CondicionesComercialesList studioSlug={slug} />
     </div>
   );

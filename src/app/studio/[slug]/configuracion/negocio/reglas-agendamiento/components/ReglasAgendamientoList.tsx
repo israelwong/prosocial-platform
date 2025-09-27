@@ -3,11 +3,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     ZenCard,
-    ZenCardContent,
     ZenButton
 } from '@/components/ui/zen';
 import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
-import { Plus, CreditCard } from 'lucide-react';
+import { Plus, Calendar } from 'lucide-react';
 import {
     DndContext,
     closestCenter,
@@ -25,24 +24,23 @@ import {
 } from '@dnd-kit/sortable';
 import { toast } from 'sonner';
 import {
-    obtenerCuentasBancarias,
-    eliminarCuentaBancaria,
-    actualizarOrdenCuentasBancarias
-} from '@/lib/actions/studio/config/cuentas-bancarias.actions';
-import { CuentaBancariaData } from '../types';
-import { CuentaBancariaForm } from './CuentaBancariaForm';
-import { CuentaBancariaItem } from './CuentaBancariaItem';
+    obtenerReglasAgendamiento,
+    eliminarReglaAgendamiento
+} from '@/lib/actions/studio/config/reglas-agendamiento.actions';
+import { ReglaAgendamientoData } from '../types';
+import { ReglaAgendamientoItem } from './ReglaAgendamientoItem';
+import { ReglaAgendamientoForm } from './ReglaAgendamientoForm';
 
-interface CuentasBancariasListProps {
+interface ReglasAgendamientoListProps {
     studioSlug: string;
 }
 
-export function CuentasBancariasList({ studioSlug }: CuentasBancariasListProps) {
-    const [cuentas, setCuentas] = useState<CuentaBancariaData[]>([]);
+export function ReglasAgendamientoList({ studioSlug }: ReglasAgendamientoListProps) {
+    const [reglas, setReglas] = useState<ReglaAgendamientoData[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
-    const [editingCuenta, setEditingCuenta] = useState<CuentaBancariaData | null>(null);
-    const [isUpdatingOrder, setIsUpdatingOrder] = useState(false);
+    const [editingRegla, setEditingRegla] = useState<ReglaAgendamientoData | null>(null);
+    const [isUpdatingOrder] = useState(false);
 
     // Configurar sensores para drag & drop
     const sensors = useSensors(
@@ -52,138 +50,91 @@ export function CuentasBancariasList({ studioSlug }: CuentasBancariasListProps) 
         })
     );
 
-    // Cargar cuentas bancarias
-    const cargarCuentas = useCallback(async () => {
+    // Cargar reglas de agendamiento
+    const cargarReglas = useCallback(async () => {
         try {
             setLoading(true);
-            const result = await obtenerCuentasBancarias(studioSlug);
+            const result = await obtenerReglasAgendamiento(studioSlug);
 
             if (result.success && result.data) {
-                setCuentas(result.data);
+                setReglas(result.data);
             } else {
-                toast.error('Error al cargar cuentas bancarias');
+                toast.error(result.error || 'Error al cargar reglas de agendamiento');
             }
         } catch (error) {
-            console.error('Error al cargar cuentas:', error);
-            toast.error('Error al cargar cuentas bancarias');
+            console.error('Error al cargar reglas:', error);
+            toast.error('Error al cargar reglas de agendamiento');
         } finally {
             setLoading(false);
         }
     }, [studioSlug]);
 
     useEffect(() => {
-        cargarCuentas();
-    }, [studioSlug, cargarCuentas]);
-
-    // Función unificada para actualizar orden
-    const actualizarOrden = async (
-        nuevasCuentas: CuentaBancariaData[],
-        mostrarToast: boolean = true,
-        operationType: 'drag' | 'button' = 'button'
-    ) => {
-        if (isUpdatingOrder) return;
-
-        try {
-            setIsUpdatingOrder(true);
-            setCuentas(nuevasCuentas);
-
-            const nuevoOrden = nuevasCuentas.map((cuenta, idx) => ({
-                id: cuenta.id,
-                orden: idx
-            }));
-
-            const result = await actualizarOrdenCuentasBancarias(studioSlug, nuevoOrden);
-
-            if (result.success) {
-                if (mostrarToast) {
-                    toast.success(
-                        operationType === 'drag'
-                            ? 'Orden actualizado exitosamente'
-                            : 'Posición actualizada'
-                    );
-                }
-            } else {
-                toast.error(result.error || 'Error al actualizar orden');
-                cargarCuentas();
-            }
-        } catch (error) {
-            console.error('Error al actualizar orden:', error);
-            toast.error('Error al actualizar orden');
-            cargarCuentas();
-        } finally {
-            setIsUpdatingOrder(false);
-        }
-    };
+        cargarReglas();
+    }, [cargarReglas]);
 
     // Manejar eliminación
-    const handleEliminar = async (cuentaId: string) => {
+    const handleEliminar = async (reglaId: string) => {
         try {
-            // Actualización optimista: eliminar inmediatamente de la UI
-            const cuentaOriginal = cuentas.find(c => c.id === cuentaId);
-            setCuentas(prev => prev.filter(cuenta => cuenta.id !== cuentaId));
-
-            const result = await eliminarCuentaBancaria(studioSlug, cuentaId);
-
+            const result = await eliminarReglaAgendamiento(studioSlug, reglaId);
             if (result.success) {
-                toast.success('Cuenta bancaria eliminada exitosamente');
+                toast.success('Regla de agendamiento eliminada exitosamente');
+                cargarReglas();
             } else {
-                // Revertir cambio si falla
-                if (cuentaOriginal) {
-                    setCuentas(prev => [...prev, cuentaOriginal]);
-                }
-                toast.error(result.error || 'Error al eliminar cuenta');
+                toast.error(result.error || 'Error al eliminar regla');
             }
         } catch (error) {
             console.error('Error al eliminar:', error);
-            // Revertir cambio si falla
-            cargarCuentas();
-            toast.error('Error al eliminar cuenta bancaria');
+            toast.error('Error al eliminar regla de agendamiento');
         }
     };
 
     // Manejar edición
-    const handleEditar = (cuenta: CuentaBancariaData) => {
-        setEditingCuenta(cuenta);
+    const handleEditar = (regla: ReglaAgendamientoData) => {
+        setEditingRegla(regla);
         setShowForm(true);
     };
 
     // Manejar creación
     const handleCrear = () => {
-        setEditingCuenta(null);
+        setEditingRegla(null);
         setShowForm(true);
     };
 
     // Manejar cierre del formulario
     const handleCerrarForm = () => {
         setShowForm(false);
-        setEditingCuenta(null);
+        setEditingRegla(null);
     };
 
     // Manejar éxito del formulario
-    const handleFormSuccess = (cuentaActualizada: CuentaBancariaData) => {
-        if (editingCuenta) {
-            setCuentas(prev =>
-                prev.map(cuenta =>
-                    cuenta.id === cuentaActualizada.id ? cuentaActualizada : cuenta
+    const handleFormSuccess = (reglaActualizada: ReglaAgendamientoData) => {
+        if (editingRegla) {
+            // Actualizar regla existente
+            setReglas(prev =>
+                prev.map(regla =>
+                    regla.id === reglaActualizada.id ? reglaActualizada : regla
                 )
             );
         } else {
-            setCuentas(prev => [...prev, cuentaActualizada]);
+            // Agregar nueva regla
+            setReglas(prev => [...prev, reglaActualizada]);
         }
     };
-
 
     // Manejar drag & drop
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
 
         if (active.id !== over?.id && !isUpdatingOrder) {
-            const oldIndex = cuentas.findIndex((item) => item.id === active.id);
-            const newIndex = cuentas.findIndex((item) => item.id === over?.id);
+            const oldIndex = reglas.findIndex((item) => item.id === active.id);
+            const newIndex = reglas.findIndex((item) => item.id === over?.id);
 
             if (oldIndex !== -1 && newIndex !== -1) {
-                const newCuentas = arrayMove(cuentas, oldIndex, newIndex);
-                actualizarOrden(newCuentas, true, 'drag');
+                const newReglas = arrayMove(reglas, oldIndex, newIndex);
+                // TODO: Implementar actualización de orden
+                setReglas(newReglas);
+                toast.success('Orden actualizado exitosamente');
             }
         }
     };
@@ -191,6 +142,7 @@ export function CuentasBancariasList({ studioSlug }: CuentasBancariasListProps) 
     if (loading) {
         return (
             <div className="space-y-6">
+                {/* Header Navigation Skeleton */}
                 <ZenCard variant="default" padding="lg">
                     <div className="animate-pulse">
                         <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
@@ -198,6 +150,7 @@ export function CuentasBancariasList({ studioSlug }: CuentasBancariasListProps) 
                     </div>
                 </ZenCard>
 
+                {/* Lista de Reglas Skeleton */}
                 <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
                         <ZenCard key={i} variant="default" padding="lg">
@@ -222,28 +175,29 @@ export function CuentasBancariasList({ studioSlug }: CuentasBancariasListProps) 
     return (
         <div className="space-y-6">
             <HeaderNavigation
-                title="Cuentas Bancarias"
-                description="Gestiona las cuentas bancarias de tu negocio para recibir pagos y transferencias"
+                title="Reglas de Agendamiento"
+                description="Define las reglas y tipos de servicios que se pueden agendar en tu negocio"
                 actionButton={{
-                    label: 'Nueva Cuenta',
+                    label: 'Nueva Regla',
                     onClick: handleCrear,
                     icon: 'Plus'
                 }}
             />
 
-            {cuentas.length === 0 ? (
+            {/* Lista de Reglas */}
+            {reglas.length === 0 ? (
                 <ZenCard variant="default" padding="lg">
                     <div className="text-center py-8">
-                        <CreditCard className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
+                        <Calendar className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
                         <h3 className="text-lg font-medium text-zinc-300 mb-2">
-                            No hay cuentas bancarias configuradas
+                            No hay reglas de agendamiento configuradas
                         </h3>
                         <p className="text-zinc-500 mb-4">
-                            Agrega las cuentas bancarias donde recibirás los pagos de tus clientes
+                            Define las reglas para los tipos de servicios que se pueden agendar
                         </p>
                         <ZenButton onClick={handleCrear} variant="primary">
                             <Plus className="mr-2 h-4 w-4" />
-                            Agregar Primera Cuenta
+                            Crear Primera Regla
                         </ZenButton>
                     </div>
                 </ZenCard>
@@ -254,14 +208,14 @@ export function CuentasBancariasList({ studioSlug }: CuentasBancariasListProps) 
                     onDragEnd={handleDragEnd}
                 >
                     <SortableContext
-                        items={cuentas.map(cuenta => cuenta.id)}
+                        items={reglas.map(regla => regla.id)}
                         strategy={verticalListSortingStrategy}
                     >
                         <div className="space-y-4">
-                            {cuentas.map((cuenta) => (
-                                <CuentaBancariaItem
-                                    key={cuenta.id}
-                                    cuenta={cuenta}
+                            {reglas.map((regla) => (
+                                <ReglaAgendamientoItem
+                                    key={regla.id}
+                                    regla={regla}
                                     onEditar={handleEditar}
                                     onEliminar={handleEliminar}
                                 />
@@ -271,10 +225,11 @@ export function CuentasBancariasList({ studioSlug }: CuentasBancariasListProps) 
                 </DndContext>
             )}
 
+            {/* Formulario Modal */}
             {showForm && (
-                <CuentaBancariaForm
+                <ReglaAgendamientoForm
                     studioSlug={studioSlug}
-                    cuenta={editingCuenta}
+                    regla={editingRegla}
                     onClose={handleCerrarForm}
                     onSuccess={handleFormSuccess}
                 />

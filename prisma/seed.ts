@@ -21,10 +21,13 @@ async function main() {
     // 6. Seed de planes
     await seedPlans();
 
-    // 7. Seed de usuarios de plataforma
+    // 7. Seed de métodos de pago
+    await seedMetodosPago();
+
+    // 8. Seed de usuarios de plataforma
     await seedPlatformUsers();
 
-    // 8. Seed de proyecto demo-studio
+    // 9. Seed de proyecto demo-studio
     await seedDemoStudio();
 
     console.log('🎉 Seed completado exitosamente!');
@@ -624,7 +627,7 @@ async function seedDemoStudio() {
         // Crear perfiles profesionales para los usuarios
         if (personal.type === 'EMPLEADO') {
             let profile: 'FOTOGRAFO' | 'EDITOR' | 'RETOCADOR' | 'CAMAROGRAFO' | 'OPERADOR_DRON' | 'ASISTENTE' | 'COORDINADOR';
-            
+
             if (personal.role === 'photographer') {
                 profile = 'FOTOGRAFO';
             } else if (personal.role === 'editor') {
@@ -722,6 +725,96 @@ async function seedDemoStudio() {
     }
 
     console.log('🎉 Demo studio seeded successfully!');
+}
+
+async function seedMetodosPago() {
+    console.log('💳 Seeding métodos de pago...');
+
+    // Obtener el proyecto demo-studio
+    const demoProject = await prisma.projects.findFirst({
+        where: { slug: 'demo-studio' }
+    });
+
+    if (!demoProject) {
+        console.log('⚠️ No se encontró el proyecto demo-studio, saltando seed de métodos de pago');
+        return;
+    }
+
+    const metodosPago = [
+        {
+            metodo_pago: 'Efectivo',
+            comision_porcentaje_base: 0,
+            comision_fija_monto: 0,
+            num_msi: 0,
+            comision_msi_porcentaje: 0,
+            orden: 1,
+            payment_method: 'cash',
+            status: 'active',
+            projectId: demoProject.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        },
+        {
+            metodo_pago: 'Depósito Bancario',
+            comision_porcentaje_base: 0,
+            comision_fija_monto: 0,
+            num_msi: 0,
+            comision_msi_porcentaje: 0,
+            orden: 2,
+            payment_method: 'bank_transfer',
+            status: 'active',
+            projectId: demoProject.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        },
+        {
+            metodo_pago: 'Transferencia SPEI',
+            comision_porcentaje_base: 0,
+            comision_fija_monto: 0,
+            num_msi: 0,
+            comision_msi_porcentaje: 0,
+            orden: 3,
+            payment_method: 'spei',
+            status: 'active',
+            projectId: demoProject.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        },
+        {
+            metodo_pago: 'OXXO',
+            comision_porcentaje_base: 0,
+            comision_fija_monto: 0,
+            num_msi: 0,
+            comision_msi_porcentaje: 0,
+            orden: 4,
+            payment_method: 'oxxo',
+            status: 'active',
+            projectId: demoProject.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }
+    ];
+
+    for (const metodo of metodosPago) {
+        // Verificar si ya existe
+        const existingMetodo = await prisma.project_metodos_pago.findFirst({
+            where: {
+                projectId: demoProject.id,
+                metodo_pago: metodo.metodo_pago
+            }
+        });
+
+        if (!existingMetodo) {
+            await prisma.project_metodos_pago.create({
+                data: metodo
+            });
+            console.log(`✅ Método de pago: ${metodo.metodo_pago}`);
+        } else {
+            console.log(`⚠️ Método de pago ya existe: ${metodo.metodo_pago}`);
+        }
+    }
+
+    console.log('🎉 Métodos de pago seeded successfully!');
 }
 
 main()

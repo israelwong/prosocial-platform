@@ -7,7 +7,7 @@ import {
     ZenButton,
     ZenBadge
 } from '@/components/ui/zen';
-import { Edit, Trash2, GripVertical, Building2, User, Hash } from 'lucide-react';
+import { Edit, Trash2, GripVertical, Calendar, Clock, Users, MapPin, User, Repeat } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
@@ -20,19 +20,19 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/shadcn/alert-dialog';
-import { CuentaBancariaData } from '../types';
+import { ReglaAgendamientoData } from '../types';
 
-interface CuentaBancariaItemProps {
-    cuenta: CuentaBancariaData;
-    onEditar: (cuenta: CuentaBancariaData) => void;
-    onEliminar: (cuentaId: string) => void;
+interface ReglaAgendamientoItemProps {
+    regla: ReglaAgendamientoData;
+    onEditar: (regla: ReglaAgendamientoData) => void;
+    onEliminar: (reglaId: string) => void;
 }
 
-export function CuentaBancariaItem({
-    cuenta,
+export function ReglaAgendamientoItem({
+    regla,
     onEditar,
     onEliminar
-}: CuentaBancariaItemProps) {
+}: ReglaAgendamientoItemProps) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     const {
@@ -42,7 +42,7 @@ export function CuentaBancariaItem({
         transform,
         transition,
         isDragging,
-    } = useSortable({ id: cuenta.id });
+    } = useSortable({ id: regla.id });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -54,8 +54,41 @@ export function CuentaBancariaItem({
     };
 
     const handleConfirmDelete = () => {
-        onEliminar(cuenta.id);
+        onEliminar(regla.id);
         setShowDeleteDialog(false);
+    };
+
+    // Obtener icono según la recurrencia
+    const getRecurrenciaIcon = () => {
+        switch (regla.recurrencia) {
+            case 'por_dia':
+                return <Calendar className="h-5 w-5 text-blue-400" />;
+            case 'por_hora':
+                return <Clock className="h-5 w-5 text-green-400" />;
+            default:
+                return <Calendar className="h-5 w-5 text-zinc-400" />;
+        }
+    };
+
+    // Obtener texto de la recurrencia
+    const getRecurrenciaText = () => {
+        switch (regla.recurrencia) {
+            case 'por_dia':
+                return 'Por Día';
+            case 'por_hora':
+                return 'Por Hora';
+            default:
+                return 'No definido';
+        }
+    };
+
+    // Formatear duración en horas
+    const formatDuracion = (minutos?: number) => {
+        if (!minutos) return 'No definido';
+        const horas = Math.floor(minutos / 60);
+        const mins = minutos % 60;
+        if (mins === 0) return `${horas}h`;
+        return `${horas}h ${mins}m`;
     };
 
     return (
@@ -66,7 +99,7 @@ export function CuentaBancariaItem({
                 variant="default"
                 padding="lg"
                 className={`transition-all duration-200 hover:shadow-lg ${isDragging ? 'opacity-50 scale-95' : ''
-                    } ${!cuenta.activo ? 'opacity-60' : ''}`}
+                    } ${regla.status === 'inactive' ? 'opacity-60' : ''}`}
             >
                 <div className="flex items-center justify-between">
                     {/* Información Principal */}
@@ -80,36 +113,49 @@ export function CuentaBancariaItem({
                             <GripVertical className="h-5 w-5" />
                         </div>
 
+                        {/* Icono de la recurrencia */}
+                        <div className="text-zinc-400">
+                            {getRecurrenciaIcon()}
+                        </div>
+
                         {/* Contenido */}
                         <div className="flex-1">
                             <div className="flex items-center space-x-3 mb-2">
-                                <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-                                    <Building2 className="h-5 w-5 text-blue-400" />
-                                    <span>{cuenta.banco}</span>
+                                <h3 className="text-lg font-semibold text-white">
+                                    {regla.nombre}
                                 </h3>
-
-                                {/* Badges */}
-                                <div className="flex items-center space-x-2">
-                                    <ZenBadge
-                                        variant={cuenta.activo ? 'success' : 'secondary'}
-                                    >
-                                        {cuenta.activo ? 'Activa' : 'Inactiva'}
-                                    </ZenBadge>
-                                </div>
+                                <ZenBadge
+                                    variant={regla.status === 'active' ? 'success' : 'secondary'}
+                                >
+                                    {regla.status === 'active' ? 'Activa' : 'Inactiva'}
+                                </ZenBadge>
+                                <ZenBadge variant="default">
+                                    {getRecurrenciaText()}
+                                </ZenBadge>
                             </div>
 
-                            {/* Detalles de la cuenta */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                {/* Número de Cuenta */}
-                                <div className="flex items-center space-x-2 text-zinc-300">
-                                    <Hash className="h-4 w-4 text-green-400" />
-                                    <span className="font-mono">{cuenta.numeroCuenta}</span>
+                            {regla.descripcion && (
+                                <p className="text-sm text-zinc-400 mb-3">
+                                    {regla.descripcion}
+                                </p>
+                            )}
+
+                            {/* Detalles de la regla */}
+                            <div className="flex items-center space-x-6 text-sm">
+                                {/* Capacidad Operativa */}
+                                <div className="flex items-center space-x-1 text-green-400">
+                                    <Users className="h-4 w-4" />
+                                    <span>
+                                        Capacidad: {regla.capacidadOperativa} eventos simultáneos
+                                    </span>
                                 </div>
 
-                                {/* Titular */}
-                                <div className="flex items-center space-x-2 text-zinc-300">
-                                    <User className="h-4 w-4 text-orange-400" />
-                                    <span>{cuenta.titular}</span>
+                                {/* Recurrencia */}
+                                <div className="flex items-center space-x-1 text-blue-400">
+                                    {getRecurrenciaIcon()}
+                                    <span>
+                                        {getRecurrenciaText()}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -120,7 +166,7 @@ export function CuentaBancariaItem({
                         <ZenButton
                             variant="ghost"
                             size="sm"
-                            onClick={() => onEditar(cuenta)}
+                            onClick={() => onEditar(regla)}
                             className="text-zinc-400 hover:text-white"
                         >
                             <Edit className="h-4 w-4" />
@@ -141,9 +187,9 @@ export function CuentaBancariaItem({
             <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>¿Eliminar cuenta bancaria?</AlertDialogTitle>
+                        <AlertDialogTitle>¿Eliminar regla de agendamiento?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Esta acción no se puede deshacer. Se eliminará permanentemente la cuenta bancaria de <strong>{cuenta.banco}</strong> con CLABE <strong>{cuenta.numeroCuenta}</strong>.
+                            Esta acción no se puede deshacer. Se eliminará permanentemente la regla <strong>{regla.nombre}</strong>.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

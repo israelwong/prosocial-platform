@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent } from '@/components/ui/shadcn/card';
-import { Button } from '@/components/ui/shadcn/button';
+import {
+    ZenCard,
+    ZenCardContent,
+    ZenButton
+} from '@/components/ui/zen';
 import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import { Plus, CreditCard } from 'lucide-react';
 import {
@@ -216,17 +219,17 @@ export function MetodosPagoList({ studioSlug }: MetodosPagoListProps) {
         return (
             <div className="space-y-6">
                 {/* Header Navigation Skeleton */}
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                <ZenCard variant="default" padding="lg">
                     <div className="animate-pulse">
                         <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
                         <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
                     </div>
-                </div>
+                </ZenCard>
 
                 {/* Lista de Métodos Skeleton */}
                 <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
-                        <div key={i} className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
+                        <ZenCard key={i} variant="default" padding="lg">
                             <div className="animate-pulse">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="h-6 bg-zinc-700 rounded w-1/4"></div>
@@ -238,7 +241,7 @@ export function MetodosPagoList({ studioSlug }: MetodosPagoListProps) {
                                     <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
                                 </div>
                             </div>
-                        </div>
+                        </ZenCard>
                     ))}
                 </div>
             </div>
@@ -254,19 +257,17 @@ export function MetodosPagoList({ studioSlug }: MetodosPagoListProps) {
 
             {/* Lista de Métodos */}
             {metodos.length === 0 ? (
-                <Card className="bg-zinc-900/50 border-zinc-800">
-                    <CardContent className="p-6">
-                        <div className="text-center py-8">
-                            <CreditCard className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
-                            <h3 className="text-lg font-medium text-zinc-300 mb-2">
-                                Cargando métodos de pago...
-                            </h3>
-                            <p className="text-zinc-500">
-                                Los métodos predefinidos se están cargando
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
+                <ZenCard variant="default" padding="lg">
+                    <div className="text-center py-8">
+                        <CreditCard className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
+                        <h3 className="text-lg font-medium text-zinc-300 mb-2">
+                            Cargando métodos de pago...
+                        </h3>
+                        <p className="text-zinc-500">
+                            Los métodos predefinidos se están cargando
+                        </p>
+                    </div>
+                </ZenCard>
             ) : (
                 <DndContext
                     sensors={sensors}
