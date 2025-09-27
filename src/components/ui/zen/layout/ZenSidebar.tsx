@@ -73,8 +73,8 @@ const ZenSidebarContext = React.createContext<{
   toggleSidebar: () => void;
 }>({
   isOpen: false,
-  setIsOpen: () => {},
-  toggleSidebar: () => {},
+  setIsOpen: () => { },
+  toggleSidebar: () => { },
 });
 
 // Provider del sidebar
@@ -117,7 +117,7 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
       <ZenCard 
         variant="default" 
         padding="none" 
-        className="h-full w-full border-r border-zinc-700 bg-zinc-950"
+        className="h-full w-full border-r border-zinc-800 bg-zinc-950 rounded-none"
       >
         {children}
       </ZenCard>
@@ -157,7 +157,7 @@ export function ZenSidebarContent({ children, className }: ZenSidebarContentProp
 // Header del sidebar
 export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps) {
   return (
-    <div className={cn("border-b border-zinc-700 p-4", className)}>
+    <div className={cn("border-b border-zinc-800 p-4", className)}>
       {children}
     </div>
   );
@@ -166,7 +166,7 @@ export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps)
 // Footer del sidebar
 export function ZenSidebarFooter({ children, className }: ZenSidebarFooterProps) {
   return (
-    <div className={cn("border-t border-zinc-700 p-4", className)}>
+    <div className={cn("border-t border-zinc-800 p-4", className)}>
       {children}
     </div>
   );
@@ -218,12 +218,12 @@ export function ZenSidebarMenuItem({ children, className }: ZenSidebarMenuItemPr
 }
 
 // Botón del menú
-export function ZenSidebarMenuButton({ 
-  children, 
-  className, 
-  asChild = false, 
+export function ZenSidebarMenuButton({
+  children,
+  className,
+  asChild = false,
   isActive = false,
-  ...props 
+  ...props
 }: ZenSidebarMenuButtonProps) {
   if (asChild) {
     return (
