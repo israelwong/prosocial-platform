@@ -3,6 +3,22 @@
 import { useState } from "react";
 import { ZenButton, ZenInput, ZenCard, ZenCardHeader, ZenCardTitle, ZenCardContent, ZenCardDescription } from "@/components/ui/zen";
 import { ZenTextarea } from "@/components/ui/zen/forms/ZenTextarea";
+import {
+  ZenSidebarProvider,
+  ZenSidebar,
+  ZenSidebarContent,
+  ZenSidebarFooter,
+  ZenSidebarGroup,
+  ZenSidebarGroupContent,
+  ZenSidebarGroupLabel,
+  ZenSidebarHeader,
+  ZenSidebarMenu,
+  ZenSidebarMenuButton,
+  ZenSidebarMenuItem,
+  ZenSidebarTrigger,
+  ZenSidebarOverlay,
+} from "@/components/ui/zen";
+import { Home, Settings, Users, BarChart3, FileText, HelpCircle } from "lucide-react";
 
 /**
  * Página de demostración MCP + ZEN Design System
@@ -12,6 +28,83 @@ import { ZenTextarea } from "@/components/ui/zen/forms/ZenTextarea";
  * - ZEN Design System para componentes unificados
  * - Tema oscuro zinc consistente
  */
+// Componente del Sidebar
+function AppSidebar() {
+  const menuItems = [
+    {
+      title: "Dashboard",
+      icon: Home,
+      url: "#",
+    },
+    {
+      title: "Usuarios",
+      icon: Users,
+      url: "#",
+    },
+    {
+      title: "Reportes",
+      icon: BarChart3,
+      url: "#",
+    },
+    {
+      title: "Documentos",
+      icon: FileText,
+      url: "#",
+    },
+    {
+      title: "Configuración",
+      icon: Settings,
+      url: "#",
+    },
+  ];
+
+  return (
+    <ZenSidebar>
+      <ZenSidebarHeader>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center">
+            <span className="text-zinc-300 font-bold">Z</span>
+          </div>
+          <span className="font-semibold text-zinc-200">ZEN Design</span>
+        </div>
+      </ZenSidebarHeader>
+      
+      <ZenSidebarContent>
+        <ZenSidebarGroup>
+          <ZenSidebarGroupLabel>Navegación</ZenSidebarGroupLabel>
+          <ZenSidebarGroupContent>
+            <ZenSidebarMenu>
+              {menuItems.map((item) => (
+                <ZenSidebarMenuItem key={item.title}>
+                  <ZenSidebarMenuButton asChild>
+                    <a href={item.url} className="flex items-center gap-3">
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.title}</span>
+                    </a>
+                  </ZenSidebarMenuButton>
+                </ZenSidebarMenuItem>
+              ))}
+            </ZenSidebarMenu>
+          </ZenSidebarGroupContent>
+        </ZenSidebarGroup>
+      </ZenSidebarContent>
+      
+      <ZenSidebarFooter>
+        <ZenSidebarMenu>
+          <ZenSidebarMenuItem>
+            <ZenSidebarMenuButton asChild>
+              <a href="#" className="flex items-center gap-3">
+                <HelpCircle className="w-4 h-4" />
+                <span>Ayuda</span>
+              </a>
+            </ZenSidebarMenuButton>
+          </ZenSidebarMenuItem>
+        </ZenSidebarMenu>
+      </ZenSidebarFooter>
+    </ZenSidebar>
+  );
+}
+
 export default function MCPDemoPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -42,14 +135,24 @@ export default function MCPDemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <ZenSidebarProvider>
+      <div className="flex min-h-screen bg-zinc-950">
+        <AppSidebar />
+        <ZenSidebarOverlay />
+        
+        <main className="flex-1 p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <ZenSidebarTrigger />
+            <h1 className="text-2xl font-bold text-white">MCP + ZEN Demo</h1>
+          </div>
+          
+          <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-white">
+          <h2 className="text-3xl font-bold text-white">
             MCP + ZEN Design System Demo
-          </h1>
+          </h2>
           <p className="text-zinc-400 text-lg">
             Demostración de la integración entre MCP (Model Context Protocol) y ZEN Design System
           </p>
@@ -129,7 +232,7 @@ export default function MCPDemoPage() {
           </ZenCard>
 
           {/* Información del Proyecto */}
-          <ZenCard variant="outline" padding="lg">
+          <ZenCard variant="default" padding="lg">
             <ZenCardHeader>
               <ZenCardTitle>Características ZEN</ZenCardTitle>
               <ZenCardDescription>
@@ -164,7 +267,7 @@ export default function MCPDemoPage() {
         </div>
 
         {/* Sección de Comandos MCP */}
-        <ZenCard variant="ghost" padding="lg">
+        <ZenCard variant="default" padding="lg">
           <ZenCardHeader>
             <ZenCardTitle>Comandos MCP Disponibles</ZenCardTitle>
             <ZenCardDescription>
@@ -177,12 +280,12 @@ export default function MCPDemoPage() {
                 <h4 className="font-semibold text-zinc-200">Exploración:</h4>
                 <div className="bg-zinc-900 p-3 rounded-md">
                   <code className="text-green-400 text-sm">
-                    "Muéstrame componentes de formulario"
+                    &quot;Muéstrame componentes de formulario&quot;
                   </code>
                 </div>
                 <div className="bg-zinc-900 p-3 rounded-md">
                   <code className="text-green-400 text-sm">
-                    "Busca componentes de dashboard"
+                    &quot;Busca componentes de dashboard&quot;
                   </code>
                 </div>
               </div>
@@ -191,12 +294,12 @@ export default function MCPDemoPage() {
                 <h4 className="font-semibold text-zinc-200">Instalación:</h4>
                 <div className="bg-zinc-900 p-3 rounded-md">
                   <code className="text-blue-400 text-sm">
-                    "Instala un formulario de contacto"
+                    &quot;Instala un formulario de contacto&quot;
                   </code>
                 </div>
                 <div className="bg-zinc-900 p-3 rounded-md">
                   <code className="text-blue-400 text-sm">
-                    "Agrega @zen/button"
+                    &quot;Agrega @zen/button&quot;
                   </code>
                 </div>
               </div>
@@ -209,7 +312,9 @@ export default function MCPDemoPage() {
           <p>ProSocial Platform - MCP + ZEN Design System Integration</p>
           <p>Desarrollado con Next.js 15, React 19, TypeScript 5 y Supabase</p>
         </div>
+          </div>
+        </main>
       </div>
-    </div>
+    </ZenSidebarProvider>
   );
 }

@@ -16,6 +16,26 @@ export { ZenLabel } from './base/ZenLabel';
 export { ZenTextarea } from './forms/ZenTextarea';
 
 // =============================================================================
+// LAYOUT COMPONENTS (DISPONIBLES)
+// =============================================================================
+export { 
+  ZenSidebarProvider, 
+  ZenSidebar, 
+  ZenSidebarTrigger, 
+  ZenSidebarContent, 
+  ZenSidebarHeader, 
+  ZenSidebarFooter,
+  ZenSidebarGroup,
+  ZenSidebarGroupLabel,
+  ZenSidebarGroupContent,
+  ZenSidebarMenu,
+  ZenSidebarMenuItem,
+  ZenSidebarMenuButton,
+  ZenSidebarOverlay,
+  useZenSidebar
+} from './layout/ZenSidebar';
+
+// =============================================================================
 // DESIGN TOKENS
 // =============================================================================
 export { ZEN_COLORS } from './tokens/colors';
