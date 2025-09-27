@@ -114,10 +114,10 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
         className
       )}
     >
-      <ZenCard 
-        variant="default" 
-        padding="none" 
-        className="h-full w-full border-r border-zinc-800 bg-zinc-950 rounded-none"
+      <ZenCard
+        variant="default"
+        padding="none"
+        className="h-full w-full border-r border-zinc-900 bg-zinc-950 rounded-none"
       >
         {children}
       </ZenCard>
@@ -157,7 +157,7 @@ export function ZenSidebarContent({ children, className }: ZenSidebarContentProp
 // Header del sidebar
 export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps) {
   return (
-    <div className={cn("border-b border-zinc-800 p-4", className)}>
+    <div className={cn("border-b border-zinc-900 p-4", className)}>
       {children}
     </div>
   );
@@ -166,7 +166,7 @@ export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps)
 // Footer del sidebar
 export function ZenSidebarFooter({ children, className }: ZenSidebarFooterProps) {
   return (
-    <div className={cn("border-t border-zinc-800 p-4", className)}>
+    <div className={cn("border-t border-zinc-900 p-4", className)}>
       {children}
     </div>
   );

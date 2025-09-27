@@ -285,7 +285,7 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
 function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSidebarZenProps) {
     const pathname = usePathname();
     const [searchTerm, setSearchTerm] = useState('');
-    const [expandedSections, setExpandedSections] = useState<string[]>(['estudio', 'negocio']);
+    const [expandedSection, setExpandedSection] = useState<string>('estudio');
 
     // Obtener secciones de configuración
     const configSections = getConfigSections(studioSlug || 'demo');
@@ -313,11 +313,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
     }, [configSections]);
 
     const toggleSection = (sectionId: string) => {
-        setExpandedSections(prev =>
-            prev.includes(sectionId)
-                ? prev.filter(id => id !== sectionId)
-                : [...prev, sectionId]
-        );
+        setExpandedSection(prev => prev === sectionId ? '' : sectionId);
     };
 
     const isActive = (href: string) => {
@@ -364,7 +360,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                                     <section.icon className="w-4 h-4" />
                                     <span>{section.title}</span>
                                 </div>
-                                {expandedSections.includes(section.id) ? (
+                                {expandedSection === section.id ? (
                                     <ChevronDown className="w-4 h-4" />
                                 ) : (
                                     <ChevronRight className="w-4 h-4" />
@@ -372,7 +368,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                             </button>
                         </ZenSidebarGroupLabel>
 
-                        {expandedSections.includes(section.id) && (
+                        {expandedSection === section.id && (
                             <ZenSidebarGroupContent>
                                 <ZenSidebarMenu>
                                     {section.items.map((item) => (
