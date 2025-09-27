@@ -3,7 +3,6 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ZenCard } from "@/components/ui/zen/base/ZenCard";
-import { Button } from "@/components/ui/shadcn/button";
 import { Menu } from "lucide-react";
 
 interface ZenSidebarProps {
@@ -89,7 +88,7 @@ export function ZenSidebarProvider({ children, defaultOpen = false }: ZenSidebar
     const checkIsMobile = () => {
       const mobile = window.innerWidth < 1024; // lg breakpoint
       setIsMobile(mobile);
-      
+
       // En desktop, siempre cerrar el sidebar
       if (!mobile && isOpen) {
         setIsOpen(false);
@@ -98,10 +97,10 @@ export function ZenSidebarProvider({ children, defaultOpen = false }: ZenSidebar
 
     // Verificar inmediatamente
     checkIsMobile();
-    
+
     // Agregar listener
     window.addEventListener('resize', checkIsMobile);
-    
+
     return () => window.removeEventListener('resize', checkIsMobile);
   }, [isOpen]);
 
@@ -136,8 +135,8 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
   return (
     <div
       className={cn(
-        "fixed left-0 top-0 z-50 h-full w-80 transform transition-transform duration-300 ease-in-out",
-        "max-w-[85vw] sm:w-80",
+        "fixed left-0 top-0 z-50 h-full w-72 transform transition-transform duration-300 ease-in-out",
+        "max-w-[80vw] sm:w-72",
         isOpen ? "translate-x-0" : "-translate-x-full",
         "lg:translate-x-0 lg:static lg:z-auto lg:max-w-none",
         className
@@ -160,24 +159,23 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
 export function ZenSidebarTrigger({ className }: ZenSidebarTriggerProps) {
   const { toggleSidebar, isOpen } = useZenSidebar();
 
+  const handleClick = () => {
+    console.log('Trigger clicked, current state:', isOpen);
+    toggleSidebar();
+  };
+
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('Trigger clicked, current state:', isOpen);
-        toggleSidebar();
-      }}
+    <button
+      onClick={handleClick}
       className={cn(
-        "lg:hidden z-50 relative",
+        "lg:hidden z-50 relative p-2 rounded-md hover:bg-zinc-800 transition-colors",
+        "flex items-center justify-center",
         className
       )}
     >
-      <Menu className="h-4 w-4" />
+      <Menu className="h-5 w-5 text-white" />
       <span className="sr-only">Toggle sidebar</span>
-    </Button>
+    </button>
   );
 }
 
@@ -193,7 +191,7 @@ export function ZenSidebarContent({ children, className }: ZenSidebarContentProp
 // Header del sidebar
 export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps) {
   return (
-    <div className={cn("border-b border-zinc-900 p-4", className)}>
+    <div className={cn("border-b border-zinc-900 p-3", className)}>
       {children}
     </div>
   );
@@ -202,7 +200,7 @@ export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps)
 // Footer del sidebar
 export function ZenSidebarFooter({ children, className }: ZenSidebarFooterProps) {
   return (
-    <div className={cn("border-t border-zinc-900 p-4", className)}>
+    <div className={cn("border-t border-zinc-900 p-3", className)}>
       {children}
     </div>
   );
@@ -211,7 +209,7 @@ export function ZenSidebarFooter({ children, className }: ZenSidebarFooterProps)
 // Grupo del sidebar
 export function ZenSidebarGroup({ children, className }: ZenSidebarGroupProps) {
   return (
-    <div className={cn("p-4", className)}>
+    <div className={cn("p-2", className)}>
       {children}
     </div>
   );
