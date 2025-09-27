@@ -13,11 +13,11 @@ export default async function ConfigurationLayout({
     const { slug } = await params;
 
     return (
-        <div className="flex min-h-screen bg-zinc-950">
+        <div className="flex min-h-screen bg-zinc-950 overflow-hidden">
             <ConfiguracionSidebarZen studioSlug={slug} />
             <ZenSidebarOverlay />
 
-            <main className="flex-1 p-4 sm:p-6 lg:ml-0">
+            <main className="flex-1 p-4 sm:p-6 lg:ml-0 overflow-y-auto">
                 <div className="flex items-center gap-4 mb-6">
                     <ZenSidebarTrigger />
                     <div>

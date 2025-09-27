@@ -87,24 +87,31 @@ export function ZenSidebarProvider({ children, defaultOpen = false }: ZenSidebar
   // Detectar si es mobile
   React.useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+      const mobile = window.innerWidth < 1024; // lg breakpoint
+      setIsMobile(mobile);
+      
+      // En desktop, siempre cerrar el sidebar
+      if (!mobile && isOpen) {
+        setIsOpen(false);
+      }
     };
 
+    // Verificar inmediatamente
     checkIsMobile();
+    
+    // Agregar listener
     window.addEventListener('resize', checkIsMobile);
+    
     return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
+  }, [isOpen]);
 
   const toggleSidebar = React.useCallback(() => {
-    setIsOpen(prev => !prev);
-  }, []);
-
-  // Cerrar sidebar en mobile cuando se redimensiona a desktop
-  React.useEffect(() => {
-    if (!isMobile && isOpen) {
-      setIsOpen(false);
-    }
-  }, [isMobile, isOpen]);
+    console.log('Toggle sidebar clicked, current state:', isOpen);
+    setIsOpen(prev => {
+      console.log('Setting sidebar to:', !prev);
+      return !prev;
+    });
+  }, [isOpen]);
 
   return (
     <ZenSidebarContext.Provider value={{ isOpen, setIsOpen, toggleSidebar, isMobile }}>
@@ -139,9 +146,11 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
       <ZenCard
         variant="default"
         padding="none"
-        className="h-full w-full border-r border-zinc-900 bg-zinc-950 rounded-none"
+        className="h-full w-full border-r border-zinc-900 bg-zinc-950 rounded-none overflow-hidden"
       >
-        {children}
+        <div className="h-full overflow-y-auto">
+          {children}
+        </div>
       </ZenCard>
     </div>
   );
@@ -149,15 +158,20 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
 
 // Trigger para abrir/cerrar el sidebar
 export function ZenSidebarTrigger({ className }: ZenSidebarTriggerProps) {
-  const { toggleSidebar } = useZenSidebar();
+  const { toggleSidebar, isOpen } = useZenSidebar();
 
   return (
     <Button
       variant="ghost"
       size="sm"
-      onClick={toggleSidebar}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Trigger clicked, current state:', isOpen);
+        toggleSidebar();
+      }}
       className={cn(
-        "lg:hidden",
+        "lg:hidden z-50 relative",
         className
       )}
     >
