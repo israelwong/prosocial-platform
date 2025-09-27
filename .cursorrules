@@ -497,7 +497,10 @@ Formato: [tipo de dato esperado]"
 
 #### **Layout Components**
 
-- `ZenSidebar` - Sidebar unificado (próximamente)
+- `ZenSidebar` - Sidebar unificado ✅ DISPONIBLE
+- `ZenSidebarProvider` - Provider del sidebar
+- `ZenSidebarTrigger` - Trigger para mobile
+- `ZenSidebarOverlay` - Overlay responsive
 - `ZenNavbar` - Navbar consistente (próximamente)
 - `ZenModal` - Modal estándar (próximamente)
 
@@ -603,6 +606,196 @@ v1.1.ui.{componente}  # ej: v1.1.ui.sidebar
 - **README**: `/src/components/ui/zen/README.md`
 - **Listado**: `/docs/04-best-practices/ZEN_COMPONENTS_LISTADO.md`
 - **Tokens**: `/src/components/ui/zen/tokens/`
+
+---
+
+## 🤖 **MCP (MODEL CONTEXT PROTOCOL) - FLUJO DE TRABAJO**
+
+### **🚀 CONFIGURACIÓN MCP**
+
+#### **Archivos de Configuración:**
+
+- **`.cursor/mcp.json`** - Configuración del servidor MCP
+- **`components.json`** - Registro de componentes shadcn/ui
+- **`registry/zen/`** - Registry personalizado ZEN
+
+#### **Comandos MCP Disponibles:**
+
+```bash
+# Explorar componentes disponibles
+mcp_shadcn_search_items_in_registries
+
+# Ver detalles de componentes
+mcp_shadcn_view_items_in_registries
+
+# Obtener ejemplos de uso
+mcp_shadcn_get_item_examples_from_registries
+
+# Instalar componentes
+mcp_shadcn_get_add_command_for_items
+```
+
+### **🔄 FLUJO DE TRABAJO MCP → ZEN**
+
+#### **1. Exploración de Componentes:**
+
+```typescript
+// 1. Buscar componentes disponibles
+mcp_shadcn_search_items_in_registries({
+  registries: ['@shadcn'],
+  query: 'sidebar',
+  limit: 10
+})
+
+// 2. Ver detalles del componente
+mcp_shadcn_view_items_in_registries({
+  items: ['@shadcn/sidebar']
+})
+
+// 3. Obtener ejemplos de uso
+mcp_shadcn_get_item_examples_from_registries({
+  registries: ['@shadcn'],
+  query: 'sidebar-demo'
+})
+```
+
+#### **2. Instalación y Adaptación:**
+
+```bash
+# Instalar componente shadcn/ui
+npx shadcn@latest add sidebar
+
+# Adaptar a ZEN Design System
+node scripts/mcp-zen-adapter.js sidebar
+```
+
+#### **3. Integración ZEN:**
+
+```typescript
+// ✅ CORRECTO - Usar componentes ZEN
+import { 
+  ZenSidebar,
+  ZenSidebarProvider,
+  ZenSidebarTrigger,
+  ZenSidebarOverlay
+} from '@/components/ui/zen';
+
+// ✅ CORRECTO - Patrón de uso
+<ZenSidebarProvider>
+  <ZenSidebar>
+    <ZenSidebarContent>
+      {/* Contenido */}
+    </ZenSidebarContent>
+  </ZenSidebar>
+  <ZenSidebarOverlay />
+  <main>
+    <ZenSidebarTrigger />
+    {/* Contenido principal */}
+  </main>
+</ZenSidebarProvider>
+```
+
+### **🎯 REGLAS MCP ESPECÍFICAS**
+
+#### **✅ SIEMPRE HACER:**
+
+1. **Explorar** componentes con MCP antes de implementar
+2. **Verificar** si existe equivalente ZEN
+3. **Instalar** componente base si es necesario
+4. **Adaptar** a ZEN Design System
+5. **Documentar** en registry personalizado
+6. **Probar** funcionalidad completa
+
+#### **❌ NUNCA HACER:**
+
+1. **Instalar** componentes sin verificar ZEN
+2. **Usar** shadcn/ui directamente si existe ZEN
+3. **Ignorar** conflictos de CSS variables
+4. **Saltarse** el proceso de adaptación
+5. **Hardcodear** estilos en lugar de usar tokens
+
+### **🔧 HERRAMIENTAS DE AUTOMATIZACIÓN**
+
+#### **Script de Adaptación:**
+
+```javascript
+// scripts/mcp-zen-adapter.js
+// Automatiza la adaptación de componentes shadcn/ui a ZEN
+```
+
+#### **Registry Personalizado:**
+
+```json
+// registry/zen/button.json
+{
+  "name": "button",
+  "description": "ZenButton - Botón unificado con tema zinc",
+  "files": [
+    {
+      "name": "ZenButton.tsx",
+      "content": "// Código del componente ZEN"
+    }
+  ]
+}
+```
+
+### **📋 CHECKLIST MCP → ZEN**
+
+#### **Antes de Implementar:**
+
+- [ ] ¿Existe componente ZEN equivalente?
+- [ ] ¿Necesito instalar shadcn/ui base?
+- [ ] ¿Hay conflictos de CSS variables?
+- [ ] ¿Cuál es el patrón de uso correcto?
+
+#### **Durante la Implementación:**
+
+- [ ] Instalar componente base si es necesario
+- [ ] Adaptar estilos a tema zinc
+- [ ] Implementar estados de loading/error
+- [ ] Agregar props específicas ZEN
+- [ ] Probar responsive design
+
+#### **Después de Implementar:**
+
+- [ ] Documentar en registry ZEN
+- [ ] Actualizar exports en index.ts
+- [ ] Probar funcionalidad completa
+- [ ] Commit con mensaje descriptivo
+- [ ] Actualizar documentación
+
+### **🚨 CONFLICTOS CONOCIDOS**
+
+#### **CSS Variables:**
+
+```css
+/* ❌ PROBLEMA - shadcn/ui sobrescribe variables globales */
+@layer base {
+  * {
+    @apply border-border bg-background text-foreground;
+  }
+}
+
+/* ✅ SOLUCIÓN - Restaurar tema zinc */
+@layer base {
+  * {
+    @apply border-zinc-800;
+  }
+  body {
+    @apply bg-zinc-950 text-white;
+  }
+}
+```
+
+#### **Componentes Sidebar:**
+
+```typescript
+// ❌ PROBLEMA - Usar shadcn/ui directamente
+import { Sidebar } from '@/components/ui/sidebar';
+
+// ✅ SOLUCIÓN - Usar ZEN wrapper
+import { ZenSidebar } from '@/components/ui/zen';
+```
 
 ---
 
