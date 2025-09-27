@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { ZenCard } from "@/components/ui/zen/base/ZenCard";
 import { Button } from "@/components/ui/shadcn/button";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 
 interface ZenSidebarProps {
   children: React.ReactNode;
@@ -108,7 +108,7 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
   return (
     <div
       className={cn(
-        "fixed left-0 top-0 z-50 h-full w-64 transform transition-transform duration-300 ease-in-out",
+        "fixed left-0 top-0 z-50 h-full w-80 transform transition-transform duration-300 ease-in-out",
         isOpen ? "translate-x-0" : "-translate-x-full",
         "lg:translate-x-0 lg:static lg:z-auto",
         className
@@ -117,7 +117,7 @@ export function ZenSidebar({ children, className }: ZenSidebarProps) {
       <ZenCard 
         variant="default" 
         padding="none" 
-        className="h-full w-full border-r border-zinc-800 bg-zinc-900"
+        className="h-full w-full border-r border-zinc-700 bg-zinc-950"
       >
         {children}
       </ZenCard>
@@ -157,7 +157,7 @@ export function ZenSidebarContent({ children, className }: ZenSidebarContentProp
 // Header del sidebar
 export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps) {
   return (
-    <div className={cn("border-b border-zinc-800 p-4", className)}>
+    <div className={cn("border-b border-zinc-700 p-4", className)}>
       {children}
     </div>
   );
@@ -166,7 +166,7 @@ export function ZenSidebarHeader({ children, className }: ZenSidebarHeaderProps)
 // Footer del sidebar
 export function ZenSidebarFooter({ children, className }: ZenSidebarFooterProps) {
   return (
-    <div className={cn("border-t border-zinc-800 p-4", className)}>
+    <div className={cn("border-t border-zinc-700 p-4", className)}>
       {children}
     </div>
   );
@@ -225,22 +225,38 @@ export function ZenSidebarMenuButton({
   isActive = false,
   ...props 
 }: ZenSidebarMenuButtonProps) {
-  const Comp = asChild ? "div" : "button";
+  if (asChild) {
+    return (
+      <div
+        className={cn(
+          "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+          "hover:bg-zinc-800 hover:text-white",
+          "focus:bg-zinc-800 focus:text-white focus:outline-none",
+          isActive && "bg-zinc-800 text-white",
+          !isActive && "text-zinc-400",
+          className
+        )}
+        {...(props as React.HTMLAttributes<HTMLDivElement>)}
+      >
+        {children}
+      </div>
+    );
+  }
 
   return (
-    <Comp
+    <button
       className={cn(
         "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
         "hover:bg-zinc-800 hover:text-white",
         "focus:bg-zinc-800 focus:text-white focus:outline-none",
         isActive && "bg-zinc-800 text-white",
-        !isActive && "text-zinc-300",
+        !isActive && "text-zinc-400",
         className
       )}
-      {...props}
+      {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
     >
       {children}
-    </Comp>
+    </button>
   );
 }
 

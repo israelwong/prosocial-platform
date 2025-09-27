@@ -642,21 +642,21 @@ mcp_shadcn_get_add_command_for_items
 ```typescript
 // 1. Buscar componentes disponibles
 mcp_shadcn_search_items_in_registries({
-  registries: ['@shadcn'],
-  query: 'sidebar',
-  limit: 10
-})
+  registries: ["@shadcn"],
+  query: "sidebar",
+  limit: 10,
+});
 
 // 2. Ver detalles del componente
 mcp_shadcn_view_items_in_registries({
-  items: ['@shadcn/sidebar']
-})
+  items: ["@shadcn/sidebar"],
+});
 
 // 3. Obtener ejemplos de uso
 mcp_shadcn_get_item_examples_from_registries({
-  registries: ['@shadcn'],
-  query: 'sidebar-demo'
-})
+  registries: ["@shadcn"],
+  query: "sidebar-demo",
+});
 ```
 
 #### **2. Instalación y Adaptación:**
@@ -673,7 +673,7 @@ node scripts/mcp-zen-adapter.js sidebar
 
 ```typescript
 // ✅ CORRECTO - Usar componentes ZEN
-import { 
+import {
   ZenSidebar,
   ZenSidebarProvider,
   ZenSidebarTrigger,
@@ -791,10 +791,10 @@ import {
 
 ```typescript
 // ❌ PROBLEMA - Usar shadcn/ui directamente
-import { Sidebar } from '@/components/ui/sidebar';
+import { Sidebar } from "@/components/ui/sidebar";
 
 // ✅ SOLUCIÓN - Usar ZEN wrapper
-import { ZenSidebar } from '@/components/ui/zen';
+import { ZenSidebar } from "@/components/ui/zen";
 ```
 
 ---

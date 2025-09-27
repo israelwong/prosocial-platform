@@ -3,22 +3,22 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  ZenInput, 
-  ZenBadge,
-  ZenSidebar,
-  ZenSidebarContent,
-  ZenSidebarHeader,
-  ZenSidebarFooter,
-  ZenSidebarGroup,
-  ZenSidebarGroupLabel,
-  ZenSidebarGroupContent,
-  ZenSidebarMenu,
-  ZenSidebarMenuItem,
-  ZenSidebarMenuButton,
-  ZenSidebarProvider,
-  ZenSidebarTrigger,
-  ZenSidebarOverlay
+import {
+    ZenInput,
+    ZenBadge,
+    ZenSidebar,
+    ZenSidebarContent,
+    ZenSidebarHeader,
+    ZenSidebarFooter,
+    ZenSidebarGroup,
+    ZenSidebarGroupLabel,
+    ZenSidebarGroupContent,
+    ZenSidebarMenu,
+    ZenSidebarMenuItem,
+    ZenSidebarMenuButton,
+    ZenSidebarProvider,
+    ZenSidebarTrigger,
+    ZenSidebarOverlay
 } from '@/components/ui/zen';
 
 // Re-exportar componentes para uso en layout
@@ -293,7 +293,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
     // Filtrar secciones basado en búsqueda
     const filteredSections = useMemo(() => {
         if (!searchTerm.trim()) return configSections;
-        
+
         return configSections.map(section => ({
             ...section,
             items: section.items.filter(item =>
@@ -306,7 +306,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
     // Calcular estadísticas
     const stats = useMemo(() => {
         const totalItems = configSections.reduce((acc, section) => acc + section.items.length, 0);
-        const completedItems = configSections.reduce((acc, section) => 
+        const completedItems = configSections.reduce((acc, section) =>
             acc + section.items.filter(item => item.completed).length, 0
         );
         return { total: totalItems, completed: completedItems };

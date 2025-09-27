@@ -20,10 +20,6 @@ export default async function ConfigurationLayout({
             <main className="flex-1 p-6">
                 <div className="flex items-center gap-4 mb-6">
                     <ZenSidebarTrigger />
-                    <div>
-                        <h1 className="text-2xl font-bold text-white">Configuración</h1>
-                        <p className="text-zinc-400">Gestiona la configuración de tu estudio</p>
-                    </div>
                 </div>
 
                 <div className="max-w-6xl mx-auto">
