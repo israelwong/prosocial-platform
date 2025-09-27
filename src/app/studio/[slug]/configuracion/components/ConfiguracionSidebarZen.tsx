@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   ZenInput, 
-  ZenButton, 
   ZenBadge,
   ZenSidebar,
   ZenSidebarContent,
@@ -25,8 +24,6 @@ import {
 // Re-exportar componentes para uso en layout
 export { ZenSidebarTrigger, ZenSidebarOverlay };
 import {
-    Search,
-    X,
     Building2,
     User,
     Zap,
@@ -40,17 +37,14 @@ import {
     Star,
     Users2,
     Tag,
-    Shield,
     Bell,
     Lock,
     Plug,
     SlidersHorizontal,
     ChevronDown,
     ChevronRight,
-    BarChart3,
-    Calendar
+    BarChart3
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface ConfigSection {
     id: string;
@@ -75,8 +69,8 @@ interface ConfiguracionSidebarZenProps {
     studioSlug?: string;
 }
 
-// Datos de configuración
-const configSections: ConfigSection[] = [
+// Función para generar secciones de configuración
+const getConfigSections = (studioSlug: string): ConfigSection[] => [
     {
         id: 'estudio',
         title: 'Estudio',
@@ -85,34 +79,34 @@ const configSections: ConfigSection[] = [
         items: [
             {
                 id: 'identidad',
-                name: 'Identidad',
-                description: 'Logo, nombre y palabras clave',
-                href: '/studio/[slug]/configuracion/estudio/identidad',
+                name: 'Identidad de Marca',
+                description: 'Define tu logo y nombre',
+                href: `/${studioSlug}/configuracion/estudio/identidad`,
                 icon: Star,
                 completed: true
             },
             {
                 id: 'contacto',
-                name: 'Contacto',
-                description: 'Información de contacto',
-                href: '/studio/[slug]/configuracion/estudio/contacto',
+                name: 'Información de Contacto',
+                description: 'Correos, teléfonos y dirección',
+                href: `/${studioSlug}/configuracion/estudio/contacto`,
                 icon: User,
                 completed: true
             },
             {
-                id: 'horarios',
-                name: 'Horarios',
-                description: 'Horarios de atención',
-                href: '/studio/[slug]/configuracion/estudio/horarios',
-                icon: Clock,
+                id: 'redes-sociales',
+                name: 'Redes Sociales',
+                description: 'Conecta tus perfiles',
+                href: `/${studioSlug}/configuracion/estudio/redes-sociales`,
+                icon: Zap,
                 completed: false
             },
             {
-                id: 'redes-sociales',
-                name: 'Redes Sociales',
-                description: 'Perfiles en redes sociales',
-                href: '/studio/[slug]/configuracion/estudio/redes-sociales',
-                icon: Zap,
+                id: 'horarios',
+                name: 'Horarios de Atención',
+                description: 'Define tus horas de trabajo',
+                href: `/${studioSlug}/configuracion/estudio/horarios`,
+                icon: Clock,
                 completed: false
             }
         ]
@@ -127,7 +121,7 @@ const configSections: ConfigSection[] = [
                 id: 'precios-y-utilidad',
                 name: 'Precios y Utilidad',
                 description: 'Configuración de precios',
-                href: '/studio/[slug]/configuracion/negocio/precios-y-utilidad',
+                href: `/${studioSlug}/configuracion/negocio/precios-y-utilidad`,
                 icon: Tag,
                 completed: true
             },
@@ -135,24 +129,24 @@ const configSections: ConfigSection[] = [
                 id: 'condiciones-comerciales',
                 name: 'Condiciones Comerciales',
                 description: 'Términos y condiciones',
-                href: '/studio/[slug]/configuracion/negocio/condiciones-comerciales',
+                href: `/${studioSlug}/configuracion/negocio/condiciones-comerciales`,
                 icon: FileText,
-                completed: false
-            },
-            {
-                id: 'cuentas-bancarias',
-                name: 'Cuentas Bancarias',
-                description: 'Información bancaria',
-                href: '/studio/[slug]/configuracion/negocio/cuentas-bancarias',
-                icon: CreditCard,
                 completed: false
             },
             {
                 id: 'metodos-de-pago',
                 name: 'Métodos de Pago',
                 description: 'Formas de pago aceptadas',
-                href: '/studio/[slug]/configuracion/negocio/metodos-de-pago',
+                href: `/${studioSlug}/configuracion/negocio/metodos-de-pago`,
                 icon: Banknote,
+                completed: false
+            },
+            {
+                id: 'cuentas-bancarias',
+                name: 'Cuentas Bancarias',
+                description: 'Información bancaria',
+                href: `/${studioSlug}/configuracion/negocio/cuentas-bancarias`,
+                icon: CreditCard,
                 completed: false
             }
         ]
@@ -167,24 +161,24 @@ const configSections: ConfigSection[] = [
                 id: 'empleados',
                 name: 'Empleados',
                 description: 'Gestión de empleados',
-                href: '/studio/[slug]/configuracion/equipo/empleados',
+                href: `/${studioSlug}/configuracion/equipo/empleados`,
                 icon: User,
-                completed: false
-            },
-            {
-                id: 'perfiles',
-                name: 'Perfiles Profesionales',
-                description: 'Perfiles de fotógrafos',
-                href: '/studio/[slug]/configuracion/equipo/perfiles',
-                icon: Star,
                 completed: false
             },
             {
                 id: 'proveedores',
                 name: 'Proveedores',
                 description: 'Gestión de proveedores',
-                href: '/studio/[slug]/configuracion/equipo/proveedores',
+                href: `/${studioSlug}/configuracion/equipo/proveedores`,
                 icon: Package,
+                completed: false
+            },
+            {
+                id: 'perfiles',
+                name: 'Perfiles Profesionales',
+                description: 'Perfiles de fotógrafos',
+                href: `/${studioSlug}/configuracion/equipo/perfiles`,
+                icon: Star,
                 completed: false
             }
         ]
@@ -199,7 +193,7 @@ const configSections: ConfigSection[] = [
                 id: 'servicios',
                 name: 'Servicios',
                 description: 'Gestión de servicios',
-                href: '/studio/[slug]/configuracion/catalogo/servicios',
+                href: `/${studioSlug}/configuracion/catalogo/servicios`,
                 icon: Zap,
                 completed: false
             },
@@ -207,23 +201,15 @@ const configSections: ConfigSection[] = [
                 id: 'paquetes',
                 name: 'Paquetes',
                 description: 'Paquetes de servicios',
-                href: '/studio/[slug]/configuracion/catalogo/paquetes',
+                href: `/${studioSlug}/configuracion/catalogo/paquetes`,
                 icon: Gift,
-                completed: false
-            },
-            {
-                id: 'tipos-evento',
-                name: 'Tipos de Evento',
-                description: 'Categorías de eventos',
-                href: '/studio/[slug]/configuracion/catalogo/tipos-evento',
-                icon: Calendar,
                 completed: false
             },
             {
                 id: 'especialidades',
                 name: 'Especialidades',
                 description: 'Áreas de especialización',
-                href: '/studio/[slug]/configuracion/catalogo/especialidades',
+                href: `/${studioSlug}/configuracion/catalogo/especialidades`,
                 icon: Star,
                 completed: false
             }
@@ -239,15 +225,23 @@ const configSections: ConfigSection[] = [
                 id: 'perfil',
                 name: 'Perfil',
                 description: 'Información personal',
-                href: '/studio/[slug]/configuracion/cuenta/perfil',
+                href: `/${studioSlug}/configuracion/cuenta/perfil`,
                 icon: User,
+                completed: false
+            },
+            {
+                id: 'suscripcion',
+                name: 'Suscripción',
+                description: 'Plan y facturación',
+                href: `/${studioSlug}/configuracion/cuenta/suscripcion`,
+                icon: CreditCard,
                 completed: false
             },
             {
                 id: 'notificaciones',
                 name: 'Notificaciones',
                 description: 'Preferencias de notificación',
-                href: '/studio/[slug]/configuracion/cuenta/notificaciones',
+                href: `/${studioSlug}/configuracion/cuenta/notificaciones`,
                 icon: Bell,
                 completed: false
             },
@@ -255,16 +249,8 @@ const configSections: ConfigSection[] = [
                 id: 'seguridad',
                 name: 'Seguridad',
                 description: 'Configuración de seguridad',
-                href: '/studio/[slug]/configuracion/cuenta/seguridad',
+                href: `/${studioSlug}/configuracion/cuenta/seguridad`,
                 icon: Lock,
-                completed: false
-            },
-            {
-                id: 'suscripcion',
-                name: 'Suscripción',
-                description: 'Plan y facturación',
-                href: '/studio/[slug]/configuracion/cuenta/suscripcion',
-                icon: CreditCard,
                 completed: false
             }
         ]
@@ -279,7 +265,7 @@ const configSections: ConfigSection[] = [
                 id: 'integraciones',
                 name: 'Integraciones',
                 description: 'Conectar servicios externos',
-                href: '/studio/[slug]/configuracion/integraciones',
+                href: `/${studioSlug}/configuracion/integraciones`,
                 icon: Plug,
                 completed: false
             },
@@ -287,7 +273,7 @@ const configSections: ConfigSection[] = [
                 id: 'avanzado',
                 name: 'Configuración Avanzada',
                 description: 'Opciones avanzadas',
-                href: '/studio/[slug]/configuracion/avanzado',
+                href: `/${studioSlug}/configuracion/avanzado`,
                 icon: SlidersHorizontal,
                 completed: false
             }
@@ -301,10 +287,13 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedSections, setExpandedSections] = useState<string[]>(['estudio', 'negocio']);
 
+    // Obtener secciones de configuración
+    const configSections = getConfigSections(studioSlug || 'demo');
+
     // Filtrar secciones basado en búsqueda
     const filteredSections = useMemo(() => {
         if (!searchTerm.trim()) return configSections;
-
+        
         return configSections.map(section => ({
             ...section,
             items: section.items.filter(item =>
@@ -312,16 +301,16 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                 item.description.toLowerCase().includes(searchTerm.toLowerCase())
             )
         })).filter(section => section.items.length > 0);
-    }, [searchTerm]);
+    }, [searchTerm, configSections]);
 
     // Calcular estadísticas
     const stats = useMemo(() => {
         const totalItems = configSections.reduce((acc, section) => acc + section.items.length, 0);
-        const completedItems = configSections.reduce((acc, section) =>
+        const completedItems = configSections.reduce((acc, section) => 
             acc + section.items.filter(item => item.completed).length, 0
         );
         return { total: totalItems, completed: completedItems };
-    }, []);
+    }, [configSections]);
 
     const toggleSection = (sectionId: string) => {
         setExpandedSections(prev =>
@@ -332,8 +321,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
     };
 
     const isActive = (href: string) => {
-        const actualHref = studioSlug ? href.replace('[slug]', studioSlug) : href;
-        return pathname === actualHref;
+        return pathname === href;
     };
 
     return (
@@ -390,7 +378,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                                     {section.items.map((item) => (
                                         <ZenSidebarMenuItem key={item.id}>
                                             <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                <Link href={studioSlug ? item.href.replace('[slug]', studioSlug) : item.href} className="flex items-center gap-3">
+                                                <Link href={item.href} className="flex items-center gap-3">
                                                     <item.icon className="w-4 h-4" />
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-2">
