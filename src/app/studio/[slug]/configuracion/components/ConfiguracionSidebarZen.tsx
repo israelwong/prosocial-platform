@@ -16,7 +16,6 @@ import {
     ZenSidebarMenu,
     ZenSidebarMenuItem,
     ZenSidebarMenuButton,
-    ZenSidebarProvider,
     ZenSidebarTrigger,
     ZenSidebarOverlay
 } from '@/components/ui/zen';
@@ -419,12 +418,10 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
     );
 }
 
-// Componente principal con provider
+// Componente principal (sin provider, se maneja en el layout)
 export function ConfiguracionSidebarZen({ className, studioSlug }: ConfiguracionSidebarZenProps) {
     return (
-        <ZenSidebarProvider>
-            <ConfiguracionSidebarContent className={className} studioSlug={studioSlug} />
-        </ZenSidebarProvider>
+        <ConfiguracionSidebarContent className={className} studioSlug={studioSlug} />
     );
 }
 
