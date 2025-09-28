@@ -440,13 +440,15 @@ model projects {
   redes_sociales           project_redes_sociales[]
   cuentas_bancarias        project_cuentas_bancarias[]      // ✅ Cuentas bancarias del estudio
   reglas_agendamiento      project_reglas_agendamiento[]    // ✅ Reglas de agendamiento
+  personal                 project_personal[]              // ✅ Personal del estudio
+  categorias_personal      project_categorias_personal[]   // ✅ Categorías de personal
+  perfiles_personal        project_perfiles_personal[]    // ✅ Perfiles de personal
   revenue_transactions     project_revenue_transactions[]
   servicios                project_servicios[]
   studio_revenue_products  project_studio_revenue_products[]
   telefonos                project_telefonos[]
   user_profiles            project_user_profiles[]
   studio_users             project_users[]
-  professional_profiles    project_professional_profiles[]   // ✅ Perfiles profesionales dinámicos
   setup_status             studio_setup_status?             // ✅ Estado de configuración del estudio
   plans                    platform_plans?                   @relation(fields: [planId], references: [id])
   subscriptions            subscriptions[]
@@ -782,6 +784,7 @@ model project_nominas {
   id                                                  String                     @id @default(cuid())
   projectId                                           String
   userId                                              String
+  personalId                                          String?                    // FK a project_personal (opcional)
   eventoId                                            String?
   concepto                                            String
   descripcion                                         String?
@@ -810,6 +813,7 @@ model project_nominas {
   project_users_nominas_pagado_porToproject_users     project_users?             @relation("nominas_pagado_porToproject_users", fields: [pagado_por], references: [id])
   projects                                            projects                   @relation(fields: [projectId], references: [id])
   project_users_nominas_userIdToproject_users         project_users              @relation("nominas_userIdToproject_users", fields: [userId], references: [id])
+  personal                                            project_personal?          @relation(fields: [personalId], references: [id])
 
   @@index([projectId])
 }
@@ -1028,8 +1032,6 @@ model project_users {
   projects                                      projects                       @relation(fields: [projectId], references: [id])
   platform_user_profiles                        platform_user_profiles?        @relation(fields: [platformUserId], references: [id])
 
-  // Nueva relación para perfiles profesionales
-  professional_profiles                         project_user_professional_profiles[]
 
   @@index([projectId, status])
   @@index([type])
@@ -1037,49 +1039,6 @@ model project_users {
   @@index([platformUserId])
 }
 
-// Perfiles profesionales dinámicos por proyecto
-model project_professional_profiles {
-  id          String @id @default(cuid())
-  projectId   String
-  name        String                    // "Fotógrafo", "Camarógrafo", etc.
-  slug        String                    // "fotografo", "camarografo"
-  description String?                   // Descripción del perfil
-  color      String?                   // Color para UI (hex)
-  icon        String?                  // Icono para UI (lucide name)
-  isActive    Boolean @default(true)
-  isDefault   Boolean @default(false)  // Perfiles del sistema
-  order       Int @default(0)          // Orden de visualización
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relaciones
-  project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  userProfiles project_user_professional_profiles[]
-
-  @@unique([projectId, slug])
-  @@index([projectId, isActive])
-  @@index([isDefault])
-  @@index([order])
-}
-
-model project_user_professional_profiles {
-  id          String @id @default(cuid())
-  userId      String
-  profileId   String?                   // ✅ Referencia a perfil dinámico (opcional)
-  description String?                   // Descripción específica del usuario
-  isActive    Boolean @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relaciones
-  user        project_users @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profile     project_professional_profiles? @relation(fields: [profileId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, profileId])  // Un usuario no puede tener el mismo perfil dos veces
-  @@index([userId])
-  @@index([profileId])
-  @@index([isActive])
-}
 
 model platform_user_profiles {
   id                     String                   @id @default(cuid())
@@ -1095,6 +1054,7 @@ model platform_user_profiles {
   projects               projects?                @relation(fields: [projectId], references: [id])
   project_users          project_users[]          // Personal del proyecto
   project_clientes       project_clientes[]      // Clientes del proyecto
+  project_personal       project_personal[]      // Personal del proyecto (nueva estructura)
 
   @@index([email])
   @@index([role])
@@ -1423,5 +1383,108 @@ model project_reglas_agendamiento {
   @@index([projectId])
   @@index([status])
   @@index([orden])
+}
+
+// =============================================================================
+// GESTIÓN DE PERSONAL SIMPLIFICADA
+// =============================================================================
+
+model project_personal {
+  id                    String   @id @default(cuid())
+  projectId            String
+  nombre               String
+  email                String?
+  telefono             String?
+  tipo                 PersonalType  // OPERATIVO | ADMINISTRATIVO | PROVEEDOR
+  categoriaId          String        // FK a project_categorias_personal
+  status               String        @default("activo") // activo | inactivo
+  
+  // Integración con autenticación (opcional)
+  platformUserId       String?       // FK a platform_user_profiles (opcional)
+  
+  // Campos específicos por tipo
+  honorarios_fijos     Float?        // Para administrativos
+  honorarios_variables   Float?        // Para operativos/proveedores
+  notas                 String?
+  
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  // Relaciones
+  project              projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  categoria            project_categorias_personal @relation(fields: [categoriaId], references: [id])
+  platformUser         platform_user_profiles? @relation(fields: [platformUserId], references: [id])
+  nominas              project_nominas[]
+  personal_perfiles    project_personal_perfil[]
+
+  @@index([projectId])
+  @@index([tipo])
+  @@index([status])
+  @@index([platformUserId])
+}
+
+model project_categorias_personal {
+  id          String   @id @default(cuid())
+  projectId   String
+  nombre      String   // "Fotógrafo", "Camarógrafo", "Recepcionista"
+  descripcion String?
+  tipo        PersonalType  // OPERATIVO | ADMINISTRATIVO | PROVEEDOR
+  color       String?       // Color para UI (hex)
+  icono       String?       // Icono Lucide
+  esDefault   Boolean       @default(false) // Categorías del sistema
+  orden       Int           @default(0)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relaciones
+  project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  personal    project_personal[]
+
+  @@unique([projectId, nombre])
+  @@index([projectId, tipo])
+  @@index([projectId, isActive])
+  @@index([esDefault])
+  @@index([orden])
+}
+
+model project_perfiles_personal {
+  id          String   @id @default(cuid())
+  projectId   String
+  nombre      String   // "Fotógrafo", "Camarógrafo", "Editor de Video"
+  descripcion String?
+  orden       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  personal_perfiles project_personal_perfil[]
+
+  @@unique([projectId, nombre])
+  @@index([projectId, isActive])
+  @@index([orden])
+}
+
+model project_personal_perfil {
+  id          String   @id @default(cuid())
+  personalId  String
+  perfilId    String
+  createdAt   DateTime @default(now())
+
+  // Relaciones
+  personal    project_personal @relation(fields: [personalId], references: [id], onDelete: Cascade)
+  perfil      project_perfiles_personal @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+
+  @@unique([personalId, perfilId])
+  @@index([personalId])
+  @@index([perfilId])
+}
+
+enum PersonalType {
+  OPERATIVO      // Fotógrafos, camarógrafos, operadores
+  ADMINISTRATIVO // Recepcionistas, administradores
+  PROVEEDOR      // Impresión, mesa de dulces, etc.
 }
 

@@ -4,10 +4,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     ZenCard,
     ZenCardContent,
-    ZenButton,
-    ZenBadge
+    ZenCardHeader,
+    ZenCardTitle,
+    ZenCardDescription,
+    ZenButton
 } from '@/components/ui/zen';
-import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
+
 import { Plus, Percent } from 'lucide-react';
 import {
     DndContext,
@@ -36,11 +38,16 @@ import { CondicionComercialItem } from './CondicionComercialItem';
 
 interface CondicionesComercialesListProps {
     studioSlug: string;
+    initialCondiciones: CondicionComercialData[];
+    onCondicionesChange: (condiciones: CondicionComercialData[]) => void;
 }
 
-export function CondicionesComercialesList({ studioSlug }: CondicionesComercialesListProps) {
-    const [condiciones, setCondiciones] = useState<CondicionComercialData[]>([]);
-    const [loading, setLoading] = useState(true);
+export function CondicionesComercialesList({
+    studioSlug,
+    initialCondiciones,
+    onCondicionesChange
+}: CondicionesComercialesListProps) {
+    const [condiciones, setCondiciones] = useState<CondicionComercialData[]>(initialCondiciones);
     const [showForm, setShowForm] = useState(false);
     const [editingCondicion, setEditingCondicion] = useState<CondicionComercialData | null>(null);
     const [isUpdatingOrder, setIsUpdatingOrder] = useState(false); // 🔥 Flag para evitar toasts múltiples
@@ -53,28 +60,28 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
         })
     );
 
-    // Cargar condiciones comerciales
-    const cargarCondiciones = useCallback(async () => {
-        try {
-            setLoading(true);
-            const result = await obtenerCondicionesComerciales(studioSlug);
+    // Sincronizar condiciones locales con las del padre
+    useEffect(() => {
+        setCondiciones(initialCondiciones);
+    }, [initialCondiciones]);
 
+    // Función para actualizar condiciones tanto local como en el padre
+    const updateCondiciones = useCallback((newCondiciones: CondicionComercialData[]) => {
+        setCondiciones(newCondiciones);
+        onCondicionesChange(newCondiciones);
+    }, [onCondicionesChange]);
+
+    // Función para recargar datos desde el servidor
+    const recargarCondiciones = useCallback(async () => {
+        try {
+            const result = await obtenerCondicionesComerciales(studioSlug);
             if (result.success && result.data) {
-                setCondiciones(result.data);
-            } else {
-                toast.error('Error al cargar condiciones comerciales');
+                updateCondiciones(result.data);
             }
         } catch (error) {
-            console.error('Error al cargar condiciones:', error);
-            toast.error('Error al cargar condiciones comerciales');
-        } finally {
-            setLoading(false);
+            console.error('Error recargando condiciones:', error);
         }
-    }, [studioSlug]);
-
-    useEffect(() => {
-        cargarCondiciones();
-    }, [studioSlug, cargarCondiciones]);
+    }, [studioSlug, updateCondiciones]);
 
     // 🔥 Función unificada para actualizar orden (evita duplicación)
     const actualizarOrden = async (
@@ -89,7 +96,7 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
             setIsUpdatingOrder(true);
 
             // Actualizar estado local inmediatamente para UX optimista
-            setCondiciones(nuevasCondiciones);
+            updateCondiciones(nuevasCondiciones);
 
             // Preparar orden para backend
             const nuevoOrden = nuevasCondiciones.map((cond, idx) => ({
@@ -111,13 +118,13 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
             } else {
                 toast.error(result.error || 'Error al actualizar orden');
                 // Revertir en caso de error
-                cargarCondiciones();
+                recargarCondiciones();
             }
         } catch (error) {
             console.error('Error al actualizar orden:', error);
             toast.error('Error al actualizar orden');
             // Revertir en caso de error
-            cargarCondiciones();
+            recargarCondiciones();
         } finally {
             setIsUpdatingOrder(false);
         }
@@ -130,7 +137,7 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
 
             if (result.success) {
                 toast.success('Condición comercial eliminada exitosamente');
-                cargarCondiciones();
+                recargarCondiciones();
             } else {
                 toast.error(result.error || 'Error al eliminar condición');
             }
@@ -162,14 +169,14 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
     const handleFormSuccess = (condicionActualizada: CondicionComercialData) => {
         if (editingCondicion) {
             // Actualizar condición existente
-            setCondiciones(prev =>
-                prev.map(cond =>
-                    cond.id === condicionActualizada.id ? condicionActualizada : cond
-                )
+            const nuevasCondiciones = condiciones.map(cond =>
+                cond.id === condicionActualizada.id ? condicionActualizada : cond
             );
+            updateCondiciones(nuevasCondiciones);
         } else {
             // Agregar nueva condición
-            setCondiciones(prev => [...prev, condicionActualizada]);
+            const nuevasCondiciones = [...condiciones, condicionActualizada];
+            updateCondiciones(nuevasCondiciones);
         }
     };
 
@@ -189,91 +196,72 @@ export function CondicionesComercialesList({ studioSlug }: CondicionesComerciale
         }
     };
 
-    if (loading) {
-        return (
-            <div className="space-y-6">
-                {/* Header Navigation Skeleton */}
-                <ZenCard variant="default" padding="lg">
-                    <div className="animate-pulse">
-                        <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                        <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                    </div>
-                </ZenCard>
-
-                {/* Lista de Condiciones Skeleton */}
-                <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                        <ZenCard key={i} variant="default" padding="lg">
-                            <div className="animate-pulse">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="h-6 bg-zinc-700 rounded w-1/4"></div>
-                                    <div className="h-8 bg-zinc-700 rounded w-24"></div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                                </div>
-                            </div>
-                        </ZenCard>
-                    ))}
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="space-y-6">
-            <HeaderNavigation
-                title="Condiciones Comerciales"
-                description="Define los términos y condiciones comerciales de tu negocio, incluyendo descuentos y anticipos"
-                actionButton={{
-                    label: 'Nueva Condición',
-                    onClick: handleCrear,
-                    icon: 'Plus'
-                }}
-            />
-
-            {/* Lista de Condiciones */}
-            {condiciones.length === 0 ? (
-                <ZenCard variant="default" padding="lg">
-                    <div className="text-center py-8">
-                        <Percent className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
-                        <h3 className="text-lg font-medium text-zinc-300 mb-2">
-                            No hay condiciones comerciales configuradas
-                        </h3>
-                        <p className="text-zinc-500 mb-4">
-                            Define los términos y condiciones comerciales para tu negocio
-                        </p>
-                        <ZenButton onClick={handleCrear} variant="primary">
+            {/* Card principal con header y botón */}
+            <ZenCard variant="default" padding="none">
+                <ZenCardHeader>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <ZenCardTitle>Condiciones Comerciales</ZenCardTitle>
+                            <ZenCardDescription>
+                                Define los términos y condiciones comerciales para tu negocio
+                            </ZenCardDescription>
+                        </div>
+                        <ZenButton
+                            onClick={handleCrear}
+                            variant="primary"
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                        >
                             <Plus className="mr-2 h-4 w-4" />
-                            Crear Primera Condición
+                            Nueva Condición
                         </ZenButton>
                     </div>
-                </ZenCard>
-            ) : (
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDragEnd}
-                >
-                    <SortableContext
-                        items={condiciones.map(cond => cond.id)}
-                        strategy={verticalListSortingStrategy}
-                    >
-                        <div className="space-y-4">
-                            {condiciones.map((condicion, index) => (
-                                <CondicionComercialItem
-                                    key={condicion.id}
-                                    condicion={condicion}
-                                    onEditar={handleEditar}
-                                    onEliminar={handleEliminar}
-                                />
-                            ))}
+                </ZenCardHeader>
+
+                <ZenCardContent>
+                    {/* Lista de Condiciones */}
+                    {condiciones.length === 0 ? (
+                        <div className="text-center py-8">
+                            <Percent className="mx-auto h-12 w-12 text-zinc-400 mb-4" />
+                            <h3 className="text-lg font-medium text-zinc-300 mb-2">
+                                No hay condiciones comerciales configuradas
+                            </h3>
+                            <p className="text-zinc-500 mb-4">
+                                Comienza creando tu primera condición comercial
+                            </p>
+                            <ZenButton onClick={handleCrear} variant="outline">
+                                <Plus className="mr-2 h-4 w-4" />
+                                Crear Primera Condición
+                            </ZenButton>
                         </div>
-                    </SortableContext>
-                </DndContext>
-            )}
+                    ) : (
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <SortableContext
+                                items={condiciones.map(cond => cond.id)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                <div className="space-y-4">
+                                    {condiciones.map((condicion) => (
+                                        <CondicionComercialItem
+                                            key={condicion.id}
+                                            condicion={condicion}
+                                            onEditar={handleEditar}
+                                            onEliminar={handleEliminar}
+                                        />
+                                    ))}
+                                </div>
+                            </SortableContext>
+                        </DndContext>
+                    )}
+                </ZenCardContent>
+            </ZenCard>
 
             {/* Formulario Modal */}
             {showForm && (

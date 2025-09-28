@@ -1,174 +1,200 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/shadcn/button';
-import { Badge } from '@/components/ui/shadcn/badge';
-import { Switch } from '@/components/ui/shadcn/switch';
-import { Edit, Trash2, User, Mail, Phone, Tag } from 'lucide-react';
-import { ConfirmModal } from '@/app/studio/[slug]/components/ConfirmModal';
-import type { Personal } from '../types';
+import { useState } from 'react';
+import { Edit, Trash2, Mail, Phone, User, DollarSign } from 'lucide-react';
+import {
+    ZenButton,
+    ZenCard,
+    ZenCardContent,
+    ZenBadge
+} from '@/components/ui/zen';
+import type { PersonalData } from '@/lib/actions/schemas/personal-schemas';
 
 interface PersonalItemProps {
-    personal: Personal;
-    onEdit: (personal: Personal) => void;
-    onDelete: (id: string, name: string) => void;
-    onToggleActive: (id: string, isActive: boolean) => void;
-    loading?: boolean;
+    personal: PersonalData;
+    onEdit: (personal: PersonalData) => void;
+    onDelete: (personalId: string) => void;
 }
 
 export function PersonalItem({
     personal,
     onEdit,
-    onDelete,
-    onToggleActive,
-    loading = false
+    onDelete
 }: PersonalItemProps) {
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleting, setDeleting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-    const handleDeleteClick = () => {
-        setShowDeleteModal(true);
-    };
-
-    const handleDeleteConfirm = async () => {
-        setDeleting(true);
-        try {
-            await onDelete(personal.id, personal.fullName || 'este miembro');
-            setShowDeleteModal(false);
-        } catch (error) {
-            // El error ya se maneja en la función padre
-        } finally {
-            setDeleting(false);
+    const handleDelete = async () => {
+        if (window.confirm(`¿Estás seguro de que quieres eliminar a "${personal.nombre}"?`)) {
+            setIsDeleting(true);
+            try {
+                await onDelete(personal.id);
+            } finally {
+                setIsDeleting(false);
+            }
         }
     };
 
-    const handleDeleteCancel = () => {
-        setShowDeleteModal(false);
+    const getTipoColor = (tipo: string) => {
+        switch (tipo) {
+            case 'OPERATIVO':
+                return 'bg-blue-600/20 text-blue-400 border-blue-600/30';
+            case 'ADMINISTRATIVO':
+                return 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30';
+            case 'PROVEEDOR':
+                return 'bg-purple-600/20 text-purple-400 border-purple-600/30';
+            default:
+                return 'bg-zinc-600/20 text-zinc-400 border-zinc-600/30';
+        }
     };
 
-    const handleToggleActive = () => {
-        onToggleActive(personal.id, !personal.isActive);
+    const getTipoLabel = (tipo: string) => {
+        switch (tipo) {
+            case 'OPERATIVO':
+                return 'Operativo';
+            case 'ADMINISTRATIVO':
+                return 'Administrativo';
+            case 'PROVEEDOR':
+                return 'Proveedor';
+            default:
+                return tipo;
+        }
     };
 
-    const getStatusColor = (isActive: boolean) => {
-        return isActive ? 'text-green-400' : 'text-red-400';
-    };
-
-    const getStatusText = (isActive: boolean) => {
-        return isActive ? 'Activo' : 'Inactivo';
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'activo':
+                return 'bg-green-600/20 text-green-400 border-green-600/30';
+            case 'inactivo':
+                return 'bg-red-600/20 text-red-400 border-red-600/30';
+            default:
+                return 'bg-zinc-600/20 text-zinc-400 border-zinc-600/30';
+        }
     };
 
     return (
-        <>
-            <div className="p-4 bg-zinc-900/50 rounded-lg border border-zinc-800 hover:border-zinc-600 transition-colors">
+        <ZenCard className="hover:bg-zinc-800/50 transition-colors">
+            <ZenCardContent className="p-4">
                 <div className="flex items-center justify-between">
-                    {/* Información principal */}
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center space-x-3 mb-2">
-                            <User className="h-5 w-5 text-zinc-400 flex-shrink-0" />
-                            <div className="min-w-0 flex-1">
-                                <h3 className="text-white font-semibold truncate">
-                                    {personal.fullName || 'Sin nombre'}
-                                </h3>
-                                <p className="text-sm text-zinc-400">
-                                    {personal.type === 'EMPLEADO' ? 'Empleado' : 'Proveedor'}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Contacto */}
-                        <div className="space-y-1 mb-3">
-                            <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                                <Mail className="h-4 w-4 flex-shrink-0" />
-                                <span className="truncate">{personal.email}</span>
-                            </div>
-                            {personal.phone && (
-                                <div className="flex items-center space-x-2 text-sm text-zinc-400">
-                                    <Phone className="h-4 w-4 flex-shrink-0" />
-                                    <span>{personal.phone}</span>
+                    <div className="flex items-center gap-3 flex-1">
+                        {/* Avatar/Icono */}
+                        <div className="flex-shrink-0">
+                            {personal.platformUser?.avatarUrl ? (
+                                <img
+                                    src={personal.platformUser.avatarUrl}
+                                    alt={personal.nombre}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center">
+                                    <User className="h-5 w-5 text-zinc-400" />
                                 </div>
                             )}
                         </div>
 
-                        {/* Perfiles profesionales */}
-                        <div className="mb-3">
-                            <div className="flex items-center space-x-2 mb-2">
-                                <Tag className="h-4 w-4 text-zinc-400" />
-                                <span className="text-sm text-zinc-400">Perfiles:</span>
+                        {/* Información principal */}
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-medium text-white truncate">
+                                    {personal.nombre}
+                                </h4>
+                                <ZenBadge
+                                    variant="default"
+                                    className={`text-xs ${getStatusColor(personal.status)}`}
+                                >
+                                    {personal.status}
+                                </ZenBadge>
                             </div>
-                            <div className="flex flex-wrap gap-1">
-                                {personal.professional_profiles && personal.professional_profiles.length > 0 ? (
-                                    personal.professional_profiles.map((profile) => (
-                                        <Badge
-                                            key={profile.id}
-                                            variant="outline"
-                                            className="text-xs border-zinc-600 text-zinc-300"
-                                        >
-                                            {profile.profile?.name || 'Sin perfil'}
-                                        </Badge>
-                                    ))
-                                ) : (
-                                    <span className="text-xs text-zinc-500 italic">Sin perfiles asignados</span>
+
+                            <div className="flex items-center gap-2 mb-2">
+                                <ZenBadge
+                                    variant="default"
+                                    className={`text-xs ${getTipoColor(personal.tipo)}`}
+                                >
+                                    {getTipoLabel(personal.tipo)}
+                                </ZenBadge>
+
+                                <span className="text-sm text-zinc-400">
+                                    {personal.categoria.nombre}
+                                </span>
+                            </div>
+
+                            {/* Información de contacto */}
+                            <div className="flex items-center gap-4 text-sm text-zinc-400">
+                                {personal.email && (
+                                    <div className="flex items-center gap-1">
+                                        <Mail className="h-3 w-3" />
+                                        <span className="truncate">{personal.email}</span>
+                                    </div>
+                                )}
+
+                                {personal.telefono && (
+                                    <div className="flex items-center gap-1">
+                                        <Phone className="h-3 w-3" />
+                                        <span>{personal.telefono}</span>
+                                    </div>
                                 )}
                             </div>
+
+                            {/* Honorarios */}
+                            {(personal.honorarios_fijos || personal.honorarios_variables) && (
+                                <div className="flex items-center gap-4 mt-2 text-sm text-zinc-400">
+                                    {personal.honorarios_fijos && (
+                                        <div className="flex items-center gap-1">
+                                            <DollarSign className="h-3 w-3" />
+                                            <span>Fijo: ${personal.honorarios_fijos.toLocaleString()}</span>
+                                        </div>
+                                    )}
+
+                                    {personal.honorarios_variables && (
+                                        <div className="flex items-center gap-1">
+                                            <DollarSign className="h-3 w-3" />
+                                            <span>Variable: ${personal.honorarios_variables.toLocaleString()}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Notas */}
+                            {personal.notas && (
+                                <p className="text-sm text-zinc-500 mt-2 line-clamp-2">
+                                    {personal.notas}
+                                </p>
+                            )}
+
+                            {/* Integración con autenticación */}
+                            {personal.platformUser && (
+                                <div className="mt-2">
+                                    <ZenBadge variant="outline" className="text-xs">
+                                        Usuario registrado: {personal.platformUser.fullName || personal.platformUser.email}
+                                    </ZenBadge>
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Controles */}
-                    <div className="flex items-center space-x-3 ml-4">
-                        {/* Switch de estado */}
-                        <div className="flex items-center space-x-2">
-                            <Switch
-                                checked={personal.isActive}
-                                onCheckedChange={handleToggleActive}
-                                disabled={loading}
-                                className="data-[state=checked]:bg-green-600"
-                            />
-                            <span className={`text-xs ${getStatusColor(personal.isActive)}`}>
-                                {getStatusText(personal.isActive)}
-                            </span>
-                        </div>
+                    {/* Acciones */}
+                    <div className="flex items-center gap-1 ml-4">
+                        <ZenButton
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEdit(personal)}
+                            className="h-8 w-8 p-0"
+                        >
+                            <Edit className="h-3 w-3" />
+                        </ZenButton>
 
-                        {/* Botones de acción */}
-                        <div className="flex items-center space-x-1">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => onEdit(personal)}
-                                disabled={loading}
-                                className="h-8 w-8 p-0 border-blue-600 text-blue-400 hover:bg-blue-900/20"
-                                title="Editar"
-                            >
-                                <Edit className="h-3 w-3" />
-                            </Button>
-
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleDeleteClick}
-                                disabled={loading}
-                                className="h-8 w-8 p-0 border-red-600 text-red-400 hover:bg-red-900/20"
-                                title="Eliminar"
-                            >
-                                <Trash2 className="h-3 w-3" />
-                            </Button>
-                        </div>
+                        <ZenButton
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                            className="h-8 w-8 p-0 text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                        >
+                            <Trash2 className="h-3 w-3" />
+                        </ZenButton>
                     </div>
                 </div>
-            </div>
-
-            {/* Modal de confirmación de eliminación */}
-            <ConfirmModal
-                isOpen={showDeleteModal}
-                onClose={handleDeleteCancel}
-                onConfirm={handleDeleteConfirm}
-                title="Eliminar miembro del personal"
-                description={`¿Estás seguro de que quieres eliminar a ${personal.fullName || 'este miembro'}? Esta acción no se puede deshacer.`}
-                confirmText="Eliminar"
-                cancelText="Cancelar"
-                variant="destructive"
-                loading={deleting}
-            />
-        </>
+            </ZenCardContent>
+        </ZenCard>
     );
 }

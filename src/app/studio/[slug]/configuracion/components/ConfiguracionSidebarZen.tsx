@@ -116,7 +116,7 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
     },
     {
         id: 'negocio',
-        title: 'Negocio',
+        title: 'Reglas de Negocio',
         description: 'Configuración comercial',
         icon: DollarSign,
         items: [
@@ -169,27 +169,11 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
         icon: Users2,
         items: [
             {
-                id: 'empleados',
-                name: 'Empleados',
-                description: 'Gestión de empleados',
-                href: `/${studioSlug}/configuracion/equipo/empleados`,
-                icon: User,
-                completed: false
-            },
-            {
-                id: 'proveedores',
-                name: 'Proveedores',
-                description: 'Gestión de proveedores',
-                href: `/${studioSlug}/configuracion/equipo/proveedores`,
-                icon: Package,
-                completed: false
-            },
-            {
-                id: 'perfiles',
-                name: 'Perfiles Profesionales',
-                description: 'Perfiles de fotógrafos',
-                href: `/${studioSlug}/configuracion/equipo/perfiles`,
-                icon: Star,
+                id: 'personal',
+                name: 'Personal',
+                description: 'Gestión de personal y colaboradores',
+                href: `/${studioSlug}/configuracion/equipo`,
+                icon: Users2,
                 completed: false
             }
         ]

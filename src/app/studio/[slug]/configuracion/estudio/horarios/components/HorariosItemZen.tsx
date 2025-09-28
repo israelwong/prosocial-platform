@@ -7,12 +7,13 @@ import { ZenBadge } from '@/components/ui/zen';
 import { Switch } from '@/components/ui/shadcn/switch';
 import { Clock, Save } from 'lucide-react';
 import { Horario, DIAS_SEMANA } from '../types';
+import { DiaSemana } from '@/lib/actions/schemas/horarios-schemas';
 
 interface HorariosItemZenProps {
     horario: Horario;
     onToggleActive: (id: string, activo: boolean) => void;
-    onUpdateHorario: (id: string, data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => void;
-    onAddHorario: (data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => void;
+    onUpdateHorario: (id: string, data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string }) => void;
+    onAddHorario: (data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string; activo: boolean }) => void;
 }
 
 export function HorariosItemZen({
@@ -54,13 +55,14 @@ export function HorariosItemZen({
         try {
             if (isNewHorario) {
                 await onAddHorario({
-                    dia_semana: horario.dia_semana,
+                    dia_semana: horario.dia_semana as DiaSemana,
                     hora_inicio: localHorario.hora_inicio,
-                    hora_fin: localHorario.hora_fin
+                    hora_fin: localHorario.hora_fin,
+                    activo: true
                 });
             } else {
                 await onUpdateHorario(horario.id, {
-                    dia_semana: horario.dia_semana,
+                    dia_semana: horario.dia_semana as DiaSemana,
                     hora_inicio: localHorario.hora_inicio,
                     hora_fin: localHorario.hora_fin
                 });

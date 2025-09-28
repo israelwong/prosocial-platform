@@ -1,387 +1,743 @@
-"use server";
+'use server';
 
-import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
-import { retryDatabaseOperation } from "@/lib/actions/utils/database-retry";
+import { prisma } from '@/lib/prisma';
 import {
-    PersonalCreateSchema,
-    PersonalUpdateSchema,
-    PersonalFiltersSchema,
-    type PersonalCreateForm,
-    type PersonalUpdateForm,
-    type PersonalFiltersForm,
-} from "@/lib/actions/schemas/personal-schemas";
+    createPersonalSchema,
+    updatePersonalSchema,
+    createCategoriaPersonalSchema,
+    updateCategoriaPersonalSchema,
+    updateOrdenCategoriasSchema,
+    createPerfilPersonalSchema,
+    updatePerfilPersonalSchema,
+    updateOrdenPerfilesSchema,
+    type PersonalListResponse,
+    type CategoriaPersonalListResponse,
+    type PersonalResponse,
+    type CategoriaPersonalResponse
+} from '@/lib/actions/schemas/personal-schemas';
 
-// Función auxiliar para obtener el studio por slug
-async function getStudioBySlug(studioSlug: string) {
-    const studio = await prisma.projects.findUnique({
-        where: { slug: studioSlug },
-        select: { id: true, slug: true },
-    });
+// =============================================================================
+// SERVER ACTIONS PARA PERSONAL
+// =============================================================================
 
-    if (!studio) {
-        throw new Error("Studio no encontrado");
-    }
+/**
+ * Obtener todo el personal de un proyecto
+ */
+export async function obtenerPersonal(studioSlug: string): Promise<PersonalListResponse> {
+    try {
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
 
-    return studio;
-}
-
-// Obtener todo el personal de un studio
-export async function obtenerPersonalStudio(
-    studioSlug: string,
-    filters?: PersonalFiltersForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
-
-        // 2. Validar filtros si se proporcionan
-        const validatedFilters = filters ? PersonalFiltersSchema.parse(filters) : {};
-
-        // 3. Construir where clause
-        const whereClause: any = {
-            projectId: studio.id,
-        };
-
-        if (validatedFilters.type) {
-            whereClause.type = validatedFilters.type;
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        if (validatedFilters.isActive !== undefined) {
-            whereClause.isActive = validatedFilters.isActive;
-        }
-
-        if (validatedFilters.search) {
-            whereClause.OR = [
-                { fullName: { contains: validatedFilters.search, mode: "insensitive" } },
-                { email: { contains: validatedFilters.search, mode: "insensitive" } },
-                { phone: { contains: validatedFilters.search, mode: "insensitive" } },
-            ];
-        }
-
-        // 4. Obtener personal con perfiles profesionales
-        const personal = await prisma.project_users.findMany({
-            where: whereClause,
+        const personal = await prisma.project_personal.findMany({
+            where: { projectId: project.id },
             include: {
-                professional_profiles: {
-                    where: { isActive: true },
+                categoria: {
                     select: {
                         id: true,
-                        profile: {
-                            select: {
-                                id: true,
-                                name: true,
-                                slug: true,
-                                color: true,
-                                icon: true,
-                            }
-                        },
-                        description: true,
-                        isActive: true,
-                    },
+                        nombre: true,
+                        tipo: true,
+                        color: true,
+                        icono: true
+                    }
                 },
+                platformUser: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                        avatarUrl: true
+                    }
+                }
             },
             orderBy: [
-                { type: "asc" },
-                { fullName: "asc" },
-            ],
+                { categoria: { orden: 'asc' } },
+                { nombre: 'asc' }
+            ]
         });
 
-        // 5. Filtrar por perfil si se especifica
-        let filteredPersonal = personal;
-        if (validatedFilters.profile) {
-            filteredPersonal = personal.filter(person =>
-                person.professional_profiles.some(profile =>
-                    profile.profile === validatedFilters.profile
-                )
-            );
-        }
-
-        return filteredPersonal;
-    });
+        return { success: true, data: personal };
+    } catch (error) {
+        console.error('Error al obtener personal:', error);
+        return { success: false, error: 'Error interno del servidor' };
+    }
 }
 
-// Crear nuevo miembro del personal
+/**
+ * Crear nuevo personal
+ */
 export async function crearPersonal(
     studioSlug: string,
-    data: PersonalCreateForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
+    data: any
+): Promise<PersonalResponse> {
+    try {
+        // Validar datos
+        const validatedData = createPersonalSchema.parse(data);
 
-        // 2. Validar datos
-        const validatedData = PersonalCreateSchema.parse(data);
-
-        // 3. Verificar que no existe otro usuario con el mismo email en este proyecto
-        const existingUser = await prisma.project_users.findFirst({
-            where: {
-                projectId: studio.id,
-                email: validatedData.email,
-            },
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
         });
 
-        if (existingUser) {
-            throw new Error(`Ya existe una persona con el email ${validatedData.email} en tu equipo`);
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        // 4. Crear usuario y perfiles profesionales en una transacción
-        const nuevoPersonal = await prisma.$transaction(async (tx) => {
-            // Crear usuario
-            const usuario = await tx.project_users.create({
-                data: {
-                    fullName: validatedData.fullName,
-                    email: validatedData.email,
-                    phone: validatedData.phone,
-                    type: validatedData.type,
-                    isActive: validatedData.isActive,
-                    projectId: studio.id,
-                    role: "user", // Role por defecto
-                    status: "active", // Status por defecto
-                },
-            });
-
-            // Crear perfiles profesionales
-            const perfilesProfesionales = await Promise.all(
-                (validatedData.profileIds || []).map(profileId =>
-                    tx.project_user_professional_profiles.create({
-                        data: {
-                            userId: usuario.id,
-                            profileId: profileId,
-                            description: validatedData.profileDescriptions?.[profileId] || null,
-                            isActive: true,
-                        },
-                    })
-                )
-            );
-
-            return {
-                ...usuario,
-                professional_profiles: perfilesProfesionales,
-            };
+        // Verificar que la categoría existe y pertenece al proyecto
+        const categoria = await prisma.project_categorias_personal.findFirst({
+            where: {
+                id: validatedData.categoriaId,
+                projectId: project.id
+            }
         });
 
-        // 5. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/empleados`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/proveedores`);
+        if (!categoria) {
+            return { success: false, error: 'Categoría no encontrada' };
+        }
 
-        return nuevoPersonal;
-    });
+        // Crear personal
+        const personal = await prisma.project_personal.create({
+            data: {
+                ...validatedData,
+                projectId: project.id,
+                email: validatedData.email || null,
+                telefono: validatedData.telefono || null,
+                platformUserId: validatedData.platformUserId || null,
+                honorarios_fijos: validatedData.honorarios_fijos || null,
+                honorarios_variables: validatedData.honorarios_variables || null,
+                notas: validatedData.notas || null
+            },
+            include: {
+                categoria: {
+                    select: {
+                        id: true,
+                        nombre: true,
+                        tipo: true,
+                        color: true,
+                        icono: true
+                    }
+                },
+                platformUser: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                        avatarUrl: true
+                    }
+                }
+            }
+        });
+
+        return { success: true, data: personal };
+    } catch (error) {
+        console.error('Error al crear personal:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
 }
 
-// Actualizar miembro del personal
+/**
+ * Actualizar personal existente
+ */
 export async function actualizarPersonal(
     studioSlug: string,
     personalId: string,
-    data: PersonalUpdateForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
+    data: any
+): Promise<PersonalResponse> {
+    try {
+        // Validar datos
+        const validatedData = updatePersonalSchema.parse({ ...data, id: personalId });
 
-        // 2. Validar datos
-        const validatedData = PersonalUpdateSchema.parse(data);
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
 
-        // 3. Verificar que el personal existe y pertenece al studio
-        const existingPersonal = await prisma.project_users.findFirst({
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Verificar que el personal existe y pertenece al proyecto
+        const existingPersonal = await prisma.project_personal.findFirst({
             where: {
                 id: personalId,
-                projectId: studio.id,
-            },
-            include: {
-                professional_profiles: true,
-            },
+                projectId: project.id
+            }
         });
 
         if (!existingPersonal) {
-            throw new Error("El miembro del personal que intentas actualizar no existe o no tienes permisos para modificarlo");
+            return { success: false, error: 'Personal no encontrado' };
         }
 
-        // 4. Si se proporciona email, verificar que no esté en uso por otro usuario
-        if (validatedData.email && validatedData.email !== existingPersonal.email) {
-            const existingEmail = await prisma.project_users.findFirst({
+        // Si se está cambiando la categoría, verificar que existe
+        if (validatedData.categoriaId) {
+            const categoria = await prisma.project_categorias_personal.findFirst({
                 where: {
-                    projectId: studio.id,
-                    email: validatedData.email,
-                    id: { not: personalId },
-                },
+                    id: validatedData.categoriaId,
+                    projectId: project.id
+                }
             });
 
-            if (existingEmail) {
-                throw new Error(`Ya existe otra persona con el email ${validatedData.email} en tu equipo`);
+            if (!categoria) {
+                return { success: false, error: 'Categoría no encontrada' };
             }
         }
 
-        // 5. Actualizar en transacción
-        const personalActualizado = await prisma.$transaction(async (tx) => {
-            // Actualizar datos básicos del usuario
-            const usuario = await tx.project_users.update({
-                where: { id: personalId },
-                data: {
-                    ...(validatedData.fullName && { fullName: validatedData.fullName }),
-                    ...(validatedData.email && { email: validatedData.email }),
-                    ...(validatedData.phone !== undefined && { phone: validatedData.phone }),
-                    ...(validatedData.type && { type: validatedData.type }),
-                    ...(validatedData.isActive !== undefined && { isActive: validatedData.isActive }),
-                    updatedAt: new Date(),
+        // Actualizar personal
+        const personal = await prisma.project_personal.update({
+            where: { id: personalId },
+            data: {
+                ...validatedData,
+                email: validatedData.email || null,
+                telefono: validatedData.telefono || null,
+                platformUserId: validatedData.platformUserId || null,
+                honorarios_fijos: validatedData.honorarios_fijos || null,
+                honorarios_variables: validatedData.honorarios_variables || null,
+                notas: validatedData.notas || null
+            },
+            include: {
+                categoria: {
+                    select: {
+                        id: true,
+                        nombre: true,
+                        tipo: true,
+                        color: true,
+                        icono: true
+                    }
                 },
-            });
-
-            // Si se proporcionan nuevos perfiles, actualizar
-            if (validatedData.profileIds) {
-                // Desactivar perfiles existentes
-                await tx.project_user_professional_profiles.updateMany({
-                    where: { userId: personalId },
-                    data: { isActive: false },
-                });
-
-                // Crear o reactivar perfiles
-                const perfilesProfesionales = await Promise.all(
-                    validatedData.profileIds.map(async (profile) => {
-                        // Buscar si ya existe el perfil
-                        const existingProfile = await tx.project_user_professional_profiles.findFirst({
-                            where: {
-                                userId: personalId,
-                                profileId: profile,
-                            },
-                        });
-
-                        if (existingProfile) {
-                            // Reactivar y actualizar
-                            return await tx.project_user_professional_profiles.update({
-                                where: { id: existingProfile.id },
-                                data: {
-                                    isActive: true,
-                                    description: validatedData.profileDescriptions?.[profile] || existingProfile.description,
-                                    updatedAt: new Date(),
-                                },
-                            });
-                        } else {
-                            // Crear nuevo
-                            return await tx.project_user_professional_profiles.create({
-                                data: {
-                                    userId: personalId,
-                                    profileId: profile,
-                                    description: validatedData.profileDescriptions?.[profile] || null,
-                                    isActive: true,
-                                },
-                            });
-                        }
-                    })
-                );
-
-                return {
-                    ...usuario,
-                    professional_profiles: perfilesProfesionales,
-                };
+                platformUser: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                        avatarUrl: true
+                    }
+                }
             }
-
-            // Si no se actualizan perfiles, obtener los existentes
-            const perfilesExistentes = await tx.project_user_professional_profiles.findMany({
-                where: { userId: personalId, isActive: true },
-            });
-
-            return {
-                ...usuario,
-                professional_profiles: perfilesExistentes,
-            };
         });
 
-        // 6. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/empleados`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/proveedores`);
-
-        return personalActualizado;
-    });
+        return { success: true, data: personal };
+    } catch (error) {
+        console.error('Error al actualizar personal:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
 }
 
-// Eliminar miembro del personal
+/**
+ * Eliminar personal
+ */
 export async function eliminarPersonal(
     studioSlug: string,
     personalId: string
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
 
-        // 2. Verificar que el personal existe y pertenece al studio
-        const existingPersonal = await prisma.project_users.findFirst({
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Verificar que el personal existe y pertenece al proyecto
+        const existingPersonal = await prisma.project_personal.findFirst({
             where: {
                 id: personalId,
-                projectId: studio.id,
-            },
+                projectId: project.id
+            }
         });
 
         if (!existingPersonal) {
-            throw new Error("El miembro del personal que intentas eliminar no existe o no tienes permisos para eliminarlo");
+            return { success: false, error: 'Personal no encontrado' };
         }
 
-        // 3. Eliminar directamente (simplificado para evitar errores de schema)
-        // TODO: Implementar verificación de relaciones cuando el schema esté sincronizado
-        await prisma.$transaction(async (tx) => {
-            await tx.project_user_professional_profiles.deleteMany({
-                where: { userId: personalId },
-            });
-
-            await tx.project_users.delete({
-                where: { id: personalId },
-            });
+        // Eliminar personal
+        await prisma.project_personal.delete({
+            where: { id: personalId }
         });
 
-        // 4. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/empleados`);
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/personal/proveedores`);
-
-        return {
-            deleted: true,
-            message: "El miembro del personal ha sido eliminado exitosamente",
-        };
-    });
+        return { success: true };
+    } catch (error) {
+        console.error('Error al eliminar personal:', error);
+        return { success: false, error: 'Error interno del servidor' };
+    }
 }
 
-// Obtener estadísticas del personal
-export async function obtenerEstadisticasPersonal(studioSlug: string) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Verificar que el studio existe
-        const studio = await getStudioBySlug(studioSlug);
+// =============================================================================
+// SERVER ACTIONS PARA CATEGORÍAS DE PERSONAL
+// =============================================================================
 
-        // 2. Obtener estadísticas
-        const [totalEmpleados, totalProveedores, totalActivos, totalInactivos, perfilesPorTipo] = await Promise.all([
-            prisma.project_users.count({
-                where: { projectId: studio.id, type: "EMPLEADO" },
-            }),
-            prisma.project_users.count({
-                where: { projectId: studio.id, type: "PROVEEDOR" },
-            }),
-            prisma.project_users.count({
-                where: { projectId: studio.id, isActive: true },
-            }),
-            prisma.project_users.count({
-                where: { projectId: studio.id, isActive: false },
-            }),
-            prisma.project_user_professional_profiles.groupBy({
-                by: ["profileId"],
+/**
+ * Obtener categorías de personal de un proyecto
+ */
+export async function obtenerCategoriasPersonal(studioSlug: string): Promise<CategoriaPersonalListResponse> {
+    try {
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        const categorias = await prisma.project_categorias_personal.findMany({
+            where: { projectId: project.id },
+            include: {
+                _count: {
+                    select: {
+                        personal: true
+                    }
+                }
+            },
+            orderBy: [
+                { tipo: 'asc' },
+                { orden: 'asc' },
+                { nombre: 'asc' }
+            ]
+        });
+
+        return { success: true, data: categorias };
+    } catch (error) {
+        console.error('Error al obtener categorías de personal:', error);
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Crear nueva categoría de personal
+ */
+export async function crearCategoriaPersonal(
+    studioSlug: string,
+    data: any
+): Promise<CategoriaPersonalResponse> {
+    try {
+        // Validar datos
+        const validatedData = createCategoriaPersonalSchema.parse(data);
+
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Verificar que no existe una categoría con el mismo nombre
+        const existingCategoria = await prisma.project_categorias_personal.findFirst({
+            where: {
+                projectId: project.id,
+                nombre: validatedData.nombre
+            }
+        });
+
+        if (existingCategoria) {
+            return { success: false, error: 'Ya existe una categoría con este nombre' };
+        }
+
+        // Crear categoría
+        const categoria = await prisma.project_categorias_personal.create({
+            data: {
+                ...validatedData,
+                projectId: project.id,
+                descripcion: validatedData.descripcion || null,
+                color: validatedData.color || null,
+                icono: validatedData.icono || null
+            },
+            include: {
+                _count: {
+                    select: {
+                        personal: true
+                    }
+                }
+            }
+        });
+
+        return { success: true, data: categoria };
+    } catch (error) {
+        console.error('Error al crear categoría de personal:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Actualizar categoría de personal
+ */
+export async function actualizarCategoriaPersonal(
+    studioSlug: string,
+    categoriaId: string,
+    data: any
+): Promise<CategoriaPersonalResponse> {
+    try {
+        // Validar datos
+        const validatedData = updateCategoriaPersonalSchema.parse({ ...data, id: categoriaId });
+
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Verificar que la categoría existe y pertenece al proyecto
+        const existingCategoria = await prisma.project_categorias_personal.findFirst({
+            where: {
+                id: categoriaId,
+                projectId: project.id
+            }
+        });
+
+        if (!existingCategoria) {
+            return { success: false, error: 'Categoría no encontrada' };
+        }
+
+        // Si se está cambiando el nombre, verificar que no existe otra con el mismo nombre
+        if (validatedData.nombre && validatedData.nombre !== existingCategoria.nombre) {
+            const duplicateCategoria = await prisma.project_categorias_personal.findFirst({
                 where: {
-                    user: { projectId: studio.id },
-                    isActive: true,
-                },
-                _count: { profileId: true },
-            }),
-        ]);
+                    projectId: project.id,
+                    nombre: validatedData.nombre,
+                    id: { not: categoriaId }
+                }
+            });
 
-        return {
-            totalEmpleados,
-            totalProveedores,
-            totalPersonal: totalEmpleados + totalProveedores,
-            totalActivos,
-            totalInactivos,
-            perfilesProfesionales: perfilesPorTipo.reduce((acc, item) => {
-                acc[item.profileId] = item._count.profileId;
-                return acc;
-            }, {} as Record<string, number>),
-        };
-    });
+            if (duplicateCategoria) {
+                return { success: false, error: 'Ya existe una categoría con este nombre' };
+            }
+        }
+
+        // Actualizar categoría
+        const categoria = await prisma.project_categorias_personal.update({
+            where: { id: categoriaId },
+            data: {
+                ...validatedData,
+                descripcion: validatedData.descripcion || null,
+                color: validatedData.color || null,
+                icono: validatedData.icono || null
+            },
+            include: {
+                _count: {
+                    select: {
+                        personal: true
+                    }
+                }
+            }
+        });
+
+        return { success: true, data: categoria };
+    } catch (error) {
+        console.error('Error al actualizar categoría de personal:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Eliminar categoría de personal
+ */
+export async function eliminarCategoriaPersonal(
+    studioSlug: string,
+    categoriaId: string
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Verificar que la categoría existe y pertenece al proyecto
+        const existingCategoria = await prisma.project_categorias_personal.findFirst({
+            where: {
+                id: categoriaId,
+                projectId: project.id
+            },
+            include: {
+                _count: {
+                    select: {
+                        personal: true
+                    }
+                }
+            }
+        });
+
+        if (!existingCategoria) {
+            return { success: false, error: 'Categoría no encontrada' };
+        }
+
+        // Verificar que no hay personal asignado a esta categoría
+        if (existingCategoria._count.personal > 0) {
+            return { success: false, error: 'No se puede eliminar una categoría que tiene personal asignado' };
+        }
+
+        // No permitir eliminar categorías del sistema
+        if (existingCategoria.esDefault) {
+            return { success: false, error: 'No se puede eliminar una categoría del sistema' };
+        }
+
+        // Eliminar categoría
+        await prisma.project_categorias_personal.delete({
+            where: { id: categoriaId }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error al eliminar categoría de personal:', error);
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Actualizar orden de categorías
+ */
+export async function actualizarOrdenCategoriasPersonal(
+    studioSlug: string,
+    data: any
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        // Validar datos
+        const validatedData = updateOrdenCategoriasSchema.parse(data);
+
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Actualizar orden de cada categoría
+        await prisma.$transaction(
+            validatedData.categorias.map(categoria =>
+                prisma.project_categorias_personal.updateMany({
+                    where: {
+                        id: categoria.id,
+                        projectId: project.id
+                    },
+                    data: {
+                        orden: categoria.orden
+                    }
+                })
+            )
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error al actualizar orden de categorías:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+// =============================================================================
+// SERVER ACTIONS PARA PERFILES DE PERSONAL
+// =============================================================================
+
+/**
+ * Obtener todos los perfiles de personal de un proyecto
+ */
+export async function obtenerPerfilesPersonal(studioSlug: string) {
+    try {
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        const perfiles = await prisma.project_perfiles_personal.findMany({
+            where: { projectId: project.id },
+            orderBy: { orden: 'asc' },
+            include: {
+                _count: {
+                    select: {
+                        personal_perfiles: true
+                    }
+                }
+            }
+        });
+
+        return { success: true, data: perfiles };
+    } catch (error) {
+        console.error('Error al obtener perfiles:', error);
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Crear un nuevo perfil de personal
+ */
+export async function crearPerfilPersonal(studioSlug: string, data: any) {
+    try {
+        // Validar datos
+        const validatedData = createPerfilPersonalSchema.parse(data);
+
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        const perfil = await prisma.project_perfiles_personal.create({
+            data: {
+                ...validatedData,
+                projectId: project.id
+            }
+        });
+
+        return { success: true, data: perfil };
+    } catch (error) {
+        console.error('Error al crear perfil:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Actualizar un perfil de personal
+ */
+export async function actualizarPerfilPersonal(studioSlug: string, perfilId: string, data: any) {
+    try {
+        // Validar datos
+        const validatedData = updatePerfilPersonalSchema.parse({ ...data, id: perfilId });
+
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        const perfil = await prisma.project_perfiles_personal.update({
+            where: {
+                id: perfilId,
+                projectId: project.id
+            },
+            data: validatedData
+        });
+
+        return { success: true, data: perfil };
+    } catch (error) {
+        console.error('Error al actualizar perfil:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Eliminar un perfil de personal
+ */
+export async function eliminarPerfilPersonal(studioSlug: string, perfilId: string) {
+    try {
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        await prisma.project_perfiles_personal.delete({
+            where: {
+                id: perfilId,
+                projectId: project.id
+            }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error al eliminar perfil:', error);
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Actualizar orden de perfiles
+ */
+export async function actualizarOrdenPerfilesPersonal(studioSlug: string, data: any) {
+    try {
+        // Validar datos
+        const validatedData = updateOrdenPerfilesSchema.parse(data);
+
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Actualizar orden de cada perfil
+        await Promise.all(
+            validatedData.perfiles.map((perfil) =>
+                prisma.project_perfiles_personal.update({
+                    where: {
+                        id: perfil.id,
+                        projectId: project.id
+                    },
+                    data: { orden: perfil.orden }
+                })
+            )
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error al actualizar orden de perfiles:', error);
+        if (error instanceof Error && error.name === 'ZodError') {
+            return { success: false, error: 'Datos de entrada inválidos' };
+        }
+        return { success: false, error: 'Error interno del servidor' };
+    }
 }

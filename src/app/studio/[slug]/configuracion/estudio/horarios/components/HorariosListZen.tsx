@@ -7,12 +7,13 @@ import { Clock, Plus } from 'lucide-react';
 import { HorariosItemZen } from './HorariosItemZen';
 import { Horario } from '../types';
 import { DIAS_SEMANA } from '../types';
+import { DiaSemana } from '@/lib/actions/schemas/horarios-schemas';
 
 interface HorariosListZenProps {
     horarios: Horario[];
     onToggleHorario: (id: string, activo: boolean) => void;
-    onUpdateHorario: (id: string, data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => void;
-    onAddHorario: (data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => void;
+    onUpdateHorario: (id: string, data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string }) => void;
+    onAddHorario: (data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string; activo: boolean }) => void;
     loading?: boolean;
 }
 
@@ -62,9 +63,10 @@ export function HorariosListZen({
                                 // Agregar el primer día sin horario
                                 const primerDiaSinHorario = diasSinHorarios[0];
                                 onAddHorario({
-                                    dia_semana: primerDiaSinHorario.dia_semana,
+                                    dia_semana: primerDiaSinHorario.dia_semana as DiaSemana,
                                     hora_inicio: primerDiaSinHorario.hora_inicio,
-                                    hora_fin: primerDiaSinHorario.hora_fin
+                                    hora_fin: primerDiaSinHorario.hora_fin,
+                                    activo: true
                                 });
                             }}
                             variant="outline"

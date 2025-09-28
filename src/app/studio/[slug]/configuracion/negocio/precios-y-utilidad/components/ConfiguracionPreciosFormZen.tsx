@@ -9,7 +9,8 @@ import { ZenInput } from '@/components/ui/zen';
 import { ZenButton } from '@/components/ui/zen';
 import { ZenBadge } from '@/components/ui/zen';
 import { ZenLabel } from '@/components/ui/zen';
-import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
+import { SeparadorZen } from '@/components/ui/zen';
+
 import {
     ConfiguracionPreciosSchema,
     type ConfiguracionPreciosForm as ConfiguracionPreciosFormType
@@ -84,7 +85,7 @@ export function ConfiguracionPreciosFormZen({
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitting },
         watch,
     } = useForm<ConfiguracionPreciosFormType>({
         resolver: zodResolver(ConfiguracionPreciosSchema),
@@ -194,22 +195,14 @@ export function ConfiguracionPreciosFormZen({
                 </ZenCard>
             )}
 
-            <HeaderNavigation
-                title="Configuración de Precios"
-                description="Define los porcentajes de utilidad, comisiones y configuraciones de precios para tu negocio"
-                actionButton={{
-                    label: "Guardar Cambios",
-                    onClick: () => handleSubmit(onSubmit)(),
-                    icon: "Save"
-                }}
-            />
+
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Configuración de Precios */}
                 <ZenCard variant="default" padding="lg">
                     <ZenCardContent className="space-y-6">
                         {/* Porcentajes de Utilidad */}
-                        <div>
+                        <div className="relative">
                             <h4 className="text-lg font-medium text-white mb-3 flex items-center gap-2">
                                 <TrendingUp className="h-4 w-4" />
                                 Porcentajes de Utilidad
@@ -233,6 +226,7 @@ export function ConfiguracionPreciosFormZen({
                                 />
                             </div>
                         </div>
+
 
                         {/* Comisiones y Sobreprecio */}
                         <div>
@@ -258,6 +252,25 @@ export function ConfiguracionPreciosFormZen({
                                     placeholder="5"
                                 />
                             </div>
+
+
+                            {/* Separador ZEN */}
+                            <SeparadorZen spacing="lg" variant="subtle" />
+
+                            {/* Botón Guardar Cambios - Esquina inferior derecha */}
+                            <div className="flex justify-end mt-4">
+                                <ZenButton
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                    disabled={isSubmitting}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                >
+                                    <Save className="h-4 w-4 mr-2" />
+                                    {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
+                                </ZenButton>
+                            </div>
+
                         </div>
                     </ZenCardContent>
                 </ZenCard>
@@ -405,6 +418,8 @@ export function ConfiguracionPreciosFormZen({
                         </div>
                     </ZenCardContent>
                 </ZenCard>
+
+
             </form>
         </div>
     );

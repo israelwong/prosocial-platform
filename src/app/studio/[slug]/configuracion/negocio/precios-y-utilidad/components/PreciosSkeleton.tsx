@@ -37,28 +37,6 @@ export function PreciosSkeleton() {
                 </div>
             </ZenCard>
 
-            {/* Comisiones y Sobreprecio Skeleton */}
-            <ZenCard variant="default" padding="lg">
-                <div className="animate-pulse">
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className="h-5 w-5 bg-zinc-700 rounded"></div>
-                        <div className="h-6 bg-zinc-700 rounded w-1/3"></div>
-                    </div>
-                    <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                            <div className="h-4 bg-zinc-700 rounded w-1/3"></div>
-                            <div className="h-10 bg-zinc-700 rounded"></div>
-                            <div className="h-3 bg-zinc-700 rounded w-2/3"></div>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="h-4 bg-zinc-700 rounded w-1/3"></div>
-                            <div className="h-10 bg-zinc-700 rounded"></div>
-                            <div className="h-3 bg-zinc-700 rounded w-2/3"></div>
-                        </div>
-                    </div>
-                </div>
-            </ZenCard>
 
             {/* Preview de Cálculo Skeleton */}
             <ZenCard variant="default" padding="lg">

@@ -24,10 +24,16 @@ async function main() {
     // 7. Seed de métodos de pago
     await seedMetodosPago();
 
-    // 8. Seed de usuarios de plataforma
+    // 8. Seed de categorías de personal
+    await seedCategoriasPersonal();
+
+    // 9. Seed de perfiles de personal
+    await seedPerfilesPersonal();
+
+    // 10. Seed de usuarios de plataforma
     await seedPlatformUsers();
 
-    // 9. Seed de proyecto demo-studio
+    // 11. Seed de proyecto demo-studio
     await seedDemoStudio();
 
     console.log('🎉 Seed completado exitosamente!');
@@ -815,6 +821,235 @@ async function seedMetodosPago() {
     }
 
     console.log('🎉 Métodos de pago seeded successfully!');
+}
+
+async function seedCategoriasPersonal() {
+    console.log('👥 Seeding categorías de personal...');
+
+    // Buscar el proyecto demo-studio
+    const demoProject = await prisma.projects.findUnique({
+        where: { slug: 'demo-studio' }
+    });
+
+    if (!demoProject) {
+        console.log('⚠️ Proyecto demo-studio no encontrado, saltando seed de categorías de personal');
+        return;
+    }
+
+    const categorias = [
+        // OPERATIVO
+        {
+            projectId: demoProject.id,
+            nombre: 'Fotógrafo Principal',
+            descripcion: 'Fotógrafo principal del evento',
+            tipo: 'OPERATIVO' as const,
+            color: '#3B82F6',
+            icono: 'camera',
+            esDefault: true,
+            orden: 1,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Camarógrafo',
+            descripcion: 'Especialista en video y grabación',
+            tipo: 'OPERATIVO' as const,
+            color: '#EF4444',
+            icono: 'video',
+            esDefault: true,
+            orden: 2,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Asistente de Fotografía',
+            descripcion: 'Asistente en sesiones fotográficas',
+            tipo: 'OPERATIVO' as const,
+            color: '#10B981',
+            icono: 'camera',
+            esDefault: true,
+            orden: 3,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Drone Operator',
+            descripcion: 'Especialista en fotografía aérea',
+            tipo: 'OPERATIVO' as const,
+            color: '#8B5CF6',
+            icono: 'drone',
+            esDefault: true,
+            orden: 4,
+            isActive: true
+        },
+        // ADMINISTRATIVO
+        {
+            projectId: demoProject.id,
+            nombre: 'Recepcionista',
+            descripcion: 'Atención al cliente y gestión administrativa',
+            tipo: 'ADMINISTRATIVO' as const,
+            color: '#F59E0B',
+            icono: 'user-check',
+            esDefault: true,
+            orden: 5,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Coordinador de Eventos',
+            descripcion: 'Coordinación y logística de eventos',
+            tipo: 'ADMINISTRATIVO' as const,
+            color: '#06B6D4',
+            icono: 'calendar',
+            esDefault: true,
+            orden: 6,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Editor de Video',
+            descripcion: 'Post-producción y edición de video',
+            tipo: 'ADMINISTRATIVO' as const,
+            color: '#84CC16',
+            icono: 'film',
+            esDefault: true,
+            orden: 7,
+            isActive: true
+        },
+        // PROVEEDOR
+        {
+            projectId: demoProject.id,
+            nombre: 'Proveedor de Impresión',
+            descripcion: 'Servicios de impresión y acabados',
+            tipo: 'PROVEEDOR' as const,
+            color: '#6B7280',
+            icono: 'printer',
+            esDefault: true,
+            orden: 8,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Proveedor de Mesa de Dulces',
+            descripcion: 'Servicios de catering y mesa de dulces',
+            tipo: 'PROVEEDOR' as const,
+            color: '#EC4899',
+            icono: 'cake',
+            esDefault: true,
+            orden: 9,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Proveedor de Decoración',
+            descripcion: 'Servicios de decoración floral y temática',
+            tipo: 'PROVEEDOR' as const,
+            color: '#F97316',
+            icono: 'flower',
+            esDefault: true,
+            orden: 10,
+            isActive: true
+        }
+    ];
+
+    for (const categoria of categorias) {
+        const existingCategoria = await prisma.project_categorias_personal.findFirst({
+            where: {
+                projectId: categoria.projectId,
+                nombre: categoria.nombre
+            }
+        });
+
+        if (!existingCategoria) {
+            await prisma.project_categorias_personal.create({
+                data: categoria
+            });
+            console.log(`✅ Categoría: ${categoria.nombre} (${categoria.tipo})`);
+        } else {
+            console.log(`⚠️ Categoría ya existe: ${categoria.nombre}`);
+        }
+    }
+
+    console.log('🎉 Categorías de personal seeded successfully!');
+}
+
+async function seedPerfilesPersonal() {
+    console.log('👤 Seeding perfiles de personal...');
+
+    // Buscar el proyecto demo-studio
+    const demoProject = await prisma.projects.findUnique({
+        where: { slug: 'demo-studio' }
+    });
+
+    if (!demoProject) {
+        console.log('⚠️ Proyecto demo-studio no encontrado, saltando seed de perfiles de personal');
+        return;
+    }
+
+    const perfiles = [
+        {
+            projectId: demoProject.id,
+            nombre: 'Fotógrafo',
+            descripcion: 'Especialista en fotografía de eventos',
+            orden: 1,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Camarógrafo',
+            descripcion: 'Especialista en grabación de video',
+            orden: 2,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Editor de Video',
+            descripcion: 'Post-producción y edición de video',
+            orden: 3,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Retocador de Fotos',
+            descripcion: 'Edición y retoque fotográfico',
+            orden: 4,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Asistente de Producción',
+            descripcion: 'Apoyo en producción y logística',
+            orden: 5,
+            isActive: true
+        },
+        {
+            projectId: demoProject.id,
+            nombre: 'Drone Operator',
+            descripcion: 'Especialista en fotografía aérea',
+            orden: 6,
+            isActive: true
+        }
+    ];
+
+    for (const perfil of perfiles) {
+        const existingPerfil = await prisma.project_perfiles_personal.findFirst({
+            where: {
+                projectId: perfil.projectId,
+                nombre: perfil.nombre
+            }
+        });
+
+        if (!existingPerfil) {
+            await prisma.project_perfiles_personal.create({
+                data: perfil
+            });
+            console.log(`✅ Perfil: ${perfil.nombre}`);
+        } else {
+            console.log(`⚠️ Perfil ya existe: ${perfil.nombre}`);
+        }
+    }
+
+    console.log('🎉 Perfiles de personal seeded successfully!');
 }
 
 main()

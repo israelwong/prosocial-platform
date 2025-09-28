@@ -9,6 +9,7 @@ export { ZenInput } from './base/ZenInput';
 export { ZenCard, ZenCardHeader, ZenCardContent, ZenCardTitle, ZenCardDescription } from './base/ZenCard';
 export { ZenBadge } from './base/ZenBadge';
 export { ZenLabel } from './base/ZenLabel';
+export { SeparadorZen } from './SeparadorZen';
 
 // =============================================================================
 // FORM COMPONENTS (DISPONIBLES)
@@ -56,6 +57,7 @@ export type { ZenCardProps, ZenCardHeaderProps, ZenCardContentProps, ZenCardTitl
 export type { ZenBadgeProps } from './base/ZenBadge';
 export type { ZenLabelProps } from './base/ZenLabel';
 export type { ZenTextareaProps } from './forms/ZenTextarea';
+export type { SeparadorZenProps } from './SeparadorZen';
 
 // =============================================================================
 // COMPONENTES PENDIENTES (comentados hasta implementación)

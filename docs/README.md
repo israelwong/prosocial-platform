@@ -38,6 +38,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 
 ### 📋 **04-best-practices/** - Mejores Prácticas
 
+- **REGLA_CONSULTA_DOCUMENTACION_OBLIGATORIA.md** - **🚨 CRÍTICO** Regla de consulta obligatoria de documentación
 - **MEJORES_PRACTICAS_COMPONENTES.md** - Mejores prácticas para componentes
 - **PATRON_CREACION_SECCIONES_ADMIN.md** - Patrón para crear secciones admin
 - **TYPESCRIPT_BEST_PRACTICES.md** - Mejores prácticas de TypeScript
@@ -74,23 +75,24 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 
 ### 🚀 **Para Desarrolladores**
 
-1. **[Arquitectura Híbrida RPC/REST](./01-architecture/ARQUITECTURA_HIBRIDA_RPC_REST.md)** - **NUEVA** Arquitectura principal del proyecto
-2. **[Estructura de Server Actions](./01-architecture/ESTRUCTURA_SERVER_ACTIONS.md)** - **NUEVA** Organización por roles
-3. **[Guía de Migración API REST](./02-implementation/GUIA_MIGRACION_API_REST.md)** - **NUEVA** Migración paso a paso
-4. **[Guía de Implementación](./02-implementation/GUIA_IMPLEMENTACION_PASO_A_PASO.md)** - **NUEVA** Implementación detallada
-5. **[Migración a zen.pro](./02-implementation/MIGRACION_ZEN_PRO_DOMAIN.md)** - **NUEVA** Plan completo de migración de dominio
-6. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
-7. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
-8. **[Drag & Drop Anidado](./02-implementation/NESTED_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento anidado
-9. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
-10. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
-11. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
-12. **[Plan de Consistencia de Diseño](./04-best-practices/PLAN_CONSISTENCIA_DISENO.md)** - **NUEVA** Plan para unificar el diseño entre admin, agente y studio
-13. **[Auditoría de Componentes](./04-best-practices/AUDITORIA_COMPONENTES.md)** - **NUEVA** Análisis detallado de inconsistencias actuales
-14. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
-15. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
-16. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
-17. **[Flujo MCP + ZEN](./04-best-practices/MCP_ZEN_WORKFLOW.md)** - **NUEVA** Integración MCP con ZEN Design System
+1. **[🚨 REGLA CRÍTICA: Consulta Obligatoria](./04-best-practices/REGLA_CONSULTA_DOCUMENTACION_OBLIGATORIA.md)** - **OBLIGATORIO** Leer antes de implementar
+2. **[Arquitectura Híbrida RPC/REST](./01-architecture/ARQUITECTURA_HIBRIDA_RPC_REST.md)** - **NUEVA** Arquitectura principal del proyecto
+3. **[Estructura de Server Actions](./01-architecture/ESTRUCTURA_SERVER_ACTIONS.md)** - **NUEVA** Organización por roles
+4. **[Guía de Migración API REST](./02-implementation/GUIA_MIGRACION_API_REST.md)** - **NUEVA** Migración paso a paso
+5. **[Guía de Implementación](./02-implementation/GUIA_IMPLEMENTACION_PASO_A_PASO.md)** - **NUEVA** Implementación detallada
+6. **[Migración a zen.pro](./02-implementation/MIGRACION_ZEN_PRO_DOMAIN.md)** - **NUEVA** Plan completo de migración de dominio
+7. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
+8. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
+9. **[Drag & Drop Anidado](./02-implementation/NESTED_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento anidado
+10. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
+11. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
+12. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
+13. **[Plan de Consistencia de Diseño](./04-best-practices/PLAN_CONSISTENCIA_DISENO.md)** - **NUEVA** Plan para unificar el diseño entre admin, agente y studio
+14. **[Auditoría de Componentes](./04-best-practices/AUDITORIA_COMPONENTES.md)** - **NUEVA** Análisis detallado de inconsistencias actuales
+15. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
+16. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
+17. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
+18. **[Flujo MCP + ZEN](./04-best-practices/MCP_ZEN_WORKFLOW.md)** - **NUEVA** Integración MCP con ZEN Design System
 
 ### 🔧 **Para Troubleshooting**
 
@@ -138,6 +140,20 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 1. **Actualizar** documentación relacionada
 2. **Verificar** que los ejemplos funcionen
 3. **Mantener** consistencia con el estilo
+
+---
+
+## 🚨 **REGLA CRÍTICA - CONSULTA OBLIGATORIA**
+
+### ⚠️ **ANTES DE CUALQUIER IMPLEMENTACIÓN:**
+
+**SIEMPRE consultar la documentación en este orden:**
+
+1. 📋 **`/docs/04-best-practices/`** - Para patrones establecidos
+2. 🔧 **`/docs/02-implementation/`** - Para guías específicas
+3. 🚨 **`/docs/03-troubleshooting/`** - Para problemas conocidos
+
+**📖 Ver:** [REGLA_CONSULTA_DOCUMENTACION_OBLIGATORIA.md](./04-best-practices/REGLA_CONSULTA_DOCUMENTACION_OBLIGATORIA.md)
 
 ---
 

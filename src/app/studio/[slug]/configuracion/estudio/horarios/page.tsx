@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
 import { ZenButton } from '@/components/ui/zen';
-import { RefreshCw, Clock } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { HorariosStatsZen } from './components/HorariosStatsZen';
 import { HorariosListZen } from './components/HorariosListZen';
+import { HorariosSkeletonZen } from './components/HorariosSkeletonZen';
 import { Horario } from './types';
+import { DiaSemana } from '@/lib/actions/schemas/horarios-schemas';
 import {
     obtenerHorariosStudio,
     toggleHorarioEstado,
@@ -107,7 +109,7 @@ export default function HorariosPageZen() {
         }
     };
 
-    const handleUpdateHorario = async (id: string, data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => {
+    const handleUpdateHorario = async (id: string, data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string }) => {
         try {
             // Actualizar optimísticamente
             setHorarios(prev => prev.map(h =>
@@ -128,7 +130,7 @@ export default function HorariosPageZen() {
         }
     };
 
-    const handleAddHorario = async (data: { dia_semana: string; hora_inicio: string; hora_fin: string }) => {
+    const handleAddHorario = async (data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string; activo: boolean }) => {
         try {
             // Crear nuevo horario
             const nuevoHorario = await crearHorario(slug, data);
@@ -162,77 +164,7 @@ export default function HorariosPageZen() {
     }
 
     if (loading) {
-        return (
-            <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
-                {/* Header Navigation Skeleton */}
-                <ZenCard variant="default" padding="lg">
-                    <div className="animate-pulse">
-                        <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                        <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                    </div>
-                </ZenCard>
-
-                {/* Estadísticas Skeleton */}
-                <div className="grid gap-4 md:grid-cols-3">
-                    {[1, 2, 3].map((i) => (
-                        <ZenCard key={i} variant="default" padding="md">
-                            <div className="animate-pulse">
-                                <div className="flex items-center justify-between mb-3">
-                                    <div className="h-4 w-24 bg-zinc-700 rounded" />
-                                    <div className="h-4 w-4 bg-zinc-700 rounded" />
-                                </div>
-                                <div className="h-8 w-16 bg-zinc-700 rounded mb-2" />
-                                <div className="h-3 w-20 bg-zinc-700 rounded" />
-                            </div>
-                        </ZenCard>
-                    ))}
-                </div>
-
-                {/* Lista de Horarios Skeleton */}
-                <ZenCard variant="default" padding="lg">
-                    <div className="animate-pulse">
-                        <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                                <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
-                            </div>
-                            <div className="h-10 bg-zinc-700 rounded w-32"></div>
-                        </div>
-
-                        <div className="space-y-3">
-                            <div className="h-16 bg-zinc-700 rounded"></div>
-                            <div className="h-16 bg-zinc-700 rounded"></div>
-                            <div className="h-16 bg-zinc-700 rounded"></div>
-                        </div>
-                    </div>
-                </ZenCard>
-
-                {/* Información de uso Skeleton */}
-                <ZenCard variant="default" padding="lg">
-                    <div className="animate-pulse">
-                        <div className="h-6 bg-zinc-700 rounded w-1/3 mb-4"></div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
-                                <div className="space-y-1">
-                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
-                                <div className="space-y-1">
-                                    <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                                    <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ZenCard>
-            </div>
-        );
+        return <HorariosSkeletonZen />;
     }
 
     return (
