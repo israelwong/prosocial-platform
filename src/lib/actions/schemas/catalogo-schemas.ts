@@ -45,6 +45,7 @@ export const GastoServicioSchema = z.object({
 
 /**
  * Schema de validación para Servicio
+ * NOTA: utilidad y precio_publico se calculan al vuelo, no se validan/almacenan
  */
 export const ServicioSchema = z.object({
     nombre: z
@@ -60,15 +61,7 @@ export const ServicioSchema = z.object({
         .number()
         .min(0, 'El gasto no puede ser negativo')
         .max(999999.99, 'El gasto es demasiado alto'),
-    utilidad: z
-        .number()
-        .min(0, 'La utilidad no puede ser negativa')
-        .max(999999.99, 'La utilidad es demasiado alta'),
-    precio_publico: z
-        .number()
-        .min(0, 'El precio no puede ser negativo')
-        .max(999999.99, 'El precio es demasiado alto'),
-    tipo_utilidad: z.enum(['servicio', 'porcentaje'], {
+    tipo_utilidad: z.enum(['servicio', 'producto'], {
         errorMap: () => ({ message: 'Tipo de utilidad inválido' }),
     }).default('servicio'),
     servicioCategoriaId: z
@@ -154,6 +147,7 @@ export interface GastoServicioData {
 
 /**
  * Tipo para datos de Servicio
+ * NOTA: utilidad y precio_publico NO se almacenan en BD, se calculan al vuelo
  */
 export interface ServicioData {
     id: string;
@@ -162,8 +156,6 @@ export interface ServicioData {
     nombre: string;
     costo: number;
     gasto: number;
-    utilidad: number;
-    precio_publico: number;
     tipo_utilidad: string;
     orden: number;
     status: string;
@@ -171,6 +163,9 @@ export interface ServicioData {
     updatedAt: Date;
     categoria?: CategoriaData;
     gastos?: GastoServicioData[];
+    // Campos calculados (no almacenados en BD)
+    utilidad?: number;
+    precio_publico?: number;
 }
 
 /**
