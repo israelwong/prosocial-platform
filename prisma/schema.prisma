@@ -439,7 +439,7 @@ model projects {
   metodos_pago             project_metodos_pago[]
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
-  perfiles_personal        project_perfiles_personal[]
+  personal_profiles        project_personal_profiles[]
   personal                 project_personal[]
   redes_sociales           project_redes_sociales[]
   reglas_agendamiento      project_reglas_agendamiento[]
