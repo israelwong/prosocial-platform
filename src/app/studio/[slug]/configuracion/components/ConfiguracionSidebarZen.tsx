@@ -166,7 +166,7 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
     },
     {
         id: 'equipo',
-        title: 'Gestión de Personal',
+        title: 'Personal',
         description: 'Gestiona tu equipo y colaboradores',
         icon: Users2,
         href: `/${studioSlug}/configuracion/equipo`,
@@ -289,7 +289,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                 item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 item.description.toLowerCase().includes(searchTerm.toLowerCase())
             ) || []
-        })).filter(section => 
+        })).filter(section =>
             section.href || (section.items && section.items.length > 0)
         );
     }, [searchTerm, configSections]);
