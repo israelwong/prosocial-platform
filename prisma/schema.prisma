@@ -439,8 +439,8 @@ model projects {
   metodos_pago             project_metodos_pago[]
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
-  personal_profiles        project_personal_profiles[]
   personal                 project_personal[]
+  personal_profiles        project_personal_profiles[]
   redes_sociales           project_redes_sociales[]
   reglas_agendamiento      project_reglas_agendamiento[]
   revenue_transactions     project_revenue_transactions[]
@@ -932,9 +932,9 @@ model project_seccion_categorias {
 model project_servicio_categorias {
   id                   String                         @id @default(cuid())
   nombre               String                         @unique
-  posicion             Int                            @default(0)
+  orden                Int                            @default(0)
   createdAt            DateTime                       @default(now())
-  updatedAt            DateTime
+  updatedAt            DateTime                       @updatedAt
   cotizacion_servicios project_cotizacion_servicios[]
   paquete_servicios    project_paquete_servicios[]
   seccion_categorias   project_seccion_categorias?
@@ -947,23 +947,23 @@ model project_servicio_gastos {
   nombre     String
   costo      Float
   createdAt  DateTime          @default(now())
-  updatedAt  DateTime
-  servicios  project_servicios @relation(fields: [servicioId], references: [id])
+  updatedAt  DateTime          @updatedAt
+  servicios  project_servicios @relation(fields: [servicioId], references: [id], onDelete: Cascade)
 }
 
 model project_servicio_secciones {
   id                 String                       @id @default(cuid())
   nombre             String                       @unique
   descripcion        String?
-  posicion           Int                          @default(0)
+  orden              Int                          @default(0)
   createdAt          DateTime                     @default(now())
-  updatedAt          DateTime
+  updatedAt          DateTime                     @updatedAt
   seccion_categorias project_seccion_categorias[]
 }
 
 model project_servicios {
   id                   String                         @id @default(cuid())
-  projectId            String
+  studioId             String
   servicioCategoriaId  String
   nombre               String
   costo                Float                          @default(0)
@@ -971,18 +971,18 @@ model project_servicios {
   utilidad             Float                          @default(0)
   precio_publico       Float                          @default(0)
   tipo_utilidad        String                         @default("servicio")
-  posicion             Int                            @default(0)
+  orden                Int                            @default(0)
   status               String                         @default("active")
-  visible_cliente      Boolean                        @default(true)
   createdAt            DateTime                       @default(now())
-  updatedAt            DateTime
+  updatedAt            DateTime                       @updatedAt
   cotizacion_servicios project_cotizacion_servicios[]
   paquete_servicios    project_paquete_servicios[]
   servicio_gastos      project_servicio_gastos[]
-  projects             projects                       @relation(fields: [projectId], references: [id])
+  projects             projects                       @relation(fields: [studioId], references: [id], map: "project_servicios_projectId_fkey")
   servicio_categorias  project_servicio_categorias    @relation(fields: [servicioCategoriaId], references: [id])
 
-  @@index([projectId, status])
+  @@index([studioId, status], map: "project_servicios_projectId_status_idx")
+  @@index([studioId, status], map: "project_servicios_studioid_status_idx")
 }
 
 model project_studio_revenue_products {
@@ -1302,26 +1302,26 @@ model project_reglas_agendamiento {
 }
 
 model project_personal {
-  id                   String                      @id @default(cuid())
+  id                   String                                 @id @default(cuid())
   projectId            String
   nombre               String
   email                String?
   telefono             String?
   tipo                 PersonalType
   categoriaId          String
-  status               String                      @default("activo")
+  status               String                                 @default("activo")
   platformUserId       String?
   honorarios_fijos     Float?
   honorarios_variables Float?
-  createdAt            DateTime                    @default(now())
-  updatedAt            DateTime                    @updatedAt
+  createdAt            DateTime                               @default(now())
+  updatedAt            DateTime                               @updatedAt
   cuenta_clabe         String?
   telefono_emergencia  String?
   orden                Int?
   nominas              project_nominas[]
-  platformUser         platform_user_profiles?     @relation(fields: [platformUserId], references: [id])
-  project              projects                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  categoria            project_categorias_personal @relation(fields: [categoriaId], references: [id])
+  categoria            project_categorias_personal            @relation(fields: [categoriaId], references: [id])
+  platformUser         platform_user_profiles?                @relation(fields: [platformUserId], references: [id])
+  project              projects                               @relation(fields: [projectId], references: [id], onDelete: Cascade)
   profile_assignments  project_personal_profile_assignments[]
 
   @@index([telefono_emergencia])
@@ -1356,16 +1356,16 @@ model project_categorias_personal {
 }
 
 model project_personal_profiles {
-  id                String                    @id @default(cuid())
-  projectId         String
-  nombre            String
-  descripcion       String?
-  orden             Int                       @default(0)
-  isActive          Boolean                   @default(true)
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
-  project           projects                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id                   String                                 @id @default(cuid())
+  projectId            String
+  nombre               String
+  descripcion          String?
+  orden                Int                                    @default(0)
+  isActive             Boolean                                @default(true)
+  createdAt            DateTime                               @default(now())
+  updatedAt            DateTime                               @updatedAt
   personal_assignments project_personal_profile_assignments[]
+  project              projects                               @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, nombre])
   @@index([projectId, isActive])
@@ -1377,8 +1377,8 @@ model project_personal_profile_assignments {
   personalId String
   profileId  String
   createdAt  DateTime                  @default(now())
-  profile    project_personal_profiles @relation(fields: [profileId], references: [id], onDelete: Cascade)
   personal   project_personal          @relation(fields: [personalId], references: [id], onDelete: Cascade)
+  profile    project_personal_profiles @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([personalId, profileId])
   @@index([personalId])

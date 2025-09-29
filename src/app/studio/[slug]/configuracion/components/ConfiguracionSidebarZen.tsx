@@ -181,11 +181,12 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
         items: [
             {
                 id: 'servicios',
-                name: 'Servicios',
-                description: 'Gestión de servicios',
-                href: `/${studioSlug}/configuracion/catalogo/servicios`,
+                name: 'Catálogo de Servicios',
+                description: 'Gestión de servicios organizados',
+                href: `/${studioSlug}/configuracion/catalogo`,
                 icon: Zap,
-                completed: false
+                completed: true,
+                badge: 'Nuevo'
             },
             {
                 id: 'paquetes',

@@ -22,6 +22,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **KANBAN_IMPLEMENTATION_GUIDE.md** - Guía completa del Kanban
 - **NESTED_DRAG_DROP_GUIDE.md** - Guía de implementación de drag & drop anidado
 - **SIMPLE_DRAG_DROP_GUIDE.md** - Guía de implementación de drag & drop simple
+- **CATALOGO_IMPLEMENTATION_PLAN.md** - **🚧 NUEVA** Plan completo de implementación del Módulo Catálogo
 - **IMPLEMENTATION_STATUS.md** - Estado actual de implementación
 - **LIMPIEZA_COMPLETADA.md** - Resumen de limpieza de código
 - **SUPABASE_TROUBLESHOOTING.md** - Guía de solución de problemas de Supabase
@@ -81,18 +82,19 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 4. **[Guía de Migración API REST](./02-implementation/GUIA_MIGRACION_API_REST.md)** - **NUEVA** Migración paso a paso
 5. **[Guía de Implementación](./02-implementation/GUIA_IMPLEMENTACION_PASO_A_PASO.md)** - **NUEVA** Implementación detallada
 6. **[Migración a zen.pro](./02-implementation/MIGRACION_ZEN_PRO_DOMAIN.md)** - **NUEVA** Plan completo de migración de dominio
-7. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
-8. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
-9. **[Drag & Drop Anidado](./02-implementation/NESTED_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento anidado
-10. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
-11. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
-12. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
-13. **[Plan de Consistencia de Diseño](./04-best-practices/PLAN_CONSISTENCIA_DISENO.md)** - **NUEVA** Plan para unificar el diseño entre admin, agente y studio
-14. **[Auditoría de Componentes](./04-best-practices/AUDITORIA_COMPONENTES.md)** - **NUEVA** Análisis detallado de inconsistencias actuales
-15. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
-16. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
-17. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
-18. **[Flujo MCP + ZEN](./04-best-practices/MCP_ZEN_WORKFLOW.md)** - **NUEVA** Integración MCP con ZEN Design System
+7. **[🚧 Plan Módulo Catálogo](./02-implementation/CATALOGO_IMPLEMENTATION_PLAN.md)** - **NUEVA** Implementación completa del catálogo de servicios
+8. **[Arquitectura de Roles](./01-architecture/ARQUITECTURA_ROLES.md)** - Entender el sistema de permisos
+9. **[Guía de Kanban](./02-implementation/KANBAN_IMPLEMENTATION_GUIDE.md)** - Implementación del CRM
+10. **[Drag & Drop Anidado](./02-implementation/NESTED_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento anidado
+11. **[Drag & Drop Simple](./02-implementation/SIMPLE_DRAG_DROP_GUIDE.md)** - Implementación de reordenamiento simple
+12. **[Mejores Prácticas](./04-best-practices/MEJORES_PRACTICAS_COMPONENTES.md)** - Estándares de código
+13. **[Patrones de Diseño UI](./04-best-practices/UI_DESIGN_PATTERNS.md)** - Patrones reutilizables para interfaces
+14. **[Plan de Consistencia de Diseño](./04-best-practices/PLAN_CONSISTENCIA_DISENO.md)** - **NUEVA** Plan para unificar el diseño entre admin, agente y studio
+15. **[Auditoría de Componentes](./04-best-practices/AUDITORIA_COMPONENTES.md)** - **NUEVA** Análisis detallado de inconsistencias actuales
+16. **[Metodología de Desarrollo](./04-best-practices/METODOLOGIA_DESARROLLO_SECCIONES.md)** - Metodología automatizada para secciones
+17. **[Comandos de Automatización](./04-best-practices/COMANDOS_AUTOMATIZACION.md)** - Comandos para desarrollo automatizado
+18. **[Automatización Git Avanzada](./04-best-practices/AUTOMATIZACION_GIT_AVANZADA.md)** - Gestión automática de ramas Git
+19. **[Flujo MCP + ZEN](./04-best-practices/MCP_ZEN_WORKFLOW.md)** - **NUEVA** Integración MCP con ZEN Design System
 
 ### 🔧 **Para Troubleshooting**
 
