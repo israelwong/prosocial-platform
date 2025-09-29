@@ -4,18 +4,28 @@ import { z } from 'zod';
 // SCHEMAS PARA GESTIÓN DE PERSONAL SIMPLIFICADA
 // =============================================================================
 
-// Schema para crear personal
+// Schema para crear personal - alineado exactamente con el modelo Prisma
 export const createPersonalSchema = z.object({
+  // Campos básicos requeridos
   nombre: z.string().min(1, 'El nombre es requerido').max(100, 'El nombre es demasiado largo'),
+  categoriaId: z.string().min(1, 'Categoría es requerida'),
+
+  // Campos opcionales que existen en Prisma
   email: z.string().email('Email inválido').optional().or(z.literal('')),
   telefono: z.string().min(10, 'Teléfono debe tener al menos 10 dígitos').optional().or(z.literal('')),
-  tipo: z.enum(['OPERATIVO', 'ADMINISTRATIVO', 'PROVEEDOR'], {
-    errorMap: () => ({ message: 'Tipo de personal inválido' })
-  }),
-  categoriaId: z.string().min(1, 'Categoría es requerida'),
-  status: z.boolean().default(true),
+  tipo: z.enum(['OPERATIVO', 'ADMINISTRATIVO', 'PROVEEDOR']).optional(), // Se obtendrá de la categoría si no se proporciona
+  status: z.enum(['activo', 'inactivo']).default('activo'),
+  telefono_emergencia: z.string().optional().or(z.literal('')),
+  cuenta_clabe: z.string().optional().or(z.literal('')),
+
+  // Campos de integración opcionales
   platformUserId: z.string().optional(),
-  perfilesIds: z.array(z.string()).optional().default([]) // IDs de perfiles asociados
+  honorarios_fijos: z.number().optional(),
+  honorarios_variables: z.number().optional(),
+  orden: z.number().optional(),
+
+  // Campo virtual para manejar perfiles (no existe en Prisma)
+  perfilesIds: z.array(z.string()).optional().default([])
 });
 
 // Schema para actualizar personal
@@ -27,9 +37,7 @@ export const updatePersonalSchema = createPersonalSchema.partial().extend({
 export const createCategoriaPersonalSchema = z.object({
   nombre: z.string().min(1, 'El nombre es requerido').max(50, 'El nombre es demasiado largo'),
   descripcion: z.string().max(200, 'La descripción es demasiado larga').optional(),
-  tipo: z.enum(['OPERATIVO', 'ADMINISTRATIVO', 'PROVEEDOR'], {
-    errorMap: () => ({ message: 'Tipo de categoría inválido' })
-  }),
+  tipo: z.enum(['OPERATIVO', 'ADMINISTRATIVO', 'PROVEEDOR']),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Color debe ser un código hex válido').optional(),
   icono: z.string().max(50, 'Nombre del icono es demasiado largo').optional(),
   esDefault: z.boolean().default(false),
@@ -102,6 +110,9 @@ export interface PersonalData {
   honorarios_fijos?: number | null;
   honorarios_variables?: number | null;
   notas?: string | null;
+  orden?: number | null;
+  telefono_emergencia?: string | null;
+  cuenta_clabe?: string | null;
   createdAt: Date;
   updatedAt: Date;
   categoria: {

@@ -106,46 +106,45 @@ model platform_lead_bitacora {
 }
 
 model platform_leads {
-  id                           String                          @id @default(cuid())
-  name                         String
-  email                        String                          @unique
-  phone                        String
-  studioName                   String?
-  studioSlug                   String?
-  lastContactDate              DateTime?
-  interestedPlan               String?
-  // monthlyBudget                Decimal? //no va
-  avatarUrl                   String? //fot de perfi 
-  probableStartDate            DateTime?
-  agentId                      String?
-  score                        Int?
-  priority                     String                          @default("medium")
-  conversionDate               DateTime?
-  studioId                     String?                         @unique //dería projectid
-  createdAt                    DateTime                        @default(now())
-  updatedAt                    DateTime
-  stageId                      String?
-  acquisitionChannelId         String?
-  campaignId                   String?                         @map("campañaId")
-  agentConversionId            String?
-  firstInteractionDate         DateTime?
-  originalSource               String?
-  conversionMethod             String?
-  interactionCount             Int?                            @default(0)
-  leadType                     String?                         @default("prospect")
-  utm_campaign                 String?
-  utm_medium                   String?
-  utm_source                   String?
-  platform_activities          platform_activities[]
-  agent_discount_codes         platform_agent_discount_codes[]
-  discount_usage               platform_discount_usage[]
-  platform_lead_bitacora       platform_lead_bitacora[]
-  platform_agents              platform_agents?                @relation(fields: [agentId], references: [id])
-  platform_campaigns           platform_campaigns?             @relation(fields: [campaignId], references: [id])
-  platform_acquisition_channels platform_acquisition_channels?   @relation(fields: [acquisitionChannelId], references: [id])
-  platform_pipeline_stages     platform_pipeline_stages?       @relation(fields: [stageId], references: [id])
-  studios                      projects?                       @relation(fields: [studioId], references: [id])
-  platform_notifications       platform_notifications[]
+  id                            String                          @id @default(cuid())
+  name                          String
+  email                         String                          @unique
+  phone                         String
+  studioName                    String?
+  studioSlug                    String?
+  lastContactDate               DateTime?
+  interestedPlan                String?
+  avatarUrl                     String?
+  probableStartDate             DateTime?
+  agentId                       String?
+  score                         Int?
+  priority                      String                          @default("medium")
+  conversionDate                DateTime?
+  studioId                      String?                         @unique
+  createdAt                     DateTime                        @default(now())
+  updatedAt                     DateTime
+  stageId                       String?
+  acquisitionChannelId          String?
+  campaignId                    String?                         @map("campañaId")
+  agentConversionId             String?
+  firstInteractionDate          DateTime?
+  originalSource                String?
+  conversionMethod              String?
+  interactionCount              Int?                            @default(0)
+  leadType                      String?                         @default("prospect")
+  utm_campaign                  String?
+  utm_medium                    String?
+  utm_source                    String?
+  platform_activities           platform_activities[]
+  agent_discount_codes          platform_agent_discount_codes[]
+  discount_usage                platform_discount_usage[]
+  platform_lead_bitacora        platform_lead_bitacora[]
+  platform_acquisition_channels platform_acquisition_channels?  @relation(fields: [acquisitionChannelId], references: [id])
+  platform_agents               platform_agents?                @relation(fields: [agentId], references: [id])
+  platform_campaigns            platform_campaigns?             @relation(fields: [campaignId], references: [id])
+  platform_pipeline_stages      platform_pipeline_stages?       @relation(fields: [stageId], references: [id])
+  studios                       projects?                       @relation(fields: [studioId], references: [id])
+  platform_notifications        platform_notifications[]
 
   @@index([agentId])
   @@index([campaignId])
@@ -215,16 +214,16 @@ model platform_pipeline_stages {
 }
 
 model platform_advertising_platforms {
-  id                           String                         @id @default(cuid())
-  name                         String                         @unique
-  description                  String?
-  type                         String
-  color                        String?
-  icon                         String?
-  isActive                     Boolean                        @default(true)
-  order                        Int                            @default(0)
-  createdAt                    DateTime                       @default(now())
-  updatedAt                    DateTime
+  id                          String                        @id @default(cuid())
+  name                        String                        @unique
+  description                 String?
+  type                        String
+  color                       String?
+  icon                        String?
+  isActive                    Boolean                       @default(true)
+  order                       Int                           @default(0)
+  createdAt                   DateTime                      @default(now())
+  updatedAt                   DateTime
   platform_campaign_platforms platform_campaign_platforms[]
 
   @@index([isActive])
@@ -290,15 +289,15 @@ model platform_agents {
 }
 
 model platform_campaign_platforms {
-  id                              String                          @id @default(cuid())
-  campaignId                      String                          @map("campañaId")
-  platformId                      String
-  budget                          Decimal
-  actualSpend                     Decimal                         @default(0)
-  leads                           Int                             @default(0)
-  conversions                     Int                             @default(0)
-  createdAt                       DateTime                        @default(now())
-  updatedAt                       DateTime
+  id                             String                         @id @default(cuid())
+  campaignId                     String                         @map("campañaId")
+  platformId                     String
+  budget                         Decimal
+  actualSpend                    Decimal                        @default(0)
+  leads                          Int                            @default(0)
+  conversions                    Int                            @default(0)
+  createdAt                      DateTime                       @default(now())
+  updatedAt                      DateTime
   platform_campaigns             platform_campaigns             @relation(fields: [campaignId], references: [id], onDelete: Cascade)
   platform_advertising_platforms platform_advertising_platforms @relation(fields: [platformId], references: [id])
 
@@ -308,23 +307,23 @@ model platform_campaign_platforms {
 }
 
 model platform_campaigns {
-  id                           String                         @id @default(cuid())
-  name                         String
-  description                  String?
-  totalBudget                  Decimal
-  startDate                    DateTime
-  endDate                      DateTime
-  isActive                     Boolean                        @default(true)
-  status                       String                         @default("planned")
-  leadsGenerated               Int                            @default(0)
-  leadsSubscribed              Int                            @default(0)
-  actualSpend                  Decimal                        @default(0)
-  projectId                    String?
-  createdAt                    DateTime                       @default(now())
-  updatedAt                    DateTime
+  id                          String                        @id @default(cuid())
+  name                        String
+  description                 String?
+  totalBudget                 Decimal
+  startDate                   DateTime
+  endDate                     DateTime
+  isActive                    Boolean                       @default(true)
+  status                      String                        @default("planned")
+  leadsGenerated              Int                           @default(0)
+  leadsSubscribed             Int                           @default(0)
+  actualSpend                 Decimal                       @default(0)
+  projectId                   String?
+  createdAt                   DateTime                      @default(now())
+  updatedAt                   DateTime
   platform_campaign_platforms platform_campaign_platforms[]
-  projects                     projects?                      @relation(fields: [projectId], references: [id])
-  platform_leads               platform_leads[]
+  projects                    projects?                     @relation(fields: [projectId], references: [id])
+  platform_leads              platform_leads[]
 
   @@index([startDate, endDate])
   @@index([isActive])
@@ -426,51 +425,51 @@ model projects {
   slogan                   String?
   platform_campaigns       platform_campaigns[]
   platform_leads           platform_leads?
+  platform_user_profiles   platform_user_profiles[]
   agenda                   project_agenda[]
+  categorias_personal      project_categorias_personal[]
   clientes                 project_clientes[]
   condiciones_comerciales  project_condiciones_comerciales[]
   configuraciones          project_configuraciones[]
   cotizaciones             project_cotizaciones[]
+  cuentas_bancarias        project_cuentas_bancarias[]
   eventos                  project_eventos[]
   gastos                   project_gastos[]
   horarios_atencion        project_horarios_atencion[]
   metodos_pago             project_metodos_pago[]
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
+  perfiles_personal        project_perfiles_personal[]
+  personal                 project_personal[]
   redes_sociales           project_redes_sociales[]
-  cuentas_bancarias        project_cuentas_bancarias[]      // ✅ Cuentas bancarias del estudio
-  reglas_agendamiento      project_reglas_agendamiento[]    // ✅ Reglas de agendamiento
-  personal                 project_personal[]              // ✅ Personal del estudio
-  categorias_personal      project_categorias_personal[]   // ✅ Categorías de personal
-  perfiles_personal        project_perfiles_personal[]    // ✅ Perfiles de personal
+  reglas_agendamiento      project_reglas_agendamiento[]
   revenue_transactions     project_revenue_transactions[]
   servicios                project_servicios[]
   studio_revenue_products  project_studio_revenue_products[]
   telefonos                project_telefonos[]
   user_profiles            project_user_profiles[]
   studio_users             project_users[]
-  setup_status             studio_setup_status?             // ✅ Estado de configuración del estudio
   plans                    platform_plans?                   @relation(fields: [planId], references: [id])
+  setup_status             studio_setup_status?
   subscriptions            subscriptions[]
-  platform_user_profiles   platform_user_profiles[]         // Usuarios del proyecto
 
   @@index([planId])
   @@index([slug])
 }
 
 model project_configuraciones {
-  id                          String   @id @default(cuid())
-  projectId                   String
-  nombre                      String
-  utilidad_servicio           Float
-  utilidad_producto           Float
-  comision_venta              Float
-  sobreprecio                 Float
-  claveAutorizacion           String?
-  status                      String   @default("active")
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime
-  projects                    projects @relation(fields: [projectId], references: [id])
+  id                String   @id @default(cuid())
+  projectId         String
+  nombre            String
+  utilidad_servicio Float
+  utilidad_producto Float
+  comision_venta    Float
+  sobreprecio       Float
+  claveAutorizacion String?
+  status            String   @default("active")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime
+  projects          projects @relation(fields: [projectId], references: [id])
 
   @@index([projectId])
 }
@@ -505,22 +504,22 @@ model project_agenda_tipos {
 }
 
 model project_clientes {
-  id            String            @id @default(cuid())
-  projectId     String
-  platformUserId String?         // FK a platform_user_profiles (opcional)
-  nombre        String
-  email         String
-  telefono      String
-  direccion     String?
-  status        String            @default("activo")
-  isActive      Boolean           @default(true)
-  lastLogin     DateTime?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime
-  projects      projects          @relation(fields: [projectId], references: [id])
+  id                     String                  @id @default(cuid())
+  projectId              String
+  platformUserId         String?
+  nombre                 String
+  email                  String
+  telefono               String
+  direccion              String?
+  status                 String                  @default("activo")
+  isActive               Boolean                 @default(true)
+  lastLogin              DateTime?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime
   platform_user_profiles platform_user_profiles? @relation(fields: [platformUserId], references: [id])
-  eventos       project_eventos[]
-  pagos         project_pagos[]
+  projects               projects                @relation(fields: [projectId], references: [id])
+  eventos                project_eventos[]
+  pagos                  project_pagos[]
 
   @@index([projectId, email])
   @@index([projectId, status])
@@ -533,7 +532,7 @@ model project_condiciones_comerciales {
   projectId                           String
   nombre                              String
   descripcion                         String?
-  porcentaje_descuento                           Float?
+  porcentaje_descuento                Float?
   porcentaje_anticipo                 Float?                                        @default(0)
   status                              String                                        @default("active")
   orden                               Int?                                          @default(0)
@@ -784,7 +783,6 @@ model project_nominas {
   id                                                  String                     @id @default(cuid())
   projectId                                           String
   userId                                              String
-  personalId                                          String?                    // FK a project_personal (opcional)
   eventoId                                            String?
   concepto                                            String
   descripcion                                         String?
@@ -807,13 +805,14 @@ model project_nominas {
   comision_porcentaje                                 Float?
   createdAt                                           DateTime                   @default(now())
   updatedAt                                           DateTime
+  personalId                                          String?
   nomina_servicios                                    project_nomina_servicios[]
   project_users_nominas_autorizado_porToproject_users project_users?             @relation("nominas_autorizado_porToproject_users", fields: [autorizado_por], references: [id])
   eventos                                             project_eventos?           @relation(fields: [eventoId], references: [id])
   project_users_nominas_pagado_porToproject_users     project_users?             @relation("nominas_pagado_porToproject_users", fields: [pagado_por], references: [id])
+  personal                                            project_personal?          @relation(fields: [personalId], references: [id])
   projects                                            projects                   @relation(fields: [projectId], references: [id])
   project_users_nominas_userIdToproject_users         project_users              @relation("nominas_userIdToproject_users", fields: [userId], references: [id])
-  personal                                            project_personal?          @relation(fields: [personalId], references: [id])
 
   @@index([projectId])
 }
@@ -986,8 +985,6 @@ model project_servicios {
   @@index([projectId, status])
 }
 
-// project_sesiones eliminado - Supabase Auth maneja las sesiones
-
 model project_studio_revenue_products {
   id                  String                   @id @default(cuid())
   projectId           String
@@ -1010,17 +1007,15 @@ model project_studio_revenue_products {
 model project_users {
   id                                            String                         @id @default(cuid())
   projectId                                     String
-  platformUserId                                String?                        // FK a platform_user_profiles (opcional)
+  platformUserId                                String?
   fullName                                      String
   phone                                         String?
-  type                                          PersonnelType                  // EMPLEADO | PROVEEDOR
+  type                                          PersonnelType
   role                                          String                         @default("user")
   status                                        String                         @default("inactive")
   isActive                                      Boolean                        @default(true)
   createdAt                                     DateTime                       @default(now())
   updatedAt                                     DateTime                       @updatedAt
-
-  // Relaciones operativas existentes
   agenda                                        project_agenda[]
   cotizacion_servicios                          project_cotizacion_servicios[]
   eventos                                       project_eventos[]
@@ -1029,9 +1024,8 @@ model project_users {
   nominas_nominas_pagado_porToproject_users     project_nominas[]              @relation("nominas_pagado_porToproject_users")
   nominas_nominas_userIdToproject_users         project_nominas[]              @relation("nominas_userIdToproject_users")
   pagos                                         project_pagos[]
-  projects                                      projects                       @relation(fields: [projectId], references: [id])
   platform_user_profiles                        platform_user_profiles?        @relation(fields: [platformUserId], references: [id])
-
+  projects                                      projects                       @relation(fields: [projectId], references: [id])
 
   @@index([projectId, status])
   @@index([type])
@@ -1039,22 +1033,21 @@ model project_users {
   @@index([platformUserId])
 }
 
-
 model platform_user_profiles {
-  id                     String                   @id @default(cuid())
-  supabaseUserId         String?                  @unique // FK a auth.users.id
-  email                  String                   @unique
-  role                   UserRole
-  fullName               String?
-  avatarUrl              String?
-  isActive               Boolean                  @default(true)
-  projectId              String?                 // FK a projects (para roles locales)
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime
-  projects               projects?                @relation(fields: [projectId], references: [id])
-  project_users          project_users[]          // Personal del proyecto
-  project_clientes       project_clientes[]      // Clientes del proyecto
-  project_personal       project_personal[]      // Personal del proyecto (nueva estructura)
+  id               String             @id @default(cuid())
+  supabaseUserId   String?            @unique
+  email            String             @unique
+  role             UserRole
+  fullName         String?
+  avatarUrl        String?
+  isActive         Boolean            @default(true)
+  projectId        String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  projects         projects?          @relation(fields: [projectId], references: [id])
+  project_clientes project_clientes[]
+  project_personal project_personal[]
+  project_users    project_users[]
 
   @@index([email])
   @@index([role])
@@ -1062,7 +1055,6 @@ model platform_user_profiles {
   @@index([supabaseUserId])
 }
 
-// Mantener project_user_profiles para compatibilidad temporal
 model project_user_profiles {
   id                     String                   @id @default(cuid())
   email                  String                   @unique
@@ -1145,8 +1137,8 @@ model project_telefonos {
   activo    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  projects  projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
   order     Int      @default(0)
+  projects  projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
   @@index([projectId, activo])
@@ -1187,16 +1179,16 @@ model platform_social_networks {
 }
 
 model project_redes_sociales {
-  id           String                               @id @default(cuid())
+  id           String                    @id @default(cuid())
   projectId    String
   plataformaId String?
   url          String
-  activo       Boolean                              @default(true)
-  order        Int                                  @default(0)
-  createdAt    DateTime                             @default(now())
-  updatedAt    DateTime                             @updatedAt
+  activo       Boolean                   @default(true)
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  order        Int                       @default(0)
   plataforma   platform_social_networks? @relation(fields: [plataformaId], references: [id])
-  projects     projects                             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projects     projects                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, plataformaId])
   @@index([projectId])
@@ -1204,21 +1196,193 @@ model project_redes_sociales {
 }
 
 model project_cuentas_bancarias {
-  id            String    @id @default(cuid())
-  projectId     String
-  banco         String
-  numeroCuenta  String
-  tipoCuenta    String    // 'corriente' | 'ahorro'
-  titular       String
-  activo        Boolean   @default(true)
-  esPrincipal   Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  projects      projects  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  projectId    String
+  banco        String
+  numeroCuenta String
+  tipoCuenta   String
+  titular      String
+  activo       Boolean  @default(true)
+  esPrincipal  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  projects     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
   @@index([activo])
   @@index([esPrincipal])
+}
+
+model studio_setup_status {
+  id                String                   @id @default(cuid())
+  projectId         String                   @unique
+  overallProgress   Int                      @default(0)
+  isFullyConfigured Boolean                  @default(false)
+  lastValidatedAt   DateTime                 @default(now())
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+  sections          setup_section_progress[]
+  project           projects                 @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([isFullyConfigured])
+  @@index([overallProgress])
+}
+
+model setup_section_progress {
+  id                   String              @id @default(cuid())
+  setupStatusId        String
+  sectionId            String
+  sectionName          String
+  status               String
+  completionPercentage Int                 @default(0)
+  completedFields      Json
+  missingFields        Json
+  errors               Json?
+  completedAt          DateTime?
+  lastUpdatedAt        DateTime            @default(now())
+  setupStatus          studio_setup_status @relation(fields: [setupStatusId], references: [id], onDelete: Cascade)
+
+  @@unique([setupStatusId, sectionId])
+  @@index([sectionId])
+  @@index([status])
+  @@index([completionPercentage])
+}
+
+model setup_section_config {
+  id             String   @id @default(cuid())
+  sectionId      String   @unique
+  sectionName    String
+  description    String
+  requiredFields Json
+  optionalFields Json
+  dependencies   Json
+  weight         Int      @default(10)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([sectionId])
+  @@index([isActive])
+}
+
+model setup_progress_log {
+  id        String   @id @default(cuid())
+  projectId String
+  sectionId String?
+  action    String
+  oldStatus String?
+  newStatus String?
+  details   Json?
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([sectionId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model project_reglas_agendamiento {
+  id                 String   @id @default(cuid())
+  projectId          String
+  nombre             String
+  descripcion        String?
+  recurrencia        String
+  capacidadOperativa Int      @default(1)
+  status             String   @default("active")
+  orden              Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  projects           projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([status])
+  @@index([orden])
+}
+
+model project_personal {
+  id                   String                      @id @default(cuid())
+  projectId            String
+  nombre               String
+  email                String?
+  telefono             String?
+  tipo                 PersonalType
+  categoriaId          String
+  status               String                      @default("activo")
+  platformUserId       String?
+  honorarios_fijos     Float?
+  honorarios_variables Float?
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
+  cuenta_clabe         String?
+  telefono_emergencia  String?
+  orden                Int?
+  nominas              project_nominas[]
+  categoria            project_categorias_personal @relation(fields: [categoriaId], references: [id])
+  platformUser         platform_user_profiles?     @relation(fields: [platformUserId], references: [id])
+  project              projects                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  personal_perfiles    project_personal_perfil[]
+
+  @@index([telefono_emergencia])
+  @@index([cuenta_clabe])
+  @@index([projectId])
+  @@index([tipo])
+  @@index([status])
+  @@index([platformUserId])
+}
+
+model project_categorias_personal {
+  id          String             @id @default(cuid())
+  projectId   String
+  nombre      String
+  descripcion String?
+  tipo        PersonalType
+  color       String?
+  icono       String?
+  esDefault   Boolean            @default(false)
+  orden       Int                @default(0)
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  project     projects           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  personal    project_personal[]
+
+  @@unique([projectId, nombre])
+  @@index([projectId, tipo])
+  @@index([projectId, isActive])
+  @@index([esDefault])
+  @@index([orden])
+}
+
+model project_perfiles_personal {
+  id                String                    @id @default(cuid())
+  projectId         String
+  nombre            String
+  descripcion       String?
+  orden             Int                       @default(0)
+  isActive          Boolean                   @default(true)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  project           projects                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  personal_perfiles project_personal_perfil[]
+
+  @@unique([projectId, nombre])
+  @@index([projectId, isActive])
+  @@index([orden])
+}
+
+model project_personal_perfil {
+  id         String                    @id @default(cuid())
+  personalId String
+  perfilId   String
+  createdAt  DateTime                  @default(now())
+  perfil     project_perfiles_personal @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  personal   project_personal          @relation(fields: [personalId], references: [id], onDelete: Cascade)
+
+  @@unique([personalId, perfilId])
+  @@index([personalId])
+  @@index([perfilId])
 }
 
 enum PlatformLeadBitacoraTipo {
@@ -1281,210 +1445,8 @@ enum PersonnelType {
   PROVEEDOR
 }
 
-// ========================================
-// SISTEMA DE PROGRESO DE CONFIGURACIÓN
-// ========================================
-
-// Estado general de configuración del estudio
-model studio_setup_status {
-  id                String   @id @default(cuid())
-  projectId         String   @unique
-  overallProgress   Int      @default(0) // 0-100
-  isFullyConfigured Boolean  @default(false)
-  lastValidatedAt   DateTime @default(now())
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  
-  // Relación con proyecto
-  project           projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  // Relación con secciones
-  sections          setup_section_progress[]
-  
-  @@index([projectId])
-  @@index([isFullyConfigured])
-  @@index([overallProgress])
-}
-
-// Progreso de cada sección específica
-model setup_section_progress {
-  id                    String   @id @default(cuid())
-  setupStatusId         String
-  sectionId             String
-  sectionName           String
-  status                String   // 'pending' | 'in_progress' | 'completed' | 'error'
-  completionPercentage  Int      @default(0) // 0-100
-  completedFields       Json     // Array de campos completados
-  missingFields         Json     // Array de campos faltantes
-  errors                Json?    // Array de errores
-  completedAt           DateTime?
-  lastUpdatedAt         DateTime @default(now())
-  
-  // Relación con estado general
-  setupStatus           studio_setup_status @relation(fields: [setupStatusId], references: [id], onDelete: Cascade)
-  
-  @@unique([setupStatusId, sectionId])
-  @@index([sectionId])
-  @@index([status])
-  @@index([completionPercentage])
-}
-
-// Configuración de secciones (tabla de configuración)
-model setup_section_config {
-  id              String   @id @default(cuid())
-  sectionId       String   @unique
-  sectionName     String
-  description     String
-  requiredFields  Json     // Array de campos requeridos
-  optionalFields  Json     // Array de campos opcionales
-  dependencies    Json     // Array de secciones que deben completarse antes
-  weight          Int      @default(10) // Peso para calcular progreso general
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@index([sectionId])
-  @@index([isActive])
-}
-
-// Log de cambios para trazabilidad
-model setup_progress_log {
-  id              String   @id @default(cuid())
-  projectId       String
-  sectionId       String?
-  action          String   // 'created' | 'updated' | 'completed' | 'error'
-  oldStatus       String?
-  newStatus       String?
-  details         Json?    // Detalles adicionales del cambio
-  source          String   // 'manual' | 'ai' | 'system'
-  createdAt       DateTime @default(now())
-  
-  @@index([projectId])
-  @@index([sectionId])
-  @@index([action])
-  @@index([createdAt])
-}
-
-model project_reglas_agendamiento {
-  id                  String   @id @default(cuid())
-  projectId           String
-  nombre              String
-  descripcion         String?
-  recurrencia         String   // 'por_dia' | 'por_hora'
-  capacidadOperativa  Int      @default(1)
-  status              String   @default("active") // 'active' | 'inactive'
-  orden               Int      @default(0)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  // Relaciones
-  projects            projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@index([projectId])
-  @@index([status])
-  @@index([orden])
-}
-
-// =============================================================================
-// GESTIÓN DE PERSONAL SIMPLIFICADA
-// =============================================================================
-
-model project_personal {
-  id                    String   @id @default(cuid())
-  projectId            String
-  nombre               String
-  email                String?
-  telefono             String?
-  tipo                 PersonalType  // OPERATIVO | ADMINISTRATIVO | PROVEEDOR
-  categoriaId          String        // FK a project_categorias_personal
-  status               String        @default("activo") // activo | inactivo
-  
-  // Integración con autenticación (opcional)
-  platformUserId       String?       // FK a platform_user_profiles (opcional)
-  
-  // Campos específicos por tipo
-  honorarios_fijos     Float?        // Para administrativos
-  honorarios_variables   Float?        // Para operativos/proveedores
-  notas                 String?
-  
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @updatedAt
-
-  // Relaciones
-  project              projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  categoria            project_categorias_personal @relation(fields: [categoriaId], references: [id])
-  platformUser         platform_user_profiles? @relation(fields: [platformUserId], references: [id])
-  nominas              project_nominas[]
-  personal_perfiles    project_personal_perfil[]
-
-  @@index([projectId])
-  @@index([tipo])
-  @@index([status])
-  @@index([platformUserId])
-}
-
-model project_categorias_personal {
-  id          String   @id @default(cuid())
-  projectId   String
-  nombre      String   // "Fotógrafo", "Camarógrafo", "Recepcionista"
-  descripcion String?
-  tipo        PersonalType  // OPERATIVO | ADMINISTRATIVO | PROVEEDOR
-  color       String?       // Color para UI (hex)
-  icono       String?       // Icono Lucide
-  esDefault   Boolean       @default(false) // Categorías del sistema
-  orden       Int           @default(0)
-  isActive    Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  // Relaciones
-  project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  personal    project_personal[]
-
-  @@unique([projectId, nombre])
-  @@index([projectId, tipo])
-  @@index([projectId, isActive])
-  @@index([esDefault])
-  @@index([orden])
-}
-
-model project_perfiles_personal {
-  id          String   @id @default(cuid())
-  projectId   String
-  nombre      String   // "Fotógrafo", "Camarógrafo", "Editor de Video"
-  descripcion String?
-  orden       Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relaciones
-  project     projects @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  personal_perfiles project_personal_perfil[]
-
-  @@unique([projectId, nombre])
-  @@index([projectId, isActive])
-  @@index([orden])
-}
-
-model project_personal_perfil {
-  id          String   @id @default(cuid())
-  personalId  String
-  perfilId    String
-  createdAt   DateTime @default(now())
-
-  // Relaciones
-  personal    project_personal @relation(fields: [personalId], references: [id], onDelete: Cascade)
-  perfil      project_perfiles_personal @relation(fields: [perfilId], references: [id], onDelete: Cascade)
-
-  @@unique([personalId, perfilId])
-  @@index([personalId])
-  @@index([perfilId])
-}
-
 enum PersonalType {
-  OPERATIVO      // Fotógrafos, camarógrafos, operadores
-  ADMINISTRATIVO // Recepcionistas, administradores
-  PROVEEDOR      // Impresión, mesa de dulces, etc.
+  OPERATIVO
+  ADMINISTRATIVO
+  PROVEEDOR
 }
-

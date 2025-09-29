@@ -1,16 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { Save, X } from 'lucide-react';
 import {
     ZenButton,
-    ZenInput,
-    ZenTextarea,
-    ZenCard,
-    ZenCardContent
+    ZenInput
 } from '@/components/ui/zen';
 import {
     Dialog,
@@ -18,13 +15,25 @@ import {
     DialogHeader,
     DialogTitle
 } from '@/components/ui/shadcn/dialog';
+import { Switch } from '@/components/ui/shadcn/switch';
+import { z } from 'zod';
 import {
-    createPersonalSchema,
-    updatePersonalSchema,
-    type CreatePersonalData,
-    type UpdatePersonalData,
     type PersonalData
 } from '@/lib/actions/schemas/personal-schemas';
+
+// Esquema de validación simplificado para el formulario
+const formPersonalSchema = z.object({
+    nombre: z.string().min(1, 'El nombre es requerido'),
+    email: z.string().email('Email inválido'),
+    telefono: z.string().min(1, 'El teléfono es requerido'),
+    categoriaId: z.string().min(1, 'La categoría es requerida'),
+    status: z.boolean(), // En el formulario seguimos usando boolean para el switch
+    telefono_emergencia: z.string().optional(),
+    cuenta_clabe: z.string().optional()
+});
+
+// Tipo temporal para el formulario con campos adicionales
+type FormPersonalData = z.infer<typeof formPersonalSchema>;
 import {
     crearPersonal,
     actualizarPersonal
@@ -60,38 +69,33 @@ export function PersonalForm({
         register,
         handleSubmit,
         formState: { errors },
-        reset,
-        watch
-    } = useForm<CreatePersonalData | UpdatePersonalData>({
-        resolver: zodResolver(isEditing ? updatePersonalSchema : createPersonalSchema),
+        watch,
+        setValue
+    } = useForm<FormPersonalData>({
+        resolver: zodResolver(formPersonalSchema),
         defaultValues: isEditing ? {
             nombre: personal.nombre,
             email: personal.email || '',
             telefono: personal.telefono || '',
-            tipo: personal.tipo,
             categoriaId: personal.categoriaId,
-            status: personal.status,
-            platformUserId: personal.platformUserId || '',
-            honorarios_fijos: personal.honorarios_fijos || undefined,
-            honorarios_variables: personal.honorarios_variables || undefined,
-            notas: personal.notas || ''
+            status: personal.status === 'activo',
+            telefono_emergencia: '',
+            cuenta_clabe: ''
         } : {
-            tipo: 'OPERATIVO',
-            status: 'activo'
+            nombre: '',
+            email: '',
+            telefono: '',
+            categoriaId: '',
+            status: true,
+            telefono_emergencia: '',
+            cuenta_clabe: ''
         }
     });
 
-    const tipoSeleccionado = watch('tipo');
+    const statusValue = watch('status');
 
-    // Cargar categorías y perfiles
-    useEffect(() => {
-        if (isOpen) {
-            cargarCategorias();
-            cargarPerfiles();
-        }
-    }, [isOpen]);
-
-    const cargarCategorias = async () => {
+    // Definir funciones de carga con useCallback
+    const cargarCategorias = useCallback(async () => {
         try {
             const result = await obtenerCategoriasPersonal(studioSlug);
             if (result.success && result.data) {
@@ -100,9 +104,9 @@ export function PersonalForm({
         } catch (error) {
             console.error('Error al cargar categorías:', error);
         }
-    };
+    }, [studioSlug]);
 
-    const cargarPerfiles = async () => {
+    const cargarPerfiles = useCallback(async () => {
         try {
             const result = await obtenerPerfilesPersonal(studioSlug);
             if (result.success && result.data) {
@@ -111,26 +115,49 @@ export function PersonalForm({
         } catch (error) {
             console.error('Error al cargar perfiles:', error);
         }
-    };
+    }, [studioSlug]);
 
-    const onSubmit = async (data: CreatePersonalData | UpdatePersonalData) => {
+    // Cargar categorías y perfiles
+    useEffect(() => {
+        if (isOpen) {
+            cargarCategorias();
+            cargarPerfiles();
+
+            // Cargar perfiles seleccionados si estamos editando
+            if (isEditing && personal) {
+                // Nota: Necesitaremos ajustar esto según la estructura real de datos
+                setPerfilesSeleccionados([]);
+            } else {
+                setPerfilesSeleccionados([]);
+            }
+        }
+    }, [isOpen, isEditing, personal, cargarCategorias, cargarPerfiles]);
+
+    const onSubmit = async (data: FormPersonalData) => {
         setLoading(true);
         const loadingToast = toast.loading(
             isEditing ? 'Actualizando personal...' : 'Creando personal...'
         );
 
         try {
-            // Incluir perfiles seleccionados en los datos
-            const dataConPerfiles = {
-                ...data,
-                perfilesIds: perfilesSeleccionados
+            // Transformar datos del formulario al formato esperado por las acciones
+            const personalData = {
+                nombre: data.nombre,
+                email: data.email || undefined,
+                telefono: data.telefono || undefined,
+                categoriaId: data.categoriaId,
+                status: data.status ? 'activo' : 'inactivo', // Convertir boolean a string
+                perfilesIds: perfilesSeleccionados,
+                // Campos adicionales (se enviarán pero pueden no ser procesados aún)
+                telefono_emergencia: data.telefono_emergencia || undefined,
+                cuenta_clabe: data.cuenta_clabe || undefined
             };
 
             let result;
             if (isEditing && personal?.id) {
-                result = await actualizarPersonal(studioSlug, personal.id, dataConPerfiles);
+                result = await actualizarPersonal(studioSlug, personal.id, personalData);
             } else {
-                result = await crearPersonal(studioSlug, dataConPerfiles);
+                result = await crearPersonal(studioSlug, personalData);
             }
 
             if (result.success && result.data) {
@@ -154,14 +181,6 @@ export function PersonalForm({
         }
     };
 
-    const tipoOptions = [
-        { value: 'OPERATIVO', label: 'Operativo', description: 'Fotógrafos, camarógrafos, operadores' },
-        { value: 'ADMINISTRATIVO', label: 'Administrativo', description: 'Recepcionistas, administradores' },
-        { value: 'PROVEEDOR', label: 'Proveedor', description: 'Servicios externos, proveedores' }
-    ];
-
-    // Filtrar categorías por tipo seleccionado
-    const categoriasFiltradas = categorias.filter(c => c.tipo === tipoSeleccionado);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -172,145 +191,172 @@ export function PersonalForm({
                     </DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Nombre */}
-                        <div className="space-y-2">
-                            <ZenInput
-                                label="Nombre Completo"
-                                placeholder="Ej: Juan Pérez"
-                                required
-                                error={errors.nombre?.message}
-                                {...register('nombre')}
-                            />
-                        </div>
-
-                        {/* Tipo */}
-                        <div className="space-y-2">
-                            <label className="block text-sm font-medium text-zinc-300 mb-2">
-                                Tipo de Personal
-                            </label>
-                            <select
-                                {...register('tipo')}
-                                className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            >
-                                {tipoOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label} - {option.description}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.tipo && (
-                                <p className="text-sm text-red-400">{errors.tipo.message}</p>
-                            )}
-                        </div>
-                    </div>
+                    {/* Nombre */}
+                    <ZenInput
+                        label="Nombre Completo"
+                        placeholder="Ej: Juan Pérez"
+                        required
+                        error={errors.nombre?.message}
+                        {...register('nombre')}
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Email */}
-                        <div className="space-y-2">
-                            <ZenInput
-                                label="Email"
-                                type="email"
-                                placeholder="juan@ejemplo.com"
-                                error={errors.email?.message}
-                                {...register('email')}
-                            />
-                        </div>
+                        <ZenInput
+                            label="Email"
+                            type="email"
+                            placeholder="juan@ejemplo.com"
+                            required
+                            error={errors.email?.message}
+                            {...register('email')}
+                        />
 
                         {/* Teléfono */}
-                        <div className="space-y-2">
-                            <ZenInput
-                                label="Teléfono"
-                                placeholder="+52 55 1234 5678"
-                                error={errors.telefono?.message}
-                                {...register('telefono')}
-                            />
-                        </div>
+                        <ZenInput
+                            label="Teléfono"
+                            placeholder="+52 55 1234 5678"
+                            required
+                            error={errors.telefono?.message}
+                            {...register('telefono')}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Teléfono de Emergencia */}
+                        <ZenInput
+                            label="Teléfono de Emergencia"
+                            placeholder="+52 55 9876 5432"
+                            hint="Opcional"
+                            error={errors.telefono_emergencia?.message}
+                            {...register('telefono_emergencia')}
+                        />
+
+                        {/* Cuenta CLABE */}
+                        <ZenInput
+                            label="Cuenta CLABE"
+                            placeholder="012345678901234567"
+                            hint="Opcional - Para pagos"
+                            error={errors.cuenta_clabe?.message}
+                            {...register('cuenta_clabe')}
+                        />
                     </div>
 
                     {/* Categoría */}
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-zinc-300 mb-2">
-                            Categoría
+                            Categoría <span className="text-red-400">*</span>
                         </label>
                         <select
                             {...register('categoriaId')}
                             className="w-full px-3 py-2 bg-zinc-900 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             <option value="">Selecciona una categoría</option>
-                            {categoriasFiltradas.map((categoria) => (
+                            {categorias.map((categoria) => (
                                 <option key={categoria.id} value={categoria.id}>
-                                    {categoria.nombre} - {categoria.descripcion || 'Sin descripción'}
+                                    {categoria.nombre} {categoria.descripcion && `- ${categoria.descripcion}`}
                                 </option>
                             ))}
                         </select>
                         {errors.categoriaId && (
                             <p className="text-sm text-red-400">{errors.categoriaId.message}</p>
                         )}
-                        {categoriasFiltradas.length === 0 && tipoSeleccionado && (
+                        {categorias.length === 0 && (
                             <p className="text-sm text-yellow-400">
-                                No hay categorías disponibles para este tipo. Crea una categoría primero.
+                                No hay categorías disponibles. Crea una categoría primero.
                             </p>
                         )}
                     </div>
 
-                    {/* Estado */}
-                    <div className="space-y-3">
-                        <label className="block text-sm font-medium text-zinc-300">
-                            Estado
-                        </label>
-                        <div className="flex items-center space-x-3">
-                            <input
-                                type="checkbox"
-                                {...register('status')}
-                                className="w-4 h-4 text-blue-600 bg-zinc-900 border-zinc-700 rounded focus:ring-blue-500"
-                            />
-                            <span className="text-sm text-zinc-300">Activo</span>
-                        </div>
-                    </div>
-
                     {/* Perfiles Asociados */}
                     <div className="space-y-3">
-                        <label className="block text-sm font-medium text-zinc-300">
-                            Perfiles Asociados
-                        </label>
+                        <div className="flex items-center justify-between">
+                            <label className="block text-sm font-medium text-zinc-300">
+                                Perfiles Asociados
+                            </label>
+                            {perfiles.length > 0 && (
+                                <span className="text-xs text-blue-400 bg-blue-900/20 px-2 py-1 rounded-full">
+                                    {perfilesSeleccionados.length} seleccionado{perfilesSeleccionados.length !== 1 ? 's' : ''}
+                                </span>
+                            )}
+                        </div>
                         <p className="text-sm text-zinc-500">
                             Selecciona uno o más perfiles para este personal
                         </p>
 
                         {perfiles.length === 0 ? (
-                            <div className="text-center py-4 text-zinc-500">
-                                No hay perfiles disponibles. Crea perfiles primero.
+                            <div className="text-center py-6 text-zinc-500 bg-zinc-800/30 rounded-lg border border-zinc-700">
+                                <div className="space-y-2">
+                                    <div className="text-zinc-400">No hay perfiles disponibles</div>
+                                    <div className="text-xs text-zinc-500">Crea perfiles primero usando el botón &quot;Perfiles&quot; arriba</div>
+                                </div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 gap-3">
-                                {perfiles.map((perfil) => (
-                                    <label
-                                        key={perfil.id}
-                                        className="flex items-center space-x-3 p-3 border border-zinc-700 rounded-lg hover:bg-zinc-800/50 cursor-pointer"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={perfilesSeleccionados.includes(perfil.id)}
-                                            onChange={(e) => {
-                                                if (e.target.checked) {
-                                                    setPerfilesSeleccionados([...perfilesSeleccionados, perfil.id]);
-                                                } else {
-                                                    setPerfilesSeleccionados(perfilesSeleccionados.filter(id => id !== perfil.id));
-                                                }
-                                            }}
-                                            className="w-4 h-4 text-blue-600 bg-zinc-900 border-zinc-700 rounded focus:ring-blue-500"
-                                        />
-                                        <div className="flex-1">
-                                            <div className="font-medium text-white">{perfil.nombre}</div>
-                                            {perfil.descripcion && (
-                                                <div className="text-sm text-zinc-400">{perfil.descripcion}</div>
-                                            )}
-                                        </div>
-                                    </label>
-                                ))}
+                            <div className="relative">
+                                {/* Contenedor con scroll limitado */}
+                                <div className="max-h-48 overflow-y-auto border border-zinc-700 rounded-lg bg-zinc-800/20 scrollbar-thin scrollbar-thumb-zinc-600 scrollbar-track-zinc-800">
+                                    <div className="p-3 space-y-2">
+                                        {perfiles.map((perfil) => (
+                                            <label
+                                                key={perfil.id}
+                                                className="flex items-center space-x-3 p-2 rounded-md hover:bg-zinc-700/50 cursor-pointer transition-colors group"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={perfilesSeleccionados.includes(perfil.id)}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setPerfilesSeleccionados([...perfilesSeleccionados, perfil.id]);
+                                                        } else {
+                                                            setPerfilesSeleccionados(perfilesSeleccionados.filter(id => id !== perfil.id));
+                                                        }
+                                                    }}
+                                                    className="w-4 h-4 text-blue-600 bg-zinc-900 border-zinc-600 rounded focus:ring-blue-500 focus:ring-2"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="font-medium text-white group-hover:text-blue-100 transition-colors">
+                                                        {perfil.nombre}
+                                                    </div>
+                                                    {perfil.descripcion && (
+                                                        <div className="text-xs text-zinc-400 group-hover:text-zinc-300 transition-colors truncate">
+                                                            {perfil.descripcion}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {perfilesSeleccionados.includes(perfil.id) && (
+                                                    <div className="text-blue-400 text-xs">✓</div>
+                                                )}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Indicador de scroll si hay muchos perfiles */}
+                                {perfiles.length > 6 && (
+                                    <div className="text-center mt-2">
+                                        <p className="text-xs text-zinc-500 flex items-center justify-center gap-1">
+                                            <span>↕</span>
+                                            Desplázate para ver más perfiles
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         )}
+                    </div>
+
+                    {/* Estado - Switch */}
+                    <div className="flex items-center justify-between p-4 bg-zinc-800/30 rounded-lg border border-zinc-700">
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-zinc-300">
+                                Estado del Personal
+                            </label>
+                            <p className="text-xs text-zinc-500">
+                                {statusValue ? 'Personal activo y disponible' : 'Personal inactivo'}
+                            </p>
+                        </div>
+                        <Switch
+                            checked={statusValue}
+                            onCheckedChange={(checked) => setValue('status', checked)}
+                        />
                     </div>
 
                     {/* Botones */}

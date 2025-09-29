@@ -58,6 +58,7 @@ export async function obtenerPersonal(studioSlug: string): Promise<PersonalListR
             },
             orderBy: [
                 { categoria: { orden: 'asc' } },
+                { orden: 'asc' },
                 { nombre: 'asc' }
             ]
         });
@@ -74,7 +75,7 @@ export async function obtenerPersonal(studioSlug: string): Promise<PersonalListR
  */
 export async function crearPersonal(
     studioSlug: string,
-    data: any
+    data: Record<string, unknown>
 ): Promise<PersonalResponse> {
     try {
         // Validar datos
@@ -102,17 +103,28 @@ export async function crearPersonal(
             return { success: false, error: 'Categoría no encontrada' };
         }
 
-        // Crear personal
+        // Extraer perfilesIds antes de crear el personal
+        const { perfilesIds, ...personalDataWithoutProfiles } = validatedData;
+
+        // Crear personal - mapear campos exactamente como están en Prisma
         const personal = await prisma.project_personal.create({
             data: {
-                ...validatedData,
+                // Campos requeridos
+                nombre: personalDataWithoutProfiles.nombre,
                 projectId: project.id,
-                email: validatedData.email || null,
-                telefono: validatedData.telefono || null,
-                platformUserId: validatedData.platformUserId || null,
-                honorarios_fijos: validatedData.honorarios_fijos || null,
-                honorarios_variables: validatedData.honorarios_variables || null,
-                notas: validatedData.notas || null
+                categoriaId: personalDataWithoutProfiles.categoriaId,
+                tipo: personalDataWithoutProfiles.tipo || categoria.tipo,
+                status: personalDataWithoutProfiles.status || 'activo',
+
+                // Campos opcionales - solo incluir si tienen valor
+                ...(personalDataWithoutProfiles.email && personalDataWithoutProfiles.email !== '' && { email: personalDataWithoutProfiles.email }),
+                ...(personalDataWithoutProfiles.telefono && personalDataWithoutProfiles.telefono !== '' && { telefono: personalDataWithoutProfiles.telefono }),
+                ...(personalDataWithoutProfiles.telefono_emergencia && personalDataWithoutProfiles.telefono_emergencia !== '' && { telefono_emergencia: personalDataWithoutProfiles.telefono_emergencia }),
+                ...(personalDataWithoutProfiles.cuenta_clabe && personalDataWithoutProfiles.cuenta_clabe !== '' && { cuenta_clabe: personalDataWithoutProfiles.cuenta_clabe }),
+                ...(personalDataWithoutProfiles.platformUserId && { platformUserId: personalDataWithoutProfiles.platformUserId }),
+                ...(personalDataWithoutProfiles.honorarios_fijos !== undefined && { honorarios_fijos: personalDataWithoutProfiles.honorarios_fijos }),
+                ...(personalDataWithoutProfiles.honorarios_variables !== undefined && { honorarios_variables: personalDataWithoutProfiles.honorarios_variables }),
+                ...(personalDataWithoutProfiles.orden !== undefined && { orden: personalDataWithoutProfiles.orden })
             },
             include: {
                 categoria: {
@@ -135,6 +147,16 @@ export async function crearPersonal(
             }
         });
 
+        // Si hay perfiles asociados, crearlos
+        if (perfilesIds && perfilesIds.length > 0) {
+            await prisma.project_personal_perfil.createMany({
+                data: perfilesIds.map(perfilId => ({
+                    personalId: personal.id,
+                    perfilId: perfilId
+                }))
+            });
+        }
+
         return { success: true, data: personal };
     } catch (error) {
         console.error('Error al crear personal:', error);
@@ -151,7 +173,7 @@ export async function crearPersonal(
 export async function actualizarPersonal(
     studioSlug: string,
     personalId: string,
-    data: any
+    data: Record<string, unknown>
 ): Promise<PersonalResponse> {
     try {
         // Validar datos
@@ -193,18 +215,29 @@ export async function actualizarPersonal(
             }
         }
 
-        // Actualizar personal
+        // Extraer perfilesIds antes de actualizar el personal
+        const { perfilesIds, ...personalDataWithoutProfiles } = validatedData;
+
+        // Actualizar personal - mapear campos exactamente como están en Prisma
+        const updateData: Record<string, unknown> = {};
+
+        // Solo incluir campos que tienen valores definidos
+        if (personalDataWithoutProfiles.nombre !== undefined) updateData.nombre = personalDataWithoutProfiles.nombre;
+        if (personalDataWithoutProfiles.categoriaId !== undefined) updateData.categoriaId = personalDataWithoutProfiles.categoriaId;
+        if (personalDataWithoutProfiles.tipo !== undefined) updateData.tipo = personalDataWithoutProfiles.tipo;
+        if (personalDataWithoutProfiles.status !== undefined) updateData.status = personalDataWithoutProfiles.status;
+        if (personalDataWithoutProfiles.email !== undefined) updateData.email = personalDataWithoutProfiles.email || null;
+        if (personalDataWithoutProfiles.telefono !== undefined) updateData.telefono = personalDataWithoutProfiles.telefono || null;
+        if (personalDataWithoutProfiles.telefono_emergencia !== undefined) updateData.telefono_emergencia = personalDataWithoutProfiles.telefono_emergencia || null;
+        if (personalDataWithoutProfiles.cuenta_clabe !== undefined) updateData.cuenta_clabe = personalDataWithoutProfiles.cuenta_clabe || null;
+        if (personalDataWithoutProfiles.platformUserId !== undefined) updateData.platformUserId = personalDataWithoutProfiles.platformUserId || null;
+        if (personalDataWithoutProfiles.honorarios_fijos !== undefined) updateData.honorarios_fijos = personalDataWithoutProfiles.honorarios_fijos;
+        if (personalDataWithoutProfiles.honorarios_variables !== undefined) updateData.honorarios_variables = personalDataWithoutProfiles.honorarios_variables;
+        if (personalDataWithoutProfiles.orden !== undefined) updateData.orden = personalDataWithoutProfiles.orden;
+
         const personal = await prisma.project_personal.update({
             where: { id: personalId },
-            data: {
-                ...validatedData,
-                email: validatedData.email || null,
-                telefono: validatedData.telefono || null,
-                platformUserId: validatedData.platformUserId || null,
-                honorarios_fijos: validatedData.honorarios_fijos || null,
-                honorarios_variables: validatedData.honorarios_variables || null,
-                notas: validatedData.notas || null
-            },
+            data: updateData,
             include: {
                 categoria: {
                     select: {
@@ -225,6 +258,24 @@ export async function actualizarPersonal(
                 }
             }
         });
+
+        // Actualizar perfiles asociados si se proporcionaron
+        if (perfilesIds !== undefined) {
+            // Eliminar perfiles existentes
+            await prisma.project_personal_perfil.deleteMany({
+                where: { personalId: personalId }
+            });
+
+            // Crear nuevos perfiles si hay alguno
+            if (perfilesIds.length > 0) {
+                await prisma.project_personal_perfil.createMany({
+                    data: perfilesIds.map(perfilId => ({
+                        personalId: personalId,
+                        perfilId: perfilId
+                    }))
+                });
+            }
+        }
 
         return { success: true, data: personal };
     } catch (error) {
@@ -325,7 +376,7 @@ export async function obtenerCategoriasPersonal(studioSlug: string): Promise<Cat
  */
 export async function crearCategoriaPersonal(
     studioSlug: string,
-    data: any
+    data: Record<string, unknown>
 ): Promise<CategoriaPersonalResponse> {
     try {
         // Validar datos
@@ -387,7 +438,7 @@ export async function crearCategoriaPersonal(
 export async function actualizarCategoriaPersonal(
     studioSlug: string,
     categoriaId: string,
-    data: any
+    data: Record<string, unknown>
 ): Promise<CategoriaPersonalResponse> {
     try {
         // Validar datos
@@ -522,7 +573,7 @@ export async function eliminarCategoriaPersonal(
  */
 export async function actualizarOrdenCategoriasPersonal(
     studioSlug: string,
-    data: any
+    data: Record<string, unknown>
 ): Promise<{ success: boolean; error?: string }> {
     try {
         // Validar datos
@@ -604,7 +655,7 @@ export async function obtenerPerfilesPersonal(studioSlug: string) {
 /**
  * Crear un nuevo perfil de personal
  */
-export async function crearPerfilPersonal(studioSlug: string, data: any) {
+export async function crearPerfilPersonal(studioSlug: string, data: Record<string, unknown>) {
     try {
         // Validar datos
         const validatedData = createPerfilPersonalSchema.parse(data);
@@ -639,7 +690,7 @@ export async function crearPerfilPersonal(studioSlug: string, data: any) {
 /**
  * Actualizar un perfil de personal
  */
-export async function actualizarPerfilPersonal(studioSlug: string, perfilId: string, data: any) {
+export async function actualizarPerfilPersonal(studioSlug: string, perfilId: string, data: Record<string, unknown>) {
     try {
         // Validar datos
         const validatedData = updatePerfilPersonalSchema.parse({ ...data, id: perfilId });
@@ -668,6 +719,87 @@ export async function actualizarPerfilPersonal(studioSlug: string, perfilId: str
         if (error instanceof Error && error.name === 'ZodError') {
             return { success: false, error: 'Datos de entrada inválidos' };
         }
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Actualizar orden del personal dentro de una categoría
+ */
+export async function actualizarOrdenPersonal(
+    studioSlug: string,
+    personalIds: string[]
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        // Buscar el proyecto por slug
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Actualizar el orden de cada personal
+        await Promise.all(
+            personalIds.map((personalId, index) =>
+                prisma.project_personal.update({
+                    where: {
+                        id: personalId,
+                        projectId: project.id // Verificar que pertenece al proyecto
+                    },
+                    data: { orden: index }
+                })
+            )
+        );
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error al actualizar orden del personal:', error);
+        return { success: false, error: 'Error interno del servidor' };
+    }
+}
+
+/**
+ * Actualizar posición de personal (similar a updateServicePosition)
+ */
+export async function actualizarPosicionPersonal(
+    studioSlug: string,
+    personalId: string,
+    newPosition: number,
+    newCategoryId?: string | null
+): Promise<{ success: boolean; error?: string }> {
+    try {
+        const project = await prisma.projects.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true }
+        });
+
+        if (!project) {
+            return { success: false, error: 'Proyecto no encontrado' };
+        }
+
+        // Actualizar el personal con nueva posición y categoría
+        const updateData: Record<string, unknown> = {
+            orden: newPosition - 1 // Convertir de basado en 1 a basado en 0
+        };
+
+        if (newCategoryId !== undefined) {
+            updateData.categoriaId = newCategoryId;
+        }
+
+        await prisma.project_personal.update({
+            where: {
+                id: personalId,
+                projectId: project.id
+            },
+            data: updateData
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error al actualizar posición del personal:', error);
         return { success: false, error: 'Error interno del servidor' };
     }
 }
@@ -704,7 +836,7 @@ export async function eliminarPerfilPersonal(studioSlug: string, perfilId: strin
 /**
  * Actualizar orden de perfiles
  */
-export async function actualizarOrdenPerfilesPersonal(studioSlug: string, data: any) {
+export async function actualizarOrdenPerfilesPersonal(studioSlug: string, data: Record<string, unknown>) {
     try {
         // Validar datos
         const validatedData = updateOrdenPerfilesSchema.parse(data);
