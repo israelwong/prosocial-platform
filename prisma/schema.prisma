@@ -1319,9 +1319,9 @@ model project_personal {
   telefono_emergencia  String?
   orden                Int?
   nominas              project_nominas[]
-  categoria            project_categorias_personal @relation(fields: [categoriaId], references: [id])
   platformUser         platform_user_profiles?     @relation(fields: [platformUserId], references: [id])
   project              projects                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  categoria            project_categorias_personal @relation(fields: [categoriaId], references: [id])
   personal_perfiles    project_personal_perfil[]
 
   @@index([telefono_emergencia])
