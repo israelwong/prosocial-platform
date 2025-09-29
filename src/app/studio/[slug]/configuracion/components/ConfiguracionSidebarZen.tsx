@@ -195,14 +195,6 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
                 href: `/${studioSlug}/configuracion/catalogo/paquetes`,
                 icon: Gift,
                 completed: false
-            },
-            {
-                id: 'especialidades',
-                name: 'Especialidades',
-                description: 'Áreas de especialización',
-                href: `/${studioSlug}/configuracion/catalogo/especialidades`,
-                icon: Star,
-                completed: false
             }
         ]
     },

@@ -2,8 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Pencil, Copy, Trash2, Eye, EyeOff } from 'lucide-react';
-import { ZenBadge } from '@/components/ui/zen';
+import { GripVertical, Pencil, Copy, Trash2 } from 'lucide-react';
 import type { ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
 
 interface ServicioCardProps {
@@ -39,6 +38,8 @@ export function ServicioCard({ servicio, onEdit, onDelete, onDuplicate }: Servic
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
             currency: 'MXN',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         }).format(amount);
     };
 
@@ -48,68 +49,105 @@ export function ServicioCard({ servicio, onEdit, onDelete, onDuplicate }: Servic
             style={style}
             className="group"
         >
-            <div className="flex items-center w-full p-3 bg-zinc-800 border border-zinc-700/50 rounded-md hover:border-zinc-600 transition-colors">
+            <div className="flex items-center gap-2 w-full p-2 bg-zinc-800 border border-zinc-700/50 rounded-md hover:border-zinc-600 hover:bg-zinc-800/80 transition-colors">
                 {/* Drag Handle */}
                 <button
                     {...attributes}
                     {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-zinc-500 hover:text-zinc-300 p-1 mr-2"
+                    className="cursor-grab active:cursor-grabbing text-zinc-500 hover:text-zinc-300 p-1 flex-shrink-0"
                     aria-label="Arrastrar servicio"
                 >
                     <GripVertical className="h-4 w-4" />
                 </button>
 
-                {/* Contenido */}
+                {/* Nombre - Desktop: flex-1, Mobile: full width */}
                 <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                        {/* Nombre */}
-                        <span className="text-sm text-zinc-200 font-medium truncate">
-                            {servicio.nombre}
+                    <span className="text-sm text-zinc-200 truncate block">
+                        {servicio.nombre}
+                    </span>
+                    {/* Badge de tipo y status - Solo mobile */}
+                    <div className="flex items-center gap-2 mt-1 md:hidden">
+                        <span
+                            className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-700 text-zinc-300"
+                            title={servicio.tipo_utilidad === 'producto' ? 'Producto' : 'Servicio'}
+                        >
+                            {servicio.tipo_utilidad === 'producto' ? 'P' : 'S'}
                         </span>
-
-                        {/* Badge de status */}
                         {servicio.status === 'inactive' && (
-                            <ZenBadge variant="destructive" className="text-xs">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400">
                                 Inactivo
-                            </ZenBadge>
+                            </span>
                         )}
-                    </div>
-
-                    {/* Info adicional */}
-                    <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1">
-                        <span title="Costo">Costo: {formatCurrency(servicio.costo)}</span>
-                        <span className="text-zinc-700">•</span>
-                        <span title="Precio">Precio: {formatCurrency(servicio.precio_publico)}</span>
                     </div>
                 </div>
 
-                {/* Acciones */}
-                <div className="flex items-center gap-2 ml-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    {/* Botón editar */}
+                {/* Costo - Solo desktop */}
+                <div className="hidden md:flex items-center min-w-[80px]">
+                    <span className="text-xs text-zinc-400">
+                        {formatCurrency(servicio.costo)}
+                    </span>
+                </div>
+
+                {/* Gasto - Solo desktop */}
+                <div className="hidden md:flex items-center min-w-[80px]">
+                    <span className="text-xs text-zinc-400">
+                        {formatCurrency(servicio.gasto)}
+                    </span>
+                </div>
+
+                {/* Precio - Desktop y Mobile */}
+                <div className="flex items-center min-w-[80px]">
+                    <span className="text-sm font-semibold text-zinc-100">
+                        {formatCurrency(servicio.precio_publico)}
+                    </span>
+                </div>
+
+                {/* Badge de tipo - Solo desktop con texto completo */}
+                <div className="hidden md:flex items-center min-w-[75px]">
+                    <span
+                        className={`text-[10px] px-2 py-1 rounded font-medium ${servicio.tipo_utilidad === 'producto'
+                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                            }`}
+                    >
+                        {servicio.tipo_utilidad === 'producto' ? 'Producto' : 'Servicio'}
+                    </span>
+                </div>
+
+                {/* Acciones inline - Desktop: Botones, Mobile: Solo eliminar */}
+                <div className="flex items-center gap-1 flex-shrink-0">
+                    {/* Desktop: Botones inline */}
                     <button
                         onClick={() => onEdit(servicio)}
-                        className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded transition-colors"
+                        className="hidden md:block p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded transition-colors"
                         title="Editar servicio"
                     >
                         <Pencil className="h-3.5 w-3.5" />
                     </button>
-
-                    {/* Botón duplicar */}
                     <button
                         onClick={() => onDuplicate(servicio.id)}
-                        className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded transition-colors"
+                        className="hidden md:block p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded transition-colors"
                         title="Duplicar servicio"
                     >
                         <Copy className="h-3.5 w-3.5" />
                     </button>
 
-                    {/* Botón eliminar */}
+                    {/* Mobile: Solo mostrar Editar y Eliminar */}
+                    <button
+                        onClick={() => onEdit(servicio)}
+                        className="md:hidden p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded transition-colors"
+                        title="Editar"
+                    >
+                        <Pencil className="h-4 w-4" />
+                    </button>
+
+                    {/* Eliminar - Visible en ambos */}
                     <button
                         onClick={() => onDelete(servicio)}
                         className="p-1.5 text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
                         title="Eliminar servicio"
                     >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Trash2 className="h-3.5 w-3.5 md:h-3.5 md:w-3.5" />
                     </button>
                 </div>
             </div>

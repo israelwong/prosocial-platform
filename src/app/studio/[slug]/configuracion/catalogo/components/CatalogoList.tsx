@@ -14,6 +14,7 @@ import { SeccionesModal } from './SeccionesModal';
 import { CategoriasModal } from './CategoriasModal';
 import { ServicioForm } from './ServicioForm';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
+import { SearchBar } from './SearchBar';
 import {
     obtenerCatalogo,
     actualizarPosicionCatalogo,
@@ -65,6 +66,55 @@ export function CatalogoList({
     const [deleteType, setDeleteType] = useState<'seccion' | 'categoria' | 'servicio' | null>(null);
     const [deleteItem, setDeleteItem] = useState<{ id: string; nombre: string } | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+
+    // Estados para búsqueda
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Filtrar catálogo según búsqueda
+    const catalogoFiltrado = useCallback(() => {
+        if (!searchQuery.trim()) {
+            return catalogo;
+        }
+
+        const query = searchQuery.toLowerCase();
+        const seccionesFiltradas: SeccionData[] = [];
+
+        catalogo.forEach((seccion) => {
+            const seccionCoincide = seccion.nombre.toLowerCase().includes(query) ||
+                seccion.descripcion?.toLowerCase().includes(query);
+
+            const categoriasFiltradas: CategoriaData[] = [];
+
+            seccion.categorias?.forEach((categoria) => {
+                const categoriaCoincide = categoria.nombre.toLowerCase().includes(query);
+
+                const serviciosFiltrados = categoria.servicios?.filter((servicio) =>
+                    servicio.nombre.toLowerCase().includes(query) ||
+                    servicio.tipo_utilidad.toLowerCase().includes(query)
+                ) || [];
+
+                // Incluir categoría si coincide o tiene servicios que coinciden
+                if (categoriaCoincide || serviciosFiltrados.length > 0) {
+                    categoriasFiltradas.push({
+                        ...categoria,
+                        servicios: serviciosFiltrados.length > 0 ? serviciosFiltrados : categoria.servicios || [],
+                    });
+                }
+            });
+
+            // Incluir sección si coincide o tiene categorías/servicios que coinciden
+            if (seccionCoincide || categoriasFiltradas.length > 0) {
+                seccionesFiltradas.push({
+                    ...seccion,
+                    categorias: categoriasFiltradas.length > 0 ? categoriasFiltradas : seccion.categorias || [],
+                });
+            }
+        });
+
+        return seccionesFiltradas;
+    }, [catalogo, searchQuery]);
+
+    const catalogoParaMostrar = catalogoFiltrado();
 
     // Configurar sensores para drag & drop
     const sensors = useSensors(
@@ -399,19 +449,42 @@ export function CatalogoList({
                 </div>
             </div>
 
+            {/* Barra de búsqueda */}
+            <SearchBar
+                onSearch={setSearchQuery}
+                placeholder="Buscar por nombre de servicio, categoría o sección..."
+            />
+
+            {/* Indicador de resultados de búsqueda */}
+            {searchQuery && (
+                <div className="flex items-center justify-between px-4 py-2 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <span className="text-sm text-blue-400">
+                        📊 Mostrando {catalogoParaMostrar.reduce((acc, s) =>
+                            acc + s.categorias.reduce((a, c) => a + c.servicios.length, 0), 0
+                        )} servicio(s) de {totalServicios} total
+                    </span>
+                    <button
+                        onClick={() => setSearchQuery('')}
+                        className="text-sm text-blue-400 hover:text-blue-300 underline"
+                    >
+                        Limpiar búsqueda
+                    </button>
+                </div>
+            )}
+
             {/* Lista de secciones con drag & drop */}
-            {catalogo.length > 0 ? (
+            {catalogoParaMostrar.length > 0 ? (
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                 >
                     <SortableContext
-                        items={catalogo.map((s) => s.id)}
+                        items={catalogoParaMostrar.map((s) => s.id)}
                         strategy={verticalListSortingStrategy}
                     >
                         <div className="space-y-6">
-                            {catalogo.map((seccion) => (
+                            {catalogoParaMostrar.map((seccion) => (
                                 <SeccionCard
                                     key={seccion.id}
                                     seccion={seccion}

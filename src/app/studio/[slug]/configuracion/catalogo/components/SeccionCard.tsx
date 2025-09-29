@@ -167,7 +167,7 @@ export function SeccionCard({
 
                 {/* Lista de categorías */}
                 {!hideChildren && (
-                    <div className="ml-8">
+                    <div className="ml-0 md:ml-8">
                         {tieneCategorias ? (
                             <SortableContext
                                 items={seccion.categorias.map((c) => c.id)}

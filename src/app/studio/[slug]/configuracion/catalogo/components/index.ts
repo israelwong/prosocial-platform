@@ -7,3 +7,4 @@ export { SeccionesModal } from './SeccionesModal';
 export { CategoriasModal } from './CategoriasModal';
 export { ServicioForm } from './ServicioForm';
 export { DeleteConfirmModal } from './DeleteConfirmModal';
+export { SearchBar } from './SearchBar';

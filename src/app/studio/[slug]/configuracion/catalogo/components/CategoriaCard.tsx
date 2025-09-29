@@ -141,7 +141,7 @@ export function CategoriaCard({
 
                 {/* Lista de servicios */}
                 {!hideChildren && (
-                    <div className="ml-6">
+                    <div className="ml-0 md:ml-6">
                         {tieneServicios ? (
                             <SortableContext
                                 items={categoria.servicios.map((s) => s.id)}
