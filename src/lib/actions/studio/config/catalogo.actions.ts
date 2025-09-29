@@ -966,3 +966,102 @@ export async function actualizarPosicionCatalogo(
         };
     }
 }
+
+// =====================================================
+// SINCRONIZACIÓN DE PRECIOS
+// =====================================================
+
+/**
+ * Sincronizar precios de todos los servicios con la configuración actual
+ */
+export async function sincronizarPreciosCatalogo(
+    studioSlug: string
+): Promise<ActionResponse<{ serviciosActualizados: number }>> {
+    try {
+        const studioId = await getStudioIdFromSlug(studioSlug);
+        if (!studioId) {
+            return { success: false, error: 'Estudio no encontrado' };
+        }
+
+        // Obtener configuración activa
+        const config = await prisma.project_configuraciones.findFirst({
+            where: {
+                projectId: studioId,
+                status: 'active',
+            },
+            orderBy: {
+                updatedAt: 'desc',
+            },
+        });
+
+        if (!config) {
+            return {
+                success: false,
+                error: 'No se encontró configuración activa',
+            };
+        }
+
+        // Función para calcular precios
+        function calcularPrecios(
+            costo: number,
+            gasto: number,
+            tipoUtilidad: string
+        ): { utilidad: number; precio_publico: number } {
+            const utilidadPorcentaje =
+                tipoUtilidad === 'servicio'
+                    ? config.utilidad_servicio
+                    : config.utilidad_producto;
+
+            const costoTotal = costo + gasto;
+            const subtotal = costoTotal / (1 - utilidadPorcentaje / 100);
+            const utilidad = subtotal - costoTotal;
+            const conSobreprecio = subtotal * (1 + config.sobreprecio / 100);
+            const precio_publico =
+                conSobreprecio * (1 + config.comision_venta / 100);
+
+            return {
+                utilidad: Number(utilidad.toFixed(2)),
+                precio_publico: Number(precio_publico.toFixed(2)),
+            };
+        }
+
+        // Obtener todos los servicios del estudio
+        const servicios = await prisma.project_servicios.findMany({
+            where: { studioId },
+        });
+
+        // Actualizar cada servicio
+        let serviciosActualizados = 0;
+
+        for (const servicio of servicios) {
+            const { utilidad, precio_publico } = calcularPrecios(
+                servicio.costo,
+                servicio.gasto,
+                servicio.tipo_utilidad
+            );
+
+            await prisma.project_servicios.update({
+                where: { id: servicio.id },
+                data: {
+                    utilidad,
+                    precio_publico,
+                },
+            });
+
+            serviciosActualizados++;
+        }
+
+        revalidateCatalogo(studioSlug);
+
+        return {
+            success: true,
+            data: { serviciosActualizados },
+        };
+    } catch (error) {
+        console.error('Error sincronizando precios:', error);
+        return {
+            success: false,
+            error: 'Error al sincronizar los precios',
+        };
+    }
+}
