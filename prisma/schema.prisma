@@ -968,8 +968,6 @@ model project_servicios {
   nombre               String
   costo                Float                          @default(0)
   gasto                Float                          @default(0)
-  utilidad             Float                          @default(0)
-  precio_publico       Float                          @default(0)
   tipo_utilidad        String                         @default("servicio")
   orden                Int                            @default(0)
   status               String                         @default("active")
@@ -984,6 +982,10 @@ model project_servicios {
   @@index([studioId, status], map: "project_servicios_projectId_status_idx")
   @@index([studioId, status], map: "project_servicios_studioid_status_idx")
 }
+
+// NOTA: utilidad y precio_publico se eliminaron - se calculan al vuelo con project_configuraciones
+// Solo se almacenan: costo, gasto, tipo_utilidad
+// En cotizaciones SÍ se congelan todos los valores
 
 model project_studio_revenue_products {
   id                  String                   @id @default(cuid())

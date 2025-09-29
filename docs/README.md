@@ -16,6 +16,7 @@ Esta documentación está organizada por categorías para facilitar la navegaci�
 - **SCHEMA_ANALYSIS.md** - Análisis del esquema de Prisma
 - **ARQUITECTURA_HIBRIDA_RPC_REST.md** - **NUEVA** Arquitectura híbrida RPC/REST
 - **ESTRUCTURA_SERVER_ACTIONS.md** - **NUEVA** Estructura de Server Actions por roles
+- **PRICING_ARCHITECTURE.md** - **🚨 NUEVA** Arquitectura híbrida de precios (catálogo vs cotizaciones)
 
 ### 🛠️ **02-implementation/** - Guías de Implementación
 
