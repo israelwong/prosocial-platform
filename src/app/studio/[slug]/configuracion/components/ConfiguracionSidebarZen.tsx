@@ -54,7 +54,9 @@ interface ConfigSection {
     title: string;
     description: string;
     icon: React.ComponentType<{ className?: string }>;
-    items: ConfigItem[];
+    items?: ConfigItem[];
+    href?: string;
+    completed?: boolean;
 }
 
 interface ConfigItem {
@@ -164,19 +166,11 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
     },
     {
         id: 'equipo',
-        title: 'Equipo',
-        description: 'Gestión de personal',
+        title: 'Gestión de Personal',
+        description: 'Gestiona tu equipo y colaboradores',
         icon: Users2,
-        items: [
-            {
-                id: 'personal',
-                name: 'Personal',
-                description: 'Gestión de personal y colaboradores',
-                href: `/${studioSlug}/configuracion/equipo`,
-                icon: Users2,
-                completed: false
-            }
-        ]
+        href: `/${studioSlug}/configuracion/equipo`,
+        completed: false
     },
     {
         id: 'catalogo',
@@ -291,11 +285,13 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
 
         return configSections.map(section => ({
             ...section,
-            items: section.items.filter(item =>
+            items: section.items?.filter(item =>
                 item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 item.description.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        })).filter(section => section.items.length > 0);
+            ) || []
+        })).filter(section => 
+            section.href || (section.items && section.items.length > 0)
+        );
     }, [searchTerm, configSections]);
 
 
@@ -327,44 +323,62 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
             <ZenSidebarContent>
                 {filteredSections.map((section) => (
                     <ZenSidebarGroup key={section.id}>
-                        <ZenSidebarGroupLabel>
-                            <button
-                                onClick={() => toggleSection(section.id)}
-                                className="flex items-center justify-between w-full text-left hover:text-zinc-200 transition-colors"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <section.icon className="w-4 h-4" />
-                                    <span>{section.title}</span>
-                                </div>
-                                {expandedSection === section.id ? (
-                                    <ChevronDown className="w-4 h-4" />
-                                ) : (
-                                    <ChevronRight className="w-4 h-4" />
-                                )}
-                            </button>
-                        </ZenSidebarGroupLabel>
+                        {section.href ? (
+                            // Botón directo (sin subsecciones)
+                            <ZenSidebarGroupLabel>
+                                <ZenSidebarMenuButton asChild isActive={isActive(section.href)}>
+                                    <Link href={section.href} className="flex items-center gap-2">
+                                        <section.icon className="w-4 h-4" />
+                                        <span>{section.title}</span>
+                                        {section.completed && (
+                                            <div className="w-2 h-2 bg-green-400 rounded-full" />
+                                        )}
+                                    </Link>
+                                </ZenSidebarMenuButton>
+                            </ZenSidebarGroupLabel>
+                        ) : (
+                            // Sección con subsecciones
+                            <>
+                                <ZenSidebarGroupLabel>
+                                    <button
+                                        onClick={() => toggleSection(section.id)}
+                                        className="flex items-center justify-between w-full text-left hover:text-zinc-200 transition-colors"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <section.icon className="w-4 h-4" />
+                                            <span>{section.title}</span>
+                                        </div>
+                                        {expandedSection === section.id ? (
+                                            <ChevronDown className="w-4 h-4" />
+                                        ) : (
+                                            <ChevronRight className="w-4 h-4" />
+                                        )}
+                                    </button>
+                                </ZenSidebarGroupLabel>
 
-                        {expandedSection === section.id && (
-                            <ZenSidebarGroupContent>
-                                <ZenSidebarMenu>
-                                    <ZenSidebarMenuItem>
-                                        <ZenSidebarMenuSub>
-                                            {section.items.map((item) => (
-                                                <ZenSidebarMenuSubItem key={item.id}>
-                                                    <ZenSidebarMenuSubButton asChild isActive={isActive(item.href)}>
-                                                        <Link href={item.href} className="flex items-center gap-2">
-                                                            <span className="truncate">{item.name}</span>
-                                                            {item.completed && (
-                                                                <div className="w-2 h-2 bg-green-400 rounded-full" />
-                                                            )}
-                                                        </Link>
-                                                    </ZenSidebarMenuSubButton>
-                                                </ZenSidebarMenuSubItem>
-                                            ))}
-                                        </ZenSidebarMenuSub>
-                                    </ZenSidebarMenuItem>
-                                </ZenSidebarMenu>
-                            </ZenSidebarGroupContent>
+                                {expandedSection === section.id && section.items && section.items.length > 0 && (
+                                    <ZenSidebarGroupContent>
+                                        <ZenSidebarMenu>
+                                            <ZenSidebarMenuItem>
+                                                <ZenSidebarMenuSub>
+                                                    {section.items.map((item) => (
+                                                        <ZenSidebarMenuSubItem key={item.id}>
+                                                            <ZenSidebarMenuSubButton asChild isActive={isActive(item.href)}>
+                                                                <Link href={item.href} className="flex items-center gap-2">
+                                                                    <span className="truncate">{item.name}</span>
+                                                                    {item.completed && (
+                                                                        <div className="w-2 h-2 bg-green-400 rounded-full" />
+                                                                    )}
+                                                                </Link>
+                                                            </ZenSidebarMenuSubButton>
+                                                        </ZenSidebarMenuSubItem>
+                                                    ))}
+                                                </ZenSidebarMenuSub>
+                                            </ZenSidebarMenuItem>
+                                        </ZenSidebarMenu>
+                                    </ZenSidebarGroupContent>
+                                )}
+                            </>
                         )}
                     </ZenSidebarGroup>
                 ))}
