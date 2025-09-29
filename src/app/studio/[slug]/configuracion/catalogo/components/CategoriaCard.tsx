@@ -8,6 +8,7 @@ import { GripVertical, Pencil, Plus, Trash2, Package } from 'lucide-react';
 import { ZenBadge, ZenButton } from '@/components/ui/zen';
 import { ServicioCard } from './ServicioCard';
 import type { CategoriaData, ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
+import { calcularPrecios, type PricingConfig } from '@/lib/utils/pricing';
 
 interface CategoriaCardProps {
     categoria: CategoriaData;
@@ -18,6 +19,7 @@ interface CategoriaCardProps {
     onDeleteServicio: (servicio: ServicioData) => void;
     onDuplicateServicio: (servicioId: string) => void;
     isParentDragging?: boolean;
+    studioConfig: PricingConfig;
 }
 
 // Componente para zona de drop vacía
@@ -55,6 +57,7 @@ export function CategoriaCard({
     onDeleteServicio,
     onDuplicateServicio,
     isParentDragging = false,
+    studioConfig,
 }: CategoriaCardProps) {
     const {
         attributes,
@@ -148,15 +151,30 @@ export function CategoriaCard({
                                 strategy={verticalListSortingStrategy}
                             >
                                 <div className="space-y-2">
-                                    {categoria.servicios.map((servicio) => (
-                                        <ServicioCard
-                                            key={servicio.id}
-                                            servicio={servicio}
-                                            onEdit={onEditServicio}
-                                            onDelete={onDeleteServicio}
-                                            onDuplicate={onDuplicateServicio}
-                                        />
-                                    ))}
+                                    {categoria.servicios.map((servicio) => {
+                                        // Asegurar conversión a número
+                                        const costo = Number(servicio.costo);
+                                        const gasto = Number(servicio.gasto);
+
+                                        const precios = calcularPrecios(
+                                            costo,
+                                            gasto,
+                                            servicio.tipo_utilidad as 'servicio' | 'producto',
+                                            studioConfig
+                                        );
+
+                                        return (
+                                            <ServicioCard
+                                                key={servicio.id}
+                                                servicio={servicio}
+                                                onEdit={onEditServicio}
+                                                onDelete={onDeleteServicio}
+                                                onDuplicate={onDuplicateServicio}
+                                                utilidadCalculada={precios.utilidad}
+                                                precioPublicoCalculado={precios.precio_publico}
+                                            />
+                                        );
+                                    })}
                                 </div>
                             </SortableContext>
                         ) : (

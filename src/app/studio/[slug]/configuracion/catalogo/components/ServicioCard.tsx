@@ -10,9 +10,12 @@ interface ServicioCardProps {
     onEdit: (servicio: ServicioData) => void;
     onDelete: (servicio: ServicioData) => void;
     onDuplicate: (servicioId: string) => void;
+    // Campos calculados al vuelo
+    utilidadCalculada: number;
+    precioPublicoCalculado: number;
 }
 
-export function ServicioCard({ servicio, onEdit, onDelete, onDuplicate }: ServicioCardProps) {
+export function ServicioCard({ servicio, onEdit, onDelete, onDuplicate, utilidadCalculada, precioPublicoCalculado }: ServicioCardProps) {
     const {
         attributes,
         listeners,
@@ -38,8 +41,8 @@ export function ServicioCard({ servicio, onEdit, onDelete, onDuplicate }: Servic
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
             currency: 'MXN',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         }).format(amount);
     };
 
@@ -98,7 +101,7 @@ export function ServicioCard({ servicio, onEdit, onDelete, onDuplicate }: Servic
                 {/* Precio - Desktop y Mobile */}
                 <div className="flex items-center min-w-[80px]">
                     <span className="text-sm font-semibold text-zinc-100">
-                        {formatCurrency(servicio.precio_publico)}
+                        {formatCurrency(precioPublicoCalculado)}
                     </span>
                 </div>
 
@@ -106,8 +109,8 @@ export function ServicioCard({ servicio, onEdit, onDelete, onDuplicate }: Servic
                 <div className="hidden md:flex items-center min-w-[75px]">
                     <span
                         className={`text-[10px] px-2 py-1 rounded font-medium ${servicio.tipo_utilidad === 'producto'
-                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                : 'bg-green-500/20 text-green-400 border border-green-500/30'
+                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                            : 'bg-green-500/20 text-green-400 border border-green-500/30'
                             }`}
                     >
                         {servicio.tipo_utilidad === 'producto' ? 'Producto' : 'Servicio'}

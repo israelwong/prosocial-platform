@@ -99,8 +99,7 @@ export async function obtenerCatalogo(
                     nombre: s.nombre,
                     costo: s.costo,
                     gasto: s.gasto,
-                    utilidad: s.utilidad,
-                    precio_publico: s.precio_publico,
+                    // utilidad y precio_publico se calculan al vuelo en el cliente
                     tipo_utilidad: s.tipo_utilidad,
                     orden: s.orden,
                     status: s.status,
@@ -590,8 +589,7 @@ export async function obtenerServicios(
             nombre: s.nombre,
             costo: s.costo,
             gasto: s.gasto,
-            utilidad: s.utilidad,
-            precio_publico: s.precio_publico,
+            // utilidad y precio_publico se calculan al vuelo en el cliente
             tipo_utilidad: s.tipo_utilidad,
             orden: s.orden,
             status: s.status,
@@ -657,8 +655,7 @@ export async function crearServicio(
                 nombre: validatedData.nombre,
                 costo: validatedData.costo,
                 gasto: validatedData.gasto,
-                utilidad: validatedData.utilidad,
-                precio_publico: validatedData.precio_publico,
+                // NO almacenamos utilidad ni precio_publico (se calculan al vuelo)
                 tipo_utilidad: validatedData.tipo_utilidad,
                 orden: nuevoOrden,
                 status: validatedData.status,
@@ -686,8 +683,7 @@ export async function crearServicio(
                 nombre: servicio.nombre,
                 costo: servicio.costo,
                 gasto: servicio.gasto,
-                utilidad: servicio.utilidad,
-                precio_publico: servicio.precio_publico,
+                // utilidad y precio_publico se calculan al vuelo en el cliente
                 tipo_utilidad: servicio.tipo_utilidad,
                 orden: servicio.orden,
                 status: servicio.status,
@@ -755,8 +751,7 @@ export async function actualizarServicio(
                 nombre: servicio.nombre,
                 costo: servicio.costo,
                 gasto: servicio.gasto,
-                utilidad: servicio.utilidad,
-                precio_publico: servicio.precio_publico,
+                // utilidad y precio_publico se calculan al vuelo en el cliente
                 tipo_utilidad: servicio.tipo_utilidad,
                 orden: servicio.orden,
                 status: servicio.status,
@@ -840,8 +835,7 @@ export async function duplicarServicio(
                 nombre: `${servicioOriginal.nombre} (Copia)`,
                 costo: servicioOriginal.costo,
                 gasto: servicioOriginal.gasto,
-                utilidad: servicioOriginal.utilidad,
-                precio_publico: servicioOriginal.precio_publico,
+                // NO almacenamos utilidad ni precio_publico (se calculan al vuelo)
                 tipo_utilidad: servicioOriginal.tipo_utilidad,
                 orden: nuevoOrden,
                 status: servicioOriginal.status,
@@ -868,8 +862,7 @@ export async function duplicarServicio(
                 nombre: servicioNuevo.nombre,
                 costo: servicioNuevo.costo,
                 gasto: servicioNuevo.gasto,
-                utilidad: servicioNuevo.utilidad,
-                precio_publico: servicioNuevo.precio_publico,
+                // utilidad y precio_publico se calculan al vuelo en el cliente
                 tipo_utilidad: servicioNuevo.tipo_utilidad,
                 orden: servicioNuevo.orden,
                 status: servicioNuevo.status,
@@ -968,104 +961,7 @@ export async function actualizarPosicionCatalogo(
 }
 
 // =====================================================
-// SINCRONIZACIÓN DE PRECIOS
+// NOTA: sincronizarPreciosCatalogo() ELIMINADA
 // =====================================================
-
-/**
- * Sincronizar precios de todos los servicios con la configuración actual
- */
-export async function sincronizarPreciosCatalogo(
-    studioSlug: string
-): Promise<ActionResponse<{ serviciosActualizados: number }>> {
-    try {
-        const studioId = await getStudioIdFromSlug(studioSlug);
-        if (!studioId) {
-            return { success: false, error: 'Estudio no encontrado' };
-        }
-
-        // Obtener configuración activa
-        const config = await prisma.project_configuraciones.findFirst({
-            where: {
-                projectId: studioId,
-                status: 'active',
-            },
-            orderBy: {
-                updatedAt: 'desc',
-            },
-        });
-
-        if (!config) {
-            return {
-                success: false,
-                error: 'No se encontró configuración activa',
-            };
-        }
-
-        // Función para calcular precios
-        function calcularPrecios(
-            costo: number,
-            gasto: number,
-            tipoUtilidad: string
-        ): { utilidad: number; precio_publico: number } {
-            const utilidadPorcentaje =
-                tipoUtilidad === 'servicio'
-                    ? config.utilidad_servicio
-                    : config.utilidad_producto;
-
-            const costoTotal = costo + gasto;
-            const subtotal = costoTotal / (1 - utilidadPorcentaje / 100);
-            const utilidad = subtotal - costoTotal;
-            const conSobreprecio = subtotal * (1 + config.sobreprecio / 100);
-            const precio_publico =
-                conSobreprecio * (1 + config.comision_venta / 100);
-
-            return {
-                utilidad: Number(utilidad.toFixed(2)),
-                precio_publico: Number(precio_publico.toFixed(2)),
-            };
-        }
-
-        // Obtener todos los servicios del estudio
-        const servicios = await prisma.project_servicios.findMany({
-            where: { studioId },
-        });
-
-        // Actualizar cada servicio
-        let serviciosActualizados = 0;
-
-        console.log(`🔄 Sincronizando ${servicios.length} servicios...`);
-
-        for (const servicio of servicios) {
-            const { utilidad, precio_publico } = calcularPrecios(
-                servicio.costo,
-                servicio.gasto,
-                servicio.tipo_utilidad
-            );
-
-            await prisma.project_servicios.update({
-                where: { id: servicio.id },
-                data: {
-                    utilidad,
-                    precio_publico,
-                },
-            });
-
-            serviciosActualizados++;
-        }
-
-        console.log(`✅ ${serviciosActualizados} servicios actualizados`);
-
-        revalidateCatalogo(studioSlug);
-
-        return {
-            success: true,
-            data: { serviciosActualizados },
-        };
-    } catch (error) {
-        console.error('Error sincronizando precios:', error);
-        return {
-            success: false,
-            error: 'Error al sincronizar los precios',
-        };
-    }
-}
+// Los precios ahora se calculan al vuelo usando /lib/utils/pricing.ts
+// No se almacenan en project_servicios, solo en cotizaciones

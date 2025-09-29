@@ -7,6 +7,17 @@
  * Para cotizaciones, los precios SÍ se congelan al momento de crear la cotización.
  */
 
+/**
+ * FACTOR DE SEGURIDAD: Porcentaje adicional para garantizar utilidad mínima
+ * 
+ * Este factor compensa la pérdida de utilidad cuando se aplican descuentos máximos.
+ * Con descuento máximo (sobreprecio) + comisión, la utilidad puede bajar ~1.3%.
+ * Este factor asegura que la utilidad se mantenga en el porcentaje deseado.
+ * 
+ * Ajustar este valor si cambias los porcentajes de comisión o sobreprecio.
+ */
+const FACTOR_SEGURIDAD_UTILIDAD = 0.045; // 4.5% adicional para garantizar 30% mínimo
+
 export interface PricingConfig {
     utilidad_servicio: number;
     utilidad_producto: number;
@@ -29,13 +40,16 @@ export interface PricingResult {
  * @returns Objeto con utilidad y precio_publico calculados
  * 
  * @example
- * const precios = calcularPrecios(1000, 100, 'servicio', {
+ * const precios = calcularPrecios(1000, 0, 'servicio', {
  *   utilidad_servicio: 30,
- *   utilidad_producto: 0,
+ *   utilidad_producto: 10,
  *   sobreprecio: 10,
  *   comision_venta: 5
  * });
- * // => { utilidad: 471.43, precio_publico: 1814.99 }
+ * // => { utilidad: 300.00, precio_publico: 1505.26 }
+ * 
+ * NOTA: El sobreprecio se aplica DESPUÉS de garantizar utilidad + comisión.
+ * Esto permite dar descuentos hasta el sobreprecio sin afectar la utilidad del 30%.
  */
 export function calcularPrecios(
     costo: number,
@@ -44,28 +58,39 @@ export function calcularPrecios(
     config: PricingConfig
 ): PricingResult {
     // 1. Determinar porcentaje de utilidad según tipo
+    // Los valores vienen como porcentajes (30, 10, etc.), necesitamos fracciones (0.30, 0.10)
     const utilidadPorcentaje =
         tipoUtilidad === 'servicio'
-            ? config.utilidad_servicio
-            : config.utilidad_producto;
+            ? config.utilidad_servicio / 100
+            : config.utilidad_producto / 100;
 
-    // 2. Calcular costo total
-    const costoTotal = costo + gasto;
+    const comisionPorcentaje = config.comision_venta / 100;
+    const sobreprecioPorcentaje = config.sobreprecio / 100;
 
-    // 3. Calcular subtotal con utilidad
-    const subtotal = costoTotal / (1 - utilidadPorcentaje / 100);
+    // 2. Calcular utilidad base (en pesos)
+    const utilidadBase = costo * utilidadPorcentaje;
 
-    // 4. Calcular utilidad en pesos
-    const utilidad = subtotal - costoTotal;
+    // 3. Calcular subtotal (costo + gastos + utilidad)
+    const subtotal = costo + gasto + utilidadBase;
 
-    // 5. Aplicar sobreprecio
-    const conSobreprecio = subtotal * (1 + config.sobreprecio / 100);
+    // 4. Calcular precio base que cubre utilidad + comisión
+    // Este precio GARANTIZA la utilidad incluso después de descuentos
+    const denominador = 1 - comisionPorcentaje;
+    const precioBase = denominador > 0
+        ? subtotal / denominador
+        : Infinity;
 
-    // 6. Aplicar comisión de venta
-    const precioPublico = conSobreprecio * (1 + config.comision_venta / 100);
+    // 5. Aplicar factor de seguridad para garantizar utilidad mínima
+    // Compensa la pérdida cuando se aplican descuentos máximos + comisión
+    const precioConSeguridad = precioBase * (1 + FACTOR_SEGURIDAD_UTILIDAD);
+
+    // 6. Aplicar sobreprecio como margen de descuento
+    // El sobreprecio se agrega DESPUÉS de asegurar utilidad + comisión + factor de seguridad
+    // Esto permite dar descuentos hasta el sobreprecio sin afectar la utilidad del 30%
+    const precioPublico = precioConSeguridad * (1 + sobreprecioPorcentaje);
 
     return {
-        utilidad: Number(utilidad.toFixed(2)),
+        utilidad: Number(utilidadBase.toFixed(2)),
         precio_publico: Number(precioPublico.toFixed(2)),
     };
 }

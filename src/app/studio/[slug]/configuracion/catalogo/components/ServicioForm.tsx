@@ -38,6 +38,12 @@ interface ConfiguracionPrecios {
     sobreprecio: number;
 }
 
+/**
+ * FACTOR DE SEGURIDAD: Porcentaje adicional para garantizar utilidad mínima
+ * Debe coincidir con el valor en /lib/utils/pricing.ts
+ */
+const FACTOR_SEGURIDAD_UTILIDAD = 0.045; // 4.5% adicional para garantizar 30% mínimo
+
 export function ServicioForm({
     isOpen,
     onClose,
@@ -168,16 +174,32 @@ export function ServicioForm({
         const comisionPorcentaje = configuracion?.comision_venta ?? 0.10;
         const sobreprecioPorcentaje = configuracion?.sobreprecio ?? 0.05;
 
-        // Cálculo según fórmula del legacy
+        // NUEVA FÓRMULA: Garantiza utilidad del 30% incluso con descuento máximo
+        // 1. Calcular utilidad base
         const utilidadBase = parseFloat((costoNum * utilidadPorcentaje).toFixed(2));
+
+        // 2. Calcular subtotal (costo + gastos + utilidad)
         const subtotal = parseFloat((costoNum + totalGastos + utilidadBase).toFixed(2));
-        const sobreprecioMonto = parseFloat((sobreprecioPorcentaje * subtotal).toFixed(2));
-        const montoTrasSobreprecio = parseFloat((subtotal + sobreprecioMonto).toFixed(2));
+
+        // 3. Calcular precio base que cubre utilidad + comisión
+        // Este precio GARANTIZA la utilidad incluso después de descuentos
         const denominador = 1 - comisionPorcentaje;
-        const precioSistema = denominador > 0
-            ? parseFloat((montoTrasSobreprecio / denominador).toFixed(2))
+        const precioBase = denominador > 0
+            ? parseFloat((subtotal / denominador).toFixed(2))
             : Infinity;
-        const comisionVentaMonto = parseFloat((precioSistema * comisionPorcentaje).toFixed(2));
+
+        // 4. Aplicar factor de seguridad para garantizar utilidad mínima
+        // Compensa la pérdida cuando se aplican descuentos máximos + comisión
+        const precioConSeguridad = parseFloat((precioBase * (1 + FACTOR_SEGURIDAD_UTILIDAD)).toFixed(2));
+
+        // 5. Aplicar sobreprecio como margen de descuento
+        // El sobreprecio se agrega DESPUÉS de asegurar utilidad + comisión + factor de seguridad
+        const precioSistema = parseFloat((precioConSeguridad * (1 + sobreprecioPorcentaje)).toFixed(2));
+
+        // 6. Calcular montos para desglose
+        const comisionVentaMonto = parseFloat((precioConSeguridad * comisionPorcentaje).toFixed(2));
+        const sobreprecioMonto = parseFloat((precioConSeguridad * sobreprecioPorcentaje).toFixed(2));
+        const montoTrasSobreprecio = precioSistema;
 
         return {
             utilidadBase,

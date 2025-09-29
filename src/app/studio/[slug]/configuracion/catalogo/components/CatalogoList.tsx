@@ -22,8 +22,8 @@ import {
     eliminarSeccion,
     eliminarCategoria,
     eliminarServicio,
-    sincronizarPreciosCatalogo,
 } from '@/lib/actions/studio/config/catalogo.actions';
+import type { PricingConfig } from '@/lib/utils/pricing';
 import {
     DndContext,
     closestCenter,
@@ -46,12 +46,14 @@ interface CatalogoListProps {
     studioSlug: string;
     initialCatalogo: SeccionData[];
     onCatalogoChange: (catalogo: SeccionData[]) => void;
+    studioConfig: PricingConfig;
 }
 
 export function CatalogoList({
     studioSlug,
     initialCatalogo,
     onCatalogoChange,
+    studioConfig,
 }: CatalogoListProps) {
     const [catalogo, setCatalogo] = useState<SeccionData[]>(initialCatalogo);
     const [isSeccionesModalOpen, setIsSeccionesModalOpen] = useState(false);
@@ -70,9 +72,6 @@ export function CatalogoList({
 
     // Estados para búsqueda
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Estados para sincronización de precios
-    const [isSyncing, setIsSyncing] = useState(false);
 
     // Filtrar catálogo según búsqueda
     const catalogoFiltrado = useCallback(() => {
@@ -415,28 +414,8 @@ export function CatalogoList({
         0
     );
 
-    // Función para sincronizar precios
-    const handleSincronizarPrecios = async () => {
-        setIsSyncing(true);
-        try {
-            const result = await sincronizarPreciosCatalogo(studioSlug);
-
-            if (result.success && result.data) {
-                toast.success(
-                    `✅ Precios sincronizados: ${result.data.serviciosActualizados} servicio(s) actualizado(s)`
-                );
-                // Recargar catálogo después de la sincronización
-                await recargarCatalogo();
-            } else {
-                toast.error(result.error || 'Error al sincronizar precios');
-            }
-        } catch (error) {
-            console.error('Error sincronizando precios:', error);
-            toast.error('Error al sincronizar precios');
-        } finally {
-            setIsSyncing(false);
-        }
-    };
+    // ELIMINADO: handleSincronizarPrecios()
+    // Los precios ahora se calculan al vuelo usando studioConfig
 
     return (
         <div className="space-y-6">
@@ -458,32 +437,6 @@ export function CatalogoList({
                 </div>
 
                 <div className="flex items-center gap-3">
-                    {/* Botón Sincronizar Precios */}
-                    <ZenButton
-                        variant="secondary"
-                        className="flex items-center gap-2"
-                        onClick={handleSincronizarPrecios}
-                        loading={isSyncing}
-                        disabled={isSyncing || catalogo.length === 0}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                            <path d="M3 3v5h5" />
-                            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-                            <path d="M16 16h5v5" />
-                        </svg>
-                        Sincronizar Precios
-                    </ZenButton>
-
                     {/* Botón Gestionar Secciones */}
                     <ZenButton
                         variant="outline"
@@ -554,6 +507,7 @@ export function CatalogoList({
                                     onEditServicio={handleEditServicio}
                                     onDeleteServicio={handleDeleteServicio}
                                     onDuplicateServicio={handleDuplicateServicio}
+                                    studioConfig={studioConfig}
                                 />
                             ))}
                         </div>

@@ -20,7 +20,34 @@ async function seedCatalogo() {
 
         console.log(`✅ Proyecto encontrado: ${demoStudio.name} (${demoStudio.slug})\n`);
 
-        // 2. Obtener configuración del estudio para calcular precios
+        // 2. LIMPIAR catálogo existente para el demo-studio
+        console.log('🧹 Limpiando catálogo existente...');
+
+        // Eliminar servicios y sus gastos asociados
+        await prisma.project_servicio_gastos.deleteMany({
+            where: {
+                servicios: {
+                    studioId: demoStudio.id,
+                },
+            },
+        });
+
+        await prisma.project_servicios.deleteMany({
+            where: { studioId: demoStudio.id },
+        });
+
+        // Eliminar relaciones de categorías con secciones
+        await prisma.project_seccion_categorias.deleteMany({});
+
+        // Eliminar categorías
+        await prisma.project_servicio_categorias.deleteMany({});
+
+        // Eliminar secciones
+        await prisma.project_servicio_secciones.deleteMany({});
+
+        console.log('✅ Catálogo limpiado exitosamente\n');
+
+        // 3. Obtener configuración del estudio para calcular precios
         const config = await prisma.project_configuraciones.findFirst({
             where: {
                 projectId: demoStudio.id,
@@ -41,32 +68,8 @@ async function seedCatalogo() {
         console.log(`   - Utilidad Servicio: ${config.utilidad_servicio}%`);
         console.log(`   - Utilidad Producto: ${config.utilidad_producto}%`);
         console.log(`   - Sobreprecio: ${config.sobreprecio}%`);
-        console.log(`   - Comisión Venta: ${config.comision_venta}%\n`);
-
-        // 3. Calcular utilidad y precio público correctamente
-        function calcularPrecioPublico(
-            costo: number,
-            tipoUtilidad: 'servicio' | 'producto'
-        ): { gasto: number; utilidad: number; precio_publico: number } {
-            const utilidadPorcentaje =
-                tipoUtilidad === 'servicio'
-                    ? config.utilidad_servicio
-                    : config.utilidad_producto;
-
-            const subtotal = costo / (1 - utilidadPorcentaje / 100);
-            const utilidad = subtotal - costo;
-            const conSobreprecio = subtotal * (1 + config.sobreprecio / 100);
-            const precio_publico = conSobreprecio * (1 + config.comision_venta / 100);
-
-            // Gasto por defecto en 0 (se puede calcular después)
-            const gasto = 0;
-
-            return {
-                gasto,
-                utilidad: Number(utilidad.toFixed(2)),
-                precio_publico: Number(precio_publico.toFixed(2)),
-            };
-        }
+        console.log(`   - Comisión Venta: ${config.comision_venta}%`);
+        console.log('   ℹ️  NOTA: utilidad y precio_publico se calculan al vuelo (no se almacenan)\n');
 
         // 4. Iterar sobre las secciones del JSON
         let totalSecciones = 0;
@@ -117,21 +120,14 @@ async function seedCatalogo() {
 
                 // Iterar sobre servicios
                 for (const [indexServicio, servicioData] of categoriaData.servicios.entries()) {
-                    const precios = calcularPrecioPublico(
-                        servicioData.costo,
-                        servicioData.tipo_utilidad as 'servicio' | 'producto'
-                    );
-
-                    // Crear servicio
+                    // Crear servicio (sin utilidad ni precio_publico - se calculan al vuelo)
                     await prisma.project_servicios.create({
                         data: {
                             studioId: demoStudio.id,
                             servicioCategoriaId: categoria.id,
                             nombre: servicioData.nombre,
                             costo: servicioData.costo,
-                            gasto: precios.gasto,
-                            utilidad: precios.utilidad,
-                            precio_publico: precios.precio_publico,
+                            gasto: 0, // Se calculará después con servicio_gastos si es necesario
                             tipo_utilidad: servicioData.tipo_utilidad,
                             orden: indexServicio,
                             status: 'active',
