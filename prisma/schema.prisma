@@ -1322,7 +1322,7 @@ model project_personal {
   platformUser         platform_user_profiles?     @relation(fields: [platformUserId], references: [id])
   project              projects                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
   categoria            project_categorias_personal @relation(fields: [categoriaId], references: [id])
-  personal_perfiles    project_personal_perfil[]
+  profile_assignments  project_personal_profile_assignments[]
 
   @@index([telefono_emergencia])
   @@index([cuenta_clabe])
@@ -1355,7 +1355,7 @@ model project_categorias_personal {
   @@index([orden])
 }
 
-model project_perfiles_personal {
+model project_personal_profiles {
   id                String                    @id @default(cuid())
   projectId         String
   nombre            String
@@ -1365,24 +1365,24 @@ model project_perfiles_personal {
   createdAt         DateTime                  @default(now())
   updatedAt         DateTime                  @updatedAt
   project           projects                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  personal_perfiles project_personal_perfil[]
+  personal_assignments project_personal_profile_assignments[]
 
   @@unique([projectId, nombre])
   @@index([projectId, isActive])
   @@index([orden])
 }
 
-model project_personal_perfil {
+model project_personal_profile_assignments {
   id         String                    @id @default(cuid())
   personalId String
-  perfilId   String
+  profileId  String
   createdAt  DateTime                  @default(now())
-  perfil     project_perfiles_personal @relation(fields: [perfilId], references: [id], onDelete: Cascade)
+  profile    project_personal_profiles @relation(fields: [profileId], references: [id], onDelete: Cascade)
   personal   project_personal          @relation(fields: [personalId], references: [id], onDelete: Cascade)
 
-  @@unique([personalId, perfilId])
+  @@unique([personalId, profileId])
   @@index([personalId])
-  @@index([perfilId])
+  @@index([profileId])
 }
 
 enum PlatformLeadBitacoraTipo {

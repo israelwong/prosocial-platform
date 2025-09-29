@@ -149,7 +149,7 @@ export async function crearPersonal(
 
         // Si hay perfiles asociados, crearlos
         if (perfilesIds && perfilesIds.length > 0) {
-            await prisma.project_personal_perfil.createMany({
+            await prisma.project_personal_profile_assignments.createMany({
                 data: perfilesIds.map(perfilId => ({
                     personalId: personal.id,
                     perfilId: perfilId
@@ -262,13 +262,13 @@ export async function actualizarPersonal(
         // Actualizar perfiles asociados si se proporcionaron
         if (perfilesIds !== undefined) {
             // Eliminar perfiles existentes
-            await prisma.project_personal_perfil.deleteMany({
+            await prisma.project_personal_profile_assignments.deleteMany({
                 where: { personalId: personalId }
             });
 
             // Crear nuevos perfiles si hay alguno
             if (perfilesIds.length > 0) {
-                await prisma.project_personal_perfil.createMany({
+                await prisma.project_personal_profile_assignments.createMany({
                     data: perfilesIds.map(perfilId => ({
                         personalId: personalId,
                         perfilId: perfilId
@@ -633,7 +633,7 @@ export async function obtenerPerfilesPersonal(studioSlug: string) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const perfiles = await prisma.project_perfiles_personal.findMany({
+        const perfiles = await prisma.project_personal_profiles.findMany({
             where: { projectId: project.id },
             orderBy: { orden: 'asc' },
             include: {
@@ -670,7 +670,7 @@ export async function crearPerfilPersonal(studioSlug: string, data: Record<strin
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const perfil = await prisma.project_perfiles_personal.create({
+        const perfil = await prisma.project_personal_profiles.create({
             data: {
                 ...validatedData,
                 projectId: project.id
@@ -705,7 +705,7 @@ export async function actualizarPerfilPersonal(studioSlug: string, perfilId: str
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const perfil = await prisma.project_perfiles_personal.update({
+        const perfil = await prisma.project_personal_profiles.update({
             where: {
                 id: perfilId,
                 projectId: project.id
@@ -819,7 +819,7 @@ export async function eliminarPerfilPersonal(studioSlug: string, perfilId: strin
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        await prisma.project_perfiles_personal.delete({
+        await prisma.project_personal_profiles.delete({
             where: {
                 id: perfilId,
                 projectId: project.id
@@ -854,7 +854,7 @@ export async function actualizarOrdenPerfilesPersonal(studioSlug: string, data: 
         // Actualizar orden de cada perfil
         await Promise.all(
             validatedData.perfiles.map((perfil) =>
-                prisma.project_perfiles_personal.update({
+                prisma.project_personal_profiles.update({
                     where: {
                         id: perfil.id,
                         projectId: project.id
