@@ -167,7 +167,7 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
                 name: 'Gestión de personal',
                 description: 'Gestiona tu equipo y colaboradores',
                 icon: Users2,
-                 href: `/${studioSlug}/configuracion/negocio/personal`,
+                href: `/${studioSlug}/configuracion/negocio/personal`,
                 completed: false
             },
         ]
@@ -245,30 +245,30 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
             }
         ]
     },
-    {
-        id: 'avanzado',
-        title: 'Avanzado',
-        description: 'Configuraciones avanzadas',
-        icon: SlidersHorizontal,
-        items: [
-            {
-                id: 'integraciones',
-                name: 'Integraciones',
-                description: 'Conectar servicios externos',
-                href: `/${studioSlug}/configuracion/integraciones`,
-                icon: Plug,
-                completed: false
-            },
-            {
-                id: 'avanzado',
-                name: 'Configuración Avanzada',
-                description: 'Opciones avanzadas',
-                href: `/${studioSlug}/configuracion/avanzado`,
-                icon: SlidersHorizontal,
-                completed: false
-            }
-        ]
-    }
+    // {
+    //     id: 'avanzado',
+    //     title: 'Avanzado',
+    //     description: 'Configuraciones avanzadas',
+    //     icon: SlidersHorizontal,
+    //     items: [
+    //         {
+    //             id: 'integraciones',
+    //             name: 'Integraciones',
+    //             description: 'Conectar servicios externos',
+    //             href: `/${studioSlug}/configuracion/integraciones`,
+    //             icon: Plug,
+    //             completed: false
+    //         },
+    //         {
+    //             id: 'avanzado',
+    //             name: 'Configuración Avanzada',
+    //             description: 'Opciones avanzadas',
+    //             href: `/${studioSlug}/configuracion/avanzado`,
+    //             icon: SlidersHorizontal,
+    //             completed: false
+    //         }
+    //     ]
+    // }
 ];
 
 // Componente del Sidebar

@@ -17,7 +17,7 @@ import {
     type PersonalCreateForm,
     type PersonalUpdateForm,
 } from '@/lib/actions/schemas/personal-schemas';
-import { obtenerPerfilesProfesionalesStudio } from '@/lib/actions/studio/config/professional-profiles.actions';
+import { obtenerPerfilesPersonal } from '@/lib/actions/studio/config/personal.actions';
 import type { Personal } from '../types';
 
 interface PersonalModalProps {
@@ -161,7 +161,8 @@ export function PersonalModal({
     const loadProfiles = async () => {
         try {
             setProfilesLoading(true);
-            const perfiles = await obtenerPerfilesProfesionalesStudio(studioSlug);
+            const result = await obtenerPerfilesPersonal(studioSlug);
+            const perfiles = result.data || [];
 
             // Transformar los datos para el formato esperado
             const perfilesFormateados = perfiles.map(perfil => ({
