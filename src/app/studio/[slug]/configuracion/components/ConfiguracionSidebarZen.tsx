@@ -325,7 +325,7 @@ function ConfiguracionSidebarContent({ className, studioSlug }: ConfiguracionSid
                     <ZenSidebarGroup key={section.id}>
                         {section.href ? (
                             // Botón directo (sin subsecciones)
-                            <ZenSidebarMenuButton asChild isActive={isActive(section.href)}>
+                            <ZenSidebarMenuButton asChild isActive={isActive(section.href)} className="text-xs">
                                 <Link href={section.href} className="flex items-center gap-2">
                                     <section.icon className="w-4 h-4" />
                                     <span>{section.title}</span>
