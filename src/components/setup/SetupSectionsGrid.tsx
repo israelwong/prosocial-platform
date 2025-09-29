@@ -95,9 +95,9 @@ const SECTION_CONFIG = {
     },
 
     // Equipo
-    'equipo_empleados': {
+    'equipo_personal': {
         icon: Users2,
-        href: '/configuracion/equipo/empleados',
+        href: '/configuracion/equipo',
         category: 'Equipo'
     }
 };
