@@ -1033,6 +1033,8 @@ export async function sincronizarPreciosCatalogo(
         // Actualizar cada servicio
         let serviciosActualizados = 0;
 
+        console.log(`🔄 Sincronizando ${servicios.length} servicios...`);
+
         for (const servicio of servicios) {
             const { utilidad, precio_publico } = calcularPrecios(
                 servicio.costo,
@@ -1050,6 +1052,8 @@ export async function sincronizarPreciosCatalogo(
 
             serviciosActualizados++;
         }
+
+        console.log(`✅ ${serviciosActualizados} servicios actualizados`);
 
         revalidateCatalogo(studioSlug);
 

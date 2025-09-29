@@ -146,9 +146,13 @@ export function CatalogoList({
     // Función para recargar datos desde el servidor
     const recargarCatalogo = useCallback(async () => {
         try {
+            console.log('🔄 Recargando catálogo desde servidor...');
             const result = await obtenerCatalogo(studioSlug);
             if (result.success && result.data) {
+                console.log('✅ Catálogo recargado:', result.data.length, 'secciones');
                 updateCatalogo(result.data);
+            } else {
+                console.error('❌ Error recargando:', result.error);
             }
         } catch (error) {
             console.error('Error recargando catálogo:', error);
@@ -421,7 +425,8 @@ export function CatalogoList({
                 toast.success(
                     `✅ Precios sincronizados: ${result.data.serviciosActualizados} servicio(s) actualizado(s)`
                 );
-                recargarCatalogo();
+                // Recargar catálogo después de la sincronización
+                await recargarCatalogo();
             } else {
                 toast.error(result.error || 'Error al sincronizar precios');
             }
