@@ -161,17 +161,18 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
                 href: `/${studioSlug}/configuracion/negocio/reglas-agendamiento`,
                 icon: Calendar,
                 completed: false
-            }
+            },
+            {
+                id: 'equipo',
+                name: 'Gestión de personal',
+                description: 'Gestiona tu equipo y colaboradores',
+                icon: Users2,
+                 href: `/${studioSlug}/configuracion/negocio/personal`,
+                completed: false
+            },
         ]
     },
-    {
-        id: 'equipo',
-        title: 'Gestión de personal',
-        description: 'Gestiona tu equipo y colaboradores',
-        icon: Users2,
-        href: `/${studioSlug}/configuracion/equipo`,
-        completed: false
-    },
+
     {
         id: 'catalogo',
         title: 'Catálogo',

@@ -213,7 +213,7 @@ function getSectionHref(sectionId: string, studioSlug: string): string {
         'catalogo_servicios': '/configuracion/catalogo/servicios',
         'catalogo_paquetes': '/configuracion/catalogo/paquetes',
         'catalogo_especialidades': '/configuracion/catalogo/especialidades',
-        'equipo_personal': '/configuracion/equipo'
+        'equipo_personal': '/configuracion/negocio/personal'
     };
 
     return `/studio/${studioSlug}${routes[sectionId] || '/configuracion'}`;
