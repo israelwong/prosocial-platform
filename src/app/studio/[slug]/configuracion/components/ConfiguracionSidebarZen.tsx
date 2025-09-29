@@ -166,7 +166,7 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
     },
     {
         id: 'equipo',
-        title: 'Personal',
+        title: 'Gestión de personal',
         description: 'Gestiona tu equipo y colaboradores',
         icon: Users2,
         href: `/${studioSlug}/configuracion/equipo`,
