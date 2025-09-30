@@ -110,8 +110,9 @@ export async function middleware(request: NextRequest) {
   };
 
   // Si es /[slug] o /[slug]/[...path] y no es ruta reservada → Rewrite a /studio/[slug][...path]
+  // IMPORTANTE: Evitar bucle infinito - NO reescribir si ya empieza con /studio/
   const slugMatch = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
-  if (slugMatch && pathname !== "/" && !isReservedPath(pathname)) {
+  if (slugMatch && pathname !== "/" && !pathname.startsWith("/studio/") && !isReservedPath(pathname)) {
     const [, slug, subPath = ""] = slugMatch;
     const studioPath = `/studio/${slug}${subPath}`;
     console.log(`🔄 [ZEN.PRO] Rewriting ${pathname} to ${studioPath}`);

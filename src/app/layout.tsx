@@ -10,24 +10,24 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "ProSocial Platform",
+  title: "Zen Universe",
   description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía con sistema de leads, campañas y agentes comerciales",
-  keywords: ["ProSocial", "fotografía", "leads", "CRM", "estudios", "agentes", "campañas"],
-  authors: [{ name: "ProSocial MX" }],
+  keywords: ["CRM para estudios"],
+  authors: [{ name: "Israel Wong" }],
   icons: {
     icon: "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
     shortcut: "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
     apple: "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
   },
   openGraph: {
-    title: "ProSocial Platform",
+    title: "Zen Universe",
     description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía",
-    siteName: "ProSocial Platform",
+    siteName: "Zen Universe",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ProSocial Platform",
+    title: "Zen Universe",
     description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía",
   },
 };

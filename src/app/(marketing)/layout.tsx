@@ -5,28 +5,28 @@ import type { Metadata } from "next";
 import "../globals.css";
 
 export const metadata: Metadata = {
-    title: "zen.pro - Plataforma para Estudios Creativos",
-    description: "Encuentra y gestiona estudios de fotografía y video profesionales. Cada estudio tiene su propio espacio personalizado en zen.pro.",
+    title: "Zen Universe - Plataforma para Estudios Creativos",
+    description: "Encuentra y gestiona estudios de fotografía y video profesionales. Cada estudio tiene su propio espacio personalizado en Zen Universe.",
     keywords: [
-        'zen.pro', 'estudios creativos', 'fotografía profesional', 'video profesional',
+        'Zen Universe', 'estudios creativos', 'fotografía profesional', 'video profesional',
         'gestión de estudios', 'plataforma creativa', 'México', 'estudios fotografía'
     ],
-    authors: [{ name: 'zen.pro' }],
-    creator: 'zen.pro',
+    authors: [{ name: 'Zen Universe' }],
+    creator: 'Zen Universe',
     publisher: 'zen.pro',
     openGraph: {
         type: 'website',
         locale: 'es_MX',
-        url: 'https://zen.pro',
-        title: 'zen.pro - Plataforma para Estudios Creativos',
+        url: 'https://zenuniverse.com',
+        title: 'Zen Universe - Plataforma para Estudios Creativos',
         description: 'Encuentra y gestiona estudios de fotografía y video profesionales. Cada estudio tiene su propio espacio personalizado.',
-        siteName: 'zen.pro',
+        siteName: 'Zen Universe',
         images: [
             {
                 url: 'https://bgtapcutchryzhzooony.supabase.co/storage/v1/object/public/ProSocial/logos/logotipo_blanco.svg',
                 width: 1200,
                 height: 630,
-                alt: 'zen.pro - Plataforma para Estudios Creativos',
+                alt: 'Zen Universe - Plataforma para Estudios Creativos',
             },
         ],
     },
