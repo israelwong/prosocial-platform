@@ -170,6 +170,14 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
                 href: `/${studioSlug}/configuracion/negocio/personal`,
                 completed: false
             },
+            {
+                id: 'tipos-evento',
+                name: 'Tipos de Evento',
+                description: 'Categorías para organizar paquetes',
+                icon: Calendar,
+                href: `/${studioSlug}/configuracion/negocio/tipos-evento`,
+                completed: false
+            },
         ]
     },
 

@@ -439,6 +439,7 @@ model projects {
   metodos_pago             project_metodos_pago[]
   nominas                  project_nominas[]
   paquetes                 project_paquetes[]
+  evento_tipos            project_evento_tipos[]
   personal                 project_personal[]
   personal_profiles        project_personal_profiles[]
   redes_sociales           project_redes_sociales[]
@@ -668,7 +669,7 @@ model project_evento_bitacoras {
 model project_evento_etapas {
   id        String            @id @default(cuid())
   nombre    String
-  posicion  Int               @default(0)
+  orden  Int               @default(0)
   createdAt DateTime          @default(now())
   updatedAt DateTime
   eventos   project_eventos[]
@@ -676,10 +677,13 @@ model project_evento_etapas {
 
 model project_evento_tipos {
   id           String                 @id @default(cuid())
+  projectId    String
   nombre       String
-  posicion     Int                    @default(0)
+  status       String                 @default("active")
+  orden     Int                    @default(0)
   createdAt    DateTime               @default(now())
   updatedAt    DateTime
+  projects     projects               @relation(fields: [projectId], references: [id], onDelete: Cascade)
   cotizaciones project_cotizaciones[]
   eventos      project_eventos[]
   paquetes     project_paquetes[]
