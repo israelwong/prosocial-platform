@@ -57,7 +57,7 @@ export interface TipoEventoFormData {
 export interface PaqueteData {
     id: string;
     nombre: string;
-    precio_venta: number;
+    precio: number;
     status: string;
 }
 
