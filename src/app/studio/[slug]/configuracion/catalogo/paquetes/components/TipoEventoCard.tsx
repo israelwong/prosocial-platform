@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { TipoEventoData } from '@/lib/actions/schemas/tipos-evento-schemas';
 import { ZenCard, ZenButton, ZenBadge } from '@/components/ui/zen';
 import { PaqueteItem } from './PaqueteItem';
@@ -11,7 +12,12 @@ interface TipoEventoCardProps {
 }
 
 export function TipoEventoCard({ tipoEvento, studioSlug }: TipoEventoCardProps) {
+    const router = useRouter();
     const paquetesActivos = tipoEvento.paquetes?.filter((p) => p.status === 'active') || [];
+
+    const handleCrearPaquete = () => {
+        router.push(`/${studioSlug}/configuracion/catalogo/paquetes/nuevo/${tipoEvento.id}`);
+    };
 
     return (
         <ZenCard>
@@ -27,10 +33,7 @@ export function TipoEventoCard({ tipoEvento, studioSlug }: TipoEventoCardProps) 
                 </div>
 
                 <ZenButton
-                    onClick={() => {
-                        // TODO: Abrir modal para crear paquete
-                        console.log('Crear paquete para:', tipoEvento.nombre);
-                    }}
+                    onClick={handleCrearPaquete}
                     size="sm"
                 >
                     Crear Paquete

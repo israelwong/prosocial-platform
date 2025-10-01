@@ -504,7 +504,11 @@ export function ServicioForm({
                                 <h3 className="text-base font-medium text-zinc-200">Desglose de Cálculo</h3>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                                     <div className="text-center">
-                                        <div className="font-medium text-zinc-300 mb-1">Utilidad Base</div>
+                                        <div className="font-medium text-zinc-300 mb-1">
+                                            Utilidad Base ({tipoUtilidad === 'servicio'
+                                                ? `${(configuracion?.utilidad_servicio ?? 0.30) * 100}%`
+                                                : `${(configuracion?.utilidad_producto ?? 0.40) * 100}%`})
+                                        </div>
                                         <div className="text-zinc-400">{formatCurrency(utilidadBase)}</div>
                                     </div>
                                     <div className="text-center">
@@ -512,11 +516,15 @@ export function ServicioForm({
                                         <div className="text-zinc-400">{formatCurrency(totalGastos)}</div>
                                     </div>
                                     <div className="text-center">
-                                        <div className="font-medium text-zinc-300 mb-1">Sobreprecio</div>
+                                        <div className="font-medium text-zinc-300 mb-1">
+                                            Sobreprecio ({(configuracion?.sobreprecio ?? 0.05) * 100}%)
+                                        </div>
                                         <div className="text-zinc-400">{formatCurrency(sobreprecioMonto)}</div>
                                     </div>
                                     <div className="text-center">
-                                        <div className="font-medium text-zinc-300 mb-1">Comisión Venta</div>
+                                        <div className="font-medium text-zinc-300 mb-1">
+                                            Comisión Venta ({(configuracion?.comision_venta ?? 0.10) * 100}%)
+                                        </div>
                                         <div className="text-zinc-400">{formatCurrency(comisionVentaMonto)}</div>
                                     </div>
                                 </div>

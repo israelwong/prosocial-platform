@@ -27,7 +27,7 @@ export default async function ConfigurationLayout({
                     {/* Separador */}
                     <div className="h-px bg-zinc-800 mb-6"></div>
 
-                    <div className="max-w-6xl mx-auto">
+                    <div className="mx-auto">
                         {children}
                     </div>
                 </main>

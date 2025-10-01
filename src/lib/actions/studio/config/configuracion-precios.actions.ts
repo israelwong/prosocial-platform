@@ -38,7 +38,7 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
             // Crear configuración por defecto
             configuracion = await prisma.project_configuraciones.create({
                 data: {
-                    projectId: studio.id,
+                    projects: { connect: { id: studio.id } },
                     nombre: 'Configuración de Precios',
                     utilidad_servicio: 0.30, // 30%
                     utilidad_producto: 0.40, // 40%
@@ -67,7 +67,20 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
     return await retryDatabaseOperation(async () => {
         const studio = await prisma.projects.findUnique({
             where: { slug: studioSlug },
-            select: { id: true },
+            select: {
+                id: true,
+                configuraciones: {
+                    where: { status: 'active' },
+                    orderBy: { updatedAt: 'desc' },
+                    take: 1,
+                    select: {
+                        utilidad_servicio: true,
+                        utilidad_producto: true,
+                        comision_venta: true,
+                        sobreprecio: true,
+                    }
+                }
+            },
         });
 
         if (!studio) {
@@ -76,7 +89,7 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
 
         // Contar servicios existentes
         const servicios = await prisma.project_servicios.findMany({
-            where: { projectId: studio.id },
+            where: { projects: { id: studio.id } },
             select: {
                 id: true,
                 tipo_utilidad: true,
@@ -90,10 +103,20 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
             paquetes: servicios.filter(s => s.tipo_utilidad === 'paquete').length,
         };
 
+        // Verificar si hay cambios en los porcentajes
+        const configuracionActual = studio.configuraciones[0];
+        const requiere_actualizacion_masiva = total_servicios > 0 && (
+            !configuracionActual || // Si no hay configuración, se necesita actualizar
+            configuracionActual.utilidad_servicio !== 0.30 || // Si los valores son diferentes a los por defecto
+            configuracionActual.utilidad_producto !== 0.40 ||
+            configuracionActual.comision_venta !== 0.10 ||
+            configuracionActual.sobreprecio !== 0.05
+        );
+
         return {
             total_servicios,
             servicios_por_tipo,
-            requiere_actualizacion_masiva: total_servicios > 0,
+            requiere_actualizacion_masiva,
         };
     });
 }
@@ -160,7 +183,7 @@ export async function actualizarConfiguracionPrecios(
         } else {
             await prisma.project_configuraciones.create({
                 data: {
-                    projectId: studio.id,
+                    projects: { connect: { id: studio.id } },
                     nombre: 'Configuración de Precios',
                     utilidad_servicio: dataToSave.utilidad_servicio,
                     utilidad_producto: dataToSave.utilidad_producto,
@@ -178,66 +201,28 @@ export async function actualizarConfiguracionPrecios(
         if (serviciosExistentes.requiere_actualizacion_masiva) {
             // 4. Obtener todos los servicios existentes para el recálculo masivo
             const todosLosServicios = await prisma.project_servicios.findMany({
-                where: { projectId: studio.id },
+                where: { projects: { id: studio.id } },
                 include: {
                     // Incluir gastos si existen
                     servicio_gastos: true,
                 },
             });
 
-            // 4. Preparamos la lista de operaciones de actualización de precios
+            // NOTA: Ya no actualizamos precio_publico ni utilidad en project_servicios
+            // Estos campos se eliminaron del modelo y ahora se calculan al vuelo
+            // usando project_configuraciones. Solo actualizamos updatedAt para
+            // indicar que hubo un cambio en la configuración.
+
             const updatePromises = todosLosServicios.map(servicio => {
-                const totalGastos = servicio.servicio_gastos?.reduce((acc, gasto) => acc + (gasto.costo || 0), 0) || 0;
-
-                // Determinar el tipo de utilidad
-                let utilidadPorcentaje: number;
-                switch (servicio.tipo_utilidad) {
-                    case 'servicio':
-                        utilidadPorcentaje = dataToSave.utilidad_servicio;
-                        break;
-                    case 'producto':
-                        utilidadPorcentaje = dataToSave.utilidad_producto;
-                        break;
-                    case 'paquete':
-                        utilidadPorcentaje = dataToSave.utilidad_servicio; // Usar utilidad_servicio como base para paquetes
-                        break;
-                    default:
-                        utilidadPorcentaje = dataToSave.utilidad_servicio;
-                }
-
-                // CÁLCULO DE PRECIOS - usando la misma lógica que el legacy
-                const costoBase = servicio.costo || 0;
-                const utilidadBase = parseFloat((costoBase * utilidadPorcentaje).toFixed(2));
-                const subtotal = parseFloat((costoBase + totalGastos + utilidadBase).toFixed(2));
-                const sobreprecioMonto = parseFloat((subtotal * dataToSave.sobreprecio).toFixed(2));
-                const montoTrasSobreprecio = parseFloat((subtotal + sobreprecioMonto).toFixed(2));
-                const denominador = 1 - dataToSave.comision_venta;
-                const nuevoPrecioSistema = denominador > 0
-                    ? parseFloat((montoTrasSobreprecio / denominador).toFixed(2))
-                    : 0;
-
-                // Aplicar IVA si está habilitado
-                const precioFinal = dataToSave.incluir_iva
-                    ? parseFloat((nuevoPrecioSistema * 1.16).toFixed(2)) // IVA 16%
-                    : nuevoPrecioSistema;
-
-                // Redondear si está habilitado
-                const precioFinalRedondeado = dataToSave.redondear_precios
-                    ? Math.round(precioFinal)
-                    : precioFinal;
-
                 return prisma.project_servicios.update({
                     where: { id: servicio.id },
                     data: {
-                        precio_publico: precioFinalRedondeado,
-                        utilidad: utilidadBase,
-                        // Actualizar otros campos si es necesario
                         updatedAt: new Date(),
                     },
                 });
             });
 
-            // 5. Ejecutar todas las actualizaciones de precios
+            // 5. Ejecutar todas las actualizaciones de timestamp
             await Promise.all(updatePromises);
         }
 
@@ -268,17 +253,17 @@ export async function obtenerEstadisticasServicios(studioSlug: string) {
         }
 
         const servicios = await prisma.project_servicios.findMany({
-            where: { projectId: studio.id },
+            where: { projects: { id: studio.id } },
             select: {
                 id: true,
                 nombre: true,
                 tipo_utilidad: true,
                 costo: true,
-                precio_publico: true,
-                utilidad: true,
+                gasto: true,
             },
         });
 
+        // NOTA: precio_publico y utilidad ya no se almacenan, se calculan al vuelo
         const estadisticas = {
             total_servicios: servicios.length,
             servicios_por_tipo: {
@@ -286,11 +271,11 @@ export async function obtenerEstadisticasServicios(studioSlug: string) {
                 productos: servicios.filter(s => s.tipo_utilidad === 'producto').length,
                 paquetes: servicios.filter(s => s.tipo_utilidad === 'paquete').length,
             },
-            precio_promedio: servicios.length > 0
-                ? servicios.reduce((acc, s) => acc + (s.precio_publico || 0), 0) / servicios.length
+            costo_promedio: servicios.length > 0
+                ? servicios.reduce((acc, s) => acc + (s.costo || 0), 0) / servicios.length
                 : 0,
-            utilidad_promedio: servicios.length > 0
-                ? servicios.reduce((acc, s) => acc + (s.utilidad || 0), 0) / servicios.length
+            gasto_promedio: servicios.length > 0
+                ? servicios.reduce((acc, s) => acc + (s.gasto || 0), 0) / servicios.length
                 : 0,
         };
 

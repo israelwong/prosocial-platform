@@ -15,15 +15,16 @@ export default async function PaquetesPage({ params }: PaquetesPageProps) {
     const tiposEvento = result.success ? result.data || [] : [];
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-screen-xl mx-auto mb-16">
             {/* Header sin botones */}
             <HeaderNavigation
                 title="Paquetes"
                 description="Crea y gestiona paquetes de servicios organizados por tipo de evento"
             />
 
-            {/* Lista de tipos de evento con sus paquetes */}
             <TiposEventoList tiposEvento={tiposEvento} studioSlug={slug} />
+
+
         </div>
     );
 }

@@ -1,13 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
 import { ZenInput } from '@/components/ui/zen';
 import { ZenButton } from '@/components/ui/zen';
-import { ZenBadge } from '@/components/ui/zen';
 import { ZenLabel } from '@/components/ui/zen';
 import { SeparadorZen } from '@/components/ui/zen';
 
@@ -17,12 +16,9 @@ import {
 } from '@/lib/actions/schemas/configuracion-precios-schemas';
 import { type ConfiguracionPreciosData } from '../types';
 import {
-    actualizarConfiguracionPrecios,
-    verificarServiciosExistentes
+    actualizarConfiguracionPrecios
 } from '@/lib/actions/studio/config/configuracion-precios.actions';
-import { type ServiciosExistentes } from '@/lib/actions/schemas/configuracion-precios-schemas';
 import {
-    AlertTriangle,
     Calculator,
     TrendingUp,
     Save
@@ -80,8 +76,6 @@ export function ConfiguracionPreciosFormZen({
     initialData,
     onUpdate
 }: ConfiguracionPreciosFormZenProps) {
-    const [serviciosExistentes, setServiciosExistentes] = useState<ServiciosExistentes | null>(null);
-
     const {
         register,
         handleSubmit,
@@ -97,19 +91,6 @@ export function ConfiguracionPreciosFormZen({
         },
     });
 
-    // Verificar servicios existentes al cargar
-    useEffect(() => {
-        const verificarServicios = async () => {
-            try {
-                const servicios = await verificarServiciosExistentes(studioSlug);
-                setServiciosExistentes(servicios);
-            } catch (error) {
-                console.error('Error verificando servicios existentes:', error);
-            }
-        };
-
-        verificarServicios();
-    }, [studioSlug]);
 
     const onSubmit = async (data: ConfiguracionPreciosFormType) => {
         const loadingToast = toast.loading('Guardando configuración de precios...');
@@ -123,14 +104,6 @@ export function ConfiguracionPreciosFormZen({
             if (result.success) {
                 toast.success('¡Configuración guardada con éxito!');
 
-                // Mostrar información sobre servicios actualizados
-                if (result.requiere_actualizacion_masiva && result.servicios_actualizados > 0) {
-                    toast.success(
-                        `Se actualizaron ${result.servicios_actualizados} servicios con los nuevos precios`,
-                        { duration: 5000 }
-                    );
-                }
-
                 // Actualizar datos locales
                 const updatedData: ConfiguracionPreciosData = {
                     id: initialData.id,
@@ -143,9 +116,6 @@ export function ConfiguracionPreciosFormZen({
                 };
                 onUpdate?.(updatedData);
 
-                // Recargar servicios existentes
-                const servicios = await verificarServiciosExistentes(studioSlug);
-                setServiciosExistentes(servicios);
             } else {
                 const fieldErrors = result.error ? Object.values(result.error).flat() : [];
                 const errorMessage = fieldErrors[0] || 'Hubo un error al guardar. Inténtalo de nuevo.';
@@ -164,36 +134,6 @@ export function ConfiguracionPreciosFormZen({
 
     return (
         <div className="space-y-6">
-            {/* Alerta de servicios existentes */}
-            {serviciosExistentes?.requiere_actualizacion_masiva && (
-                <ZenCard variant="default" padding="lg" className="border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20">
-                    <ZenCardContent className="pt-6">
-                        <div className="flex items-start gap-3">
-                            <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
-                            <div>
-                                <h4 className="font-medium text-yellow-800 dark:text-yellow-200">
-                                    Actualización Masiva de Precios
-                                </h4>
-                                <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                                    Tienes {serviciosExistentes.total_servicios} servicios registrados que se actualizarán
-                                    automáticamente con los nuevos porcentajes de utilidad.
-                                </p>
-                                <div className="flex gap-2 mt-2">
-                                    <ZenBadge variant="secondary" className="text-yellow-700 border-yellow-300">
-                                        {serviciosExistentes.servicios_por_tipo.servicios} Servicios
-                                    </ZenBadge>
-                                    <ZenBadge variant="secondary" className="text-yellow-700 border-yellow-300">
-                                        {serviciosExistentes.servicios_por_tipo.productos} Productos
-                                    </ZenBadge>
-                                    <ZenBadge variant="secondary" className="text-yellow-700 border-yellow-300">
-                                        {serviciosExistentes.servicios_por_tipo.paquetes} Paquetes
-                                    </ZenBadge>
-                                </div>
-                            </div>
-                        </div>
-                    </ZenCardContent>
-                </ZenCard>
-            )}
 
 
 

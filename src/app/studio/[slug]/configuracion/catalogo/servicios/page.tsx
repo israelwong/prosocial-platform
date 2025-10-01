@@ -30,7 +30,7 @@ export default async function ServiciosPage({ params }: ServiciosPageProps) {
                         Servicios Individuales
                     </CardTitle>
                     <CardDescription className="text-zinc-400">
-                        Gestiona todos tus servicios como "Sesión de fotos 1hr", "Video con dron", "Álbum impreso"
+                        Gestiona todos tus servicios como &quot;Sesión de fotos 1hr&quot;, &quot;Video con dron&quot;, &quot;Álbum impreso&quot;
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
