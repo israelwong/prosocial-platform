@@ -46,7 +46,8 @@ import {
     ChevronDown,
     ChevronRight,
     BarChart3,
-    Calendar
+    Calendar,
+    Layers
 } from 'lucide-react';
 
 interface ConfigSection {
@@ -76,6 +77,14 @@ interface ConfiguracionSidebarZenProps {
 
 // Función para generar secciones de configuración
 const getConfigSections = (studioSlug: string): ConfigSection[] => [
+    {
+        id: 'modulos',
+        title: 'Módulos',
+        description: 'Gestiona módulos activos',
+        icon: Layers,
+        href: `/${studioSlug}/configuracion/modulos`,
+        completed: true
+    },
     {
         id: 'estudio',
         title: 'Estudio',
