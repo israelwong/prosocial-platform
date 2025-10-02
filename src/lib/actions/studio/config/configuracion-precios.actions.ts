@@ -17,7 +17,7 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
             where: { slug: studioSlug },
             select: {
                 id: true,
-                name: true,
+                studio_name: true,
                 slug: true,
                 configuraciones: {
                     where: { status: 'active' },

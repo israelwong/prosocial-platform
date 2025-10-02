@@ -25,7 +25,7 @@ export async function obtenerRedesSocialesStudio(
     // 1. Obtener studio
     const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
-      select: { id: true, name: true },
+      select: { id: true, studio_name: true },
     });
 
     if (!studio) {

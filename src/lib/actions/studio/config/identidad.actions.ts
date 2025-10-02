@@ -147,7 +147,7 @@ export async function actualizarLogo(
 
     const validatedData = LogoUpdateSchema.parse(data);
 
-    const updateData = validatedData.tipo === "logo" 
+    const updateData = validatedData.tipo === "logo"
       ? { logoUrl: validatedData.url }
       : { isotipo_url: validatedData.url };
 
