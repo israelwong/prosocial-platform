@@ -21,7 +21,7 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
                 slug: true,
                 configuraciones: {
                     where: { status: 'active' },
-                    orderBy: { updatedAt: 'desc' },
+                    orderBy: { updated_at: 'desc' },
                     take: 1,
                 },
             },
@@ -71,7 +71,7 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
                 id: true,
                 configuraciones: {
                     where: { status: 'active' },
-                    orderBy: { updatedAt: 'desc' },
+                    orderBy: { updated_at: 'desc' },
                     take: 1,
                     select: {
                         utilidad_servicio: true,

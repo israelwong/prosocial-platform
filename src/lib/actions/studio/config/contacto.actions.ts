@@ -105,7 +105,7 @@ export async function obtenerTelefonosStudio(
         // 3. Obtener teléfonos
         const telefonos = await prisma.studio_telefonos.findMany({
             where: whereClause,
-            orderBy: { createdAt: "asc" },
+            orderBy: { created_at: "asc" },
         });
 
         return telefonos;

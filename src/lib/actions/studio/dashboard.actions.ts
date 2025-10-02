@@ -135,7 +135,7 @@ export async function obtenerClientesRecientes(studioSlug: string): Promise<Dash
           telefono: true,
           status: true,
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { created_at: "desc" },
         take: 5,
       });
 
