@@ -1,6 +1,6 @@
 export interface ReglaAgendamientoData {
     id: string;
-    projectId: string;
+    studio_id: string;
     nombre: string;
     descripcion?: string | null;
     recurrencia: 'por_dia' | 'por_hora';

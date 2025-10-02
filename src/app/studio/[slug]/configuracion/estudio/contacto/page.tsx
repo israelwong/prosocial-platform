@@ -69,7 +69,7 @@ export default function ContactoPageZen() {
 
             const telefonosConTipos = (data.telefonos || []).map(telefono => ({
                 id: telefono.id,
-                projectId: telefono.projectId,
+                studio_id: telefono.studio_id,
                 numero: telefono.numero,
                 tipo: telefono.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina',
                 activo: telefono.activo,

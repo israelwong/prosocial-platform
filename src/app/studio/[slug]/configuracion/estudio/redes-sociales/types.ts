@@ -14,7 +14,7 @@ export interface Plataforma {
 
 export interface RedSocial {
     id: string;
-    projectId: string;
+    studio_id: string;
     plataformaId: string | null;
     url: string;
     activo: boolean;

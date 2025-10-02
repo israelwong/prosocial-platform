@@ -1,6 +1,6 @@
 export interface Telefono {
     id: string;
-    projectId: string;
+    studio_id: string;
     numero: string;
     tipo: 'principal' | 'whatsapp' | 'emergencia' | 'oficina';
     activo: boolean;

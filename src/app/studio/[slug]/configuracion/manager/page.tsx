@@ -77,7 +77,7 @@ export default async function ManagerConfigPage({
     params: { slug: string }
 }) {
     const { slug } = await params;
-    
+
     return (
         <div className="space-y-8">
             {/* Header */}
@@ -89,12 +89,12 @@ export default async function ManagerConfigPage({
                     Configura los aspectos operacionales de tu estudio para gestionar eventos y proyectos
                 </p>
             </div>
-            
+
             {/* Secciones de configuración */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {managerSections.map((section) => {
                     const Icon = section.icon;
-                    
+
                     return (
                         <Link
                             key={section.id}
@@ -111,7 +111,7 @@ export default async function ManagerConfigPage({
                                     ">
                                         <Icon className="w-6 h-6" />
                                     </div>
-                                    
+
                                     {/* Contenido */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-2">
@@ -130,11 +130,11 @@ export default async function ManagerConfigPage({
                     );
                 })}
             </div>
-            
+
             {/* Info adicional */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
                 <p className="text-sm text-zinc-400">
-                    💡 <span className="text-white font-medium">Tip:</span> Completa estas configuraciones antes de empezar a gestionar eventos. 
+                    💡 <span className="text-white font-medium">Tip:</span> Completa estas configuraciones antes de empezar a gestionar eventos.
                     Esto te permitirá aprovechar al máximo las funcionalidades de ZEN Manager.
                 </p>
             </div>

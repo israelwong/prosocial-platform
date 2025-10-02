@@ -34,7 +34,7 @@ export function HorariosListZen({
         const horarioExistente = horariosPorDia.get(dia.value);
         return horarioExistente || {
             id: `temp-${dia.value}`,
-            projectId: '',
+            studio_id: '',
             dia_semana: dia.value,
             hora_inicio: '09:00',
             hora_fin: '18:00',

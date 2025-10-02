@@ -2,7 +2,7 @@
 
 export interface MetodoPagoData {
     id: string;
-    projectId: string;
+    studio_id: string;
     metodo_pago: string;
     comision_porcentaje_base?: number | null;
     comision_fija_monto?: number | null;

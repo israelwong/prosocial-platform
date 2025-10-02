@@ -19,7 +19,7 @@ export interface Personal {
             color: string | null;
             icon: string | null;
             description: string | null;
-            projectId: string;
+            studio_id: string;
             isActive: boolean;
             isDefault: boolean;
             order: number;

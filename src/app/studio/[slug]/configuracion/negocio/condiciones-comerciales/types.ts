@@ -2,7 +2,7 @@
 
 export interface CondicionComercialData {
     id: string;
-    projectId: string;
+    studio_id: string;
     nombre: string;
     descripcion?: string | null;
     porcentaje_descuento?: number | null;
