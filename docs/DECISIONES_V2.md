@@ -23,12 +23,14 @@ model studios {                    // snake_case para tablas
 ```
 
 **Justificación:**
+
 - Consistencia total (tablas + columnas)
 - Estándar PostgreSQL nativo
 - Queries SQL más legibles
 - Evita conversión mental
 
 **Impacto:**
+
 - ❌ NO crear tablas con prefijo `_v2`
 - ✅ Renombrar columnas existentes
 - ✅ Data es de prueba, no hay riesgo
@@ -56,6 +58,7 @@ model studios {
 ```
 
 **Razón:**
+
 - Congruencia con scope del negocio
 - Mejor comprensión semántica
 - Alineado con dominio (studio fotográfico)
@@ -67,11 +70,13 @@ model studios {
 ✅ **APROBADO: Migración agresiva (data de prueba)**
 
 **Contexto:**
+
 - Toda la data actual es de prueba
 - No hay información real de clientes
 - Podemos hacer cambios radicales sin rollback complejo
 
 **Estrategia:**
+
 1. Renombrar tablas y columnas directamente
 2. Aplicar migración en un solo paso
 3. Validar con Prisma generate
@@ -94,6 +99,7 @@ ITERACIÓN 4: ZEN MAGIC (3 días)
 ```
 
 **Razón:**
+
 - Studio = Core business (fotógrafos usándolo diario)
 - Admin = Gestión de plataforma (menos crítico para MVP)
 - Agente = Ventas/soporte (puede esperar)
@@ -152,7 +158,7 @@ model studio_modules {
   studio_id String
   module_id String
   is_active Boolean @default(false)
-  
+
   @@unique([studio_id, module_id])
 }
 ```
@@ -165,7 +171,7 @@ model users {
   supabase_id String @unique
   email String @unique
   full_name String?
-  
+
   platform_roles user_platform_roles[]
   studio_roles user_studio_roles[]
 }
@@ -222,6 +228,7 @@ model gantt_event_instances {
 ## 📊 FASE 0: FUNDAMENTOS (3-4 días)
 
 ### **Día 1: Limpieza Base de Datos** ✅ COMPLETADO
+
 - [x] Crear ramas: backup-pre-v2, v2-foundation
 - [x] Renombrar projects → studios
 - [x] Aplicar snake_case a TODAS las columnas
@@ -231,16 +238,19 @@ model gantt_event_instances {
 - [ ] Aplicar migración → SIGUIENTE PASO
 
 ### **Día 2: Sistema de Módulos**
+
 - [ ] Crear platform_modules, studio_modules
 - [ ] Seed módulos MVP
 - [ ] Helper checkStudioModule()
 
 ### **Día 3: Usuarios Multi-Contexto**
+
 - [ ] Crear users, user_platform_roles, user_studio_roles
 - [ ] Seed usuarios de prueba
 - [ ] Migrar usuarios existentes
 
 ### **Día 4: Pipelines + Gantt**
+
 - [ ] Crear marketing_leads, marketing_pipeline_stages
 - [ ] Extender project_eventos → manager_events
 - [ ] Crear gantt_templates, gantt_event_instances
@@ -251,22 +261,26 @@ model gantt_event_instances {
 ## ✅ CHECKLIST DE VALIDACIÓN
 
 ### **Post-Migración (Día 1)**
+
 - [ ] `npx prisma generate` sin errores
 - [ ] `npx prisma migrate dev` exitoso
 - [ ] Queries básicas funcionan
 - [ ] Seed exitoso
 
 ### **Post-Módulos (Día 2)**
+
 - [ ] checkStudioModule() funciona
 - [ ] Módulos activados en studios de prueba
 - [ ] Gates de features funcionan
 
 ### **Post-Usuarios (Día 3)**
+
 - [ ] Login con Supabase funciona
 - [ ] Roles se asignan correctamente
 - [ ] Permisos se verifican
 
 ### **Post-Pipelines (Día 4)**
+
 - [ ] Kanban Marketing funciona
 - [ ] Kanban Manager funciona
 - [ ] Gantt templates se aplican
@@ -295,4 +309,3 @@ model gantt_event_instances {
 **Última actualización:** 2025-10-02  
 **Responsable:** Israel Wong  
 **Status:** ✅ En ejecución
-
