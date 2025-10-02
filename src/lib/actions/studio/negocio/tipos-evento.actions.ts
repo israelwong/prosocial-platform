@@ -174,14 +174,14 @@ export async function actualizarTipoEvento(
             },
         });
 
-        // Obtener el slug del proyecto para revalidar
+        // Obtener el slug del studio para revalidar
         const studio = await prisma.studios.findUnique({
             where: { id: tipoEvento.studio_id },
             select: { slug: true },
         });
 
         if (studio) {
-            revalidateTiposEvento(project.slug);
+            revalidateTiposEvento(studio.slug);
         }
 
         return {
@@ -235,14 +235,14 @@ export async function eliminarTipoEvento(
             where: { id: tipoId },
         });
 
-        // Obtener el slug del proyecto para revalidar
+        // Obtener el slug del studio para revalidar
         const studio = await prisma.studios.findUnique({
             where: { id: tipoEvento.studio_id },
             select: { slug: true },
         });
 
         if (studio) {
-            revalidateTiposEvento(project.slug);
+            revalidateTiposEvento(studio.slug);
         }
 
         return {
