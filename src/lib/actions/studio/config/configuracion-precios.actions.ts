@@ -38,14 +38,14 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
             // Crear configuración por defecto
             configuracion = await prisma.studio_configuraciones.create({
                 data: {
-                    studios: { connect: { id: studio.id } },
+                    studio: { connect: { id: studio.id } },
                     nombre: 'Configuración de Precios',
                     utilidad_servicio: 0.30, // 30%
                     utilidad_producto: 0.40, // 40%
                     comision_venta: 0.10, // 10%
                     sobreprecio: 0.05, // 5%
                     status: 'active',
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 },
             });
         }
@@ -89,7 +89,7 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
 
         // Contar servicios existentes
         const servicios = await prisma.studio_servicios.findMany({
-            where: { studios: { id: studio.id } },
+            where: { studio: { id: studio.id } },
             select: {
                 id: true,
                 tipo_utilidad: true,
@@ -177,20 +177,20 @@ export async function actualizarConfiguracionPrecios(
                     comision_venta: dataToSave.comision_venta,
                     sobreprecio: dataToSave.sobreprecio,
                     status: 'active',
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 },
             });
         } else {
             await prisma.studio_configuraciones.create({
                 data: {
-                    studios: { connect: { id: studio.id } },
+                    studio: { connect: { id: studio.id } },
                     nombre: 'Configuración de Precios',
                     utilidad_servicio: dataToSave.utilidad_servicio,
                     utilidad_producto: dataToSave.utilidad_producto,
                     comision_venta: dataToSave.comision_venta,
                     sobreprecio: dataToSave.sobreprecio,
                     status: 'active',
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 },
             });
         }
@@ -201,7 +201,7 @@ export async function actualizarConfiguracionPrecios(
         if (serviciosExistentes.requiere_actualizacion_masiva) {
             // 4. Obtener todos los servicios existentes para el recálculo masivo
             const todosLosServicios = await prisma.studio_servicios.findMany({
-                where: { studios: { id: studio.id } },
+                where: { studio: { id: studio.id } },
                 include: {
                     // Incluir gastos si existen
                     servicio_gastos: true,
@@ -217,7 +217,7 @@ export async function actualizarConfiguracionPrecios(
                 return prisma.studio_servicios.update({
                     where: { id: servicio.id },
                     data: {
-                        updatedAt: new Date(),
+                        updated_at: new Date(),
                     },
                 });
             });
@@ -253,7 +253,7 @@ export async function obtenerEstadisticasServicios(studioSlug: string) {
         }
 
         const servicios = await prisma.studio_servicios.findMany({
-            where: { studios: { id: studio.id } },
+            where: { studio: { id: studio.id } },
             select: {
                 id: true,
                 nombre: true,
