@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/shadcn/button';
-import { ZenInput } from '@/components/ui/zen';
+import { ZenButton, ZenInput } from '@/components/ui/zen';
 import { Textarea } from '@/components/ui/shadcn/textarea';
 import { Switch } from '@/components/ui/shadcn/switch';
+import { Label } from '@/components/ui/shadcn/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Separator } from '@/components/ui/shadcn/separator';
 import { toast } from 'sonner';
@@ -249,16 +249,16 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                             placeholder="Agregar característica..."
                             onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                         />
-                        <Button type="button" onClick={addFeature} variant="outline">
+                        <ZenButton type="button" onClick={addFeature} variant="outline">
                             Agregar
-                        </Button>
+                        </ZenButton>
                     </div>
 
                     <div className="space-y-2">
                         {features.map((feature, index) => (
                             <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
                                 <span className="text-sm">{feature}</span>
-                                <Button
+                                <ZenButton
                                     type="button"
                                     variant="ghost"
                                     size="sm"
@@ -266,7 +266,7 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                                     className="text-red-500 hover:text-red-700"
                                 >
                                     Eliminar
-                                </Button>
+                                </ZenButton>
                             </div>
                         ))}
                     </div>
@@ -279,9 +279,9 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                     <CardTitle>Límites del Plan</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <Button type="button" onClick={addLimit} variant="outline">
+                    <ZenButton type="button" onClick={addLimit} variant="outline">
                         Agregar Límite
-                    </Button>
+                    </ZenButton>
 
                     <div className="space-y-2">
                         {Object.entries(limits).map(([key, value]) => (
@@ -289,7 +289,7 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                                 <span className="text-sm">
                                     <strong>{key}:</strong> {String(value)}
                                 </span>
-                                <Button
+                                <ZenButton
                                     type="button"
                                     variant="ghost"
                                     size="sm"
@@ -297,7 +297,7 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                                     className="text-red-500 hover:text-red-700"
                                 >
                                     Eliminar
-                                </Button>
+                                </ZenButton>
                             </div>
                         ))}
                     </div>
@@ -366,16 +366,16 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
 
             {/* Botones de Acción */}
             <div className="flex justify-end gap-4">
-                <Button
+                <ZenButton
                     type="button"
                     variant="outline"
                     onClick={() => router.push('/admin/plans')}
                 >
                     Cancelar
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Guardando...' : mode === 'create' ? 'Crear Plan' : 'Actualizar Plan'}
-                </Button>
+                </ZenButton>
+                <ZenButton type="submit" loading={isSubmitting} loadingText="Guardando...">
+                    {mode === 'create' ? 'Crear Plan' : 'Actualizar Plan'}
+                </ZenButton>
             </div>
         </form>
     );

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
+import { ZenInput } from '@/components/ui/zen';
 import { Label } from '@/components/ui/shadcn/label';
 import { Textarea } from '@/components/ui/shadcn/textarea';
 import {
@@ -144,16 +144,14 @@ export function PipelineStageModal({ isOpen, onClose, stage, activeSection = 'co
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="nombre" className="text-white">
-                                Nombre *
-                            </Label>
-                            <Input
+                            <ZenInput
                                 id="nombre"
+                                label="Nombre"
+                                required
                                 value={formData.nombre}
                                 onChange={(e) => setFormData(prev => ({ ...prev, nombre: e.target.value }))}
                                 className="bg-zinc-800 border-zinc-700 text-white"
                                 placeholder="Ej: Calificación Inicial"
-                                required
                             />
                         </div>
                         <div className="grid gap-2">
@@ -174,14 +172,14 @@ export function PipelineStageModal({ isOpen, onClose, stage, activeSection = 'co
                                 Color
                             </Label>
                             <div className="flex items-center space-x-2">
-                                <Input
+                                <ZenInput
                                     id="color"
                                     type="color"
                                     value={formData.color}
                                     onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
                                     className="w-16 h-10 bg-zinc-800 border-zinc-700"
                                 />
-                                <Input
+                                <ZenInput
                                     value={formData.color}
                                     onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
                                     className="bg-zinc-800 border-zinc-700 text-white"

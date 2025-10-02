@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/shadcn/button";
-import { Input } from "@/components/ui/shadcn/input";
+import { ZenInput } from "@/components/ui/zen";
 import { Label } from "@/components/ui/shadcn/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/shadcn/card";
 import { Badge } from "@/components/ui/shadcn/badge";
@@ -170,24 +170,19 @@ export function DiscountCodeValidator({
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex gap-2">
-                        <div className="flex-1">
-                            <Label htmlFor="discount-code" className="sr-only">
-                                Código de descuento
-                            </Label>
-                            <Input
-                                id="discount-code"
-                                value={code}
-                                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                                placeholder="Ingresa tu código de descuento"
-                                className="font-mono"
-                                disabled={disabled || loading}
-                                onKeyPress={(e) => {
-                                    if (e.key === "Enter") {
-                                        validateCode();
-                                    }
-                                }}
-                            />
-                        </div>
+                        <ZenInput
+                            id="discount-code"
+                            value={code}
+                            onChange={(e) => setCode(e.target.value.toUpperCase())}
+                            placeholder="Ingresa tu código de descuento"
+                            className="font-mono flex-1"
+                            disabled={disabled || loading}
+                            onKeyPress={(e) => {
+                                if (e.key === "Enter") {
+                                    validateCode();
+                                }
+                            }}
+                        />
                         <Button
                             onClick={validateCode}
                             disabled={disabled || loading || !code.trim()}

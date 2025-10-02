@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/shadcn/card";
 import { Button } from "@/components/ui/shadcn/button";
-import { Input } from "@/components/ui/shadcn/input";
+import { ZenInput } from "@/components/ui/zen";
 import { Label } from "@/components/ui/shadcn/label";
 import { Textarea } from "@/components/ui/shadcn/textarea";
 import {
@@ -291,26 +291,24 @@ export default function EditarCódigoPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="codigo">Código *</Label>
-                                <Input
-                                    id="codigo"
-                                    value={formData.codigo}
-                                    onChange={(e) => handleInputChange("codigo", e.target.value.toUpperCase())}
-                                    placeholder="BLACKFRIDAY2024"
-                                    className="font-mono"
-                                />
-                            </div>
+                            <ZenInput
+                                id="codigo"
+                                label="Código"
+                                required
+                                value={formData.codigo}
+                                onChange={(e) => handleInputChange("codigo", e.target.value.toUpperCase())}
+                                placeholder="BLACKFRIDAY2024"
+                                className="font-mono"
+                            />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="nombre">Nombre *</Label>
-                                <Input
-                                    id="nombre"
-                                    value={formData.nombre}
-                                    onChange={(e) => handleInputChange("nombre", e.target.value)}
-                                    placeholder="Black Friday 2024"
-                                />
-                            </div>
+                            <ZenInput
+                                id="nombre"
+                                label="Nombre"
+                                required
+                                value={formData.nombre}
+                                onChange={(e) => handleInputChange("nombre", e.target.value)}
+                                placeholder="Black Friday 2024"
+                            />
 
                             <div className="space-y-2">
                                 <Label htmlFor="descripcion">Descripción</Label>
@@ -352,22 +350,21 @@ export default function EditarCódigoPage() {
                                 </Select>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="valor_descuento">Valor del Descuento *</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="valor_descuento"
-                                        type="number"
-                                        value={formData.valor_descuento}
-                                        onChange={(e) => handleInputChange("valor_descuento", parseFloat(e.target.value) || 0)}
-                                        placeholder="15"
-                                        min="0"
-                                        max={formData.tipo_descuento === "porcentaje" ? 100 : undefined}
-                                    />
-                                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
-                                        {formData.tipo_descuento === "porcentaje" ? "%" : "$"}
-                                    </span>
-                                </div>
+                            <div className="relative">
+                                <ZenInput
+                                    id="valor_descuento"
+                                    label="Valor del Descuento"
+                                    required
+                                    type="number"
+                                    value={formData.valor_descuento}
+                                    onChange={(e) => handleInputChange("valor_descuento", parseFloat(e.target.value) || 0)}
+                                    placeholder="15"
+                                    min="0"
+                                    max={formData.tipo_descuento === "porcentaje" ? 100 : undefined}
+                                />
+                                <span className="absolute right-3 top-[38px] text-muted-foreground">
+                                    {formData.tipo_descuento === "porcentaje" ? "%" : "$"}
+                                </span>
                             </div>
 
                             <div className="space-y-2">
@@ -389,20 +386,16 @@ export default function EditarCódigoPage() {
                                 </Select>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="uso_maximo">Uso Máximo</Label>
-                                <Input
-                                    id="uso_maximo"
-                                    type="number"
-                                    value={formData.uso_maximo || ""}
-                                    onChange={(e) => handleInputChange("uso_maximo", e.target.value ? parseInt(e.target.value) : null)}
-                                    placeholder="1000 (dejar vacío para ilimitado)"
-                                    min="1"
-                                />
-                                <p className="text-sm text-muted-foreground">
-                                    Deja vacío para uso ilimitado
-                                </p>
-                            </div>
+                            <ZenInput
+                                id="uso_maximo"
+                                label="Uso Máximo"
+                                type="number"
+                                value={formData.uso_maximo || ""}
+                                onChange={(e) => handleInputChange("uso_maximo", e.target.value ? parseInt(e.target.value) : null)}
+                                placeholder="1000 (dejar vacío para ilimitado)"
+                                min="1"
+                                hint="Deja vacío para uso ilimitado"
+                            />
                         </CardContent>
                     </Card>
                 </div>
@@ -417,25 +410,23 @@ export default function EditarCódigoPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="fecha_inicio">Fecha de Inicio *</Label>
-                                <Input
-                                    id="fecha_inicio"
-                                    type="date"
-                                    value={formData.fecha_inicio}
-                                    onChange={(e) => handleInputChange("fecha_inicio", e.target.value)}
-                                />
-                            </div>
+                            <ZenInput
+                                id="fecha_inicio"
+                                label="Fecha de Inicio"
+                                required
+                                type="date"
+                                value={formData.fecha_inicio}
+                                onChange={(e) => handleInputChange("fecha_inicio", e.target.value)}
+                            />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="fecha_fin">Fecha de Fin *</Label>
-                                <Input
-                                    id="fecha_fin"
-                                    type="date"
-                                    value={formData.fecha_fin}
-                                    onChange={(e) => handleInputChange("fecha_fin", e.target.value)}
-                                />
-                            </div>
+                            <ZenInput
+                                id="fecha_fin"
+                                label="Fecha de Fin"
+                                required
+                                type="date"
+                                value={formData.fecha_fin}
+                                onChange={(e) => handleInputChange("fecha_fin", e.target.value)}
+                            />
                         </CardContent>
                     </Card>
 

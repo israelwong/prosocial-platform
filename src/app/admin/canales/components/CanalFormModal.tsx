@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
+import { ZenInput } from '@/components/ui/zen';
 import { Label } from '@/components/ui/shadcn/label';
 import { Textarea } from '@/components/ui/shadcn/textarea';
 import { Switch } from '@/components/ui/shadcn/switch';
@@ -120,15 +120,13 @@ export default function CanalFormModal({
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <Label htmlFor="nombre">Nombre *</Label>
-                        <Input
-                            id="nombre"
-                            value={formData.nombre}
-                            onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                            required
-                        />
-                    </div>
+                    <ZenInput
+                        id="nombre"
+                        label="Nombre"
+                        required
+                        value={formData.nombre}
+                        onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                    />
 
                     <div>
                         <Label htmlFor="descripcion">Descripción</Label>
@@ -140,15 +138,13 @@ export default function CanalFormModal({
                         />
                     </div>
 
-                    <div>
-                        <Label htmlFor="color">Color</Label>
-                        <Input
-                            id="color"
-                            type="color"
-                            value={formData.color}
-                            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                        />
-                    </div>
+                    <ZenInput
+                        id="color"
+                        label="Color"
+                        type="color"
+                        value={formData.color}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                    />
 
                     <div className="flex items-center space-x-6">
                         <div className="flex items-center space-x-2">

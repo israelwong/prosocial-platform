@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
-import { Input } from '@/components/ui/shadcn/input';
+import { ZenInput } from '@/components/ui/zen';
 import { Switch } from '@/components/ui/shadcn/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/shadcn/select';
 import { Badge } from '@/components/ui/shadcn/badge';
@@ -367,7 +367,7 @@ export function PlanServicesList({ planId, isEdit = true, onServicesChange }: Pl
 
                                             {/* Límite (máximo 3 dígitos) */}
                                             <div className="w-20">
-                                                <Input
+                                                <ZenInput
                                                     type="number"
                                                     placeholder="∞"
                                                     value={service.planService?.limite ?? ''}

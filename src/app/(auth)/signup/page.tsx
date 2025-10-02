@@ -4,12 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/auth-provider'
-import { Button } from '@/components/ui/shadcn/button'
+import { ZenButton } from '@/components/ui/zen'
 import { Input } from '@/components/ui/shadcn/input'
 import { Label } from '@/components/ui/shadcn/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card'
 import { Alert, AlertDescription } from '@/components/ui/shadcn/alert'
-import { Loader2 } from 'lucide-react'
 
 export default function SignUpPage() {
     const [email, setEmail] = useState('')
@@ -66,9 +65,9 @@ export default function SignUpPage() {
                             <p className="text-sm text-gray-600 mb-4">
                                 Te hemos enviado un enlace de confirmación a tu email.
                             </p>
-                            <Button onClick={() => router.push('/login')} className="w-full">
+                            <ZenButton onClick={() => router.push('/login')} fullWidth>
                                 Ir a Iniciar Sesión
-                            </Button>
+                            </ZenButton>
                         </CardContent>
                     </Card>
                 </div>
@@ -137,16 +136,14 @@ export default function SignUpPage() {
                                 />
                             </div>
 
-                            <Button type="submit" className="w-full" disabled={loading}>
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Creando cuenta...
-                                    </>
-                                ) : (
-                                    'Crear Cuenta'
-                                )}
-                            </Button>
+                            <ZenButton
+                                type="submit"
+                                fullWidth
+                                loading={loading}
+                                loadingText="Creando cuenta..."
+                            >
+                                Crear Cuenta
+                            </ZenButton>
                         </form>
 
                         <div className="mt-6 text-center">

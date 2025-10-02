@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/shadcn/button';
+import { ZenButton } from '@/components/ui/zen';
 import { ZenInput } from '@/components/ui/zen';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Save, User, Mail, Phone } from 'lucide-react';
@@ -124,14 +124,16 @@ export function PerfilFormSimple({
 
                     {/* Botón de guardar */}
                     <div className="flex justify-end pt-4">
-                        <Button
+                        <ZenButton
                             type="submit"
-                            disabled={loading}
+                            loading={loading}
+                            loadingText="Actualizando..."
+                            icon={Save}
+                            iconPosition="left"
                             className="bg-blue-600 hover:bg-blue-700"
                         >
-                            <Save className="mr-2 h-4 w-4" />
-                            {loading ? 'Actualizando...' : 'Actualizar Perfil'}
-                        </Button>
+                            Actualizar Perfil
+                        </ZenButton>
                     </div>
                 </form>
             </CardContent>

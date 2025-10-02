@@ -9,7 +9,7 @@ import {
     DialogFooter,
 } from '@/components/ui/shadcn/dialog';
 import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
+import { ZenInput } from '@/components/ui/zen';
 import { Label } from '@/components/ui/shadcn/label';
 import { Textarea } from '@/components/ui/shadcn/textarea';
 import { Loader2 } from 'lucide-react';
@@ -130,16 +130,15 @@ export function ServiceCategoryModal({
                 </DialogHeader>
 
                 <div className="space-y-4">
-                    <div>
-                        <Label htmlFor="name" className='mb-2'>Nombre *</Label>
-                        <Input
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => handleInputChange('name', e.target.value)}
-                            placeholder="Ej: Gestión de Clientes y Leads"
-                            disabled={isLoading}
-                        />
-                    </div>
+                    <ZenInput
+                        id="name"
+                        label="Nombre"
+                        required
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        placeholder="Ej: Gestión de Clientes y Leads"
+                        disabled={isLoading}
+                    />
 
                     <div>
                         <Label htmlFor="description" className='mb-2'>Descripción *</Label>
@@ -153,19 +152,16 @@ export function ServiceCategoryModal({
                         />
                     </div>
 
-                    <div>
-                        <Label htmlFor="icon" className='mb-2'>Icono *</Label>
-                        <Input
-                            id="icon"
-                            value={formData.icon}
-                            onChange={(e) => handleInputChange('icon', e.target.value)}
-                            placeholder="Ej: Users, DollarSign, Calendar"
-                            disabled={isLoading}
-                        />
-                        <p className="text-xs text-muted-foreground mt-2">
-                            Nombre del icono de Lucide React (ej: Users, DollarSign, Calendar)
-                        </p>
-                    </div>
+                    <ZenInput
+                        id="icon"
+                        label="Icono"
+                        required
+                        value={formData.icon}
+                        onChange={(e) => handleInputChange('icon', e.target.value)}
+                        placeholder="Ej: Users, DollarSign, Calendar"
+                        disabled={isLoading}
+                        hint="Nombre del icono de Lucide React (ej: Users, DollarSign, Calendar)"
+                    />
 
                 </div>
 

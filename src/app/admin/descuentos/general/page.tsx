@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/shadcn/card";
 import { Button } from "@/components/ui/shadcn/button";
 import { Badge } from "@/components/ui/shadcn/badge";
-import { Input } from "@/components/ui/shadcn/input";
+import { ZenInput } from "@/components/ui/zen";
 import {
     Table,
     TableBody,
@@ -157,15 +157,12 @@ export default function CódigosGeneralesPage() {
                 <CardContent>
                     <div className="flex gap-4">
                         <div className="flex-1">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    placeholder="Buscar por código o nombre..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10"
-                                />
-                            </div>
+                            <ZenInput
+                                placeholder="Buscar por código o nombre..."
+                                icon={Search}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                         <div className="flex gap-2">
                             <Button

@@ -9,7 +9,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/shadcn/dialog';
-import { Button } from '@/components/ui/shadcn/button';
+import { ZenButton } from '@/components/ui/zen';
 import { AlertTriangle } from 'lucide-react';
 
 interface ConfirmModalProps {
@@ -62,25 +62,28 @@ export function ConfirmModal({
                 </DialogHeader>
 
                 <DialogFooter className="flex-col sm:flex-row gap-2">
-                    <Button
+                    <ZenButton
                         variant="outline"
                         onClick={onClose}
                         disabled={loading}
-                        className="w-full sm:w-auto border-zinc-600 text-zinc-300 hover:bg-zinc-700"
+                        fullWidth
+                        className="sm:w-auto border-zinc-600 text-zinc-300 hover:bg-zinc-700"
                     >
                         {cancelText}
-                    </Button>
-                    <Button
-                        variant={variant === 'destructive' ? 'destructive' : 'default'}
+                    </ZenButton>
+                    <ZenButton
+                        variant={variant === 'destructive' ? 'destructive' : 'primary'}
                         onClick={handleConfirm}
-                        disabled={loading}
-                        className={`w-full sm:w-auto ${variant === 'destructive'
+                        loading={loading}
+                        loadingText="Procesando..."
+                        fullWidth
+                        className={`sm:w-auto ${variant === 'destructive'
                                 ? 'bg-red-600 hover:bg-red-700 text-white'
                                 : 'bg-blue-600 hover:bg-blue-700 text-white'
                             }`}
                     >
-                        {loading ? 'Procesando...' : confirmText}
-                    </Button>
+                        {confirmText}
+                    </ZenButton>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
