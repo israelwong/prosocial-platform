@@ -24,7 +24,7 @@ import {
 export async function obtenerContactoStudio(studioSlug: string) {
     return await retryDatabaseOperation(async () => {
         // 1. Obtener studio con teléfonos
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: {
                 id: true,
@@ -35,7 +35,7 @@ export async function obtenerContactoStudio(studioSlug: string) {
                 telefonos: {
                     select: {
                         id: true,
-                        projectId: true,
+                        studio_id: true,
                         numero: true,
                         tipo: true,
                         activo: true,
@@ -72,7 +72,7 @@ export async function obtenerTelefonosStudio(
 ) {
     return await retryDatabaseOperation(async () => {
         // 1. Obtener studio
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true, name: true },
         });
@@ -83,11 +83,11 @@ export async function obtenerTelefonosStudio(
 
         // 2. Construir filtros
         const whereClause: {
-            projectId: string;
+            studio_id: string;
             activo?: boolean;
             tipo?: string;
         } = {
-            projectId: studio.id,
+            studio_id: studio.id,
         };
 
         if (filters) {
@@ -103,7 +103,7 @@ export async function obtenerTelefonosStudio(
         }
 
         // 3. Obtener teléfonos
-        const telefonos = await prisma.project_telefonos.findMany({
+        const telefonos = await prisma.studio_telefonos.findMany({
             where: whereClause,
             orderBy: { createdAt: "asc" },
         });
@@ -119,7 +119,7 @@ export async function crearTelefono(
 ) {
     return await retryDatabaseOperation(async () => {
         // 1. Obtener studio
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -134,9 +134,9 @@ export async function crearTelefono(
         // 3. Verificar si ya existe un teléfono del mismo tipo activo
         // Solo para tipo "principal" limitamos a uno activo
         if (validatedData.tipo === "principal") {
-            const existingTelefono = await prisma.project_telefonos.findFirst({
+            const existingTelefono = await prisma.studio_telefonos.findFirst({
                 where: {
-                    projectId: studio.id,
+                    studio_id: studio.id,
                     tipo: "principal",
                     activo: true,
                 },
@@ -148,9 +148,9 @@ export async function crearTelefono(
         }
 
         // 4. Crear teléfono
-        const nuevoTelefono = await prisma.project_telefonos.create({
+        const nuevoTelefono = await prisma.studio_telefonos.create({
             data: {
-                projectId: studio.id,
+                studio_id: studio.id,
                 numero: validatedData.numero,
                 tipo: validatedData.tipo,
                 activo: validatedData.activo,
@@ -174,10 +174,10 @@ export async function actualizarTelefono(
         const validatedData = TelefonoUpdateSchema.parse(data);
 
         // 2. Obtener teléfono existente
-        const existingTelefono = await prisma.project_telefonos.findUnique({
+        const existingTelefono = await prisma.studio_telefonos.findUnique({
             where: { id: telefonoId },
             include: {
-                projects: { select: { slug: true } },
+                studios: { select: { slug: true } },
             },
         });
 
@@ -186,7 +186,7 @@ export async function actualizarTelefono(
         }
 
         // 3. Actualizar teléfono
-        const telefonoActualizado = await prisma.project_telefonos.update({
+        const telefonoActualizado = await prisma.studio_telefonos.update({
             where: { id: telefonoId },
             data: {
                 ...(validatedData.numero && { numero: validatedData.numero }),
@@ -196,7 +196,7 @@ export async function actualizarTelefono(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.projects.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studios.slug}/configuracion/cuenta/contacto`);
 
         return telefonoActualizado;
     });
@@ -209,7 +209,7 @@ export async function actualizarTelefonosBulk(
 ) {
     return await retryDatabaseOperation(async () => {
         // 1. Obtener studio
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -224,7 +224,7 @@ export async function actualizarTelefonosBulk(
         // 3. Actualizar todos los teléfonos en una transacción
         const resultados = await prisma.$transaction(
             validatedData.telefonos.map((telefono) =>
-                prisma.project_telefonos.update({
+                prisma.studio_telefonos.update({
                     where: { id: telefono.id },
                     data: {
                         ...(telefono.numero && { numero: telefono.numero }),
@@ -252,10 +252,10 @@ export async function toggleTelefonoEstado(
         const validatedData = TelefonoToggleSchema.parse(data);
 
         // 2. Obtener teléfono existente
-        const existingTelefono = await prisma.project_telefonos.findUnique({
+        const existingTelefono = await prisma.studio_telefonos.findUnique({
             where: { id: telefonoId },
             include: {
-                projects: { select: { slug: true } },
+                studios: { select: { slug: true } },
             },
         });
 
@@ -264,13 +264,13 @@ export async function toggleTelefonoEstado(
         }
 
         // 3. Actualizar estado
-        const telefonoActualizado = await prisma.project_telefonos.update({
+        const telefonoActualizado = await prisma.studio_telefonos.update({
             where: { id: telefonoId },
             data: { activo: validatedData.activo },
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.projects.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studios.slug}/configuracion/cuenta/contacto`);
 
         return telefonoActualizado;
     });
@@ -280,10 +280,10 @@ export async function toggleTelefonoEstado(
 export async function eliminarTelefono(telefonoId: string) {
     return await retryDatabaseOperation(async () => {
         // 1. Obtener teléfono existente
-        const existingTelefono = await prisma.project_telefonos.findUnique({
+        const existingTelefono = await prisma.studio_telefonos.findUnique({
             where: { id: telefonoId },
             include: {
-                projects: { select: { slug: true } },
+                studios: { select: { slug: true } },
             },
         });
 
@@ -292,12 +292,12 @@ export async function eliminarTelefono(telefonoId: string) {
         }
 
         // 2. Eliminar teléfono
-        await prisma.project_telefonos.delete({
+        await prisma.studio_telefonos.delete({
             where: { id: telefonoId },
         });
 
         // 3. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.projects.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studios.slug}/configuracion/cuenta/contacto`);
 
         return { success: true };
     });
@@ -316,7 +316,7 @@ export async function actualizarContactoData(
         const dbField = validatedData.field === "direccion" ? "address" : "website";
 
         // 3. Actualizar studio
-        const studio = await prisma.projects.update({
+        const studio = await prisma.studios.update({
             where: { slug: studioSlug },
             data: {
                 [dbField]: validatedData.value,
@@ -349,7 +349,7 @@ export async function actualizarContactoDataBulk(
         const validatedData = ContactoDataBulkUpdateSchema.parse(data);
 
         // 2. Actualizar studio
-        const studio = await prisma.projects.update({
+        const studio = await prisma.studios.update({
             where: { slug: studioSlug },
             data: {
                 ...(validatedData.direccion !== undefined && { address: validatedData.direccion }),
@@ -377,7 +377,7 @@ export async function actualizarContactoDataBulk(
 export async function obtenerEstadisticasContacto(studioSlug: string) {
     return await retryDatabaseOperation(async () => {
         // 1. Obtener studio
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -388,20 +388,20 @@ export async function obtenerEstadisticasContacto(studioSlug: string) {
 
         // 2. Obtener estadísticas
         const [totalTelefonos, telefonosActivos, telefonosInactivos] = await Promise.all([
-            prisma.project_telefonos.count({
-                where: { projectId: studio.id },
+            prisma.studio_telefonos.count({
+                where: { studio_id: studio.id },
             }),
-            prisma.project_telefonos.count({
-                where: { projectId: studio.id, activo: true },
+            prisma.studio_telefonos.count({
+                where: { studio_id: studio.id, activo: true },
             }),
-            prisma.project_telefonos.count({
-                where: { projectId: studio.id, activo: false },
+            prisma.studio_telefonos.count({
+                where: { studio_id: studio.id, activo: false },
             }),
         ]);
 
         // 3. Obtener teléfonos por tipo
-        const telefonosPorTipo = await prisma.project_telefonos.findMany({
-            where: { projectId: studio.id },
+        const telefonosPorTipo = await prisma.studio_telefonos.findMany({
+            where: { studio_id: studio.id },
             select: { tipo: true, activo: true },
         });
 
@@ -443,7 +443,7 @@ export async function validarTelefono(numero: string) {
 export async function reordenarTelefonos(studioSlug: string, telefonos: Array<{ id: string; order: number }>) {
     return await retryDatabaseOperation(async () => {
         // 1. Verificar que el studio existe
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -454,10 +454,10 @@ export async function reordenarTelefonos(studioSlug: string, telefonos: Array<{ 
 
         // 2. Actualizar el orden de cada teléfono
         const updatePromises = telefonos.map(({ id, order }) =>
-            prisma.project_telefonos.update({
+            prisma.studio_telefonos.update({
                 where: { 
                     id,
-                    projectId: studio.id // Asegurar que pertenece al studio
+                    studio_id: studio.id // Asegurar que pertenece al studio
                 },
                 data: { order },
             })

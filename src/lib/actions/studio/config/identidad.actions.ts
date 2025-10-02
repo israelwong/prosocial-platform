@@ -15,7 +15,7 @@ import {
 // Obtener datos de identidad del studio
 export async function obtenerIdentidadStudio(studioSlug: string) {
   return await retryDatabaseOperation(async () => {
-    const studio = await prisma.projects.findUnique({
+    const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
       select: {
         id: true,
@@ -61,7 +61,7 @@ export async function actualizarIdentidadBasica(
   data: IdentidadUpdateForm
 ) {
   return await retryDatabaseOperation(async () => {
-    const studio = await prisma.projects.findUnique({
+    const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
       select: { id: true },
     });
@@ -72,7 +72,7 @@ export async function actualizarIdentidadBasica(
 
     const validatedData = IdentidadUpdateSchema.parse(data);
 
-    const studioActualizado = await prisma.projects.update({
+    const studioActualizado = await prisma.studios.update({
       where: { id: studio.id },
       data: {
         name: validatedData.nombre,
@@ -101,7 +101,7 @@ export async function actualizarPalabrasClave(
   palabrasClave: string[]
 ) {
   return await retryDatabaseOperation(async () => {
-    const studio = await prisma.projects.findUnique({
+    const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
       select: { id: true },
     });
@@ -113,7 +113,7 @@ export async function actualizarPalabrasClave(
     // Convertir array a string JSON
     const palabrasClaveString = JSON.stringify(palabrasClave);
 
-    const studioActualizado = await prisma.projects.update({
+    const studioActualizado = await prisma.studios.update({
       where: { id: studio.id },
       data: {
         palabras_clave: palabrasClaveString,
@@ -136,7 +136,7 @@ export async function actualizarLogo(
   data: LogoUpdateForm
 ) {
   return await retryDatabaseOperation(async () => {
-    const studio = await prisma.projects.findUnique({
+    const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
       select: { id: true },
     });
@@ -151,7 +151,7 @@ export async function actualizarLogo(
       ? { logoUrl: validatedData.url }
       : { isotipo_url: validatedData.url };
 
-    const studioActualizado = await prisma.projects.update({
+    const studioActualizado = await prisma.studios.update({
       where: { id: studio.id },
       data: updateData,
       select: {
@@ -171,7 +171,7 @@ export async function actualizarIdentidadCompleta(
   data: IdentidadUpdateForm & { palabras_clave?: string[] }
 ) {
   return await retryDatabaseOperation(async () => {
-    const studio = await prisma.projects.findUnique({
+    const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
       select: { id: true },
     });
@@ -196,7 +196,7 @@ export async function actualizarIdentidadCompleta(
       updateData.palabras_clave = JSON.stringify(data.palabras_clave);
     }
 
-    const studioActualizado = await prisma.projects.update({
+    const studioActualizado = await prisma.studios.update({
       where: { id: studio.id },
       data: updateData,
       select: {

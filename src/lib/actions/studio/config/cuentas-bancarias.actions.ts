@@ -18,7 +18,7 @@ export async function obtenerCuentasBancarias(studioSlug: string): Promise<Actio
         console.log('🔍 Buscando proyecto con slug:', studioSlug);
 
         // Buscar el proyecto por slug
-        const proyecto = await prisma.projects.findUnique({
+        const proyecto = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
@@ -35,9 +35,9 @@ export async function obtenerCuentasBancarias(studioSlug: string): Promise<Actio
 
         console.log('🔍 Buscando cuentas bancarias para proyecto:', proyecto.id);
 
-        const cuentas = await prisma.project_cuentas_bancarias.findMany({
+        const cuentas = await prisma.studio_cuentas_bancarias.findMany({
             where: {
-                projectId: proyecto.id,
+                studio_id: proyecto.id,
                 activo: true
             },
             orderBy: {
@@ -87,7 +87,7 @@ export async function crearCuentaBancaria(
         const validatedData = CuentaBancariaSchema.parse(data);
 
         // Buscar el proyecto por slug
-        const proyecto = await prisma.projects.findUnique({
+        const proyecto = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
@@ -100,9 +100,9 @@ export async function crearCuentaBancaria(
         }
 
         // Verificar que la CLABE no esté duplicada
-        const cuentaExistente = await prisma.project_cuentas_bancarias.findFirst({
+        const cuentaExistente = await prisma.studio_cuentas_bancarias.findFirst({
             where: {
-                projectId: proyecto.id,
+                studio_id: proyecto.id,
                 numeroCuenta: validatedData.numeroCuenta,
                 activo: true
             }
@@ -116,9 +116,9 @@ export async function crearCuentaBancaria(
         }
 
         // Crear la cuenta bancaria
-        const nuevaCuenta = await prisma.project_cuentas_bancarias.create({
+        const nuevaCuenta = await prisma.studio_cuentas_bancarias.create({
             data: {
-                projectId: proyecto.id,
+                studio_id: proyecto.id,
                 banco: validatedData.banco,
                 numeroCuenta: validatedData.numeroCuenta,
                 tipoCuenta: 'corriente', // Valor por defecto
@@ -177,7 +177,7 @@ export async function actualizarCuentaBancaria(
         const validatedData = CuentaBancariaUpdateSchema.parse({ ...data, id: cuentaId });
 
         // Buscar el proyecto por slug
-        const proyecto = await prisma.projects.findUnique({
+        const proyecto = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
@@ -190,10 +190,10 @@ export async function actualizarCuentaBancaria(
         }
 
         // Verificar que la cuenta existe y pertenece al proyecto
-        const cuentaExistente = await prisma.project_cuentas_bancarias.findFirst({
+        const cuentaExistente = await prisma.studio_cuentas_bancarias.findFirst({
             where: {
                 id: cuentaId,
-                projectId: proyecto.id
+                studio_id: proyecto.id
             }
         });
 
@@ -206,9 +206,9 @@ export async function actualizarCuentaBancaria(
 
         // Verificar que la CLABE no esté duplicada (excluyendo la cuenta actual)
         if (validatedData.numeroCuenta && validatedData.numeroCuenta !== cuentaExistente.numeroCuenta) {
-            const clabeDuplicada = await prisma.project_cuentas_bancarias.findFirst({
+            const clabeDuplicada = await prisma.studio_cuentas_bancarias.findFirst({
                 where: {
-                    projectId: proyecto.id,
+                    studio_id: proyecto.id,
                     numeroCuenta: validatedData.numeroCuenta,
                     activo: true,
                     id: { not: cuentaId }
@@ -226,7 +226,7 @@ export async function actualizarCuentaBancaria(
         // No permitir cuenta principal en versión simple
 
         // Actualizar la cuenta bancaria
-        const cuentaActualizada = await prisma.project_cuentas_bancarias.update({
+        const cuentaActualizada = await prisma.studio_cuentas_bancarias.update({
             where: { id: cuentaId },
             data: {
                 banco: validatedData.banco,
@@ -283,7 +283,7 @@ export async function eliminarCuentaBancaria(
 ): Promise<ActionResult> {
     try {
         // Buscar el proyecto por slug
-        const proyecto = await prisma.projects.findUnique({
+        const proyecto = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
@@ -296,10 +296,10 @@ export async function eliminarCuentaBancaria(
         }
 
         // Verificar que la cuenta existe y pertenece al proyecto
-        const cuentaExistente = await prisma.project_cuentas_bancarias.findFirst({
+        const cuentaExistente = await prisma.studio_cuentas_bancarias.findFirst({
             where: {
                 id: cuentaId,
-                projectId: proyecto.id
+                studio_id: proyecto.id
             }
         });
 
@@ -311,7 +311,7 @@ export async function eliminarCuentaBancaria(
         }
 
         // Soft delete - marcar como inactiva
-        await prisma.project_cuentas_bancarias.update({
+        await prisma.studio_cuentas_bancarias.update({
             where: { id: cuentaId },
             data: {
                 activo: false,
@@ -341,7 +341,7 @@ export async function actualizarOrdenCuentasBancarias(
 ): Promise<ActionResult> {
     try {
         // Buscar el proyecto por slug
-        const proyecto = await prisma.projects.findUnique({
+        const proyecto = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
@@ -355,10 +355,10 @@ export async function actualizarOrdenCuentasBancarias(
 
         // Actualizar el orden de cada cuenta
         for (const { id } of nuevoOrden) {
-            await prisma.project_cuentas_bancarias.updateMany({
+            await prisma.studio_cuentas_bancarias.updateMany({
                 where: {
                     id,
-                    projectId: proyecto.id
+                    studio_id: proyecto.id
                 },
                 data: {
                     // No hay campo orden en el schema actual, pero mantenemos la función para compatibilidad

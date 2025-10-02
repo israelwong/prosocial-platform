@@ -18,7 +18,7 @@ export async function obtenerPerfil(studioSlug: string): Promise<ActionResult<Pe
         console.log('🔍 Buscando proyecto con slug:', studioSlug);
 
         // Buscar el proyecto por slug
-        const proyecto = await prisma.projects.findUnique({
+        const proyecto = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
@@ -91,7 +91,7 @@ export async function actualizarPerfil(
         const validatedData = PerfilSchema.parse(data);
 
         // Buscar el proyecto por slug
-        const proyecto = await prisma.projects.findUnique({
+        const proyecto = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });

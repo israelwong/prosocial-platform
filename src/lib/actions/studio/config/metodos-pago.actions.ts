@@ -9,7 +9,7 @@ import { MetodoPagoSchema, type MetodoPagoForm } from "@/lib/actions/schemas/met
 // Obtener todos los métodos de pago de un studio
 export async function obtenerMetodosPago(studioSlug: string) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -18,8 +18,8 @@ export async function obtenerMetodosPago(studioSlug: string) {
             throw new Error("Studio no encontrado");
         }
 
-        const metodos = await prisma.project_metodos_pago.findMany({
-            where: { projectId: studio.id },
+        const metodos = await prisma.studio_metodos_pago.findMany({
+            where: { studio_id: studio.id },
             orderBy: { orden: 'asc' },
         });
 
@@ -39,7 +39,7 @@ export async function obtenerMetodosPago(studioSlug: string) {
 // Obtener un método de pago específico
 export async function obtenerMetodoPago(studioSlug: string, metodoId: string) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -48,10 +48,10 @@ export async function obtenerMetodoPago(studioSlug: string, metodoId: string) {
             throw new Error("Studio no encontrado");
         }
 
-        const metodo = await prisma.project_metodos_pago.findFirst({
+        const metodo = await prisma.studio_metodos_pago.findFirst({
             where: {
                 id: metodoId,
-                projectId: studio.id,
+                studio_id: studio.id,
             },
         });
 
@@ -84,7 +84,7 @@ export async function crearMetodoPago(studioSlug: string, data: MetodoPagoForm) 
             };
         }
 
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -94,7 +94,7 @@ export async function crearMetodoPago(studioSlug: string, data: MetodoPagoForm) 
         }
 
         const dataToSave = {
-            projectId: studio.id,
+            studio_id: studio.id,
             metodo_pago: validationResult.data.metodo_pago,
             comision_porcentaje_base: validationResult.data.comision_porcentaje_base ? parseFloat(validationResult.data.comision_porcentaje_base) : null,
             comision_fija_monto: validationResult.data.comision_fija_monto ? parseFloat(validationResult.data.comision_fija_monto) : null,
@@ -106,7 +106,7 @@ export async function crearMetodoPago(studioSlug: string, data: MetodoPagoForm) 
             updatedAt: new Date(),
         };
 
-        const nuevoMetodo = await prisma.project_metodos_pago.create({
+        const nuevoMetodo = await prisma.studio_metodos_pago.create({
             data: dataToSave,
         });
 
@@ -137,7 +137,7 @@ export async function actualizarMetodoPago(studioSlug: string, metodoId: string,
             };
         }
 
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -158,7 +158,7 @@ export async function actualizarMetodoPago(studioSlug: string, metodoId: string,
             updatedAt: new Date(),
         };
 
-        const metodoActualizado = await prisma.project_metodos_pago.update({
+        const metodoActualizado = await prisma.studio_metodos_pago.update({
             where: { id: metodoId },
             data: dataToSave,
         });
@@ -181,7 +181,7 @@ export async function actualizarMetodoPago(studioSlug: string, metodoId: string,
 // Eliminar método de pago
 export async function eliminarMetodoPago(studioSlug: string, metodoId: string) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -190,7 +190,7 @@ export async function eliminarMetodoPago(studioSlug: string, metodoId: string) {
             throw new Error("Studio no encontrado");
         }
 
-        await prisma.project_metodos_pago.delete({
+        await prisma.studio_metodos_pago.delete({
             where: { id: metodoId },
         });
 
@@ -212,7 +212,7 @@ export async function eliminarMetodoPago(studioSlug: string, metodoId: string) {
 // Actualizar orden de métodos de pago
 export async function actualizarOrdenMetodosPago(studioSlug: string, metodos: { id: string; orden: number }[]) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -223,7 +223,7 @@ export async function actualizarOrdenMetodosPago(studioSlug: string, metodos: { 
 
         await prisma.$transaction(
             metodos.map(metodo =>
-                prisma.project_metodos_pago.update({
+                prisma.studio_metodos_pago.update({
                     where: { id: metodo.id },
                     data: { orden: metodo.orden, updatedAt: new Date() },
                 })

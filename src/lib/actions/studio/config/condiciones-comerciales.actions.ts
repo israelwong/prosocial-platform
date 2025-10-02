@@ -9,7 +9,7 @@ import { CondicionComercialSchema, type CondicionComercialForm } from "@/lib/act
 // Obtener todas las condiciones comerciales de un studio
 export async function obtenerCondicionesComerciales(studioSlug: string) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -18,8 +18,8 @@ export async function obtenerCondicionesComerciales(studioSlug: string) {
             throw new Error("Studio no encontrado");
         }
 
-        const condiciones = await prisma.project_condiciones_comerciales.findMany({
-            where: { projectId: studio.id },
+        const condiciones = await prisma.studio_condiciones_comerciales.findMany({
+            where: { studio_id: studio.id },
             orderBy: { orden: 'asc' },
         });
 
@@ -39,7 +39,7 @@ export async function obtenerCondicionesComerciales(studioSlug: string) {
 // Obtener una condición comercial específica
 export async function obtenerCondicionComercial(studioSlug: string, condicionId: string) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -48,10 +48,10 @@ export async function obtenerCondicionComercial(studioSlug: string, condicionId:
             throw new Error("Studio no encontrado");
         }
 
-        const condicion = await prisma.project_condiciones_comerciales.findFirst({
+        const condicion = await prisma.studio_condiciones_comerciales.findFirst({
             where: {
                 id: condicionId,
-                projectId: studio.id,
+                studio_id: studio.id,
             },
         });
 
@@ -84,7 +84,7 @@ export async function crearCondicionComercial(studioSlug: string, data: Condicio
             };
         }
 
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -94,7 +94,7 @@ export async function crearCondicionComercial(studioSlug: string, data: Condicio
         }
 
         const dataToSave = {
-            projectId: studio.id,
+            studio_id: studio.id,
             nombre: validationResult.data.nombre,
             descripcion: validationResult.data.descripcion,
             porcentaje_descuento: validationResult.data.porcentaje_descuento ? parseFloat(validationResult.data.porcentaje_descuento) : null,
@@ -104,7 +104,7 @@ export async function crearCondicionComercial(studioSlug: string, data: Condicio
             updatedAt: new Date(),
         };
 
-        const nuevaCondicion = await prisma.project_condiciones_comerciales.create({
+        const nuevaCondicion = await prisma.studio_condiciones_comerciales.create({
             data: dataToSave,
         });
 
@@ -135,7 +135,7 @@ export async function actualizarCondicionComercial(studioSlug: string, condicion
             };
         }
 
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -154,7 +154,7 @@ export async function actualizarCondicionComercial(studioSlug: string, condicion
             updatedAt: new Date(),
         };
 
-        const condicionActualizada = await prisma.project_condiciones_comerciales.update({
+        const condicionActualizada = await prisma.studio_condiciones_comerciales.update({
             where: { id: condicionId },
             data: dataToSave,
         });
@@ -177,7 +177,7 @@ export async function actualizarCondicionComercial(studioSlug: string, condicion
 // Eliminar condición comercial
 export async function eliminarCondicionComercial(studioSlug: string, condicionId: string) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -186,7 +186,7 @@ export async function eliminarCondicionComercial(studioSlug: string, condicionId
             throw new Error("Studio no encontrado");
         }
 
-        await prisma.project_condiciones_comerciales.delete({
+        await prisma.studio_condiciones_comerciales.delete({
             where: { id: condicionId },
         });
 
@@ -208,7 +208,7 @@ export async function eliminarCondicionComercial(studioSlug: string, condicionId
 // Actualizar orden de condiciones comerciales
 export async function actualizarOrdenCondicionesComerciales(studioSlug: string, condiciones: { id: string; orden: number }[]) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -219,7 +219,7 @@ export async function actualizarOrdenCondicionesComerciales(studioSlug: string, 
 
         await prisma.$transaction(
             condiciones.map(condicion =>
-                prisma.project_condiciones_comerciales.update({
+                prisma.studio_condiciones_comerciales.update({
                     where: { id: condicion.id },
                     data: { orden: condicion.orden, updatedAt: new Date() },
                 })
@@ -244,7 +244,7 @@ export async function actualizarOrdenCondicionesComerciales(studioSlug: string, 
 // Obtener configuración de precios para validaciones
 export async function obtenerConfiguracionPrecios(studioSlug: string) {
     try {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -253,9 +253,9 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
             throw new Error("Studio no encontrado");
         }
 
-        const configuracion = await prisma.project_configuraciones.findFirst({
+        const configuracion = await prisma.studio_configuraciones.findFirst({
             where: {
-                projectId: studio.id,
+                studio_id: studio.id,
                 status: 'active',
             },
             select: {

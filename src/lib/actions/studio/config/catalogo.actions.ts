@@ -23,7 +23,7 @@ import { revalidatePath } from 'next/cache';
  * Obtener studioId desde el slug
  */
 async function getStudioIdFromSlug(slug: string): Promise<string | null> {
-    const studio = await prisma.projects.findUnique({
+    const studio = await prisma.studios.findUnique({
         where: { slug },
         select: { id: true },
     });
@@ -53,7 +53,7 @@ export async function obtenerCatalogo(
             return { success: false, error: 'Estudio no encontrado' };
         }
 
-        const secciones = await prisma.project_servicio_secciones.findMany({
+        const secciones = await prisma.studio_servicio_secciones.findMany({
             include: {
                 seccion_categorias: {
                     include: {
@@ -131,7 +131,7 @@ export async function obtenerSecciones(
     studioSlug: string
 ): Promise<ActionResponse<SeccionData[]>> {
     try {
-        const secciones = await prisma.project_servicio_secciones.findMany({
+        const secciones = await prisma.studio_servicio_secciones.findMany({
             orderBy: { orden: 'asc' },
         });
 
@@ -167,7 +167,7 @@ export async function crearSeccion(
         const validatedData = SeccionSchema.parse(data);
 
         // Obtener el siguiente número de orden
-        const ultimaSeccion = await prisma.project_servicio_secciones.findFirst({
+        const ultimaSeccion = await prisma.studio_servicio_secciones.findFirst({
             orderBy: { orden: 'desc' },
             select: { orden: true },
         });
@@ -175,7 +175,7 @@ export async function crearSeccion(
         const nuevoOrden = ultimaSeccion ? ultimaSeccion.orden + 1 : 0;
 
         // Crear sección
-        const seccion = await prisma.project_servicio_secciones.create({
+        const seccion = await prisma.studio_servicio_secciones.create({
             data: {
                 nombre: validatedData.nombre,
                 descripcion: validatedData.descripcion,
@@ -221,7 +221,7 @@ export async function actualizarSeccion(
         // Validar datos (parcial para permitir updates parciales)
         const validatedData = SeccionSchema.partial().parse(data);
 
-        const seccion = await prisma.project_servicio_secciones.update({
+        const seccion = await prisma.studio_servicio_secciones.update({
             where: { id: seccionId },
             data: validatedData,
         });
@@ -261,7 +261,7 @@ export async function eliminarSeccion(
 ): Promise<ActionResponse<boolean>> {
     try {
         // Verificar si tiene categorías
-        const seccion = await prisma.project_servicio_secciones.findUnique({
+        const seccion = await prisma.studio_servicio_secciones.findUnique({
             where: { id: seccionId },
             include: {
                 seccion_categorias: true,
@@ -279,7 +279,7 @@ export async function eliminarSeccion(
             };
         }
 
-        await prisma.project_servicio_secciones.delete({
+        await prisma.studio_servicio_secciones.delete({
             where: { id: seccionId },
         });
 
@@ -308,7 +308,7 @@ export async function actualizarOrdenSecciones(
         // Actualizar en batch
         await Promise.all(
             validatedData.secciones.map((seccion) =>
-                prisma.project_servicio_secciones.update({
+                prisma.studio_servicio_secciones.update({
                     where: { id: seccion.id },
                     data: { orden: seccion.orden },
                 })
@@ -338,7 +338,7 @@ export async function obtenerCategorias(
     studioSlug: string
 ): Promise<ActionResponse<CategoriaData[]>> {
     try {
-        const categorias = await prisma.project_servicio_categorias.findMany({
+        const categorias = await prisma.studio_servicio_categorias.findMany({
             include: {
                 seccion_categorias: {
                     select: {
@@ -382,7 +382,7 @@ export async function crearCategoria(
 
         // Obtener el siguiente número de orden
         const ultimaCategoria =
-            await prisma.project_servicio_categorias.findFirst({
+            await prisma.studio_servicio_categorias.findFirst({
                 orderBy: { orden: 'desc' },
                 select: { orden: true },
             });
@@ -390,7 +390,7 @@ export async function crearCategoria(
         const nuevoOrden = ultimaCategoria ? ultimaCategoria.orden + 1 : 0;
 
         // Crear categoría con relación a sección
-        const categoria = await prisma.project_servicio_categorias.create({
+        const categoria = await prisma.studio_servicio_categorias.create({
             data: {
                 nombre: validatedData.nombre,
                 orden: nuevoOrden,
@@ -439,7 +439,7 @@ export async function actualizarCategoria(
     try {
         const validatedData = CategoriaSchema.partial().parse(data);
 
-        const categoria = await prisma.project_servicio_categorias.update({
+        const categoria = await prisma.studio_servicio_categorias.update({
             where: { id: categoriaId },
             data: validatedData,
             include: {
@@ -483,7 +483,7 @@ export async function eliminarCategoria(
 ): Promise<ActionResponse<boolean>> {
     try {
         // Verificar si tiene servicios
-        const categoria = await prisma.project_servicio_categorias.findUnique({
+        const categoria = await prisma.studio_servicio_categorias.findUnique({
             where: { id: categoriaId },
             include: {
                 servicios: true,
@@ -501,8 +501,8 @@ export async function eliminarCategoria(
             };
         }
 
-        // Eliminar categoría (cascade eliminará la relación en project_seccion_categorias)
-        await prisma.project_servicio_categorias.delete({
+        // Eliminar categoría (cascade eliminará la relación en studio_seccion_categorias)
+        await prisma.studio_servicio_categorias.delete({
             where: { id: categoriaId },
         });
 
@@ -530,7 +530,7 @@ export async function actualizarOrdenCategorias(
 
         await Promise.all(
             validatedData.categorias.map((categoria) =>
-                prisma.project_servicio_categorias.update({
+                prisma.studio_servicio_categorias.update({
                     where: { id: categoria.id },
                     data: { orden: categoria.orden },
                 })
@@ -565,7 +565,7 @@ export async function obtenerServicios(
             return { success: false, error: 'Estudio no encontrado' };
         }
 
-        const servicios = await prisma.project_servicios.findMany({
+        const servicios = await prisma.studio_servicios.findMany({
             where: { studioId },
             include: {
                 servicio_categorias: {
@@ -637,7 +637,7 @@ export async function crearServicio(
         const validatedData = ServicioSchema.parse(data);
 
         // Obtener el siguiente número de orden para esta categoría
-        const ultimoServicio = await prisma.project_servicios.findFirst({
+        const ultimoServicio = await prisma.studio_servicios.findFirst({
             where: {
                 studioId,
                 servicioCategoriaId: validatedData.servicioCategoriaId,
@@ -648,7 +648,7 @@ export async function crearServicio(
 
         const nuevoOrden = ultimoServicio ? ultimoServicio.orden + 1 : 0;
 
-        const servicio = await prisma.project_servicios.create({
+        const servicio = await prisma.studio_servicios.create({
             data: {
                 studioId,
                 servicioCategoriaId: validatedData.servicioCategoriaId,
@@ -721,7 +721,7 @@ export async function actualizarServicio(
         const { gastos, ...servicioData } = validatedData;
 
         // Actualizar servicio y reemplazar gastos si se proporcionan
-        const servicio = await prisma.project_servicios.update({
+        const servicio = await prisma.studio_servicios.update({
             where: { id: servicioId },
             data: {
                 ...servicioData,
@@ -781,7 +781,7 @@ export async function eliminarServicio(
     servicioId: string
 ): Promise<ActionResponse<boolean>> {
     try {
-        await prisma.project_servicios.delete({
+        await prisma.studio_servicios.delete({
             where: { id: servicioId },
         });
 
@@ -805,7 +805,7 @@ export async function duplicarServicio(
     servicioId: string
 ): Promise<ActionResponse<ServicioData>> {
     try {
-        const servicioOriginal = await prisma.project_servicios.findUnique({
+        const servicioOriginal = await prisma.studio_servicios.findUnique({
             where: { id: servicioId },
             include: {
                 servicio_gastos: true,
@@ -817,7 +817,7 @@ export async function duplicarServicio(
         }
 
         // Obtener el siguiente orden
-        const ultimoServicio = await prisma.project_servicios.findFirst({
+        const ultimoServicio = await prisma.studio_servicios.findFirst({
             where: {
                 studioId: servicioOriginal.studioId,
                 servicioCategoriaId: servicioOriginal.servicioCategoriaId,
@@ -828,7 +828,7 @@ export async function duplicarServicio(
 
         const nuevoOrden = ultimoServicio ? ultimoServicio.orden + 1 : 0;
 
-        const servicioNuevo = await prisma.project_servicios.create({
+        const servicioNuevo = await prisma.studio_servicios.create({
             data: {
                 studioId: servicioOriginal.studioId,
                 servicioCategoriaId: servicioOriginal.servicioCategoriaId,
@@ -903,7 +903,7 @@ export async function actualizarPosicionCatalogo(
 
         if (itemType === 'seccion') {
             // Actualizar orden de sección
-            await prisma.project_servicio_secciones.update({
+            await prisma.studio_servicio_secciones.update({
                 where: { id: itemId },
                 data: { orden: newIndex },
             });
@@ -913,19 +913,19 @@ export async function actualizarPosicionCatalogo(
                 // Cambiar de sección si parentId es diferente
                 await prisma.$transaction(async (tx) => {
                     // Actualizar orden
-                    await tx.project_servicio_categorias.update({
+                    await tx.studio_servicio_categorias.update({
                         where: { id: itemId },
                         data: { orden: newIndex },
                     });
 
                     // Actualizar relación de sección
-                    await tx.project_seccion_categorias.update({
+                    await tx.studio_seccion_categorias.update({
                         where: { categoriaId: itemId },
                         data: { seccionId: parentId },
                     });
                 });
             } else {
-                await prisma.project_servicio_categorias.update({
+                await prisma.studio_servicio_categorias.update({
                     where: { id: itemId },
                     data: { orden: newIndex },
                 });
@@ -933,7 +933,7 @@ export async function actualizarPosicionCatalogo(
         } else if (itemType === 'servicio') {
             // Actualizar orden de servicio y posiblemente cambiar de categoría
             if (parentId) {
-                await prisma.project_servicios.update({
+                await prisma.studio_servicios.update({
                     where: { id: itemId },
                     data: {
                         orden: newIndex,
@@ -941,7 +941,7 @@ export async function actualizarPosicionCatalogo(
                     },
                 });
             } else {
-                await prisma.project_servicios.update({
+                await prisma.studio_servicios.update({
                     where: { id: itemId },
                     data: { orden: newIndex },
                 });
@@ -964,4 +964,4 @@ export async function actualizarPosicionCatalogo(
 // NOTA: sincronizarPreciosCatalogo() ELIMINADA
 // =====================================================
 // Los precios ahora se calculan al vuelo usando /lib/utils/pricing.ts
-// No se almacenan en project_servicios, solo en cotizaciones
+// No se almacenan en studio_servicios, solo en cotizaciones

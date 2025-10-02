@@ -20,13 +20,13 @@ const prisma = new PrismaClient();
  */
 async function getProjectIdFromSlug(studioSlug: string): Promise<string | null> {
     try {
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
         return project?.id || null;
     } catch (error) {
-        console.error('Error obteniendo projectId:', error);
+        console.error('Error obteniendo studio_id:', error);
         return null;
     }
 }
@@ -178,14 +178,14 @@ export async function obtenerPaquetesPorTipo(
     eventoTipoId: string
 ): Promise<ActionResponse<PaqueteData[]>> {
     try {
-        const projectId = await getProjectIdFromSlug(studioSlug);
-        if (!projectId) {
+        const studio_id = await getProjectIdFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
-        const paquetes = await prisma.project_paquetes.findMany({
+        const paquetes = await prisma.studio_paquetes.findMany({
             where: {
-                projectId,
+                studio_id,
                 eventoTipoId,
             },
             include: {
@@ -203,7 +203,7 @@ export async function obtenerPaquetesPorTipo(
 
         const paquetesData: PaqueteData[] = paquetes.map((p) => ({
             id: p.id,
-            projectId: p.projectId,
+            studio_id: p.studio_id,
             eventoTipoId: p.eventoTipoId,
             nombre: p.nombre,
             descripcion: null,
@@ -239,7 +239,7 @@ export async function obtenerPaquete(
     paqueteId: string
 ): Promise<ActionResponse<PaqueteConServiciosCompletos>> {
     try {
-        const paquete = await prisma.project_paquetes.findUnique({
+        const paquete = await prisma.studio_paquetes.findUnique({
             where: { id: paqueteId },
             include: {
                 paquete_servicios: {
@@ -287,7 +287,7 @@ export async function obtenerPaquete(
 
         const paqueteData: PaqueteConServiciosCompletos = {
             id: paquete.id,
-            projectId: paquete.projectId,
+            studio_id: paquete.studio_id,
             eventoTipoId: paquete.eventoTipoId,
             nombre: paquete.nombre,
             descripcion: null,
@@ -325,17 +325,17 @@ export async function crearPaquete(
     data: unknown
 ): Promise<ActionResponse<PaqueteData>> {
     try {
-        const projectId = await getProjectIdFromSlug(studioSlug);
-        if (!projectId) {
+        const studio_id = await getProjectIdFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
         const validatedData = CrearPaqueteSchema.parse(data);
 
         // Obtener el siguiente número de posición
-        const ultimoPaquete = await prisma.project_paquetes.findFirst({
+        const ultimoPaquete = await prisma.studio_paquetes.findFirst({
             where: {
-                projectId,
+                studio_id,
                 eventoTipoId: validatedData.eventoTipoId,
             },
             orderBy: { posicion: 'desc' },
@@ -346,9 +346,9 @@ export async function crearPaquete(
 
         // Crear paquete con servicios en transacción
         const paquete = await prisma.$transaction(async (tx) => {
-            const nuevoPaquete = await tx.project_paquetes.create({
+            const nuevoPaquete = await tx.studio_paquetes.create({
                 data: {
-                    projectId,
+                    studio_id,
                     eventoTipoId: validatedData.eventoTipoId,
                     nombre: validatedData.nombre,
                     precio: validatedData.precio,
@@ -359,7 +359,7 @@ export async function crearPaquete(
             });
 
             // Crear relaciones con servicios
-            await tx.project_paquete_servicios.createMany({
+            await tx.studio_paquete_servicios.createMany({
                 data: validatedData.servicios.map((s, index) => ({
                     paqueteId: nuevoPaquete.id,
                     servicioId: s.servicioId,
@@ -381,7 +381,7 @@ export async function crearPaquete(
             success: true,
             data: {
                 id: paquete.id,
-                projectId: paquete.projectId,
+                studio_id: paquete.studio_id,
                 eventoTipoId: paquete.eventoTipoId,
                 nombre: paquete.nombre,
                 descripcion: null,
@@ -421,7 +421,7 @@ export async function actualizarPaquete(
         // Actualizar paquete y servicios en transacción
         const paquete = await prisma.$transaction(async (tx) => {
             // Actualizar datos del paquete
-            const paqueteActualizado = await tx.project_paquetes.update({
+            const paqueteActualizado = await tx.studio_paquetes.update({
                 where: { id: validatedData.id },
                 data: {
                     nombre: validatedData.nombre,
@@ -431,12 +431,12 @@ export async function actualizarPaquete(
             });
 
             // Eliminar servicios existentes
-            await tx.project_paquete_servicios.deleteMany({
+            await tx.studio_paquete_servicios.deleteMany({
                 where: { paqueteId: validatedData.id },
             });
 
             // Crear nuevos servicios
-            await tx.project_paquete_servicios.createMany({
+            await tx.studio_paquete_servicios.createMany({
                 data: validatedData.servicios.map((s, index) => ({
                     paqueteId: validatedData.id,
                     servicioId: s.servicioId,
@@ -458,7 +458,7 @@ export async function actualizarPaquete(
             success: true,
             data: {
                 id: paquete.id,
-                projectId: paquete.projectId,
+                studio_id: paquete.studio_id,
                 eventoTipoId: paquete.eventoTipoId,
                 nombre: paquete.nombre,
                 descripcion: null,
@@ -494,7 +494,7 @@ export async function eliminarPaquete(
 ): Promise<ActionResponse<{ id: string }>> {
     try {
         // Eliminar en transacción (servicios se eliminan por CASCADE)
-        const paquete = await prisma.project_paquetes.delete({
+        const paquete = await prisma.studio_paquetes.delete({
             where: { id: paqueteId },
         });
 
@@ -526,14 +526,14 @@ export async function validarNombrePaqueteUnico(
     paqueteIdExcluir?: string
 ): Promise<ActionResponse<boolean>> {
     try {
-        const projectId = await getProjectIdFromSlug(studioSlug);
-        if (!projectId) {
+        const studio_id = await getProjectIdFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
-        const paqueteExistente = await prisma.project_paquetes.findFirst({
+        const paqueteExistente = await prisma.studio_paquetes.findFirst({
             where: {
-                projectId,
+                studio_id,
                 eventoTipoId,
                 nombre: {
                     equals: nombre,

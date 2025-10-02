@@ -13,7 +13,7 @@ import {
 // Obtener configuración de precios del studio
 export async function obtenerConfiguracionPrecios(studioSlug: string) {
     return await retryDatabaseOperation(async () => {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: {
                 id: true,
@@ -36,9 +36,9 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
 
         if (!configuracion) {
             // Crear configuración por defecto
-            configuracion = await prisma.project_configuraciones.create({
+            configuracion = await prisma.studio_configuraciones.create({
                 data: {
-                    projects: { connect: { id: studio.id } },
+                    studios: { connect: { id: studio.id } },
                     nombre: 'Configuración de Precios',
                     utilidad_servicio: 0.30, // 30%
                     utilidad_producto: 0.40, // 40%
@@ -65,7 +65,7 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
 // Verificar si hay servicios existentes que requieran actualización masiva
 export async function verificarServiciosExistentes(studioSlug: string): Promise<ServiciosExistentes> {
     return await retryDatabaseOperation(async () => {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: {
                 id: true,
@@ -88,8 +88,8 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
         }
 
         // Contar servicios existentes
-        const servicios = await prisma.project_servicios.findMany({
-            where: { projects: { id: studio.id } },
+        const servicios = await prisma.studio_servicios.findMany({
+            where: { studios: { id: studio.id } },
             select: {
                 id: true,
                 tipo_utilidad: true,
@@ -148,7 +148,7 @@ export async function actualizarConfiguracionPrecios(
         };
 
         // Obtener el studio
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -158,16 +158,16 @@ export async function actualizarConfiguracionPrecios(
         }
 
         // 1. Buscar configuración existente
-        const configuracionExistente = await prisma.project_configuraciones.findFirst({
+        const configuracionExistente = await prisma.studio_configuraciones.findFirst({
             where: {
-                projectId: studio.id,
+                studio_id: studio.id,
                 status: 'active',
             },
         });
 
         // 2. Actualizar o crear la configuración del studio
         if (configuracionExistente) {
-            await prisma.project_configuraciones.update({
+            await prisma.studio_configuraciones.update({
                 where: {
                     id: configuracionExistente.id,
                 },
@@ -181,9 +181,9 @@ export async function actualizarConfiguracionPrecios(
                 },
             });
         } else {
-            await prisma.project_configuraciones.create({
+            await prisma.studio_configuraciones.create({
                 data: {
-                    projects: { connect: { id: studio.id } },
+                    studios: { connect: { id: studio.id } },
                     nombre: 'Configuración de Precios',
                     utilidad_servicio: dataToSave.utilidad_servicio,
                     utilidad_producto: dataToSave.utilidad_producto,
@@ -200,21 +200,21 @@ export async function actualizarConfiguracionPrecios(
 
         if (serviciosExistentes.requiere_actualizacion_masiva) {
             // 4. Obtener todos los servicios existentes para el recálculo masivo
-            const todosLosServicios = await prisma.project_servicios.findMany({
-                where: { projects: { id: studio.id } },
+            const todosLosServicios = await prisma.studio_servicios.findMany({
+                where: { studios: { id: studio.id } },
                 include: {
                     // Incluir gastos si existen
                     servicio_gastos: true,
                 },
             });
 
-            // NOTA: Ya no actualizamos precio_publico ni utilidad en project_servicios
+            // NOTA: Ya no actualizamos precio_publico ni utilidad en studio_servicios
             // Estos campos se eliminaron del modelo y ahora se calculan al vuelo
-            // usando project_configuraciones. Solo actualizamos updatedAt para
+            // usando studio_configuraciones. Solo actualizamos updatedAt para
             // indicar que hubo un cambio en la configuración.
 
             const updatePromises = todosLosServicios.map(servicio => {
-                return prisma.project_servicios.update({
+                return prisma.studio_servicios.update({
                     where: { id: servicio.id },
                     data: {
                         updatedAt: new Date(),
@@ -243,7 +243,7 @@ export async function actualizarConfiguracionPrecios(
 // Obtener estadísticas de servicios para mostrar en la UI
 export async function obtenerEstadisticasServicios(studioSlug: string) {
     return await retryDatabaseOperation(async () => {
-        const studio = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
@@ -252,8 +252,8 @@ export async function obtenerEstadisticasServicios(studioSlug: string) {
             throw new Error("Studio no encontrado");
         }
 
-        const servicios = await prisma.project_servicios.findMany({
-            where: { projects: { id: studio.id } },
+        const servicios = await prisma.studio_servicios.findMany({
+            where: { studios: { id: studio.id } },
             select: {
                 id: true,
                 nombre: true,

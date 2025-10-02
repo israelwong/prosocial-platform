@@ -49,11 +49,11 @@ const METODOS_PAGO_BASICOS = [
 ];
 
 // Sembrar métodos de pago básicos para un studio
-export async function sembrarMetodosPagoBasicos(projectId: string) {
+export async function sembrarMetodosPagoBasicos(studio_id: string) {
     try {
         // Verificar si ya existen métodos para este studio
-        const metodosExistentes = await prisma.project_metodos_pago.findFirst({
-            where: { projectId },
+        const metodosExistentes = await prisma.studio_metodos_pago.findFirst({
+            where: { studio_id },
         });
 
         if (metodosExistentes) {
@@ -64,9 +64,9 @@ export async function sembrarMetodosPagoBasicos(projectId: string) {
         }
 
         // Crear métodos básicos
-        await prisma.project_metodos_pago.createMany({
+        await prisma.studio_metodos_pago.createMany({
             data: METODOS_PAGO_BASICOS.map(metodo => ({
-                projectId,
+                studio_id,
                 ...metodo,
                 updatedAt: new Date(),
             })),
@@ -86,10 +86,10 @@ export async function sembrarMetodosPagoBasicos(projectId: string) {
 }
 
 // Verificar si un studio tiene métodos de pago configurados
-export async function verificarMetodosPagoConfigurados(projectId: string) {
+export async function verificarMetodosPagoConfigurados(studio_id: string) {
     try {
-        const metodosExistentes = await prisma.project_metodos_pago.findFirst({
-            where: { projectId },
+        const metodosExistentes = await prisma.studio_metodos_pago.findFirst({
+            where: { studio_id },
         });
 
         return {
@@ -106,11 +106,11 @@ export async function verificarMetodosPagoConfigurados(projectId: string) {
 }
 
 // Obtener métodos de pago activos de un studio
-export async function obtenerMetodosPagoActivos(projectId: string) {
+export async function obtenerMetodosPagoActivos(studio_id: string) {
     try {
-        const metodos = await prisma.project_metodos_pago.findMany({
+        const metodos = await prisma.studio_metodos_pago.findMany({
             where: {
-                projectId,
+                studio_id,
                 status: "active",
             },
             orderBy: { orden: 'asc' },

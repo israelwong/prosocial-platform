@@ -23,12 +23,12 @@ export async function obtenerReglasAgendamiento(
 ): Promise<ReglasAgendamientoListResponse> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: projectSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return {
                 success: false,
                 error: 'Proyecto no encontrado'
@@ -36,15 +36,15 @@ export async function obtenerReglasAgendamiento(
         }
 
         // Obtener reglas ordenadas por orden
-        const reglas = await prisma.project_reglas_agendamiento.findMany({
-            where: { projectId: project.id },
+        const reglas = await prisma.studio_reglas_agendamiento.findMany({
+            where: { studio_id: studio.id },
             orderBy: { orden: 'asc' }
         });
 
         // Mapear los datos para asegurar compatibilidad de tipos
         const reglasMapeadas = reglas.map(regla => ({
             id: regla.id,
-            projectId: regla.projectId,
+            studio_id: regla.studio_id,
             nombre: regla.nombre,
             descripcion: regla.descripcion || null,
             recurrencia: regla.recurrencia as 'por_dia' | 'por_hora',
@@ -82,12 +82,12 @@ export async function crearReglaAgendamiento(
 ): Promise<ReglaAgendamientoResponse> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: projectSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return {
                 success: false,
                 error: 'Proyecto no encontrado'
@@ -95,8 +95,8 @@ export async function crearReglaAgendamiento(
         }
 
         // Obtener el siguiente orden
-        const maxOrden = await prisma.project_reglas_agendamiento.findFirst({
-            where: { projectId: project.id },
+        const maxOrden = await prisma.studio_reglas_agendamiento.findFirst({
+            where: { studio_id: studio.id },
             orderBy: { orden: 'desc' },
             select: { orden: true }
         });
@@ -104,10 +104,10 @@ export async function crearReglaAgendamiento(
         const siguienteOrden = (maxOrden?.orden || 0) + 1;
 
         // Crear la regla
-        const regla = await prisma.project_reglas_agendamiento.create({
+        const regla = await prisma.studio_reglas_agendamiento.create({
             data: {
                 ...data,
-                projectId: project.id,
+                studio_id: studio.id,
                 orden: data.orden || siguienteOrden
             }
         });
@@ -140,12 +140,12 @@ export async function actualizarReglaAgendamiento(
 ): Promise<ReglaAgendamientoResponse> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: projectSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return {
                 success: false,
                 error: 'Proyecto no encontrado'
@@ -153,10 +153,10 @@ export async function actualizarReglaAgendamiento(
         }
 
         // Verificar que la regla pertenece al proyecto
-        const reglaExistente = await prisma.project_reglas_agendamiento.findFirst({
+        const reglaExistente = await prisma.studio_reglas_agendamiento.findFirst({
             where: {
                 id: reglaId,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -168,7 +168,7 @@ export async function actualizarReglaAgendamiento(
         }
 
         // Actualizar la regla
-        const regla = await prisma.project_reglas_agendamiento.update({
+        const regla = await prisma.studio_reglas_agendamiento.update({
             where: { id: reglaId },
             data: {
                 ...data,
@@ -203,12 +203,12 @@ export async function eliminarReglaAgendamiento(
 ): Promise<ReglaAgendamientoResponse> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: projectSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return {
                 success: false,
                 error: 'Proyecto no encontrado'
@@ -216,10 +216,10 @@ export async function eliminarReglaAgendamiento(
         }
 
         // Verificar que la regla pertenece al proyecto
-        const reglaExistente = await prisma.project_reglas_agendamiento.findFirst({
+        const reglaExistente = await prisma.studio_reglas_agendamiento.findFirst({
             where: {
                 id: reglaId,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -231,7 +231,7 @@ export async function eliminarReglaAgendamiento(
         }
 
         // Eliminar la regla
-        await prisma.project_reglas_agendamiento.delete({
+        await prisma.studio_reglas_agendamiento.delete({
             where: { id: reglaId }
         });
 
@@ -262,12 +262,12 @@ export async function actualizarOrdenReglasAgendamiento(
 ): Promise<ReglaAgendamientoResponse> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: projectSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return {
                 success: false,
                 error: 'Proyecto no encontrado'
@@ -277,10 +277,10 @@ export async function actualizarOrdenReglasAgendamiento(
         // Actualizar el orden de cada regla
         await prisma.$transaction(
             reglas.map(regla =>
-                prisma.project_reglas_agendamiento.update({
+                prisma.studio_reglas_agendamiento.update({
                     where: {
                         id: regla.id,
-                        projectId: project.id
+                        studio_id: studio.id
                     },
                     data: {
                         orden: regla.orden,

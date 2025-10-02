@@ -45,7 +45,7 @@ export interface DashboardCliente {
  */
 export async function obtenerDashboardStudio(studioSlug: string): Promise<DashboardStudio | null> {
   return await retryDatabaseOperation(async () => {
-    const studio = await prisma.projects.findUnique({
+    const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
       select: {
         id: true,
@@ -88,7 +88,7 @@ export async function obtenerEventosRecientes(studioSlug: string): Promise<Dashb
     try {
       const eventos = await prisma.eventos.findMany({
         where: {
-          projects: { slug: studioSlug },
+          studios: { slug: studioSlug },
         },
         select: {
           id: true,
@@ -126,7 +126,7 @@ export async function obtenerClientesRecientes(studioSlug: string): Promise<Dash
     try {
       const clientes = await prisma.clientes.findMany({
         where: {
-          projects: { slug: studioSlug },
+          studios: { slug: studioSlug },
         },
         select: {
           id: true,

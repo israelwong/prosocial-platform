@@ -17,13 +17,13 @@ const prisma = new PrismaClient();
  */
 async function getProjectIdFromSlug(studioSlug: string): Promise<string | null> {
     try {
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
         return project?.id || null;
     } catch (error) {
-        console.error('Error obteniendo projectId:', error);
+        console.error('Error obteniendo studio_id:', error);
         return null;
     }
 }
@@ -43,13 +43,13 @@ export async function obtenerTiposEvento(
     studioSlug: string
 ): Promise<ActionResponse<TipoEventoData[]>> {
     try {
-        const projectId = await getProjectIdFromSlug(studioSlug);
-        if (!projectId) {
+        const studio_id = await getProjectIdFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
-        const tiposEvento = await prisma.project_evento_tipos.findMany({
-            where: { projectId },
+        const tiposEvento = await prisma.studio_evento_tipos.findMany({
+            where: { studio_id },
             include: {
                 paquetes: {
                     select: {
@@ -65,7 +65,7 @@ export async function obtenerTiposEvento(
 
         const tiposEventoData: TipoEventoData[] = tiposEvento.map((tipo) => ({
             id: tipo.id,
-            projectId: tipo.projectId,
+            studio_id: tipo.studio_id,
             nombre: tipo.nombre,
             descripcion: tipo.descripcion,
             color: tipo.color,
@@ -100,25 +100,25 @@ export async function crearTipoEvento(
     data: unknown
 ): Promise<ActionResponse<TipoEventoData>> {
     try {
-        const projectId = await getProjectIdFromSlug(studioSlug);
-        if (!projectId) {
+        const studio_id = await getProjectIdFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
         const validatedData = TipoEventoSchema.parse(data);
 
         // Obtener el siguiente número de posición
-        const ultimoTipo = await prisma.project_evento_tipos.findFirst({
-            where: { projectId },
+        const ultimoTipo = await prisma.studio_evento_tipos.findFirst({
+            where: { studio_id },
             orderBy: { orden: 'desc' },
             select: { orden: true },
         });
 
         const nuevaPosicion = ultimoTipo ? ultimoTipo.orden + 1 : 0;
 
-        const tipoEvento = await prisma.project_evento_tipos.create({
+        const tipoEvento = await prisma.studio_evento_tipos.create({
             data: {
-                projectId,
+                studio_id,
                 nombre: validatedData.nombre,
                 status: validatedData.status,
                 orden: nuevaPosicion,
@@ -132,7 +132,7 @@ export async function crearTipoEvento(
             success: true,
             data: {
                 id: tipoEvento.id,
-                projectId: tipoEvento.projectId,
+                studio_id: tipoEvento.studio_id,
                 nombre: tipoEvento.nombre,
                 descripcion: tipoEvento.descripcion,
                 color: tipoEvento.color,
@@ -166,7 +166,7 @@ export async function actualizarTipoEvento(
     try {
         const validatedData = ActualizarTipoEventoSchema.parse(data);
 
-        const tipoEvento = await prisma.project_evento_tipos.update({
+        const tipoEvento = await prisma.studio_evento_tipos.update({
             where: { id: tipoId },
             data: {
                 nombre: validatedData.nombre,
@@ -175,12 +175,12 @@ export async function actualizarTipoEvento(
         });
 
         // Obtener el slug del proyecto para revalidar
-        const project = await prisma.projects.findUnique({
-            where: { id: tipoEvento.projectId },
+        const studio = await prisma.studios.findUnique({
+            where: { id: tipoEvento.studio_id },
             select: { slug: true },
         });
 
-        if (project) {
+        if (studio) {
             revalidateTiposEvento(project.slug);
         }
 
@@ -188,7 +188,7 @@ export async function actualizarTipoEvento(
             success: true,
             data: {
                 id: tipoEvento.id,
-                projectId: tipoEvento.projectId,
+                studio_id: tipoEvento.studio_id,
                 nombre: tipoEvento.nombre,
                 descripcion: tipoEvento.descripcion,
                 color: tipoEvento.color,
@@ -220,7 +220,7 @@ export async function eliminarTipoEvento(
 ): Promise<ActionResponse<{ id: string }>> {
     try {
         // Verificar si tiene paquetes asociados
-        const paquetesAsociados = await prisma.project_paquetes.count({
+        const paquetesAsociados = await prisma.studio_paquetes.count({
             where: { eventoTipoId: tipoId },
         });
 
@@ -231,17 +231,17 @@ export async function eliminarTipoEvento(
             };
         }
 
-        const tipoEvento = await prisma.project_evento_tipos.delete({
+        const tipoEvento = await prisma.studio_evento_tipos.delete({
             where: { id: tipoId },
         });
 
         // Obtener el slug del proyecto para revalidar
-        const project = await prisma.projects.findUnique({
-            where: { id: tipoEvento.projectId },
+        const studio = await prisma.studios.findUnique({
+            where: { id: tipoEvento.studio_id },
             select: { slug: true },
         });
 
-        if (project) {
+        if (studio) {
             revalidateTiposEvento(project.slug);
         }
 
@@ -269,8 +269,8 @@ export async function actualizarOrdenTiposEvento(
     data: unknown
 ): Promise<ActionResponse<{ success: boolean }>> {
     try {
-        const projectId = await getProjectIdFromSlug(studioSlug);
-        if (!projectId) {
+        const studio_id = await getProjectIdFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
@@ -279,7 +279,7 @@ export async function actualizarOrdenTiposEvento(
         // Actualizar ordenes en una transacción
         await prisma.$transaction(
             validatedData.tipos.map((tipo) =>
-                prisma.project_evento_tipos.update({
+                prisma.studio_evento_tipos.update({
                     where: { id: tipo.id },
                     data: { orden: tipo.orden },
                 })
@@ -308,7 +308,7 @@ export async function obtenerTipoEventoPorId(
     tipoId: string
 ): Promise<ActionResponse<TipoEventoData>> {
     try {
-        const tipoEvento = await prisma.project_evento_tipos.findUnique({
+        const tipoEvento = await prisma.studio_evento_tipos.findUnique({
             where: { id: tipoId },
             include: {
                 paquetes: {
@@ -330,7 +330,7 @@ export async function obtenerTipoEventoPorId(
             success: true,
             data: {
                 id: tipoEvento.id,
-                projectId: tipoEvento.projectId,
+                studio_id: tipoEvento.studio_id,
                 nombre: tipoEvento.nombre,
                 descripcion: tipoEvento.descripcion,
                 color: tipoEvento.color,

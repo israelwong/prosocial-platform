@@ -26,17 +26,17 @@ import {
 export async function obtenerPersonal(studioSlug: string): Promise<PersonalListResponse> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const personal = await prisma.project_personal.findMany({
-            where: { projectId: project.id },
+        const personal = await prisma.studio_personal.findMany({
+            where: { studio_id: studio.id },
             include: {
                 categoria: {
                     select: {
@@ -82,20 +82,20 @@ export async function crearPersonal(
         const validatedData = createPersonalSchema.parse(data);
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Verificar que la categoría existe y pertenece al proyecto
-        const categoria = await prisma.project_categorias_personal.findFirst({
+        const categoria = await prisma.studio_categorias_personal.findFirst({
             where: {
                 id: validatedData.categoriaId,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -107,11 +107,11 @@ export async function crearPersonal(
         const { perfilesIds, ...personalDataWithoutProfiles } = validatedData;
 
         // Crear personal - mapear campos exactamente como están en Prisma
-        const personal = await prisma.project_personal.create({
+        const personal = await prisma.studio_personal.create({
             data: {
                 // Campos requeridos
                 nombre: personalDataWithoutProfiles.nombre,
-                projectId: project.id,
+                studio_id: studio.id,
                 categoriaId: personalDataWithoutProfiles.categoriaId,
                 tipo: personalDataWithoutProfiles.tipo || categoria.tipo,
                 status: personalDataWithoutProfiles.status || 'activo',
@@ -149,7 +149,7 @@ export async function crearPersonal(
 
         // Si hay perfiles asociados, crearlos
         if (perfilesIds && perfilesIds.length > 0) {
-            await prisma.project_personal_profile_assignments.createMany({
+            await prisma.studio_personal_profile_assignments.createMany({
                 data: perfilesIds.map(perfilId => ({
                     personalId: personal.id,
                     perfilId: perfilId
@@ -180,20 +180,20 @@ export async function actualizarPersonal(
         const validatedData = updatePersonalSchema.parse({ ...data, id: personalId });
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Verificar que el personal existe y pertenece al proyecto
-        const existingPersonal = await prisma.project_personal.findFirst({
+        const existingPersonal = await prisma.studio_personal.findFirst({
             where: {
                 id: personalId,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -203,10 +203,10 @@ export async function actualizarPersonal(
 
         // Si se está cambiando la categoría, verificar que existe
         if (validatedData.categoriaId) {
-            const categoria = await prisma.project_categorias_personal.findFirst({
+            const categoria = await prisma.studio_categorias_personal.findFirst({
                 where: {
                     id: validatedData.categoriaId,
-                    projectId: project.id
+                    studio_id: studio.id
                 }
             });
 
@@ -235,7 +235,7 @@ export async function actualizarPersonal(
         if (personalDataWithoutProfiles.honorarios_variables !== undefined) updateData.honorarios_variables = personalDataWithoutProfiles.honorarios_variables;
         if (personalDataWithoutProfiles.orden !== undefined) updateData.orden = personalDataWithoutProfiles.orden;
 
-        const personal = await prisma.project_personal.update({
+        const personal = await prisma.studio_personal.update({
             where: { id: personalId },
             data: updateData,
             include: {
@@ -262,13 +262,13 @@ export async function actualizarPersonal(
         // Actualizar perfiles asociados si se proporcionaron
         if (perfilesIds !== undefined) {
             // Eliminar perfiles existentes
-            await prisma.project_personal_profile_assignments.deleteMany({
+            await prisma.studio_personal_profile_assignments.deleteMany({
                 where: { personalId: personalId }
             });
 
             // Crear nuevos perfiles si hay alguno
             if (perfilesIds.length > 0) {
-                await prisma.project_personal_profile_assignments.createMany({
+                await prisma.studio_personal_profile_assignments.createMany({
                     data: perfilesIds.map(perfilId => ({
                         personalId: personalId,
                         perfilId: perfilId
@@ -296,20 +296,20 @@ export async function eliminarPersonal(
 ): Promise<{ success: boolean; error?: string }> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Verificar que el personal existe y pertenece al proyecto
-        const existingPersonal = await prisma.project_personal.findFirst({
+        const existingPersonal = await prisma.studio_personal.findFirst({
             where: {
                 id: personalId,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -318,7 +318,7 @@ export async function eliminarPersonal(
         }
 
         // Eliminar personal
-        await prisma.project_personal.delete({
+        await prisma.studio_personal.delete({
             where: { id: personalId }
         });
 
@@ -339,17 +339,17 @@ export async function eliminarPersonal(
 export async function obtenerCategoriasPersonal(studioSlug: string): Promise<CategoriaPersonalListResponse> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const categorias = await prisma.project_categorias_personal.findMany({
-            where: { projectId: project.id },
+        const categorias = await prisma.studio_categorias_personal.findMany({
+            where: { studio_id: studio.id },
             include: {
                 _count: {
                     select: {
@@ -383,19 +383,19 @@ export async function crearCategoriaPersonal(
         const validatedData = createCategoriaPersonalSchema.parse(data);
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Verificar que no existe una categoría con el mismo nombre
-        const existingCategoria = await prisma.project_categorias_personal.findFirst({
+        const existingCategoria = await prisma.studio_categorias_personal.findFirst({
             where: {
-                projectId: project.id,
+                studio_id: studio.id,
                 nombre: validatedData.nombre
             }
         });
@@ -405,10 +405,10 @@ export async function crearCategoriaPersonal(
         }
 
         // Crear categoría
-        const categoria = await prisma.project_categorias_personal.create({
+        const categoria = await prisma.studio_categorias_personal.create({
             data: {
                 ...validatedData,
-                projectId: project.id,
+                studio_id: studio.id,
                 descripcion: validatedData.descripcion || null,
                 color: validatedData.color || null,
                 icono: validatedData.icono || null
@@ -445,20 +445,20 @@ export async function actualizarCategoriaPersonal(
         const validatedData = updateCategoriaPersonalSchema.parse({ ...data, id: categoriaId });
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Verificar que la categoría existe y pertenece al proyecto
-        const existingCategoria = await prisma.project_categorias_personal.findFirst({
+        const existingCategoria = await prisma.studio_categorias_personal.findFirst({
             where: {
                 id: categoriaId,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -468,9 +468,9 @@ export async function actualizarCategoriaPersonal(
 
         // Si se está cambiando el nombre, verificar que no existe otra con el mismo nombre
         if (validatedData.nombre && validatedData.nombre !== existingCategoria.nombre) {
-            const duplicateCategoria = await prisma.project_categorias_personal.findFirst({
+            const duplicateCategoria = await prisma.studio_categorias_personal.findFirst({
                 where: {
-                    projectId: project.id,
+                    studio_id: studio.id,
                     nombre: validatedData.nombre,
                     id: { not: categoriaId }
                 }
@@ -482,7 +482,7 @@ export async function actualizarCategoriaPersonal(
         }
 
         // Actualizar categoría
-        const categoria = await prisma.project_categorias_personal.update({
+        const categoria = await prisma.studio_categorias_personal.update({
             where: { id: categoriaId },
             data: {
                 ...validatedData,
@@ -518,20 +518,20 @@ export async function eliminarCategoriaPersonal(
 ): Promise<{ success: boolean; error?: string }> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Verificar que la categoría existe y pertenece al proyecto
-        const existingCategoria = await prisma.project_categorias_personal.findFirst({
+        const existingCategoria = await prisma.studio_categorias_personal.findFirst({
             where: {
                 id: categoriaId,
-                projectId: project.id
+                studio_id: studio.id
             },
             include: {
                 _count: {
@@ -557,7 +557,7 @@ export async function eliminarCategoriaPersonal(
         }
 
         // Eliminar categoría
-        await prisma.project_categorias_personal.delete({
+        await prisma.studio_categorias_personal.delete({
             where: { id: categoriaId }
         });
 
@@ -580,22 +580,22 @@ export async function actualizarOrdenCategoriasPersonal(
         const validatedData = updateOrdenCategoriasSchema.parse(data);
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Actualizar orden de cada categoría
         await prisma.$transaction(
             validatedData.categorias.map(categoria =>
-                prisma.project_categorias_personal.updateMany({
+                prisma.studio_categorias_personal.updateMany({
                     where: {
                         id: categoria.id,
-                        projectId: project.id
+                        studio_id: studio.id
                     },
                     data: {
                         orden: categoria.orden
@@ -624,17 +624,17 @@ export async function actualizarOrdenCategoriasPersonal(
 export async function obtenerPerfilesPersonal(studioSlug: string) {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const perfiles = await prisma.project_personal_profiles.findMany({
-            where: { projectId: project.id },
+        const perfiles = await prisma.studio_personal_profiles.findMany({
+            where: { studio_id: studio.id },
             orderBy: { orden: 'asc' },
             include: {
                 _count: {
@@ -661,19 +661,19 @@ export async function crearPerfilPersonal(studioSlug: string, data: Record<strin
         const validatedData = createPerfilPersonalSchema.parse(data);
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const perfil = await prisma.project_personal_profiles.create({
+        const perfil = await prisma.studio_personal_profiles.create({
             data: {
                 ...validatedData,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -696,19 +696,19 @@ export async function actualizarPerfilPersonal(studioSlug: string, perfilId: str
         const validatedData = updatePerfilPersonalSchema.parse({ ...data, id: perfilId });
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        const perfil = await prisma.project_personal_profiles.update({
+        const perfil = await prisma.studio_personal_profiles.update({
             where: {
                 id: perfilId,
-                projectId: project.id
+                studio_id: studio.id
             },
             data: validatedData
         });
@@ -732,22 +732,22 @@ export async function actualizarOrdenPersonal(
 ): Promise<{ success: boolean; error?: string }> {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Actualizar el orden de cada personal
         await Promise.all(
             personalIds.map((personalId, index) =>
-                prisma.project_personal.update({
+                prisma.studio_personal.update({
                     where: {
                         id: personalId,
-                        projectId: project.id // Verificar que pertenece al proyecto
+                        studio_id: studio.id // Verificar que pertenece al proyecto
                     },
                     data: { orden: index }
                 })
@@ -771,12 +771,12 @@ export async function actualizarPosicionPersonal(
     newCategoryId?: string | null
 ): Promise<{ success: boolean; error?: string }> {
     try {
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
@@ -789,10 +789,10 @@ export async function actualizarPosicionPersonal(
             updateData.categoriaId = newCategoryId;
         }
 
-        await prisma.project_personal.update({
+        await prisma.studio_personal.update({
             where: {
                 id: personalId,
-                projectId: project.id
+                studio_id: studio.id
             },
             data: updateData
         });
@@ -810,19 +810,19 @@ export async function actualizarPosicionPersonal(
 export async function eliminarPerfilPersonal(studioSlug: string, perfilId: string) {
     try {
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
-        await prisma.project_personal_profiles.delete({
+        await prisma.studio_personal_profiles.delete({
             where: {
                 id: perfilId,
-                projectId: project.id
+                studio_id: studio.id
             }
         });
 
@@ -842,22 +842,22 @@ export async function actualizarOrdenPerfilesPersonal(studioSlug: string, data: 
         const validatedData = updateOrdenPerfilesSchema.parse(data);
 
         // Buscar el proyecto por slug
-        const project = await prisma.projects.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return { success: false, error: 'Proyecto no encontrado' };
         }
 
         // Actualizar orden de cada perfil
         await Promise.all(
             validatedData.perfiles.map((perfil) =>
-                prisma.project_personal_profiles.update({
+                prisma.studio_personal_profiles.update({
                     where: {
                         id: perfil.id,
-                        projectId: project.id
+                        studio_id: studio.id
                     },
                     data: { orden: perfil.orden }
                 })
