@@ -103,7 +103,7 @@ export async function crearMetodoPago(studioSlug: string, data: MetodoPagoForm) 
             requiere_stripe: validationResult.data.requiere_stripe,
             status: validationResult.data.status,
             orden: validationResult.data.orden || 0,
-            updatedAt: new Date(),
+            updated_at: new Date(),
         };
 
         const nuevoMetodo = await prisma.studio_metodos_pago.create({
@@ -155,7 +155,7 @@ export async function actualizarMetodoPago(studioSlug: string, metodoId: string,
             requiere_stripe: validationResult.data.requiere_stripe,
             status: validationResult.data.status,
             orden: validationResult.data.orden || 0,
-            updatedAt: new Date(),
+            updated_at: new Date(),
         };
 
         const metodoActualizado = await prisma.studio_metodos_pago.update({
@@ -225,7 +225,7 @@ export async function actualizarOrdenMetodosPago(studioSlug: string, metodos: { 
             metodos.map(metodo =>
                 prisma.studio_metodos_pago.update({
                     where: { id: metodo.id },
-                    data: { orden: metodo.orden, updatedAt: new Date() },
+                    data: { orden: metodo.orden, updated_at: new Date() },
                 })
             )
         );

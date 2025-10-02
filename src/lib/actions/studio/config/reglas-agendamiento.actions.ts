@@ -172,7 +172,7 @@ export async function actualizarReglaAgendamiento(
             where: { id: reglaId },
             data: {
                 ...data,
-                updatedAt: new Date()
+                updated_at: new Date()
             }
         });
 
@@ -284,7 +284,7 @@ export async function actualizarOrdenReglasAgendamiento(
                     },
                     data: {
                         orden: regla.orden,
-                        updatedAt: new Date()
+                        updated_at: new Date()
                     }
                 })
             )

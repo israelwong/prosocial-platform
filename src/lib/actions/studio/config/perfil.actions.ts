@@ -141,7 +141,7 @@ export async function actualizarPerfil(
                 name: validatedData.name,
                 email: validatedData.email,
                 phone: validatedData.phone,
-                updatedAt: new Date()
+                updated_at: new Date()
             }
         });
 

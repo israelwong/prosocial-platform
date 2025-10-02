@@ -354,7 +354,7 @@ export async function crearPaquete(
                     precio: validatedData.precio,
                     status: 'active',
                     posicion: nuevaPosicion,
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 },
             });
 
@@ -368,7 +368,7 @@ export async function crearPaquete(
                     posicion: index,
                     visible_cliente: true,
                     status: 'active',
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 })),
             });
 
@@ -426,7 +426,7 @@ export async function actualizarPaquete(
                 data: {
                     nombre: validatedData.nombre,
                     precio: validatedData.precio,
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 },
             });
 
@@ -445,7 +445,7 @@ export async function actualizarPaquete(
                     posicion: index,
                     visible_cliente: true,
                     status: 'active',
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 })),
             });
 

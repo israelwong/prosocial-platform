@@ -68,7 +68,7 @@ export async function sembrarMetodosPagoBasicos(studio_id: string) {
             data: METODOS_PAGO_BASICOS.map(metodo => ({
                 studio_id,
                 ...metodo,
-                updatedAt: new Date(),
+                updated_at: new Date(),
             })),
         });
 

@@ -122,7 +122,7 @@ export async function crearTipoEvento(
                 nombre: validatedData.nombre,
                 status: validatedData.status,
                 orden: nuevaPosicion,
-                updatedAt: new Date(),
+                updated_at: new Date(),
             },
         });
 

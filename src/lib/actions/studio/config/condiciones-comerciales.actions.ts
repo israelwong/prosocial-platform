@@ -101,7 +101,7 @@ export async function crearCondicionComercial(studioSlug: string, data: Condicio
             porcentaje_anticipo: validationResult.data.porcentaje_anticipo ? parseFloat(validationResult.data.porcentaje_anticipo) : null,
             status: validationResult.data.status,
             orden: validationResult.data.orden || 0,
-            updatedAt: new Date(),
+            updated_at: new Date(),
         };
 
         const nuevaCondicion = await prisma.studio_condiciones_comerciales.create({
@@ -151,7 +151,7 @@ export async function actualizarCondicionComercial(studioSlug: string, condicion
             porcentaje_anticipo: validationResult.data.porcentaje_anticipo ? parseFloat(validationResult.data.porcentaje_anticipo) : null,
             status: validationResult.data.status,
             orden: validationResult.data.orden || 0,
-            updatedAt: new Date(),
+            updated_at: new Date(),
         };
 
         const condicionActualizada = await prisma.studio_condiciones_comerciales.update({
@@ -221,7 +221,7 @@ export async function actualizarOrdenCondicionesComerciales(studioSlug: string, 
             condiciones.map(condicion =>
                 prisma.studio_condiciones_comerciales.update({
                     where: { id: condicion.id },
-                    data: { orden: condicion.orden, updatedAt: new Date() },
+                    data: { orden: condicion.orden, updated_at: new Date() },
                 })
             )
         );
