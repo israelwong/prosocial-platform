@@ -8,16 +8,16 @@
 
 ## 🎯 RESUMEN EJECUTIVO
 
-| Fase                        | Duración       | Estado         | Completado       |
-| --------------------------- | -------------- | -------------- | ---------------- |
-| **Fase 0: Fundamentos**     | 3-4 días       | 🟢 En progreso | 67% (2.5/4 días) |
-| **Iteración 1: Studio MVP** | 2-3 semanas    | ⚪ Pendiente   | 0%               |
-| ├─ Refactorización          | 4 días         | ⚪ Pendiente   | 0%               |
-| ├─ Módulo Manager           | 7 días         | ⚪ Pendiente   | 0%               |
-| └─ Limpieza                 | 2 días         | ⚪ Pendiente   | 0%               |
-| **Iteración 2: Admin**      | 1.5 semanas    | ⚪ Pendiente   | 0%               |
-| **Iteración 3: Agente CRM** | 1 semana       | ⚪ Pendiente   | 0%               |
-| **Iteración 4: ZEN Magic**  | 3 días         | ⚪ Pendiente   | 0%               |
+| Fase                        | Duración    | Estado         | Completado       |
+| --------------------------- | ----------- | -------------- | ---------------- |
+| **Fase 0: Fundamentos**     | 3-4 días    | 🟢 En progreso | 67% (2.5/4 días) |
+| **Iteración 1: Studio MVP** | 2-3 semanas | ⚪ Pendiente   | 0%               |
+| ├─ Refactorización          | 4 días      | ⚪ Pendiente   | 0%               |
+| ├─ Módulo Manager           | 7 días      | ⚪ Pendiente   | 0%               |
+| └─ Limpieza                 | 2 días      | ⚪ Pendiente   | 0%               |
+| **Iteración 2: Admin**      | 1.5 semanas | ⚪ Pendiente   | 0%               |
+| **Iteración 3: Agente CRM** | 1 semana    | ⚪ Pendiente   | 0%               |
+| **Iteración 4: ZEN Magic**  | 3 días      | ⚪ Pendiente   | 0%               |
 
 ---
 
@@ -275,6 +275,7 @@ Antes de iniciar Iteración 1, validar:
 **Contexto:** Studio actual tiene estructura legacy que necesita migración a V2.0 antes de continuar
 
 **Decisiones clave:**
+
 1. ✅ Configuración CENTRALIZADA con secciones por módulo (híbrido)
 2. ✅ Sidebar dinámico basado en `getActiveModules()`
 3. ✅ Middleware de validación en cada módulo
@@ -301,6 +302,7 @@ Antes de iniciar Iteración 1, validar:
 ```
 
 **Tareas:**
+
 - [ ] Crear `/configuracion/modulos/page.tsx`
   - [ ] Usar `getAllModulesWithStatus(studioId)`
   - [ ] Mostrar módulos CORE (activos)
@@ -319,6 +321,7 @@ Antes de iniciar Iteración 1, validar:
   - [ ] Validar tipos con Prisma V2.0
 
 **Criterio de éxito:**
+
 - ✅ Configuración base funciona (estudio, cuenta)
 - ✅ Página de módulos muestra correctamente
 - ✅ Sidebar dinámico funciona
@@ -360,6 +363,7 @@ Configuración (siempre)
 ```
 
 **Tareas:**
+
 - [ ] Crear `/dashboard/page.tsx` limpio
   - [ ] Metrics cards con datos reales
   - [ ] Query eventos del mes
@@ -377,6 +381,7 @@ Configuración (siempre)
   - [ ] `getPendingPayments(studioId)`
 
 **Criterio de éxito:**
+
 - ✅ Dashboard muestra métricas reales
 - ✅ Sidebar dinámico funciona correctamente
 - ✅ Solo módulos activos aparecen en menú
@@ -408,6 +413,7 @@ src/app/studio/[slug]/manager/
 ```
 
 **Tareas:**
+
 - [ ] Crear `/manager/layout.tsx` con middleware
 - [ ] Crear `/manager/kanban/page.tsx` básica
   - [ ] Obtener `manager_pipeline_stages` del studio
@@ -419,6 +425,7 @@ src/app/studio/[slug]/manager/
   - [ ] `EventoCard.tsx` - Info básica del evento
 
 **Server Actions:**
+
 ```typescript
 // src/lib/actions/studio/manager/eventos.actions.ts
 - getEventosKanban(studioId: string)
@@ -426,6 +433,7 @@ src/app/studio/[slug]/manager/
 ```
 
 **Criterio de éxito:**
+
 - ✅ Middleware protege ruta `/manager`
 - ✅ Kanban muestra columnas con eventos
 - ✅ Cards muestran info básica de eventos
@@ -439,6 +447,7 @@ src/app/studio/[slug]/manager/
 **Objetivo:** Drag & drop funcional + CRUD completo de eventos
 
 **Tareas:**
+
 - [ ] Implementar Drag & Drop (dnd-kit)
   - [ ] Instalar `@dnd-kit/core` y `@dnd-kit/sortable`
   - [ ] DndContext en KanbanBoard
@@ -456,14 +465,16 @@ src/app/studio/[slug]/manager/
   - [ ] Search por nombre/cliente
 
 **Server Actions:**
+
 ```typescript
-- crearEvento(studioId, data)
-- actualizarEvento(eventoId, data)
-- moverEventoEtapa(eventoId, nuevaEtapaId)
-- eliminarEvento(eventoId)
+-crearEvento(studioId, data) -
+  actualizarEvento(eventoId, data) -
+  moverEventoEtapa(eventoId, nuevaEtapaId) -
+  eliminarEvento(eventoId);
 ```
 
 **Criterio de éxito:**
+
 - ✅ Drag & drop funcional entre stages
 - ✅ Crear evento desde modal
 - ✅ Editar evento existente
@@ -478,6 +489,7 @@ src/app/studio/[slug]/manager/
 **Objetivo:** Aplicar templates Gantt a eventos + visualización timeline
 
 **Tareas:**
+
 - [ ] Página `/manager/eventos/[id]/gantt/page.tsx`
   - [ ] Vista timeline del evento
   - [ ] Selector de template (si no tiene)
@@ -498,6 +510,7 @@ src/app/studio/[slug]/manager/
   - [ ] `ApplyTemplateModal.tsx`
 
 **Criterio de éxito:**
+
 - ✅ Eventos pueden tener templates aplicados
 - ✅ Tareas se crean automáticamente
 - ✅ Progreso se calcula correctamente
@@ -512,6 +525,7 @@ src/app/studio/[slug]/manager/
 **Objetivo:** Calendario de eventos + testing end-to-end
 
 **Tareas:**
+
 - [ ] Página `/manager/agenda/page.tsx`
   - [ ] Calendario mensual (FullCalendar o custom)
   - [ ] Eventos en el calendario
@@ -523,6 +537,7 @@ src/app/studio/[slug]/manager/
   - [ ] Fix de bugs encontrados
 
 **Criterio de éxito:**
+
 - ✅ Agenda muestra eventos correctamente
 - ✅ Flujo end-to-end funciona
 - ✅ Sin errores en consola
@@ -536,6 +551,7 @@ src/app/studio/[slug]/manager/
 #### Día 16-17: Refactoring + Documentación
 
 **Tareas:**
+
 - [ ] Eliminar código legacy
   - [ ] Código duplicado de `/studio/(main)` antiguo
   - [ ] Componentes no utilizados
@@ -550,6 +566,7 @@ src/app/studio/[slug]/manager/
   - [ ] Ejemplos de uso de helpers
 
 **Criterio de éxito:**
+
 - ✅ 0 referencias a `projects` en código
 - ✅ Código limpio y mantenible
 - ✅ Documentación actualizada
@@ -591,7 +608,7 @@ src/app/studio/[slug]/manager/
 
 ### Estado actual:
 
-- **Última actualización:** 2025-10-02 (Día 3 completado - Plan detallado definido)
+- **Última actualización:** 2025-10-02 (ZEN Pages implementado - Listo para Iteración 1)
 - **Siguiente paso:** Día 5-6 - Migración de Configuración (Refactorización Studio)
 - **Bloqueadores:** Ninguno
 - **Decisión:** Saltar Día 4 (Gantt Templates seeds), ir directo a Iteración 1
@@ -600,9 +617,12 @@ src/app/studio/[slug]/manager/
   - ✅ Schema V2.0 migrado
   - ✅ Seeds base (módulos, pipelines, usuarios)
   - ✅ Helpers de módulos implementados y testeados
+  - ✅ **ZEN Pages agregado** (4 módulos CORE, 4 ADDON)
+  - ✅ Modelos de landing pública, portfolios, lead forms, portal clientes
   - 📖 Plan detallado de Iteración 1 documentado (13 días, 3 fases)
   - 🎯 Auditoría de estructura actual completada
   - 🎯 Arquitectura V2.0 definida (ver `ARQUITECTURA_STUDIO_V2.md`)
+  - 🎯 ZEN Pages arquitectura documentada (ver `ANALISIS_PAGES_MODULOS.md`)
 
 ---
 
