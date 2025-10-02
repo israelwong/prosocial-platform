@@ -8,13 +8,16 @@
 
 ## 🎯 RESUMEN EJECUTIVO
 
-| Fase                        | Duración    | Estado         | Completado     |
-| --------------------------- | ----------- | -------------- | -------------- |
-| **Fase 0: Fundamentos**     | 3-4 días    | 🟢 En progreso | 67% (2.5/4 días) |
-| **Iteración 1: Studio MVP** | 2 semanas   | ⚪ Pendiente   | 0%             |
-| **Iteración 2: Admin**      | 1.5 semanas | ⚪ Pendiente   | 0%             |
-| **Iteración 3: Agente CRM** | 1 semana    | ⚪ Pendiente   | 0%             |
-| **Iteración 4: ZEN Magic**  | 3 días      | ⚪ Pendiente   | 0%             |
+| Fase                        | Duración       | Estado         | Completado       |
+| --------------------------- | -------------- | -------------- | ---------------- |
+| **Fase 0: Fundamentos**     | 3-4 días       | 🟢 En progreso | 67% (2.5/4 días) |
+| **Iteración 1: Studio MVP** | 2-3 semanas    | ⚪ Pendiente   | 0%               |
+| ├─ Refactorización          | 4 días         | ⚪ Pendiente   | 0%               |
+| ├─ Módulo Manager           | 7 días         | ⚪ Pendiente   | 0%               |
+| └─ Limpieza                 | 2 días         | ⚪ Pendiente   | 0%               |
+| **Iteración 2: Admin**      | 1.5 semanas    | ⚪ Pendiente   | 0%               |
+| **Iteración 3: Agente CRM** | 1 semana       | ⚪ Pendiente   | 0%               |
+| **Iteración 4: ZEN Magic**  | 3 días         | ⚪ Pendiente   | 0%               |
 
 ---
 
@@ -261,103 +264,297 @@ Antes de iniciar Iteración 1, validar:
 
 ---
 
-## 🔷 ITERACIÓN 1: STUDIO MVP (2 semanas)
+## 🔷 ITERACIÓN 1: STUDIO MVP (2-3 semanas)
 
-**Objetivo:** Módulo ZEN Manager completamente funcional para fotógrafos
+**Objetivo:** Refactorizar Studio a arquitectura modular + Módulo ZEN Manager funcional
 
-### **📅 Semana 1: Layout + Manager Kanban**
+> 📖 **Análisis detallado:** Ver `docs/ARQUITECTURA_STUDIO_V2.md` para auditoría completa
 
-#### Día 5-6: Layout Base con ZEN Design System
+### **⚠️ PRIORIDAD: REFACTORIZACIÓN MODULAR**
 
-```typescript
-// src/app/studio/[slug]/layout.tsx
-- [ ] Crear layout base con sidebar
-- [ ] ZenSidebar con navegación por módulos
-- [ ] ZenNavbar con user dropdown
-- [ ] Verificar módulos activos del studio
-- [ ] Ocultar módulos no activos
-- [ ] Responsive mobile-first
-```
+**Contexto:** Studio actual tiene estructura legacy que necesita migración a V2.0 antes de continuar
 
-#### Día 7-8: Dashboard Studio
-
-```typescript
-// src/app/studio/[slug]/page.tsx
-- [ ] Métricas básicas (ZenCard)
-  - [ ] Eventos este mes
-  - [ ] Pendientes de pago
-  - [ ] Próximos eventos (7 días)
-- [ ] Lista próximos eventos (ZenTable)
-- [ ] Gráfico simple de ingresos (opcional)
-```
-
-#### Día 9-11: Kanban Manager (Pipeline Operacional)
-
-```typescript
-// src/app/studio/[slug]/manager/kanban/page.tsx
-- [ ] Vista Kanban con columnas por stage
-- [ ] Drag & drop eventos entre stages
-- [ ] Modal crear evento (ZenModal + ZenForm)
-- [ ] Modal editar evento
-- [ ] Filtros: fecha, tipo evento, cliente
-- [ ] Server Actions:
-  - [ ] crearEvento(data)
-  - [ ] actualizarEvento(id, data)
-  - [ ] moverEtapa(eventoId, nuevaEtapaId)
-  - [ ] eliminarEvento(id)
-```
-
-**Componentes ZEN a crear:**
-
-- [ ] EventoCard (muestra info del evento en kanban)
-- [ ] EventoModal (formulario crear/editar)
-- [ ] StageColumn (columna del kanban)
-- [ ] EventoFilters (filtros de búsqueda)
+**Decisiones clave:**
+1. ✅ Configuración CENTRALIZADA con secciones por módulo (híbrido)
+2. ✅ Sidebar dinámico basado en `getActiveModules()`
+3. ✅ Middleware de validación en cada módulo
+4. ✅ Responsive puede esperar (Desktop-first aceptable por ahora)
 
 ---
 
-### **📅 Semana 2: Gantt + Agenda**
+### **📅 FASE 1: REFACTORIZACIÓN (4 días) - PREREQUISITO**
 
-#### Día 12-14: Sistema Gantt Templates
+#### Día 5-6: Migración de Configuración (2 días)
+
+**Objetivo:** Reorganizar `/configuracion` con arquitectura modular V2.0
 
 ```typescript
-// src/app/studio/[slug]/manager/evento/[id]/gantt/page.tsx
-- [ ] Vista timeline del evento
-- [ ] Selector de template (si no tiene)
-- [ ] Lista de tareas con fechas
-- [ ] Editar tarea (modal)
-- [ ] Asignar personal a tarea
-- [ ] Marcar tarea completada
-- [ ] Indicadores de progreso (%)
-- [ ] Alertas de tareas atrasadas
-
-// src/app/studio/[slug]/configuracion/gantt-templates/page.tsx
-- [ ] Lista templates del studio
-- [ ] Crear template nuevo
-- [ ] Editar template existente
-- [ ] Agregar/quitar tareas del template
-- [ ] Preview del template
+// Nueva estructura de configuración
+/configuracion/
+├── estudio/           # Config base (identidad, contacto, horarios)
+├── cuenta/            # Config usuario (perfil, notificaciones)
+├── modulos/           # ⭐ NUEVO: Gestión de módulos
+└── [modulo]/          # Config por módulo (solo si activo)
+    ├── manager/       # Config ZEN Manager
+    ├── marketing/     # Config ZEN Marketing
+    └── magic/         # Config ZEN Magic
 ```
+
+**Tareas:**
+- [ ] Crear `/configuracion/modulos/page.tsx`
+  - [ ] Usar `getAllModulesWithStatus(studioId)`
+  - [ ] Mostrar módulos CORE (activos)
+  - [ ] Mostrar módulos ADDON (con precio, placeholder)
+- [ ] Migrar config de `/catalogo` a `/manager`
+  - [ ] Mover tipos-evento a `/manager/tipos-evento`
+  - [ ] Mover servicios a `/manager/servicios`
+  - [ ] Mover paquetes a `/manager/paquetes`
+- [ ] Refactorizar `ConfiguracionSidebarZen.tsx`
+  - [ ] Lógica dinámica con `getActiveModules()`
+  - [ ] Mostrar secciones solo si módulo activo
+  - [ ] Iconos por módulo
+- [ ] Actualizar Server Actions de configuración
+  - [ ] Cambiar `projects` → `studios`
+  - [ ] Cambiar `project_*` → `studio_*`
+  - [ ] Validar tipos con Prisma V2.0
+
+**Criterio de éxito:**
+- ✅ Configuración base funciona (estudio, cuenta)
+- ✅ Página de módulos muestra correctamente
+- ✅ Sidebar dinámico funciona
+- ✅ 0 referencias a `projects` en `/configuracion`
+
+**Tiempo estimado:** 2 días (16 horas)
+
+---
+
+#### Día 7-8: Dashboard Global + Sidebar Modular (2 días)
+
+**Objetivo:** Dashboard cross-módulo + Sidebar dinámico por módulos activos
+
+```typescript
+// Dashboard Sidebar V2.0
+Dashboard (siempre)
+├─ Vista General
+└─ Notificaciones
+
+─────────────────────
+
+ZEN Manager (si activo)
+├─ Kanban Operacional
+├─ Eventos
+├─ Agenda
+└─ Finanzas
+
+ZEN Marketing (si activo)
+├─ Kanban CRM
+├─ Leads
+└─ Cotizaciones
+
+ZEN Magic (si activo)
+└─ Asistente IA
+
+─────────────────────
+
+Configuración (siempre)
+```
+
+**Tareas:**
+- [ ] Crear `/dashboard/page.tsx` limpio
+  - [ ] Metrics cards con datos reales
+  - [ ] Query eventos del mes
+  - [ ] Query pagos pendientes
+  - [ ] Query próximos eventos
+- [ ] Refactorizar `DashboardSidebarZen.tsx`
+  - [ ] Obtener módulos activos con `getActiveModules()`
+  - [ ] Renderizar secciones condicionalmente
+  - [ ] Dashboard siempre visible
+  - [ ] Configuración siempre visible
+  - [ ] Módulos solo si activos
+- [ ] Crear Server Actions de Dashboard
+  - [ ] `getMonthMetrics(studioId, month)`
+  - [ ] `getUpcomingEvents(studioId, days)`
+  - [ ] `getPendingPayments(studioId)`
+
+**Criterio de éxito:**
+- ✅ Dashboard muestra métricas reales
+- ✅ Sidebar dinámico funciona correctamente
+- ✅ Solo módulos activos aparecen en menú
+- ✅ Navegación fluida entre secciones
+
+**Tiempo estimado:** 2 días (16 horas)
+
+---
+
+### **📅 FASE 2: MÓDULO MANAGER (1 semana)**
+
+#### Día 9-10: Estructura Manager + Kanban Base (2 días)
+
+**Objetivo:** Crear estructura del módulo Manager con middleware + Kanban básico
+
+```
+src/app/studio/[slug]/manager/
+├── layout.tsx                # Middleware con checkStudioModule()
+├── page.tsx                  # Redirect a /kanban
+├── kanban/
+│   └── page.tsx             # Vista Kanban
+├── eventos/
+│   └── [id]/
+│       ├── page.tsx         # Detalle del evento
+│       └── gantt/
+│           └── page.tsx     # Timeline (placeholder)
+└── agenda/
+    └── page.tsx             # Calendario (placeholder)
+```
+
+**Tareas:**
+- [ ] Crear `/manager/layout.tsx` con middleware
+- [ ] Crear `/manager/kanban/page.tsx` básica
+  - [ ] Obtener `manager_pipeline_stages` del studio
+  - [ ] Obtener `manager_events` agrupados por stage
+  - [ ] Renderizar columnas (sin drag & drop aún)
+- [ ] Componentes base
+  - [ ] `KanbanBoard.tsx` - Container principal
+  - [ ] `KanbanColumn.tsx` - Columna por stage
+  - [ ] `EventoCard.tsx` - Info básica del evento
 
 **Server Actions:**
-
 ```typescript
-- [ ] aplicarTemplate(eventoId, templateId)
-- [ ] crearTemplate(studioId, data)
-- [ ] actualizarTarea(tareaId, data)
-- [ ] completarTarea(tareaId, userId)
+// src/lib/actions/studio/manager/eventos.actions.ts
+- getEventosKanban(studioId: string)
+- getPipelineStages(studioId: string)
 ```
 
-#### Día 15-16: Agenda de Eventos
+**Criterio de éxito:**
+- ✅ Middleware protege ruta `/manager`
+- ✅ Kanban muestra columnas con eventos
+- ✅ Cards muestran info básica de eventos
 
+**Tiempo estimado:** 2 días (16 horas)
+
+---
+
+#### Día 11-12: Drag & Drop + Modal CRUD Eventos (2 días)
+
+**Objetivo:** Drag & drop funcional + CRUD completo de eventos
+
+**Tareas:**
+- [ ] Implementar Drag & Drop (dnd-kit)
+  - [ ] Instalar `@dnd-kit/core` y `@dnd-kit/sortable`
+  - [ ] DndContext en KanbanBoard
+  - [ ] Draggable en EventoCard
+  - [ ] Droppable en KanbanColumn
+  - [ ] Optimistic updates
+- [ ] EventoModal (CRUD)
+  - [ ] Formulario con ZEN components
+  - [ ] Campos: nombre, cliente, tipo evento, fecha, venue, valor
+  - [ ] Validación con Zod
+  - [ ] Estados de loading y error
+- [ ] Filtros y búsqueda
+  - [ ] Filtro por tipo de evento
+  - [ ] Filtro por rango de fechas
+  - [ ] Search por nombre/cliente
+
+**Server Actions:**
 ```typescript
-// src/app/studio/[slug]/manager/agenda/page.tsx
-- [ ] Calendario mensual (ZenCalendar o custom)
-- [ ] Vista lista con filtros
-- [ ] Códigos de color por tipo evento
-- [ ] Click evento → Modal detalle
-- [ ] Integración Google Calendar (básica)
+- crearEvento(studioId, data)
+- actualizarEvento(eventoId, data)
+- moverEventoEtapa(eventoId, nuevaEtapaId)
+- eliminarEvento(eventoId)
 ```
+
+**Criterio de éxito:**
+- ✅ Drag & drop funcional entre stages
+- ✅ Crear evento desde modal
+- ✅ Editar evento existente
+- ✅ Filtros funcionan correctamente
+
+**Tiempo estimado:** 2 días (16 horas)
+
+---
+
+#### Día 13-14: Sistema Gantt Básico (2 días)
+
+**Objetivo:** Aplicar templates Gantt a eventos + visualización timeline
+
+**Tareas:**
+- [ ] Página `/manager/eventos/[id]/gantt/page.tsx`
+  - [ ] Vista timeline del evento
+  - [ ] Selector de template (si no tiene)
+  - [ ] Lista de tareas con fechas
+  - [ ] Marcar tarea completada
+  - [ ] Indicadores de progreso (%)
+- [ ] Modal aplicar template
+  - [ ] Selector de templates del studio
+  - [ ] Preview del template
+  - [ ] Confirmar aplicación
+- [ ] Server Actions Gantt
+  - [ ] `aplicarTemplate(eventoId, templateId)`
+  - [ ] `actualizarTarea(tareaId, data)`
+  - [ ] `completarTarea(tareaId)`
+- [ ] Componentes
+  - [ ] `GanttTimeline.tsx`
+  - [ ] `GanttTaskRow.tsx`
+  - [ ] `ApplyTemplateModal.tsx`
+
+**Criterio de éxito:**
+- ✅ Eventos pueden tener templates aplicados
+- ✅ Tareas se crean automáticamente
+- ✅ Progreso se calcula correctamente
+- ✅ Tareas pueden marcarse como completadas
+
+**Tiempo estimado:** 2 días (16 horas)
+
+---
+
+#### Día 15: Agenda + Testing Final (1 día)
+
+**Objetivo:** Calendario de eventos + testing end-to-end
+
+**Tareas:**
+- [ ] Página `/manager/agenda/page.tsx`
+  - [ ] Calendario mensual (FullCalendar o custom)
+  - [ ] Eventos en el calendario
+  - [ ] Códigos de color por tipo evento
+  - [ ] Click evento → Modal detalle
+- [ ] Testing end-to-end
+  - [ ] Flujo completo: Crear → Aplicar template → Mover stage → Ver agenda
+  - [ ] Testing responsive
+  - [ ] Fix de bugs encontrados
+
+**Criterio de éxito:**
+- ✅ Agenda muestra eventos correctamente
+- ✅ Flujo end-to-end funciona
+- ✅ Sin errores en consola
+
+**Tiempo estimado:** 1 día (8 horas)
+
+---
+
+### **📅 FASE 3: LIMPIEZA Y DOCUMENTACIÓN (2 días)**
+
+#### Día 16-17: Refactoring + Documentación
+
+**Tareas:**
+- [ ] Eliminar código legacy
+  - [ ] Código duplicado de `/studio/(main)` antiguo
+  - [ ] Componentes no utilizados
+  - [ ] Imports obsoletos
+- [ ] Audit de Server Actions
+  - [ ] Buscar todas las referencias a `project_*`
+  - [ ] Reemplazar por `studio_*`
+  - [ ] Validar tipos con Prisma V2.0
+- [ ] Documentación
+  - [ ] Actualizar README con nueva estructura
+  - [ ] Documentar convenciones de módulos
+  - [ ] Ejemplos de uso de helpers
+
+**Criterio de éxito:**
+- ✅ 0 referencias a `projects` en código
+- ✅ Código limpio y mantenible
+- ✅ Documentación actualizada
+
+**Tiempo estimado:** 2 días (16 horas)
 
 ---
 
@@ -394,13 +591,18 @@ Antes de iniciar Iteración 1, validar:
 
 ### Estado actual:
 
-- **Última actualización:** 2025-10-02 (Día 3 completado - 67% Fase 0)
-- **Siguiente paso:** Día 4 - Gantt Templates (opcional) o saltar a Iteración 1 (Studio MVP)
+- **Última actualización:** 2025-10-02 (Día 3 completado - Plan detallado definido)
+- **Siguiente paso:** Día 5-6 - Migración de Configuración (Refactorización Studio)
 - **Bloqueadores:** Ninguno
-- **Notas:** 
-  - Seed V2.0 ✅ (7 módulos, 2 pipelines con 14 stages, 2 usuarios, 4 tipos de evento)
-  - Helpers de módulos ✅ (5 funciones, testing completo, documentación)
-  - Listo para iniciar frontend Studio MVP
+- **Decisión:** Saltar Día 4 (Gantt Templates seeds), ir directo a Iteración 1
+- **Notas:**
+  - ✅ Fase 0: 67% completada (3 de 4 días)
+  - ✅ Schema V2.0 migrado
+  - ✅ Seeds base (módulos, pipelines, usuarios)
+  - ✅ Helpers de módulos implementados y testeados
+  - 📖 Plan detallado de Iteración 1 documentado (13 días, 3 fases)
+  - 🎯 Auditoría de estructura actual completada
+  - 🎯 Arquitectura V2.0 definida (ver `ARQUITECTURA_STUDIO_V2.md`)
 
 ---
 
