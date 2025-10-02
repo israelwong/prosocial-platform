@@ -199,7 +199,7 @@ export default async function ModulosPage({
                                                 </span>
                                                 {module.base_price && (
                                                     <span className="text-sm font-semibold text-purple-400">
-                                                        ${module.base_price}/mes
+                                                        ${module.base_price.toString()}/mes
                                                     </span>
                                                 )}
                                             </div>

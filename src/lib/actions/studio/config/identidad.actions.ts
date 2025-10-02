@@ -19,12 +19,12 @@ export async function obtenerIdentidadStudio(studioSlug: string) {
       where: { slug: studioSlug },
       select: {
         id: true,
-        name: true,
+        studio_name: true,
         slug: true,
         slogan: true,
         descripcion: true,
         palabras_clave: true,
-        logoUrl: true,
+        logo_url: true,
         isotipo_url: true,
       },
     });
@@ -75,17 +75,17 @@ export async function actualizarIdentidadBasica(
     const studioActualizado = await prisma.studios.update({
       where: { id: studio.id },
       data: {
-        name: validatedData.nombre,
+        studio_name: validatedData.nombre,
         slogan: validatedData.slogan,
         descripcion: validatedData.descripcion,
-        logoUrl: validatedData.logoUrl,
+        logo_url: validatedData.logoUrl,
         isotipo_url: validatedData.isotipo_url,
       },
       select: {
-        name: true,
+        studio_name: true,
         slogan: true,
         descripcion: true,
-        logoUrl: true,
+        logo_url: true,
         isotipo_url: true,
       },
     });
@@ -184,10 +184,10 @@ export async function actualizarIdentidadCompleta(
 
     // Preparar datos de actualización
     const updateData: any = {
-      name: validatedData.nombre,
+      studio_name: validatedData.nombre,
       slogan: validatedData.slogan,
       descripcion: validatedData.descripcion,
-      logoUrl: validatedData.logoUrl,
+      logo_url: validatedData.logoUrl,
       isotipo_url: validatedData.isotipo_url,
     };
 
@@ -200,11 +200,11 @@ export async function actualizarIdentidadCompleta(
       where: { id: studio.id },
       data: updateData,
       select: {
-        name: true,
+        studio_name: true,
         slogan: true,
         descripcion: true,
         palabras_clave: true,
-        logoUrl: true,
+        logo_url: true,
         isotipo_url: true,
       },
     });
