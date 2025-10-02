@@ -118,11 +118,12 @@
 #### Helper Functions ⚪ PENDIENTE (Día 3)
 
 ```typescript
-// src/lib/modules/check-module.ts
-- [ ] Crear helper `checkStudioModule(studioId, moduleSlug)`
-- [ ] Crear helper `getStudioModules(studioId)`
-- [ ] Crear helper `activateModule(studioId, moduleSlug, config?)`
+// src/lib/modules/index.ts
+- [ ] Crear helper `checkStudioModule(studioId, moduleSlug)` - Validación BÁSICA (sin planes)
+- [ ] Crear helper `getActiveModules(studioId)` - Listar módulos activos
 - [ ] Testing básico de helpers
+
+NOTA: Validación completa con planes (checkStudioModuleWithPlan) → Iteración 2 (Admin)
 ```
 
 **Criterio de Éxito:**
@@ -400,10 +401,24 @@ Antes de iniciar Iteración 1, validar:
 
 ### Iteración 2: Admin (1.5 semanas)
 
-- Gestión de módulos platform
-- Gestión de usuarios y roles
-- Pipelines globales (default stages)
-- Analytics básicos
+- **Gestión de módulos platform**
+  - CRUD de módulos (crear, editar, desactivar)
+  - Asignación de módulos a planes
+  - Configuración de precios y billing_type
+- **Gestión de planes y suscripciones** ⭐ VALIDACIÓN COMPLETA
+  - CRUD de planes (Basic, Pro, Enterprise)
+  - Límites por plan (eventos/mes, storage, usuarios)
+  - Módulos incluidos por plan
+  - **Validación completa de planes:**
+    - `checkStudioModuleWithPlan()` - Validar suscripción + plan + módulo
+    - Verificar límites de uso (eventos, storage, etc.)
+    - Bloqueo por suscripción vencida
+    - Stripe integration para billing
+- **Gestión de usuarios y roles**
+  - CRUD de usuarios platform y studio
+  - Asignación de roles y permisos
+- **Pipelines globales (default stages)**
+- **Analytics básicos**
 
 ### Iteración 3: Agente CRM (1 semana)
 
