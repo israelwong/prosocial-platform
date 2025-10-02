@@ -8,13 +8,13 @@
 
 ## 🎯 RESUMEN EJECUTIVO
 
-| Fase | Duración | Estado | Completado |
-|------|----------|--------|------------|
-| **Fase 0: Fundamentos** | 3-4 días | 🟢 En progreso | 25% (1/4 días) |
-| **Iteración 1: Studio MVP** | 2 semanas | ⚪ Pendiente | 0% |
-| **Iteración 2: Admin** | 1.5 semanas | ⚪ Pendiente | 0% |
-| **Iteración 3: Agente CRM** | 1 semana | ⚪ Pendiente | 0% |
-| **Iteración 4: ZEN Magic** | 3 días | ⚪ Pendiente | 0% |
+| Fase                        | Duración    | Estado         | Completado     |
+| --------------------------- | ----------- | -------------- | -------------- |
+| **Fase 0: Fundamentos**     | 3-4 días    | 🟢 En progreso | 25% (1/4 días) |
+| **Iteración 1: Studio MVP** | 2 semanas   | ⚪ Pendiente   | 0%             |
+| **Iteración 2: Admin**      | 1.5 semanas | ⚪ Pendiente   | 0%             |
+| **Iteración 3: Agente CRM** | 1 semana    | ⚪ Pendiente   | 0%             |
+| **Iteración 4: ZEN Magic**  | 3 días      | ⚪ Pendiente   | 0%             |
 
 ---
 
@@ -25,6 +25,7 @@
 ### **📅 Día 1: Arquitectura de Base de Datos** ✅ COMPLETADO
 
 #### Database Schema Transformation
+
 - [x] Crear rama `backup-pre-v2` (respaldo seguro)
 - [x] Crear rama `v2-foundation` (trabajo activo)
 - [x] Renombrar modelo `projects` → `studios`
@@ -34,6 +35,7 @@
 - [x] Agregar prefijos `platform_*` o `studio_*` a tablas ambiguas
 
 #### Nuevos Modelos V2.0
+
 - [x] Sistema de Módulos: `platform_modules`, `studio_modules`
 - [x] Usuarios Multi-Contexto: `users`, `user_platform_roles`, `user_studio_roles`, `studio_role_permissions`
 - [x] Pipelines Marketing: `marketing_pipeline_stages`, `marketing_leads`, `marketing_lead_activities`, `marketing_quotes`, `marketing_lead_notes`
@@ -41,6 +43,7 @@
 - [x] Gantt Templates: `gantt_templates`, `gantt_template_tasks`, `gantt_event_instances`, `gantt_event_tasks`, `gantt_task_activity`
 
 #### Validación
+
 - [x] `npx prisma validate` sin errores
 - [x] `npx prisma format` aplicado
 - [x] Commit con mensaje descriptivo
@@ -50,15 +53,18 @@
 
 ---
 
-### **📅 Día 2: Migración + Seeds Base** 🔵 SIGUIENTE
+### **📅 Día 2: Migración + Seeds Base** 🟢 EN PROGRESO
 
-#### Aplicar Migración
-- [ ] Respaldar base de datos actual (aunque es data de prueba)
-- [ ] `npx prisma migrate dev --name v2_architecture_complete`
-- [ ] `npx prisma generate` (generar cliente TypeScript)
-- [ ] Verificar que no hay errores de migración
+#### Aplicar Migración ✅ COMPLETADO
+
+- [x] Respaldar base de datos actual (rama backup-pre-v2)
+- [x] `npx prisma migrate reset --force` (base de datos limpia)
+- [x] `npx prisma migrate dev --name init_v2_architecture`
+- [x] `npx prisma generate` (cliente TypeScript generado)
+- [x] Verificar que no hay errores de migración
 
 #### Seed: Módulos Platform
+
 ```typescript
 // prisma/seeds/modules-seed.ts
 - [ ] Crear seed de platform_modules:
@@ -72,6 +78,7 @@
 ```
 
 #### Seed: Usuarios de Prueba
+
 ```typescript
 // prisma/seeds/users-seed.ts
 - [ ] Crear usuarios base:
@@ -81,6 +88,7 @@
 ```
 
 #### Activar Módulos en Studios
+
 ```typescript
 // prisma/seeds/studio-modules-seed.ts
 - [ ] Activar módulos core en studio de prueba:
@@ -90,6 +98,7 @@
 ```
 
 #### Helper Functions
+
 ```typescript
 // src/lib/modules/check-module.ts
 - [ ] Crear helper `checkStudioModule(studioId, moduleSlug)`
@@ -99,6 +108,7 @@
 ```
 
 **Criterio de Éxito:**
+
 - ✅ Migración sin errores
 - ✅ Base de datos con modelos V2.0
 - ✅ Módulos creados y activados
@@ -111,6 +121,7 @@
 ### **📅 Día 3: Pipelines + Stages Seeds** ⚪ Pendiente
 
 #### Seed: Marketing Pipeline (CRM)
+
 ```typescript
 // prisma/seeds/marketing-pipeline-seed.ts
 - [ ] Stages por defecto para Marketing:
@@ -124,6 +135,7 @@
 ```
 
 #### Seed: Manager Pipeline (Operacional)
+
 ```typescript
 // prisma/seeds/manager-pipeline-seed.ts
 - [ ] Stages por defecto para Manager:
@@ -137,6 +149,7 @@
 ```
 
 #### Testing de Pipelines
+
 ```typescript
 - [ ] Crear lead de prueba en Marketing
 - [ ] Mover lead entre stages
@@ -145,6 +158,7 @@
 ```
 
 **Criterio de Éxito:**
+
 - ✅ Stages de ambos pipelines creados
 - ✅ Leads y eventos de prueba funcionan
 - ✅ Flujo de conversión Lead → Evento funciona
@@ -156,13 +170,14 @@
 ### **📅 Día 4: Gantt Templates Seeds** ⚪ Pendiente
 
 #### Seed: Templates Básicos
+
 ```typescript
 // prisma/seeds/gantt-templates-seed.ts
 - [ ] Template "Boda Standard" (45 días, 15 tareas)
   - [ ] Pre-evento: Reunión inicial, visita locación, sesión pre-boda, preparar equipo
   - [ ] Evento: Cobertura del evento
   - [ ] Post-evento: Backup, selección, edición, revisión, entrega
-  
+
 - [ ] Template "Sesión Familiar Express" (7 días, 4 tareas)
   - [ ] Coordinar locación
   - [ ] Sesión fotográfica
@@ -174,6 +189,7 @@
 ```
 
 #### Testing de Gantt
+
 ```typescript
 - [ ] Crear evento de prueba
 - [ ] Aplicar template "Boda Standard"
@@ -184,6 +200,7 @@
 ```
 
 #### Documentación
+
 ```markdown
 - [ ] Actualizar README con setup de base de datos
 - [ ] Documentar sistema de módulos
@@ -192,6 +209,7 @@
 ```
 
 **Criterio de Éxito:**
+
 - ✅ Templates creados y funcionando
 - ✅ Aplicación de templates funciona
 - ✅ Cálculo de fechas correcto
@@ -225,6 +243,7 @@ Antes de iniciar Iteración 1, validar:
 ### **📅 Semana 1: Layout + Manager Kanban**
 
 #### Día 5-6: Layout Base con ZEN Design System
+
 ```typescript
 // src/app/studio/[slug]/layout.tsx
 - [ ] Crear layout base con sidebar
@@ -236,6 +255,7 @@ Antes de iniciar Iteración 1, validar:
 ```
 
 #### Día 7-8: Dashboard Studio
+
 ```typescript
 // src/app/studio/[slug]/page.tsx
 - [ ] Métricas básicas (ZenCard)
@@ -247,6 +267,7 @@ Antes de iniciar Iteración 1, validar:
 ```
 
 #### Día 9-11: Kanban Manager (Pipeline Operacional)
+
 ```typescript
 // src/app/studio/[slug]/manager/kanban/page.tsx
 - [ ] Vista Kanban con columnas por stage
@@ -262,6 +283,7 @@ Antes de iniciar Iteración 1, validar:
 ```
 
 **Componentes ZEN a crear:**
+
 - [ ] EventoCard (muestra info del evento en kanban)
 - [ ] EventoModal (formulario crear/editar)
 - [ ] StageColumn (columna del kanban)
@@ -272,6 +294,7 @@ Antes de iniciar Iteración 1, validar:
 ### **📅 Semana 2: Gantt + Agenda**
 
 #### Día 12-14: Sistema Gantt Templates
+
 ```typescript
 // src/app/studio/[slug]/manager/evento/[id]/gantt/page.tsx
 - [ ] Vista timeline del evento
@@ -292,6 +315,7 @@ Antes de iniciar Iteración 1, validar:
 ```
 
 **Server Actions:**
+
 ```typescript
 - [ ] aplicarTemplate(eventoId, templateId)
 - [ ] crearTemplate(studioId, data)
@@ -300,6 +324,7 @@ Antes de iniciar Iteración 1, validar:
 ```
 
 #### Día 15-16: Agenda de Eventos
+
 ```typescript
 // src/app/studio/[slug]/manager/agenda/page.tsx
 - [ ] Calendario mensual (ZenCalendar o custom)
@@ -314,6 +339,7 @@ Antes de iniciar Iteración 1, validar:
 ## 📊 MÉTRICAS DE ÉXITO POR FASE
 
 ### Fase 0
+
 - ✅ 0 errores en migración
 - ✅ Schema validado 100%
 - ✅ Módulos funcionando
@@ -321,6 +347,7 @@ Antes de iniciar Iteración 1, validar:
 - ✅ Templates Gantt aplicables
 
 ### Iteración 1 (Studio)
+
 - 🎯 Crear evento completo end-to-end
 - 🎯 Kanban drag & drop funcional
 - 🎯 Aplicar template Gantt a evento
@@ -333,6 +360,7 @@ Antes de iniciar Iteración 1, validar:
 ## 🔄 TRACKING DE PROGRESO
 
 ### Cómo usar este documento:
+
 1. ✅ Marcar checkboxes conforme se completan
 2. 📝 Agregar notas si hay bloqueos
 3. ⏱️ Actualizar tiempos reales vs estimados
@@ -340,6 +368,7 @@ Antes de iniciar Iteración 1, validar:
 5. 🎯 Validar criterios de éxito antes de avanzar
 
 ### Estado actual:
+
 - **Última actualización:** 2025-10-02 (Día 1 completado)
 - **Siguiente paso:** Día 2 - Migración + Seeds
 - **Bloqueadores:** Ninguno
@@ -350,12 +379,14 @@ Antes de iniciar Iteración 1, validar:
 ## 📌 PRÓXIMAS ITERACIONES (Referencia)
 
 ### Iteración 2: Admin (1.5 semanas)
+
 - Gestión de módulos platform
 - Gestión de usuarios y roles
 - Pipelines globales (default stages)
 - Analytics básicos
 
 ### Iteración 3: Agente CRM (1 semana)
+
 - Kanban Marketing (leads)
 - Gestión de leads
 - Cotizaciones
@@ -363,6 +394,7 @@ Antes de iniciar Iteración 1, validar:
 - Dashboard agente
 
 ### Iteración 4: ZEN Magic (3 días)
+
 - Chat con Claude
 - Function calling a Server Actions
 - Queries conversacionales
@@ -373,4 +405,3 @@ Antes de iniciar Iteración 1, validar:
 **Responsable:** Israel Wong  
 **Status:** 🟢 Fase 0 - Día 1 completado  
 **Próximo:** Día 2 - Migración de base de datos
-
