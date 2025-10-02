@@ -104,7 +104,7 @@ const zenButtonVariants = cva(
 // =============================================================================
 export interface ZenButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof zenButtonVariants> {
+  VariantProps<typeof zenButtonVariants> {
   /** Renderizar como un elemento hijo (para usar con Link, etc.) */
   asChild?: boolean;
   /** Mostrar spinner de carga */
@@ -112,7 +112,7 @@ export interface ZenButtonProps
   /** Texto a mostrar durante la carga */
   loadingText?: string;
   /** Icono a mostrar antes del texto */
-  icon?: React.ComponentType<any>;
+  icon?: React.ComponentType<{ className?: string }>;
   /** Posición del icono */
   iconPosition?: 'left' | 'right';
   /** Hacer el botón de ancho completo */
@@ -147,7 +147,7 @@ export interface ZenButtonProps
  * ```
  */
 const ZenButton = React.forwardRef<HTMLButtonElement, ZenButtonProps>(
-  ({ 
+  ({
     className,
     variant,
     size,
@@ -159,13 +159,13 @@ const ZenButton = React.forwardRef<HTMLButtonElement, ZenButtonProps>(
     iconPosition = 'left',
     children,
     disabled,
-    ...props 
+    ...props
   }, ref) => {
     const Comp = asChild ? Slot : 'button';
-    
+
     // Determinar si el botón está deshabilitado
     const isDisabled = disabled || loading;
-    
+
     // Contenido del botón
     const buttonContent = React.useMemo(() => {
       // Si está cargando, mostrar spinner
@@ -177,11 +177,11 @@ const ZenButton = React.forwardRef<HTMLButtonElement, ZenButtonProps>(
           </>
         );
       }
-      
+
       // Si hay icono, posicionarlo correctamente
       if (Icon) {
         const iconElement = <Icon className="h-4 w-4" />;
-        
+
         if (iconPosition === 'right') {
           return (
             <>
@@ -190,7 +190,7 @@ const ZenButton = React.forwardRef<HTMLButtonElement, ZenButtonProps>(
             </>
           );
         }
-        
+
         return (
           <>
             {iconElement}
@@ -198,7 +198,7 @@ const ZenButton = React.forwardRef<HTMLButtonElement, ZenButtonProps>(
           </>
         );
       }
-      
+
       // Solo texto
       return children;
     }, [loading, loadingText, children, Icon, iconPosition]);

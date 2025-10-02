@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
-import { Label } from '@/components/ui/shadcn/label';
+import { ZenInput } from '@/components/ui/zen';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Save, User, Mail, Phone } from 'lucide-react';
 import { toast } from 'sonner';
@@ -90,56 +89,38 @@ export function PerfilFormSimple({
             <CardContent>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     {/* Nombre */}
-                    <div className="space-y-2">
-                        <Label htmlFor="name" className="flex items-center space-x-2">
-                            <User className="h-4 w-4" />
-                            <span>Nombre Completo *</span>
-                        </Label>
-                        <Input
-                            id="name"
-                            {...register('name')}
-                            placeholder="Tu nombre completo"
-                            className={errors.name ? 'border-red-500' : ''}
-                        />
-                        {errors.name && (
-                            <p className="text-sm text-red-500">{errors.name.message}</p>
-                        )}
-                    </div>
+                    <ZenInput
+                        id="name"
+                        label="Nombre Completo"
+                        icon={User}
+                        required
+                        {...register('name')}
+                        placeholder="Tu nombre completo"
+                        error={errors.name?.message}
+                    />
 
                     {/* Email */}
-                    <div className="space-y-2">
-                        <Label htmlFor="email" className="flex items-center space-x-2">
-                            <Mail className="h-4 w-4" />
-                            <span>Correo Electrónico *</span>
-                        </Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            {...register('email')}
-                            placeholder="tu@email.com"
-                            className={errors.email ? 'border-red-500' : ''}
-                        />
-                        {errors.email && (
-                            <p className="text-sm text-red-500">{errors.email.message}</p>
-                        )}
-                    </div>
+                    <ZenInput
+                        id="email"
+                        label="Correo Electrónico"
+                        icon={Mail}
+                        required
+                        type="email"
+                        {...register('email')}
+                        placeholder="tu@email.com"
+                        error={errors.email?.message}
+                    />
 
                     {/* Teléfono */}
-                    <div className="space-y-2">
-                        <Label htmlFor="phone" className="flex items-center space-x-2">
-                            <Phone className="h-4 w-4" />
-                            <span>Teléfono *</span>
-                        </Label>
-                        <Input
-                            id="phone"
-                            {...register('phone')}
-                            placeholder="+52 55 1234 5678"
-                            className={errors.phone ? 'border-red-500' : ''}
-                        />
-                        {errors.phone && (
-                            <p className="text-sm text-red-500">{errors.phone.message}</p>
-                        )}
-                    </div>
+                    <ZenInput
+                        id="phone"
+                        label="Teléfono"
+                        icon={Phone}
+                        required
+                        {...register('phone')}
+                        placeholder="+52 55 1234 5678"
+                        error={errors.phone?.message}
+                    />
 
                     {/* Botón de guardar */}
                     <div className="flex justify-end pt-4">

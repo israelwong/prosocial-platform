@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/shadcn/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
-import { Input } from '@/components/ui/shadcn/input';
-import { Label } from '@/components/ui/shadcn/label';
+import { ZenInput } from '@/components/ui/zen';
 import { Switch } from '@/components/ui/shadcn/switch';
 import { ArrowLeft, Save, User, Copy, Check } from 'lucide-react';
 import Link from 'next/link';
@@ -275,39 +274,33 @@ export default function NewAgentPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="nombre">Nombre Completo *</Label>
-                                <Input
-                                    id="nombre"
-                                    value={formData.nombre}
-                                    onChange={(e) => handleInputChange('nombre', e.target.value)}
-                                    placeholder="Ej: Juan Pérez"
-                                    required
-                                />
-                            </div>
+                            <ZenInput
+                                id="nombre"
+                                label="Nombre Completo"
+                                required
+                                value={formData.nombre}
+                                onChange={(e) => handleInputChange('nombre', e.target.value)}
+                                placeholder="Ej: Juan Pérez"
+                            />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email *</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={(e) => handleInputChange('email', e.target.value)}
-                                    placeholder="juan@ejemplo.com"
-                                    required
-                                />
-                            </div>
+                            <ZenInput
+                                id="email"
+                                label="Email"
+                                required
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => handleInputChange('email', e.target.value)}
+                                placeholder="juan@ejemplo.com"
+                            />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="telefono">Teléfono *</Label>
-                                <Input
-                                    id="telefono"
-                                    value={formData.telefono}
-                                    onChange={(e) => handleInputChange('telefono', e.target.value)}
-                                    placeholder="+52 55 1234 5678"
-                                    required
-                                />
-                            </div>
+                            <ZenInput
+                                id="telefono"
+                                label="Teléfono"
+                                required
+                                value={formData.telefono}
+                                onChange={(e) => handleInputChange('telefono', e.target.value)}
+                                placeholder="+52 55 1234 5678"
+                            />
 
                             <div className="flex items-center justify-between">
                                 <div className="space-y-0.5">
@@ -334,27 +327,23 @@ export default function NewAgentPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="metaMensualLeads">Meta Mensual de Leads</Label>
-                                <Input
-                                    id="metaMensualLeads"
-                                    type="number"
-                                    min="1"
-                                    max="1000"
-                                    value={formData.metaMensualLeads}
-                                    onChange={(e) => handleInputChange('metaMensualLeads', parseInt(e.target.value) || 0)}
-                                    placeholder="20"
-                                />
-                                <p className="text-sm text-muted-foreground">
-                                    Número de leads que debe gestionar mensualmente
-                                </p>
-                            </div>
+                            <ZenInput
+                                id="metaMensualLeads"
+                                label="Meta Mensual de Leads"
+                                type="number"
+                                min="1"
+                                max="1000"
+                                value={formData.metaMensualLeads}
+                                onChange={(e) => handleInputChange('metaMensualLeads', parseInt(e.target.value) || 0)}
+                                placeholder="20"
+                                hint="Número de leads que debe gestionar mensualmente"
+                            />
 
                             <div className="space-y-2">
-                                <Label htmlFor="comisionConversion">Comisión por Conversión</Label>
                                 <div className="flex items-center space-x-2">
-                                    <Input
+                                    <ZenInput
                                         id="comisionConversion"
+                                        label="Comisión por Conversión"
                                         type="number"
                                         min="0"
                                         max="1"
@@ -362,15 +351,13 @@ export default function NewAgentPage() {
                                         value={formData.comisionConversion}
                                         onChange={(e) => handleInputChange('comisionConversion', parseFloat(e.target.value) || 0)}
                                         placeholder="0.05"
+                                        hint="Porcentaje de comisión por cada conversión exitosa"
                                         className="flex-1"
                                     />
-                                    <span className="text-sm text-muted-foreground">
+                                    <span className="text-sm text-muted-foreground mt-8">
                                         ({Math.round(formData.comisionConversion * 100)}%)
                                     </span>
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Porcentaje de comisión por cada conversión exitosa
-                                </p>
                             </div>
 
                             <div className="p-4 bg-muted rounded-lg">

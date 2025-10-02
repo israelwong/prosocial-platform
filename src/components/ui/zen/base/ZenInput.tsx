@@ -18,7 +18,7 @@ export interface ZenInputProps extends Omit<React.InputHTMLAttributes<HTMLInputE
   /** Texto de ayuda adicional */
   hint?: string;
   /** Icono a mostrar al lado del label (componente de Lucide) */
-  icon?: React.ComponentType<any>;
+  icon?: React.ComponentType<{ className?: string }>;
   /** Tamaño del input */
   size?: 'sm' | 'md' | 'lg';
   /** Clases CSS adicionales para el input */
@@ -52,19 +52,20 @@ export interface ZenInputProps extends Omit<React.InputHTMLAttributes<HTMLInputE
  * ```
  */
 const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
-  ({ 
-    label, 
-    required = false, 
-    error, 
-    hint, 
+  ({
+    label,
+    required = false,
+    error,
+    hint,
     icon: Icon,
     size = 'md',
     className,
     id,
-    ...props 
+    ...props
   }, ref) => {
     // Generar ID único si no se proporciona
-    const inputId = id || React.useId();
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
     const errorId = `${inputId}-error`;
     const hintId = `${inputId}-hint`;
 
@@ -104,7 +105,7 @@ const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
     return (
       <div className={cn(ZEN_SPACING.zen.formFieldGap)}>
         {/* Label con icono opcional */}
-        <label 
+        <label
           htmlFor={inputId}
           className={cn(
             // Tipografía ZEN para labels
@@ -145,7 +146,7 @@ const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
 
         {/* Mensaje de error */}
         {error && (
-          <p 
+          <p
             id={errorId}
             className={cn(
               'text-xs font-normal leading-normal',
@@ -160,7 +161,7 @@ const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
 
         {/* Hint text */}
         {hint && !error && (
-          <p 
+          <p
             id={hintId}
             className={cn(
               'text-xs font-normal leading-normal',

@@ -6,8 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/shadcn/button';
-import { Input } from '@/components/ui/shadcn/input';
-import { Label } from '@/components/ui/shadcn/label';
+import { ZenInput } from '@/components/ui/zen';
 import { Textarea } from '@/components/ui/shadcn/textarea';
 import { Switch } from '@/components/ui/shadcn/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
@@ -174,29 +173,23 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Nombre del Plan *</Label>
-                            <Input
-                                id="name"
-                                {...register('name')}
-                                placeholder="Ej: Plan Básico"
-                            />
-                            {errors.name && (
-                                <p className="text-sm text-red-500">{errors.name.message}</p>
-                            )}
-                        </div>
+                        <ZenInput
+                            id="name"
+                            label="Nombre del Plan"
+                            required
+                            {...register('name')}
+                            placeholder="Ej: Plan Básico"
+                            error={errors.name?.message}
+                        />
 
-                        <div className="space-y-2">
-                            <Label htmlFor="slug">Slug *</Label>
-                            <Input
-                                id="slug"
-                                {...register('slug')}
-                                placeholder="plan-basico"
-                            />
-                            {errors.slug && (
-                                <p className="text-sm text-red-500">{errors.slug.message}</p>
-                            )}
-                        </div>
+                        <ZenInput
+                            id="slug"
+                            label="Slug"
+                            required
+                            {...register('slug')}
+                            placeholder="plan-basico"
+                            error={errors.slug?.message}
+                        />
                     </div>
 
                     <div className="space-y-2">
@@ -218,35 +211,27 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="price_monthly">Precio Mensual</Label>
-                            <Input
-                                id="price_monthly"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                {...register('price_monthly', { valueAsNumber: true })}
-                                placeholder="29.99"
-                            />
-                            {errors.price_monthly && (
-                                <p className="text-sm text-red-500">{errors.price_monthly.message}</p>
-                            )}
-                        </div>
+                        <ZenInput
+                            id="price_monthly"
+                            label="Precio Mensual"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            {...register('price_monthly', { valueAsNumber: true })}
+                            placeholder="29.99"
+                            error={errors.price_monthly?.message}
+                        />
 
-                        <div className="space-y-2">
-                            <Label htmlFor="price_yearly">Precio Anual</Label>
-                            <Input
-                                id="price_yearly"
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                {...register('price_yearly', { valueAsNumber: true })}
-                                placeholder="299.99"
-                            />
-                            {errors.price_yearly && (
-                                <p className="text-sm text-red-500">{errors.price_yearly.message}</p>
-                            )}
-                        </div>
+                        <ZenInput
+                            id="price_yearly"
+                            label="Precio Anual"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            {...register('price_yearly', { valueAsNumber: true })}
+                            placeholder="299.99"
+                            error={errors.price_yearly?.message}
+                        />
                     </div>
                 </CardContent>
             </Card>
@@ -258,7 +243,7 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex gap-2">
-                        <Input
+                        <ZenInput
                             value={newFeature}
                             onChange={(e) => setNewFeature(e.target.value)}
                             placeholder="Agregar característica..."
@@ -326,23 +311,19 @@ export function PlanForm({ plan, mode }: PlanFormProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="stripe_price_id">Stripe Price ID</Label>
-                            <Input
-                                id="stripe_price_id"
-                                {...register('stripe_price_id')}
-                                placeholder="price_1S73QoHxyreVzp11ZcP1hGea"
-                            />
-                        </div>
+                        <ZenInput
+                            id="stripe_price_id"
+                            label="Stripe Price ID"
+                            {...register('stripe_price_id')}
+                            placeholder="price_1S73QoHxyreVzp11ZcP1hGea"
+                        />
 
-                        <div className="space-y-2">
-                            <Label htmlFor="stripe_product_id">Stripe Product ID</Label>
-                            <Input
-                                id="stripe_product_id"
-                                {...register('stripe_product_id')}
-                                placeholder="prod_T39jUez5Bkutia"
-                            />
-                        </div>
+                        <ZenInput
+                            id="stripe_product_id"
+                            label="Stripe Product ID"
+                            {...register('stripe_product_id')}
+                            placeholder="prod_T39jUez5Bkutia"
+                        />
                     </div>
                 </CardContent>
             </Card>

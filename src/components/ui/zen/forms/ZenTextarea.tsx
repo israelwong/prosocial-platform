@@ -18,7 +18,7 @@ export interface ZenTextareaProps extends React.TextareaHTMLAttributes<HTMLTextA
   /** Texto de ayuda adicional */
   hint?: string;
   /** Icono a mostrar al lado del label (componente de Lucide) */
-  icon?: React.ComponentType<any>;
+  icon?: React.ComponentType<{ className?: string }>;
   /** Número máximo de caracteres permitidos */
   maxLength?: number;
   /** Número mínimo de filas visibles */
@@ -60,11 +60,11 @@ export interface ZenTextareaProps extends React.TextareaHTMLAttributes<HTMLTextA
  * ```
  */
 const ZenTextarea = React.forwardRef<HTMLTextAreaElement, ZenTextareaProps>(
-  ({ 
-    label, 
-    required = false, 
-    error, 
-    hint, 
+  ({
+    label,
+    required = false,
+    error,
+    hint,
     icon: Icon,
     maxLength,
     minRows = 3,
@@ -72,7 +72,7 @@ const ZenTextarea = React.forwardRef<HTMLTextAreaElement, ZenTextareaProps>(
     className,
     id,
     value,
-    ...props 
+    ...props
   }, ref) => {
     // Generar ID único si no se proporciona
     const textareaId = id || React.useId();
@@ -122,7 +122,7 @@ const ZenTextarea = React.forwardRef<HTMLTextAreaElement, ZenTextareaProps>(
     return (
       <div className={cn(ZEN_SPACING.zen.formFieldGap)}>
         {/* Label con icono opcional */}
-        <label 
+        <label
           htmlFor={textareaId}
           className={cn(
             // Tipografía ZEN para labels
@@ -169,7 +169,7 @@ const ZenTextarea = React.forwardRef<HTMLTextAreaElement, ZenTextareaProps>(
           <div className="flex-1">
             {/* Mensaje de error */}
             {error && (
-              <p 
+              <p
                 id={errorId}
                 className={cn(
                   'text-xs font-normal leading-normal',
@@ -183,7 +183,7 @@ const ZenTextarea = React.forwardRef<HTMLTextAreaElement, ZenTextareaProps>(
 
             {/* Hint text */}
             {hint && !error && (
-              <p 
+              <p
                 id={hintId}
                 className={cn(
                   'text-xs font-normal leading-normal',
@@ -197,12 +197,12 @@ const ZenTextarea = React.forwardRef<HTMLTextAreaElement, ZenTextareaProps>(
 
           {/* Contador de caracteres */}
           {maxLength && (
-            <p 
+            <p
               id={countId}
               className={cn(
                 'text-xs font-normal leading-normal ml-2 flex-shrink-0',
                 // Color dinámico basado en proximidad al límite
-                currentLength > maxLength * 0.9 
+                currentLength > maxLength * 0.9
                   ? ZEN_COLORS.semantic.warning.text
                   : currentLength === maxLength
                     ? ZEN_COLORS.semantic.error.text

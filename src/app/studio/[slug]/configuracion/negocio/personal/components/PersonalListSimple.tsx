@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/shadcn/card';
-import { Input } from '@/components/ui/shadcn/input';
+import { ZenInput } from '@/components/ui/zen';
 import { Search, Users } from 'lucide-react';
 import { PersonalItem } from './PersonalItem';
 import type { Personal } from '../types';
@@ -84,15 +84,12 @@ export function PersonalListSimple({
         <>
             {/* Búsqueda simple */}
             <div className="mb-6">
-                <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                    <Input
-                        placeholder="Buscar por nombre, email o teléfono..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                    />
-                </div>
+                <ZenInput
+                    placeholder="Buscar por nombre, email o teléfono..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    icon={Search}
+                />
             </div>
 
             {/* Lista simplificada */}
