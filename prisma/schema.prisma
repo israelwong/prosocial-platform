@@ -464,6 +464,12 @@ model studios {
   manager_events            manager_events[]
   gantt_templates           gantt_templates[]
 
+  // ZEN Pages Relaciones
+  pages                studio_pages?
+  portfolios           studio_portfolios[]
+  lead_forms           studio_lead_forms[]
+  client_portal_access studio_client_portal_access[]
+
   @@index([plan_id])
   @@index([slug])
   @@index([is_active])
@@ -1838,12 +1844,13 @@ model manager_events {
   project_manager user_studio_roles?      @relation("EventProjectManager", fields: [studio_manager_id], references: [id])
   originated_lead marketing_leads?        @relation(fields: [originated_from_lead_id], references: [id])
 
-  gantt            gantt_event_instances?
-  tasks            manager_event_tasks[]
-  deliverables     manager_event_deliverables[]
-  team_assignments manager_event_team[]
-  timeline         manager_event_timeline[]
-  payments         manager_event_payments[]
+  gantt                       gantt_event_instances?
+  tasks                       manager_event_tasks[]
+  deliverables                manager_event_deliverables[]
+  team_assignments            manager_event_team[]
+  timeline                    manager_event_timeline[]
+  payments                    manager_event_payments[]
+  studio_client_portal_access studio_client_portal_access[]
 
   @@index([studio_id, stage_id])
   @@index([event_date])
@@ -2113,4 +2120,156 @@ enum TaskAction {
   COMPLETED
   DELETED
   NOTE_ADDED
+}
+
+// ---------------------------------------------
+// 6. ZEN PAGES - LANDING PÚBLICA DEL STUDIO
+// ---------------------------------------------
+
+model studio_pages {
+  id               String   @id @default(cuid())
+  studio_id        String   @unique
+  is_published     Boolean  @default(false)
+  custom_domain    String?  @unique // futuro: estudio.com
+  meta_title       String?
+  meta_description String?
+  meta_keywords    String?
+  favicon_url      String?
+  og_image_url     String? // Open Graph para redes sociales
+  analytics_code   String? // Google Analytics
+  theme_color      String?  @default("#8B5CF6") // Color principal
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  studio     studios                @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  sections   studio_page_sections[]
+  portfolios studio_portfolios[]
+
+  @@index([studio_id, is_published])
+}
+
+model studio_page_sections {
+  id           String          @id @default(cuid())
+  page_id      String
+  section_type PageSectionType // HERO, ABOUT, CTA, etc.
+  title        String?
+  subtitle     String?
+  content      String? // Texto rico o markdown
+  image_url    String?
+  video_url    String?
+  cta_text     String?
+  cta_link     String?
+  order        Int             @default(0)
+  is_visible   Boolean         @default(true)
+  settings     Json? // Configuración específica (colores, layout)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+
+  page studio_pages @relation(fields: [page_id], references: [id], onDelete: Cascade)
+
+  @@index([page_id, order])
+}
+
+enum PageSectionType {
+  HERO // Sección principal con imagen y CTA
+  ABOUT // Sobre nosotros
+  SERVICES // Servicios destacados
+  CTA // Call to action
+  TESTIMONIALS // Testimonios de clientes
+  FAQ // Preguntas frecuentes
+  CUSTOM // Sección personalizada
+}
+
+model studio_portfolios {
+  id              String   @id @default(cuid())
+  page_id         String
+  studio_id       String
+  title           String
+  slug            String // URL-friendly (ej: "bodas-2024")
+  description     String?
+  cover_image_url String?
+  category        String? // "Bodas", "XV Años", "Empresarial"
+  order           Int      @default(0)
+  is_published    Boolean  @default(false)
+  view_count      Int      @default(0)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  page   studio_pages             @relation(fields: [page_id], references: [id], onDelete: Cascade)
+  studio studios                  @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  items  studio_portfolio_items[]
+
+  @@unique([page_id, slug])
+  @@index([studio_id, is_published])
+  @@index([order])
+}
+
+model studio_portfolio_items {
+  id             String            @id @default(cuid())
+  portfolio_id   String
+  item_type      PortfolioItemType // PHOTO, VIDEO
+  title          String?
+  description    String?
+  image_url      String // URL de la imagen (CDN o storage)
+  thumbnail_url  String? // Thumbnail optimizado
+  video_url      String? // YouTube/Vimeo embed o URL directo
+  video_provider String? // "youtube", "vimeo", "direct"
+  order          Int               @default(0)
+  width          Int? // Para layout masonry/grid responsivo
+  height         Int?
+  file_size      Int? // Bytes
+  created_at     DateTime          @default(now())
+
+  portfolio studio_portfolios @relation(fields: [portfolio_id], references: [id], onDelete: Cascade)
+
+  @@index([portfolio_id, order])
+}
+
+enum PortfolioItemType {
+  PHOTO
+  VIDEO
+}
+
+model studio_lead_forms {
+  id                   String   @id @default(cuid())
+  studio_id            String
+  form_name            String // "Formulario de Contacto Principal"
+  form_slug            String // URL-friendly
+  title                String?
+  description          String?
+  success_message      String   @default("¡Gracias! Nos pondremos en contacto pronto.")
+  redirect_to_packages Boolean  @default(true) // Redirigir a paquetes después
+  fields_config        Json // Configuración de campos (requeridos, orden, etc.)
+  is_active            Boolean  @default(true)
+  submit_count         Int      @default(0)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  studio studios @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+
+  @@unique([studio_id, form_slug])
+  @@index([studio_id, is_active])
+}
+
+// Portal de Clientes - Accesos públicos
+model studio_client_portal_access {
+  id               String    @id @default(cuid())
+  studio_id        String
+  event_id         String // Relacionado con manager_events
+  client_email     String
+  client_name      String?
+  access_code      String    @unique // Código de 6-8 dígitos para login simple
+  is_active        Boolean   @default(true)
+  last_accessed_at DateTime?
+  access_count     Int       @default(0)
+  expires_at       DateTime? // Opcional: acceso temporal
+  created_at       DateTime  @default(now())
+
+  studio studios        @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  event  manager_events @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@unique([studio_id, event_id, client_email])
+  @@index([access_code])
+  @@index([client_email])
+  @@index([studio_id, is_active])
 }

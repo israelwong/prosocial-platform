@@ -53,7 +53,7 @@ async function main() {
     // ========================================
     console.log('🧩 Activating modules for demo studio...');
 
-    const modulesToActivate = ['manager', 'magic', 'marketing'];
+    const modulesToActivate = ['manager', 'magic', 'marketing', 'pages'];
 
     for (const module_slug of modulesToActivate) {
         const module = await prisma.platform_modules.findUnique({

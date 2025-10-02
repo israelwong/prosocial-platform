@@ -38,6 +38,17 @@ export async function seedModules() {
             version: '1.0.0',
             is_active: true
         },
+        {
+            id: 'module-pages',
+            slug: 'pages',
+            name: 'ZEN Pages',
+            description: 'Landing page pública - Portfolios, lead forms, presencia online',
+            category: 'CORE',
+            base_price: null, // Incluido en todos los planes
+            billing_type: 'MONTHLY',
+            version: '1.0.0',
+            is_active: true
+        },
 
         // ADDON MODULES (adicionales con precio)
         {
