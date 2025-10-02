@@ -16,15 +16,15 @@ import {
 const prisma = new PrismaClient();
 
 /**
- * Obtener el ID del proyecto desde el slug
+ * Obtener el ID del studio desde el slug
  */
-async function getProjectIdFromSlug(studioSlug: string): Promise<string | null> {
+async function getStudioIdFromSlug(studioSlug: string): Promise<string | null> {
     try {
         const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
         });
-        return project?.id || null;
+        return studio?.id || null;
     } catch (error) {
         console.error('Error obteniendo studio_id:', error);
         return null;
@@ -178,7 +178,7 @@ export async function obtenerPaquetesPorTipo(
     eventoTipoId: string
 ): Promise<ActionResponse<PaqueteData[]>> {
     try {
-        const studio_id = await getProjectIdFromSlug(studioSlug);
+        const studio_id = await getStudioIdFromSlug(studioSlug);
         if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
@@ -325,7 +325,7 @@ export async function crearPaquete(
     data: unknown
 ): Promise<ActionResponse<PaqueteData>> {
     try {
-        const studio_id = await getProjectIdFromSlug(studioSlug);
+        const studio_id = await getStudioIdFromSlug(studioSlug);
         if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
@@ -526,7 +526,7 @@ export async function validarNombrePaqueteUnico(
     paqueteIdExcluir?: string
 ): Promise<ActionResponse<boolean>> {
     try {
-        const studio_id = await getProjectIdFromSlug(studioSlug);
+        const studio_id = await getStudioIdFromSlug(studioSlug);
         if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
