@@ -22,7 +22,7 @@ export async function seedPipelinesV2(studioId: string) {
             description: 'Lead recién capturado que necesita contacto inicial',
             stage_type: 'PROSPECTING',
             color: '#3B82F6',
-            display_order: 0,
+            order: 0,
             is_active: true,
             is_system: false
         },
@@ -34,7 +34,7 @@ export async function seedPipelinesV2(studioId: string) {
             description: 'Lead contactado exitosamente',
             stage_type: 'PROSPECTING',
             color: '#8B5CF6',
-            display_order: 1,
+            order: 1,
             is_active: true,
             is_system: false
         },
@@ -46,7 +46,7 @@ export async function seedPipelinesV2(studioId: string) {
             description: 'Lead calificado con interés real',
             stage_type: 'QUALIFICATION',
             color: '#10B981',
-            display_order: 2,
+            order: 2,
             is_active: true,
             is_system: false
         },
@@ -58,7 +58,7 @@ export async function seedPipelinesV2(studioId: string) {
             description: 'Cotización o propuesta enviada al cliente',
             stage_type: 'PROPOSAL',
             color: '#F59E0B',
-            display_order: 3,
+            order: 3,
             is_active: true,
             is_system: false
         },
@@ -70,7 +70,7 @@ export async function seedPipelinesV2(studioId: string) {
             description: 'En proceso de negociación de términos',
             stage_type: 'PROPOSAL',
             color: '#EF4444',
-            display_order: 4,
+            order: 4,
             is_active: true,
             is_system: false
         },
@@ -82,7 +82,7 @@ export async function seedPipelinesV2(studioId: string) {
             description: 'Lead convertido en cliente - se crea evento en Manager',
             stage_type: 'CONVERSION',
             color: '#059669',
-            display_order: 5,
+            order: 5,
             is_active: true,
             is_system: true
         },
@@ -94,7 +94,7 @@ export async function seedPipelinesV2(studioId: string) {
             description: 'Lead no convertido',
             stage_type: 'CLOSED_LOST',
             color: '#6B7280',
-            display_order: 6,
+            order: 6,
             is_active: true,
             is_system: true
         }
@@ -125,88 +125,84 @@ export async function seedPipelinesV2(studioId: string) {
         {
             id: `manager-${studioId}-planning`,
             studio_id: studioId,
+            slug: 'planeacion',
             name: 'Planeación',
             description: 'Planeación inicial del evento',
             stage_type: 'PLANNING',
-            color: '#3B82F6', // Azul
-            display_order: 0,
+            color: '#3B82F6',
+            order: 0,
             is_active: true,
             is_system: false
         },
         {
             id: `manager-${studioId}-preparation`,
             studio_id: studioId,
+            slug: 'preparacion',
             name: 'Preparación',
             description: 'Preparación de equipo y logística',
             stage_type: 'PLANNING',
-            color: '#8B5CF6', // Púrpura
-            display_order: 1,
+            color: '#8B5CF6',
+            order: 1,
             is_active: true,
             is_system: false
         },
         {
             id: `manager-${studioId}-production`,
             studio_id: studioId,
+            slug: 'produccion',
             name: 'Producción',
             description: 'Ejecución del evento (cobertura)',
             stage_type: 'PRODUCTION',
-            color: '#EF4444', // Rojo (en vivo)
-            display_order: 2,
+            color: '#EF4444',
+            order: 2,
             is_active: true,
             is_system: false
         },
         {
             id: `manager-${studioId}-post-production`,
             studio_id: studioId,
+            slug: 'post-produccion',
             name: 'Post-Producción',
             description: 'Edición y retoque de material',
             stage_type: 'POST_PRODUCTION',
-            color: '#F59E0B', // Ámbar
-            display_order: 3,
-            is_active: true,
-            is_system: false
-        },
-        {
-            id: `manager-${studioId}-review`,
-            studio_id: studioId,
-            name: 'Revisión Cliente',
-            description: 'Cliente revisando material antes de entrega final',
-            stage_type: 'REVIEW',
-            color: '#10B981', // Verde
-            display_order: 4,
+            color: '#F59E0B',
+            order: 3,
             is_active: true,
             is_system: false
         },
         {
             id: `manager-${studioId}-delivery`,
             studio_id: studioId,
+            slug: 'entrega',
             name: 'Entrega',
             description: 'Entrega final del material al cliente',
             stage_type: 'DELIVERY',
-            color: '#06B6D4', // Cyan
-            display_order: 5,
+            color: '#06B6D4',
+            order: 4,
+            is_active: true,
+            is_system: false
+        },
+        {
+            id: `manager-${studioId}-warranty`,
+            studio_id: studioId,
+            slug: 'garantia',
+            name: 'Garantía',
+            description: 'Período de garantía y soporte post-entrega',
+            stage_type: 'WARRANTY',
+            color: '#10B981',
+            order: 5,
             is_active: true,
             is_system: false
         },
         {
             id: `manager-${studioId}-completed`,
             studio_id: studioId,
+            slug: 'completado',
             name: 'Completado',
             description: 'Evento completado exitosamente',
             stage_type: 'COMPLETED',
-            color: '#059669', // Verde oscuro
-            display_order: 6,
-            is_active: true,
-            is_system: true // No se puede editar/eliminar
-        },
-        {
-            id: `manager-${studioId}-cancelled`,
-            studio_id: studioId,
-            name: 'Cancelado',
-            description: 'Evento cancelado',
-            stage_type: 'CANCELLED',
-            color: '#6B7280', // Gris
-            display_order: 7,
+            color: '#059669',
+            order: 6,
             is_active: true,
             is_system: true
         }

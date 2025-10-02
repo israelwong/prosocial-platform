@@ -211,23 +211,19 @@ async function main() {
     for (const eventType of eventTypes) {
         await prisma.studio_evento_tipos.upsert({
             where: {
-                studio_id_slug: {
-                    studio_id: demoStudio.id,
-                    slug: eventType.slug
-                }
+                id: `${demoStudio.id}-${eventType.slug}`
             },
             update: {
-                updated_at: new Date()
+                updatedAt: new Date()
             },
             create: {
                 id: `${demoStudio.id}-${eventType.slug}`,
                 studio_id: demoStudio.id,
-                slug: eventType.slug,
                 nombre: eventType.name,
-                descripcion: eventType.descripcion,
-                activo: true,
-                created_at: new Date(),
-                updated_at: new Date()
+                status: 'active',
+                orden: 0,
+                createdAt: new Date(),
+                updatedAt: new Date()
             }
         });
         console.log(`  ✅ Event type: ${eventType.name}`);
