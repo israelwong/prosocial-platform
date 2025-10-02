@@ -49,12 +49,12 @@ export async function obtenerDashboardStudio(studioSlug: string): Promise<Dashbo
       where: { slug: studioSlug },
       select: {
         id: true,
-        name: true,
+        studio_name: true,
         slug: true,
         email: true,
         address: true,
         website: true,
-        subscriptionStatus: true,
+        subscription_status: true,
         _count: {
           select: {
             eventos: true,

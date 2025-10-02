@@ -31,10 +31,10 @@ export class SetupValidationService {
     async validateStudioSetup(projectId: string): Promise<StudioSetupStatus> {
         try {
             // 1. Obtener datos del proyecto
-            const projectData = await this.getProjectData(projectId);
+            const studioData = await this.getStudioData(projectId);
 
-            if (!projectData) {
-                throw new Error(`Proyecto no encontrado: ${projectId}`);
+            if (!studioData) {
+                throw new Error(`Studio no encontrado: ${projectId}`);
             }
 
             // 2. Obtener configuración de secciones
@@ -43,7 +43,7 @@ export class SetupValidationService {
             // 3. Validar cada sección
             const sections = await Promise.all(
                 sectionsConfig.map(config =>
-                    this.validateSection(projectId, config, projectData)
+                    this.validateSection(projectId, config, studioData)
                 )
             );
 
@@ -65,9 +65,9 @@ export class SetupValidationService {
         }
     }
 
-    private async getProjectData(projectId: string): Promise<any> {
-        return await prisma.projects.findUnique({
-            where: { id: projectId },
+    private async getStudioData(studioId: string): Promise<any> {
+        return await prisma.studios.findUnique({
+            where: { id: studioId },
             include: {
                 redes_sociales: {
                     include: {
@@ -92,13 +92,13 @@ export class SetupValidationService {
     }
 
     private async validateSection(
-        projectId: string,
+        studioId: string,
         config: SetupSectionConfig,
-        projectData: any
+        studioData: any
     ): Promise<SetupSectionProgress> {
         try {
             const validator = this.getSectionValidator(config.sectionId);
-            const result = await validator.validate(projectData);
+            const result = await validator.validate(studioData);
 
             // Lógica de estado más clara y consistente
             let status: 'pending' | 'in_progress' | 'completed' | 'error';

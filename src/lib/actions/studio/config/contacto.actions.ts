@@ -455,7 +455,7 @@ export async function reordenarTelefonos(studioSlug: string, telefonos: Array<{ 
         // 2. Actualizar el orden de cada teléfono
         const updatePromises = telefonos.map(({ id, order }) =>
             prisma.studio_telefonos.update({
-                where: { 
+                where: {
                     id,
                     studio_id: studio.id // Asegurar que pertenece al studio
                 },
