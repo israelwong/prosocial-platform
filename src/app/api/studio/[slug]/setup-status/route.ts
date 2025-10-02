@@ -11,13 +11,13 @@ export async function GET(
     try {
         const { slug } = await params;
 
-        // Obtener projectId por slug
-        const project = await prisma.projects.findUnique({
+        // Obtener studio por slug
+        const studio = await prisma.studios.findUnique({
             where: { slug },
-            select: { id: true, name: true, slug: true }
+            select: { id: true, studio_name: true, slug: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return NextResponse.json(
                 { error: 'Studio no encontrado' },
                 { status: 404 }
@@ -26,15 +26,15 @@ export async function GET(
 
         // Obtener o generar estado de configuración
         const validationService = SetupValidationService.getInstance();
-        const setupStatus = await validationService.validateStudioSetup(project.id);
+        const setupStatus = await validationService.validateStudioSetup(studio.id);
 
         return NextResponse.json({
             success: true,
             data: {
-                project: {
-                    id: project.id,
-                    name: project.name,
-                    slug: project.slug
+                studio: {
+                    id: studio.id,
+                    name: studio.studio_name,
+                    slug: studio.slug
                 },
                 overallProgress: setupStatus.overallProgress,
                 isFullyConfigured: setupStatus.isFullyConfigured,
@@ -73,13 +73,13 @@ export async function POST(
         const { slug } = await params;
         const { force = false } = await request.json();
 
-        // Obtener projectId por slug
-        const project = await prisma.projects.findUnique({
+        // Obtener studio por slug
+        const studio = await prisma.studios.findUnique({
             where: { slug },
             select: { id: true }
         });
 
-        if (!project) {
+        if (!studio) {
             return NextResponse.json(
                 { error: 'Studio no encontrado' },
                 { status: 404 }
@@ -88,11 +88,11 @@ export async function POST(
 
         // Forzar revalidación del estado
         const validationService = SetupValidationService.getInstance();
-        const setupStatus = await validationService.validateStudioSetup(project.id);
+        const setupStatus = await validationService.validateStudioSetup(studio.id);
 
         // Log de revalidación manual
         await validationService.logSetupChange(
-            project.id,
+            studio.id,
             'updated',
             'manual',
             undefined,

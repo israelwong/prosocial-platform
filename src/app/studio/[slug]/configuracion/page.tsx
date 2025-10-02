@@ -34,7 +34,7 @@ export default function ConfiguracionPage({ params }: ConfiguracionPageProps) {
             <SetupProgressHeader
                 overallProgress={setupStatus.overallProgress}
                 isFullyConfigured={setupStatus.isFullyConfigured}
-                projectName={setupStatus.project.name}
+                projectName={setupStatus.studio.name}
             />
 
             {/* <SetupRecommendations
