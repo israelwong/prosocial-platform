@@ -126,19 +126,75 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
         ]
     },
     {
+        id: 'manager',
+        title: 'ZEN Manager',
+        description: 'Configuración operacional',
+        icon: Package,
+        items: [
+            {
+                id: 'tipos-evento',
+                name: 'Tipos de Evento',
+                description: 'Categorías de eventos',
+                href: `/${studioSlug}/configuracion/manager/tipos-evento`,
+                icon: Calendar,
+                completed: false
+            },
+            {
+                id: 'servicios',
+                name: 'Catálogo de Servicios',
+                description: 'Gestión de servicios',
+                href: `/${studioSlug}/configuracion/manager/servicios`,
+                icon: Zap,
+                completed: true
+            },
+            {
+                id: 'paquetes',
+                name: 'Paquetes',
+                description: 'Paquetes de servicios',
+                href: `/${studioSlug}/configuracion/manager/paquetes`,
+                icon: Gift,
+                completed: false
+            },
+            {
+                id: 'personal',
+                name: 'Personal y Equipo',
+                description: 'Gestiona tu equipo',
+                href: `/${studioSlug}/configuracion/manager/personal`,
+                icon: Users2,
+                completed: false
+            },
+            {
+                id: 'reglas-agendamiento',
+                name: 'Reglas de Agendamiento',
+                description: 'Configuración de agenda',
+                href: `/${studioSlug}/configuracion/manager/reglas-agendamiento`,
+                icon: Clock,
+                completed: false
+            },
+            {
+                id: 'cuentas-bancarias',
+                name: 'Cuentas Bancarias',
+                description: 'Información bancaria',
+                href: `/${studioSlug}/configuracion/manager/cuentas-bancarias`,
+                icon: CreditCard,
+                completed: false
+            },
+            {
+                id: 'precios-utilidad',
+                name: 'Precios y Utilidad',
+                description: 'Configuración de precios',
+                href: `/${studioSlug}/configuracion/manager/precios-utilidad`,
+                icon: Tag,
+                completed: true
+            }
+        ]
+    },
+    {
         id: 'negocio',
         title: 'Reglas de Negocio',
         description: 'Configuración comercial',
         icon: DollarSign,
         items: [
-            {
-                id: 'precios-y-utilidad',
-                name: 'Precios y Utilidad',
-                description: 'Configuración de precios',
-                href: `/${studioSlug}/configuracion/negocio/precios-y-utilidad`,
-                icon: Tag,
-                completed: true
-            },
             {
                 id: 'condiciones-comerciales',
                 name: 'Condiciones Comerciales',
@@ -153,64 +209,6 @@ const getConfigSections = (studioSlug: string): ConfigSection[] => [
                 description: 'Formas de pago aceptadas',
                 href: `/${studioSlug}/configuracion/negocio/metodos-de-pago`,
                 icon: Banknote,
-                completed: false
-            },
-            {
-                id: 'cuentas-bancarias',
-                name: 'Cuentas Bancarias',
-                description: 'Información bancaria',
-                href: `/${studioSlug}/configuracion/negocio/cuentas-bancarias`,
-                icon: CreditCard,
-                completed: false
-            },
-            {
-                id: 'reglas-agendamiento',
-                name: 'Reglas de Agendamiento',
-                description: 'Tipos de servicios agendables',
-                href: `/${studioSlug}/configuracion/negocio/reglas-agendamiento`,
-                icon: Calendar,
-                completed: false
-            },
-            {
-                id: 'equipo',
-                name: 'Gestión de personal',
-                description: 'Gestiona tu equipo y colaboradores',
-                icon: Users2,
-                href: `/${studioSlug}/configuracion/negocio/personal`,
-                completed: false
-            },
-            {
-                id: 'tipos-evento',
-                name: 'Tipos de Evento',
-                description: 'Categorías para organizar paquetes',
-                icon: Calendar,
-                href: `/${studioSlug}/configuracion/negocio/tipos-evento`,
-                completed: false
-            },
-        ]
-    },
-
-    {
-        id: 'catalogo',
-        title: 'Catálogo',
-        description: 'Servicios y productos',
-        icon: Package,
-        items: [
-            {
-                id: 'servicios',
-                name: 'Catálogo de Servicios',
-                description: 'Gestión de servicios organizados',
-                href: `/${studioSlug}/configuracion/catalogo`,
-                icon: Zap,
-                completed: true,
-                badge: 'Nuevo'
-            },
-            {
-                id: 'paquetes',
-                name: 'Paquetes',
-                description: 'Paquetes de servicios',
-                href: `/${studioSlug}/configuracion/catalogo/paquetes`,
-                icon: Gift,
                 completed: false
             }
         ]
