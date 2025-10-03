@@ -53,6 +53,7 @@ export default function IdentidadPageZen() {
 
       // Asumir que es IdentidadData y hacer type assertion
       setIdentidadData(response as IdentidadData);
+      console.log('Datos de identidad cargados:', response);
       setRetryCount(0);
     } catch (error) {
       console.error('Error loading identidad data:', error);
@@ -191,9 +192,9 @@ export default function IdentidadPageZen() {
           <ZenCardContent>
             <LogoManagerZen
               tipo="logo"
-              url={identidadData.logoUrl}
+              url={identidadData.logo_url}
               onUpdate={(url) => handleUpdateLogo('logo', url)}
-              onLocalUpdate={(url) => handleLocalUpdate({ logoUrl: url })}
+              onLocalUpdate={(url) => handleLocalUpdate({ logo_url: url })}
               studioSlug={slug}
               loading={loading}
             />

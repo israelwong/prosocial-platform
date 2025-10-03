@@ -1,4 +1,7 @@
-import type { PersonnelType, PersonnelProfile } from '@/lib/actions/schemas/personal-schemas';
+import { createPersonalSchema } from '@/lib/actions/schemas/personal-schemas';
+import { z } from 'zod';
+
+type PersonnelType = z.infer<typeof createPersonalSchema>['tipo'];
 
 // Tipo base para Personal
 export interface Personal {

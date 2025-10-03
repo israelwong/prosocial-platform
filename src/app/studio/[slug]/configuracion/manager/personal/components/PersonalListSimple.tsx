@@ -5,16 +5,15 @@ import { Card, CardContent } from '@/components/ui/shadcn/card';
 import { ZenInput } from '@/components/ui/zen';
 import { Search, Users } from 'lucide-react';
 import { PersonalItem } from './PersonalItem';
-import type { Personal } from '../types';
-import { type PersonnelType } from '@/lib/actions/schemas/personal-schemas';
+import { type PersonalData } from '@/lib/actions/schemas/personal-schemas';
 
 interface PersonalListSimpleProps {
-    personal: Personal[];
-    onEdit: (personal: Personal) => void;
-    onDelete: (personalId: string, personalName: string) => void;
+    personal: PersonalData[];
+    onEdit: (personal: PersonalData) => void;
+    onDelete: (personalId: string) => void;
     onToggleActive: (id: string, isActive: boolean) => void;
     loading?: boolean;
-    filterType?: PersonnelType;
+    // filterType?: PersonnelType; // No se puede usar con PersonalData actual
 }
 
 export function PersonalListSimple({
@@ -22,24 +21,23 @@ export function PersonalListSimple({
     onEdit,
     onDelete,
     onToggleActive,
-    loading = false,
-    filterType
+    loading = false
 }: PersonalListSimpleProps) {
     const [searchTerm, setSearchTerm] = useState('');
 
     // Filtrar personal por búsqueda y tipo
     const filteredPersonal = personal.filter((person) => {
-        // Filtro por tipo (si se especifica)
-        if (filterType && person.type !== filterType) {
-            return false;
-        }
+        // Filtro por tipo (si se especifica) - PersonalData no tiene campo type directo
+        // if (filterType && person.type !== filterType) {
+        //     return false;
+        // }
 
         // Filtro por búsqueda
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
-            const matchesName = person.fullName?.toLowerCase().includes(searchLower);
-            const matchesEmail = person.email.toLowerCase().includes(searchLower);
-            const matchesPhone = person.phone?.toLowerCase().includes(searchLower);
+            const matchesName = person.nombre?.toLowerCase().includes(searchLower);
+            const matchesEmail = person.email?.toLowerCase().includes(searchLower);
+            const matchesPhone = person.telefono?.toLowerCase().includes(searchLower);
 
             if (!matchesName && !matchesEmail && !matchesPhone) {
                 return false;
@@ -121,8 +119,7 @@ export function PersonalListSimple({
                             personal={person}
                             onEdit={onEdit}
                             onDelete={onDelete}
-                            onToggleActive={handleToggleActive}
-                            loading={loading}
+                            onToggleStatus={handleToggleActive}
                         />
                     ))
                 )}

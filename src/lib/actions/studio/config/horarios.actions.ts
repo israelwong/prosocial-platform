@@ -130,7 +130,7 @@ export async function actualizarHorario(
         const existingHorario = await prisma.studio_horarios_atencion.findUnique({
             where: { id: horarioId },
             include: {
-                studios: { select: { slug: true } }
+                studio: { select: { slug: true } }
             },
         });
 
@@ -150,7 +150,7 @@ export async function actualizarHorario(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingHorario.studios.slug}/configuracion/cuenta/horarios`);
+        revalidatePath(`/studio/${existingHorario.studio.slug}/configuracion/cuenta/horarios`);
 
         return horarioActualizado;
     });
@@ -210,7 +210,7 @@ export async function toggleHorarioEstado(
         const existingHorario = await prisma.studio_horarios_atencion.findUnique({
             where: { id: horarioId },
             include: {
-                studios: { select: { slug: true } }
+                studio: { select: { slug: true } }
             },
         });
 
@@ -225,7 +225,7 @@ export async function toggleHorarioEstado(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingHorario.studios.slug}/configuracion/cuenta/horarios`);
+        revalidatePath(`/studio/${existingHorario.studio.slug}/configuracion/cuenta/horarios`);
 
         return horarioActualizado;
     });
@@ -238,7 +238,7 @@ export async function eliminarHorario(horarioId: string) {
         const existingHorario = await prisma.studio_horarios_atencion.findUnique({
             where: { id: horarioId },
             include: {
-                studios: { select: { slug: true } }
+                studio: { select: { slug: true } }
             },
         });
 
@@ -252,7 +252,7 @@ export async function eliminarHorario(horarioId: string) {
         });
 
         // 3. Revalidar cache
-        revalidatePath(`/studio/${existingHorario.studios.slug}/configuracion/cuenta/horarios`);
+        revalidatePath(`/studio/${existingHorario.studio.slug}/configuracion/cuenta/horarios`);
 
         return { success: true };
     });

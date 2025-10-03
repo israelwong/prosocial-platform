@@ -5,7 +5,6 @@ import {
     SeccionSchema,
     CategoriaSchema,
     ServicioSchema,
-    ActualizarOrdenSchema,
     ActualizarOrdenSeccionesSchema,
     ActualizarOrdenCategoriasSchema,
     type SeccionData,
@@ -99,7 +98,6 @@ export async function obtenerCatalogo(
                     nombre: s.nombre,
                     costo: s.costo,
                     gasto: s.gasto,
-                    // utilidad y precio_publico se calculan al vuelo en el cliente
                     tipo_utilidad: s.tipo_utilidad,
                     orden: s.orden,
                     status: s.status,
@@ -127,9 +125,7 @@ export async function obtenerCatalogo(
 /**
  * Obtener solo las secciones (sin categorías ni servicios)
  */
-export async function obtenerSecciones(
-    studioSlug: string
-): Promise<ActionResponse<SeccionData[]>> {
+export async function obtenerSecciones(): Promise<ActionResponse<SeccionData[]>> {
     try {
         const secciones = await prisma.studio_servicio_secciones.findMany({
             orderBy: { orden: 'asc' },
@@ -334,9 +330,7 @@ export async function actualizarOrdenSecciones(
 /**
  * Obtener todas las categorías
  */
-export async function obtenerCategorias(
-    studioSlug: string
-): Promise<ActionResponse<CategoriaData[]>> {
+export async function obtenerCategorias(): Promise<ActionResponse<CategoriaData[]>> {
     try {
         const categorias = await prisma.studio_servicio_categorias.findMany({
             include: {
@@ -501,7 +495,7 @@ export async function eliminarCategoria(
             };
         }
 
-        // Eliminar categoría (cascade eliminará la relación en studio_seccion_categorias)
+        // Eliminar categoría (cascade eliminará la relación en project_seccion_categorias)
         await prisma.studio_servicio_categorias.delete({
             where: { id: categoriaId },
         });
@@ -589,7 +583,6 @@ export async function obtenerServicios(
             nombre: s.nombre,
             costo: s.costo,
             gasto: s.gasto,
-            // utilidad y precio_publico se calculan al vuelo en el cliente
             tipo_utilidad: s.tipo_utilidad,
             orden: s.orden,
             status: s.status,
@@ -655,7 +648,8 @@ export async function crearServicio(
                 nombre: validatedData.nombre,
                 costo: validatedData.costo,
                 gasto: validatedData.gasto,
-                // NO almacenamos utilidad ni precio_publico (se calculan al vuelo)
+                // utilidad: validatedData.utilidad,
+                // precio_publico: validatedData.precio_publico,
                 tipo_utilidad: validatedData.tipo_utilidad,
                 orden: nuevoOrden,
                 status: validatedData.status,
@@ -683,7 +677,6 @@ export async function crearServicio(
                 nombre: servicio.nombre,
                 costo: servicio.costo,
                 gasto: servicio.gasto,
-                // utilidad y precio_publico se calculan al vuelo en el cliente
                 tipo_utilidad: servicio.tipo_utilidad,
                 orden: servicio.orden,
                 status: servicio.status,
@@ -751,7 +744,6 @@ export async function actualizarServicio(
                 nombre: servicio.nombre,
                 costo: servicio.costo,
                 gasto: servicio.gasto,
-                // utilidad y precio_publico se calculan al vuelo en el cliente
                 tipo_utilidad: servicio.tipo_utilidad,
                 orden: servicio.orden,
                 status: servicio.status,
@@ -835,7 +827,8 @@ export async function duplicarServicio(
                 nombre: `${servicioOriginal.nombre} (Copia)`,
                 costo: servicioOriginal.costo,
                 gasto: servicioOriginal.gasto,
-                // NO almacenamos utilidad ni precio_publico (se calculan al vuelo)
+                // utilidad: servicioOriginal.utilidad,
+                // precio_publico: servicioOriginal.precio_publico,
                 tipo_utilidad: servicioOriginal.tipo_utilidad,
                 orden: nuevoOrden,
                 status: servicioOriginal.status,
@@ -862,7 +855,8 @@ export async function duplicarServicio(
                 nombre: servicioNuevo.nombre,
                 costo: servicioNuevo.costo,
                 gasto: servicioNuevo.gasto,
-                // utilidad y precio_publico se calculan al vuelo en el cliente
+                //  utilidad: servicioNuevo.utilidad,
+                // precio_publico: servicioNuevo.precio_publico,
                 tipo_utilidad: servicioNuevo.tipo_utilidad,
                 orden: servicioNuevo.orden,
                 status: servicioNuevo.status,
@@ -899,7 +893,7 @@ export async function actualizarPosicionCatalogo(
     parentId?: string | null
 ): Promise<ActionResponse<boolean>> {
     try {
-        const studioId = await getStudioIdFromSlug(studioSlug);
+        await getStudioIdFromSlug(studioSlug);
 
         if (itemType === 'seccion') {
             // Actualizar orden de sección
@@ -959,9 +953,3 @@ export async function actualizarPosicionCatalogo(
         };
     }
 }
-
-// =====================================================
-// NOTA: sincronizarPreciosCatalogo() ELIMINADA
-// =====================================================
-// Los precios ahora se calculan al vuelo usando /lib/utils/pricing.ts
-// No se almacenan en studio_servicios, solo en cotizaciones

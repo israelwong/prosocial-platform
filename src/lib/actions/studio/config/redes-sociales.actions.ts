@@ -140,7 +140,7 @@ export async function actualizarRedSocial(
     const existingRedSocial = await prisma.studio_redes_sociales.findUnique({
       where: { id: redSocialId },
       include: {
-        studios: { select: { slug: true } },
+        studio: { select: { slug: true } },
         plataforma: true
       },
     });
@@ -162,7 +162,7 @@ export async function actualizarRedSocial(
     });
 
     // 4. Revalidar cache
-    revalidatePath(`/studio/${existingRedSocial.studios.slug}/configuracion/cuenta/redes-sociales`);
+    revalidatePath(`/studio/${existingRedSocial.studio.slug}/configuracion/cuenta/redes-sociales`);
 
     return redSocialActualizada;
   });
@@ -228,7 +228,7 @@ export async function eliminarRedSocial(redSocialId: string) {
     const existingRedSocial = await prisma.studio_redes_sociales.findUnique({
       where: { id: redSocialId },
       include: {
-        studios: { select: { slug: true } },
+        studio: { select: { slug: true } },
         plataforma: true
       },
     });
@@ -243,7 +243,7 @@ export async function eliminarRedSocial(redSocialId: string) {
     });
 
     // 3. Revalidar cache
-    revalidatePath(`/studio/${existingRedSocial.studios.slug}/configuracion/cuenta/redes-sociales`);
+    revalidatePath(`/studio/${existingRedSocial.studio.slug}/configuracion/cuenta/redes-sociales`);
 
     return { success: true };
   });
@@ -262,7 +262,7 @@ export async function toggleRedSocialEstado(
     const existingRedSocial = await prisma.studio_redes_sociales.findUnique({
       where: { id: redSocialId },
       include: {
-        studios: { select: { slug: true } },
+        studio: { select: { slug: true } },
         plataforma: true
       },
     });
@@ -281,7 +281,7 @@ export async function toggleRedSocialEstado(
     });
 
     // 4. Revalidar cache
-    revalidatePath(`/studio/${existingRedSocial.studios.slug}/configuracion/cuenta/redes-sociales`);
+    revalidatePath(`/studio/${existingRedSocial.studio.slug}/configuracion/cuenta/redes-sociales`);
 
     return redSocialActualizada;
   });

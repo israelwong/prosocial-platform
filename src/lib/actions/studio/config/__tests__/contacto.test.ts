@@ -17,7 +17,7 @@ const mockPrisma = {
         findUnique: vi.fn(),
         update: vi.fn(),
     },
-    project_telefonos: {
+    studio_telefonos: {
         findMany: vi.fn(),
         findFirst: vi.fn(),
         findUnique: vi.fn(),
@@ -131,7 +131,7 @@ describe('Contacto Actions', () => {
             ];
 
             mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-            mockPrisma.project_telefonos.findMany.mockResolvedValue(mockTelefonos);
+            mockPrisma.studio_telefonos.findMany.mockResolvedValue(mockTelefonos);
 
             const result = await obtenerTelefonosStudio('test-studio');
 
@@ -140,7 +140,7 @@ describe('Contacto Actions', () => {
                 select: { id: true, name: true },
             });
 
-            expect(mockPrisma.project_telefonos.findMany).toHaveBeenCalledWith({
+            expect(mockPrisma.studio_telefonos.findMany).toHaveBeenCalledWith({
                 where: { projectId: 'studio-1' },
                 orderBy: { createdAt: "asc" },
             });
@@ -153,11 +153,11 @@ describe('Contacto Actions', () => {
             const mockTelefonos = [];
 
             mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-            mockPrisma.project_telefonos.findMany.mockResolvedValue(mockTelefonos);
+            mockPrisma.studio_telefonos.findMany.mockResolvedValue(mockTelefonos);
 
             await obtenerTelefonosStudio('test-studio', { activo: true, tipo: 'principal' });
 
-            expect(mockPrisma.project_telefonos.findMany).toHaveBeenCalledWith({
+            expect(mockPrisma.studio_telefonos.findMany).toHaveBeenCalledWith({
                 where: {
                     projectId: 'studio-1',
                     activo: true,
@@ -182,8 +182,8 @@ describe('Contacto Actions', () => {
             };
 
             mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-            mockPrisma.project_telefonos.findFirst.mockResolvedValue(null);
-            mockPrisma.project_telefonos.create.mockResolvedValue(mockNuevoTelefono);
+            mockPrisma.studio_telefonos.findFirst.mockResolvedValue(null);
+            mockPrisma.studio_telefonos.create.mockResolvedValue(mockNuevoTelefono);
 
             const result = await crearTelefono('test-studio', {
                 numero: '+52 55 1234 5678',
@@ -191,7 +191,7 @@ describe('Contacto Actions', () => {
                 activo: true,
             });
 
-            expect(mockPrisma.project_telefonos.create).toHaveBeenCalledWith({
+            expect(mockPrisma.studio_telefonos.create).toHaveBeenCalledWith({
                 data: {
                     projectId: 'studio-1',
                     numero: '+52 55 1234 5678',
@@ -214,7 +214,7 @@ describe('Contacto Actions', () => {
             };
 
             mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-            mockPrisma.project_telefonos.findFirst.mockResolvedValue(mockTelefonoExistente);
+            mockPrisma.studio_telefonos.findFirst.mockResolvedValue(mockTelefonoExistente);
 
             await expect(crearTelefono('test-studio', {
                 numero: '+52 55 9876 5432',
@@ -240,15 +240,15 @@ describe('Contacto Actions', () => {
                 numero: '+52 55 9876 5432',
             };
 
-            mockPrisma.project_telefonos.findUnique.mockResolvedValue(mockTelefonoExistente);
-            mockPrisma.project_telefonos.update.mockResolvedValue(mockTelefonoActualizado);
+            mockPrisma.studio_telefonos.findUnique.mockResolvedValue(mockTelefonoExistente);
+            mockPrisma.studio_telefonos.update.mockResolvedValue(mockTelefonoActualizado);
 
             const result = await actualizarTelefono('telefono-1', {
                 id: 'telefono-1',
                 numero: '+52 55 9876 5432',
             });
 
-            expect(mockPrisma.project_telefonos.update).toHaveBeenCalledWith({
+            expect(mockPrisma.studio_telefonos.update).toHaveBeenCalledWith({
                 where: { id: 'telefono-1' },
                 data: {
                     numero: '+52 55 9876 5432',
@@ -259,7 +259,7 @@ describe('Contacto Actions', () => {
         });
 
         it('debería lanzar error si el teléfono no existe', async () => {
-            mockPrisma.project_telefonos.findUnique.mockResolvedValue(null);
+            mockPrisma.studio_telefonos.findUnique.mockResolvedValue(null);
 
             await expect(actualizarTelefono('telefono-inexistente', {
                 id: 'telefono-inexistente',
@@ -284,15 +284,15 @@ describe('Contacto Actions', () => {
                 activo: false,
             };
 
-            mockPrisma.project_telefonos.findUnique.mockResolvedValue(mockTelefonoExistente);
-            mockPrisma.project_telefonos.update.mockResolvedValue(mockTelefonoActualizado);
+            mockPrisma.studio_telefonos.findUnique.mockResolvedValue(mockTelefonoExistente);
+            mockPrisma.studio_telefonos.update.mockResolvedValue(mockTelefonoActualizado);
 
             const result = await toggleTelefonoEstado('telefono-1', {
                 id: 'telefono-1',
                 activo: false,
             });
 
-            expect(mockPrisma.project_telefonos.update).toHaveBeenCalledWith({
+            expect(mockPrisma.studio_telefonos.update).toHaveBeenCalledWith({
                 where: { id: 'telefono-1' },
                 data: { activo: false },
             });
@@ -312,12 +312,12 @@ describe('Contacto Actions', () => {
                 projects: { slug: 'test-studio' },
             };
 
-            mockPrisma.project_telefonos.findUnique.mockResolvedValue(mockTelefonoExistente);
-            mockPrisma.project_telefonos.delete.mockResolvedValue(mockTelefonoExistente);
+            mockPrisma.studio_telefonos.findUnique.mockResolvedValue(mockTelefonoExistente);
+            mockPrisma.studio_telefonos.delete.mockResolvedValue(mockTelefonoExistente);
 
             const result = await eliminarTelefono('telefono-1');
 
-            expect(mockPrisma.project_telefonos.delete).toHaveBeenCalledWith({
+            expect(mockPrisma.studio_telefonos.delete).toHaveBeenCalledWith({
                 where: { id: 'telefono-1' },
             });
 
@@ -373,12 +373,12 @@ describe('Contacto Actions', () => {
             };
 
             mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-            mockPrisma.project_telefonos.count
+            mockPrisma.studio_telefonos.count
                 .mockResolvedValueOnce(3)  // total
                 .mockResolvedValueOnce(2)  // activos
                 .mockResolvedValueOnce(1); // inactivos
 
-            mockPrisma.project_telefonos.findMany.mockResolvedValue([
+            mockPrisma.studio_telefonos.findMany.mockResolvedValue([
                 { tipo: 'principal', activo: true },
                 { tipo: 'whatsapp', activo: true },
                 { tipo: 'emergencia', activo: false },

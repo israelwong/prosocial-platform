@@ -1,11 +1,47 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
-import { Button } from '@/components/ui/shadcn/button';
-import { Plus, Clock, Calendar, Settings } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { ZenButton, ZenCard, ZenCardHeader, ZenCardTitle, ZenCardDescription, ZenCardContent } from '@/components/ui/zen';
+import { Plus } from 'lucide-react';
+import { TiposEventoList } from './components/TiposEventoList';
+import { obtenerTiposEvento } from '@/lib/actions/studio/negocio/tipos-evento.actions';
+import type { TipoEventoData } from '@/lib/actions/schemas/tipos-evento-schemas';
+import { toast } from 'sonner';
 
 export default function TiposEventoPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+
+  const [tiposEvento, setTiposEvento] = useState<TipoEventoData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadTiposEvento = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await obtenerTiposEvento(slug);
+      if (result.success && result.data) {
+        setTiposEvento(result.data);
+      } else {
+        toast.error(result.error || 'Error al cargar tipos de evento');
+      }
+    } catch (error) {
+      console.error('Error loading tipos evento:', error);
+      toast.error('Error al cargar tipos de evento');
+    } finally {
+      setLoading(false);
+    }
+  }, [slug]);
+
+  useEffect(() => {
+    loadTiposEvento();
+  }, [loadTiposEvento]);
+
+  const handleEdit = (tipo: TipoEventoData) => {
+    // TODO: Implementar edición
+    console.log('Editar tipo:', tipo);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -16,161 +52,61 @@ export default function TiposEventoPage() {
             Configura los tipos de eventos que ofrece tu estudio
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
+        <ZenButton variant="primary" icon={Plus} iconPosition="left">
           Nuevo Tipo de Evento
-        </Button>
+        </ZenButton>
       </div>
 
-      {/* Contenido Principal */}
-      <div className="grid gap-6">
-        {/* Tipos de Evento Existentes */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Tipos de Evento
-            </CardTitle>
-            <CardDescription>
-              Gestiona los diferentes tipos de eventos que ofreces
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Evento por Día */}
-              <div className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-blue-500" />
-                  <div>
-                    <h4 className="font-medium text-zinc-300">Evento por Día</h4>
-                    <p className="text-sm text-zinc-400">Servicios que se cobran por día completo</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Evento por Hora */}
-              <div className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Clock className="h-5 w-5 text-green-500" />
-                  <div>
-                    <h4 className="font-medium text-zinc-300">Evento por Hora</h4>
-                    <p className="text-sm text-zinc-400">Servicios que se cobran por hora</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Evento por Sesión */}
-              <div className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-purple-500" />
-                  <div>
-                    <h4 className="font-medium text-zinc-300">Evento por Sesión</h4>
-                    <p className="text-sm text-zinc-400">Servicios que se cobran por sesión</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+      {/* Lista de Tipos de Evento */}
+      <ZenCard variant="default" padding="none">
+        <ZenCardHeader>
+          <ZenCardTitle>Tipos de Evento</ZenCardTitle>
+          <ZenCardDescription>
+            Gestiona y organiza los diferentes tipos de eventos que ofreces
+          </ZenCardDescription>
+        </ZenCardHeader>
+        <ZenCardContent>
+          {loading ? (
+            <div className="text-center py-8 text-zinc-400">
+              Cargando tipos de evento...
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Configuración de Tipos */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuración de Tipos</CardTitle>
-            <CardDescription>
-              Personaliza los tipos de eventos según tu negocio
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-300">
-                    Nombre del Tipo
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Ej: Evento por Día"
-                    className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-300">
-                    Unidad de Medida
-                  </label>
-                  <select className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="dia">Día</option>
-                    <option value="hora">Hora</option>
-                    <option value="sesion">Sesión</option>
-                    <option value="evento">Evento</option>
-                  </select>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-zinc-300">
-                  Descripción
-                </label>
-                <textarea
-                  placeholder="Describe este tipo de evento..."
-                  rows={3}
-                  className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Agregar Tipo de Evento
-              </Button>
+          ) : tiposEvento.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-zinc-400 mb-4">No hay tipos de evento configurados</p>
+              <ZenButton variant="primary" icon={Plus} iconPosition="left">
+                Crear Primer Tipo de Evento
+              </ZenButton>
             </div>
-          </CardContent>
-        </Card>
+          ) : (
+            <TiposEventoList
+              tiposEvento={tiposEvento}
+              onEdit={handleEdit}
+              onTiposChange={setTiposEvento}
+              studioSlug={slug}
+            />
+          )}
+        </ZenCardContent>
+      </ZenCard>
 
-        {/* Información Adicional */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Información</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4 text-sm text-zinc-400">
-              <p>
-                Los tipos de eventos te permiten categorizar tus servicios según:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Duración:</strong> Por día, hora, sesión, etc.</li>
-                <li><strong>Modalidad:</strong> Presencial, virtual, híbrido</li>
-                <li><strong>Alcance:</strong> Individual, grupal, empresarial</li>
-                <li><strong>Especialización:</strong> Bodas, eventos corporativos, etc.</li>
-              </ul>
-              <p className="mt-4">
-                Cada tipo de evento puede tener diferentes precios y configuraciones.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Información Adicional */}
+      <ZenCard variant="default" padding="none">
+        <ZenCardHeader>
+          <ZenCardTitle>Información</ZenCardTitle>
+        </ZenCardHeader>
+        <ZenCardContent>
+          <div className="space-y-4 text-sm text-zinc-400">
+            <p>
+              Los tipos de eventos te permiten categorizar tus servicios y crear paquetes específicos para cada uno.
+            </p>
+            <ul className="list-disc list-inside space-y-2 ml-4">
+              <li><strong>Organización:</strong> Arrastra y suelta para reordenar</li>
+              <li><strong>Estado:</strong> Activa o desactiva tipos según necesites</li>
+              <li><strong>Paquetes:</strong> Cada tipo puede tener múltiples paquetes asociados</li>
+              <li><strong>Edición:</strong> Modifica nombre y configuración en cualquier momento</li>
+            </ul>
+          </div>
+        </ZenCardContent>
+      </ZenCard>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import Navbar from "@/app/components/main/Navbar";
+import Navbar from "@/components/main/Navbar";
 import { PlatformFooter } from "@/components/platform";
 import { GoogleTagManager } from '@next/third-parties/google';
 import type { Metadata } from "next";

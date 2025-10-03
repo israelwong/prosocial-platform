@@ -14,7 +14,7 @@ const mockPrisma = {
   projects: {
     findUnique: vi.fn(),
   },
-  project_horarios_atencion: {
+  studio_horarios_atencion: {
     findMany: vi.fn(),
     findUnique: vi.fn(),
     create: vi.fn(),
@@ -66,7 +66,7 @@ describe('Horarios Actions', () => {
       ];
 
       mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-      mockPrisma.project_horarios_atencion.findMany.mockResolvedValue(mockHorarios);
+      mockPrisma.studio_horarios_atencion.findMany.mockResolvedValue(mockHorarios);
 
       const result = await obtenerHorariosStudio('test-studio');
 
@@ -75,7 +75,7 @@ describe('Horarios Actions', () => {
         select: { id: true, name: true },
       });
 
-      expect(mockPrisma.project_horarios_atencion.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.studio_horarios_atencion.findMany).toHaveBeenCalledWith({
         where: { projectId: 'studio-1' },
         orderBy: [
           { dia_semana: 'asc' },
@@ -97,11 +97,11 @@ describe('Horarios Actions', () => {
       const mockHorarios = [];
 
       mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-      mockPrisma.project_horarios_atencion.findMany.mockResolvedValue(mockHorarios);
+      mockPrisma.studio_horarios_atencion.findMany.mockResolvedValue(mockHorarios);
 
       await obtenerHorariosStudio('test-studio', { activo: true, dia_semana: 'lunes' });
 
-      expect(mockPrisma.project_horarios_atencion.findMany).toHaveBeenCalledWith({
+      expect(mockPrisma.studio_horarios_atencion.findMany).toHaveBeenCalledWith({
         where: {
           projectId: 'studio-1',
           activo: true,
@@ -130,8 +130,8 @@ describe('Horarios Actions', () => {
       };
 
       mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-      mockPrisma.project_horarios_atencion.findUnique.mockResolvedValue(null);
-      mockPrisma.project_horarios_atencion.create.mockResolvedValue(mockNuevoHorario);
+      mockPrisma.studio_horarios_atencion.findUnique.mockResolvedValue(null);
+      mockPrisma.studio_horarios_atencion.create.mockResolvedValue(mockNuevoHorario);
 
       const result = await crearHorario('test-studio', {
         dia_semana: 'lunes',
@@ -140,7 +140,7 @@ describe('Horarios Actions', () => {
         activo: true,
       });
 
-      expect(mockPrisma.project_horarios_atencion.create).toHaveBeenCalledWith({
+      expect(mockPrisma.studio_horarios_atencion.create).toHaveBeenCalledWith({
         data: {
           projectId: 'studio-1',
           dia_semana: 'lunes',
@@ -165,7 +165,7 @@ describe('Horarios Actions', () => {
       };
 
       mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-      mockPrisma.project_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
+      mockPrisma.studio_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
 
       await expect(crearHorario('test-studio', {
         dia_semana: 'lunes',
@@ -194,8 +194,8 @@ describe('Horarios Actions', () => {
         hora_fin: '19:00',
       };
 
-      mockPrisma.project_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
-      mockPrisma.project_horarios_atencion.update.mockResolvedValue(mockHorarioActualizado);
+      mockPrisma.studio_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
+      mockPrisma.studio_horarios_atencion.update.mockResolvedValue(mockHorarioActualizado);
 
       const result = await actualizarHorario('horario-1', {
         id: 'horario-1',
@@ -203,7 +203,7 @@ describe('Horarios Actions', () => {
         hora_fin: '19:00',
       });
 
-      expect(mockPrisma.project_horarios_atencion.update).toHaveBeenCalledWith({
+      expect(mockPrisma.studio_horarios_atencion.update).toHaveBeenCalledWith({
         where: { id: 'horario-1' },
         data: {
           hora_inicio: '10:00',
@@ -215,7 +215,7 @@ describe('Horarios Actions', () => {
     });
 
     it('debería lanzar error si el horario no existe', async () => {
-      mockPrisma.project_horarios_atencion.findUnique.mockResolvedValue(null);
+      mockPrisma.studio_horarios_atencion.findUnique.mockResolvedValue(null);
 
       await expect(actualizarHorario('horario-inexistente', {
         id: 'horario-inexistente',
@@ -241,15 +241,15 @@ describe('Horarios Actions', () => {
         activo: false,
       };
 
-      mockPrisma.project_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
-      mockPrisma.project_horarios_atencion.update.mockResolvedValue(mockHorarioActualizado);
+      mockPrisma.studio_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
+      mockPrisma.studio_horarios_atencion.update.mockResolvedValue(mockHorarioActualizado);
 
       const result = await toggleHorarioEstado('horario-1', {
         id: 'horario-1',
         activo: false,
       });
 
-      expect(mockPrisma.project_horarios_atencion.update).toHaveBeenCalledWith({
+      expect(mockPrisma.studio_horarios_atencion.update).toHaveBeenCalledWith({
         where: { id: 'horario-1' },
         data: { activo: false },
       });
@@ -270,12 +270,12 @@ describe('Horarios Actions', () => {
         projects: { slug: 'test-studio' },
       };
 
-      mockPrisma.project_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
-      mockPrisma.project_horarios_atencion.delete.mockResolvedValue(mockHorarioExistente);
+      mockPrisma.studio_horarios_atencion.findUnique.mockResolvedValue(mockHorarioExistente);
+      mockPrisma.studio_horarios_atencion.delete.mockResolvedValue(mockHorarioExistente);
 
       const result = await eliminarHorario('horario-1');
 
-      expect(mockPrisma.project_horarios_atencion.delete).toHaveBeenCalledWith({
+      expect(mockPrisma.studio_horarios_atencion.delete).toHaveBeenCalledWith({
         where: { id: 'horario-1' },
       });
 
@@ -297,12 +297,12 @@ describe('Horarios Actions', () => {
       };
 
       mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-      mockPrisma.project_horarios_atencion.count
+      mockPrisma.studio_horarios_atencion.count
         .mockResolvedValueOnce(7)  // total
         .mockResolvedValueOnce(6)  // activos
         .mockResolvedValueOnce(1); // inactivos
 
-      mockPrisma.project_horarios_atencion.findMany.mockResolvedValue([
+      mockPrisma.studio_horarios_atencion.findMany.mockResolvedValue([
         { dia_semana: 'lunes', activo: true },
         { dia_semana: 'martes', activo: true },
         { dia_semana: 'miercoles', activo: true },
@@ -327,12 +327,12 @@ describe('Horarios Actions', () => {
       ];
 
       mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-      mockPrisma.project_horarios_atencion.count.mockResolvedValue(0);
-      mockPrisma.project_horarios_atencion.$transaction.mockResolvedValue(mockHorariosCreados);
+      mockPrisma.studio_horarios_atencion.count.mockResolvedValue(0);
+      mockPrisma.studio_horarios_atencion.$transaction.mockResolvedValue(mockHorariosCreados);
 
       const result = await inicializarHorariosPorDefecto('test-studio');
 
-      expect(mockPrisma.project_horarios_atencion.$transaction).toHaveBeenCalled();
+      expect(mockPrisma.studio_horarios_atencion.$transaction).toHaveBeenCalled();
       expect(result).toEqual(mockHorariosCreados);
     });
 
@@ -340,7 +340,7 @@ describe('Horarios Actions', () => {
       const mockStudio = { id: 'studio-1' };
 
       mockPrisma.projects.findUnique.mockResolvedValue(mockStudio);
-      mockPrisma.project_horarios_atencion.count.mockResolvedValue(3);
+      mockPrisma.studio_horarios_atencion.count.mockResolvedValue(3);
 
       await expect(inicializarHorariosPorDefecto('test-studio')).rejects.toThrow(
         'El studio ya tiene horarios configurados'

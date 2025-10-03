@@ -639,7 +639,7 @@ export async function obtenerPerfilesPersonal(studioSlug: string) {
             include: {
                 _count: {
                     select: {
-                        personal_perfiles: true
+                        personal_assignments: true
                     }
                 }
             }

@@ -177,7 +177,7 @@ export async function actualizarTelefono(
         const existingTelefono = await prisma.studio_telefonos.findUnique({
             where: { id: telefonoId },
             include: {
-                studios: { select: { slug: true } },
+                studio: { select: { slug: true } },
             },
         });
 
@@ -196,7 +196,7 @@ export async function actualizarTelefono(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.studios.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/cuenta/contacto`);
 
         return telefonoActualizado;
     });
@@ -255,7 +255,7 @@ export async function toggleTelefonoEstado(
         const existingTelefono = await prisma.studio_telefonos.findUnique({
             where: { id: telefonoId },
             include: {
-                studios: { select: { slug: true } },
+                studio: { select: { slug: true } },
             },
         });
 
@@ -270,7 +270,7 @@ export async function toggleTelefonoEstado(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.studios.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/cuenta/contacto`);
 
         return telefonoActualizado;
     });
@@ -283,7 +283,7 @@ export async function eliminarTelefono(telefonoId: string) {
         const existingTelefono = await prisma.studio_telefonos.findUnique({
             where: { id: telefonoId },
             include: {
-                studios: { select: { slug: true } },
+                studio: { select: { slug: true } },
             },
         });
 
@@ -297,7 +297,7 @@ export async function eliminarTelefono(telefonoId: string) {
         });
 
         // 3. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.studios.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/cuenta/contacto`);
 
         return { success: true };
     });

@@ -118,12 +118,14 @@ src/app/studio/[slug]/
 ```
 
 **Ventajas:**
+
 - ✅ Setup inicial simple (solo config base)
 - ✅ Configuración avanzada accesible sin salir de contexto
 - ✅ Escalable: agregar módulo = agregar su config
 - ✅ Validación: solo muestra config de módulos activos
 
 **Sidebar de Configuración V2.0:**
+
 ```typescript
 Configuración
 ├─ Estudio (siempre visible)
@@ -205,11 +207,11 @@ export default async function ManagerLayout({
   children: React.ReactNode;
 }) {
   const { slug } = await params;
-  
+
   // Obtener studio para validar
   const studio = await getStudioBySlug(slug);
   if (!studio) redirect('/404');
-  
+
   // Validar módulo activo
   const hasManager = await checkStudioModule(studio.id, 'manager');
   if (!hasManager) {
@@ -237,6 +239,7 @@ export default async function ManagerLayout({
 **Tareas:**
 
 1. **Crear nueva estructura de carpetas** (2 horas)
+
    ```bash
    mkdir -p src/app/studio/[slug]/configuracion/modulos
    mkdir -p src/app/studio/[slug]/configuracion/manager
@@ -262,6 +265,7 @@ export default async function ManagerLayout({
    - [ ] Iconos por módulo
 
 **Archivos a crear/modificar:**
+
 ```
 src/app/studio/[slug]/configuracion/
 ├── modulos/
@@ -276,6 +280,7 @@ src/app/studio/[slug]/configuracion/
 ```
 
 **Server Actions a actualizar:**
+
 ```typescript
 // Todas las actions en /configuracion necesitan:
 - Cambiar references de 'projects' a 'studios'
@@ -310,6 +315,7 @@ src/app/studio/[slug]/configuracion/
    - [ ] `getPendingPayments(studioId)`
 
 **Archivos:**
+
 ```
 src/app/studio/[slug]/
 ├── dashboard/
@@ -324,6 +330,7 @@ src/app/studio/[slug]/
 ### **FASE 2: MÓDULO MANAGER (1 semana)**
 
 **Seguir plan detallado de Iteración 1 del PLAN_TRABAJO_V2.md:**
+
 - Día 5-6: Kanban Manager
 - Día 7-8: Eventos y detalle
 - Día 9-11: Sistema Gantt
@@ -354,6 +361,7 @@ src/app/studio/[slug]/
 **Antes de considerar refactorización completa:**
 
 **Configuración:**
+
 - [ ] Configuración base funciona (estudio, cuenta)
 - [ ] Página de módulos muestra correctamente
 - [ ] Sidebar dinámico muestra solo módulos activos
@@ -361,12 +369,14 @@ src/app/studio/[slug]/
 - [ ] Todas las Server Actions usan `studios`
 
 **Dashboard:**
+
 - [ ] Dashboard carga métricas reales
 - [ ] Sidebar muestra solo módulos activos
 - [ ] Navegación entre módulos funciona
 - [ ] Middleware valida acceso a módulos
 
 **Módulo Manager:**
+
 - [ ] Kanban con pipeline Manager
 - [ ] CRUD de eventos funcional
 - [ ] Sistema Gantt básico
@@ -381,22 +391,22 @@ src/app/studio/[slug]/
 ```
 1. Configuración Base (Día 1-2)
    ↓ (Esto desbloquea todo lo demás)
-   
+
 2. Dashboard Global (Día 3-4)
    ↓ (Estructura base funcional)
-   
+
 3. Módulo Manager - Kanban (Día 5-6)
    ↓ (Feature más crítica)
-   
+
 4. Módulo Manager - Eventos (Día 7-8)
    ↓ (Completar gestión operacional)
-   
+
 5. Módulo Manager - Gantt (Día 9-11)
    ↓ (Diferenciador clave)
-   
+
 6. Limpieza y Optimización (Día 12-13)
    ↓ (Código limpio y mantenible)
-   
+
 7. Responsive y Polish (Iteración posterior)
 ```
 
@@ -407,6 +417,7 @@ src/app/studio/[slug]/
 **Al finalizar refactorización:**
 
 **Técnicas:**
+
 - ✅ 0 referencias a `projects` en código
 - ✅ 100% de tablas usan nomenclatura `studio_*`
 - ✅ Todas las rutas protegidas con validación de módulos
@@ -414,12 +425,14 @@ src/app/studio/[slug]/
 - ✅ Configuración modular y escalable
 
 **Funcionales:**
+
 - ✅ Usuario puede configurar studio completamente
 - ✅ Dashboard muestra métricas reales
 - ✅ Módulo Manager funciona end-to-end
 - ✅ Navegación intuitiva y rápida
 
 **UX:**
+
 - ✅ Simplicidad: Configuración en un solo lugar
 - ✅ Velocidad: Carga < 2 segundos
 - ✅ Robustez: Sin errores en consola
@@ -428,4 +441,3 @@ src/app/studio/[slug]/
 ---
 
 **Próximo paso:** Confirmar estrategia y comenzar Día 1-2 (Migración de Configuración)
-

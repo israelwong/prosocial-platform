@@ -5,10 +5,8 @@ import { retryDatabaseOperation } from "@/lib/actions/utils/database-retry";
 import { revalidatePath } from "next/cache";
 import {
   IdentidadUpdateSchema,
-  PalabrasClaveUpdateSchema,
   LogoUpdateSchema,
   type IdentidadUpdateForm,
-  type PalabrasClaveUpdateForm,
   type LogoUpdateForm,
 } from "@/lib/actions/schemas/identidad-schemas";
 
@@ -78,14 +76,14 @@ export async function actualizarIdentidadBasica(
         studio_name: validatedData.nombre,
         slogan: validatedData.slogan,
         descripcion: validatedData.descripcion,
-        logo_url: validatedData.logoUrl,
-        isotipo_url: validatedData.isotipo_url,
+        logo_url: validatedData.logoUrl,      // ✅ Cambiar a logo_url
+        isotipo_url: validatedData.isotipo_url, // ✅ Ya correcto
       },
       select: {
         studio_name: true,
         slogan: true,
         descripcion: true,
-        logo_url: true,
+        logo_url: true,      // ✅ Cambiar a logo_url
         isotipo_url: true,
       },
     });
@@ -113,7 +111,7 @@ export async function actualizarPalabrasClave(
     // Convertir array a string JSON
     const palabrasClaveString = JSON.stringify(palabrasClave);
 
-    const studioActualizado = await prisma.studios.update({
+    await prisma.studios.update({
       where: { id: studio.id },
       data: {
         palabras_clave: palabrasClaveString,
@@ -148,14 +146,14 @@ export async function actualizarLogo(
     const validatedData = LogoUpdateSchema.parse(data);
 
     const updateData = validatedData.tipo === "logo"
-      ? { logoUrl: validatedData.url }
+      ? { logo_url: validatedData.url }      // ✅ Cambiar a logo_url
       : { isotipo_url: validatedData.url };
 
     const studioActualizado = await prisma.studios.update({
       where: { id: studio.id },
       data: updateData,
       select: {
-        logoUrl: true,
+        logo_url: true,      // ✅ Cambiar a logo_url
         isotipo_url: true,
       },
     });
@@ -182,13 +180,20 @@ export async function actualizarIdentidadCompleta(
 
     const validatedData = IdentidadUpdateSchema.parse(data);
 
-    // Preparar datos de actualización
-    const updateData: any = {
+    // Preparar datos de actualización con tipo explícito
+    const updateData: {
+      studio_name: string;
+      slogan: string | null;
+      descripcion: string | null;
+      logo_url: string | null;
+      isotipo_url: string | null;
+      palabras_clave?: string;
+    } = {
       studio_name: validatedData.nombre,
-      slogan: validatedData.slogan,
-      descripcion: validatedData.descripcion,
-      logo_url: validatedData.logoUrl,
-      isotipo_url: validatedData.isotipo_url,
+      slogan: validatedData.slogan ?? null,
+      descripcion: validatedData.descripcion ?? null,
+      logo_url: validatedData.logoUrl ?? null,
+      isotipo_url: validatedData.isotipo_url ?? null,
     };
 
     // Agregar palabras clave si se proporcionan

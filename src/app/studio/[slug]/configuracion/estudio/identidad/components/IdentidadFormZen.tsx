@@ -30,7 +30,7 @@ export function IdentidadFormZen({
   loading = false
 }: IdentidadFormZenProps) {
   const [formData, setFormData] = useState({
-    nombre: data.name || '',
+    nombre: data.studio_name || '',
     slogan: data.slogan || '',
     descripcion: data.descripcion || '',
   });
@@ -49,7 +49,7 @@ export function IdentidadFormZen({
 
     // Actualización optimista - actualizar UI inmediatamente
     onLocalUpdate({
-      name: formData.nombre,
+      studio_name: formData.nombre,
       slogan: formData.slogan || null,
       descripcion: formData.descripcion || null,
     });
@@ -60,7 +60,7 @@ export function IdentidadFormZen({
     } catch (error) {
       // Revertir cambios en caso de error
       onLocalUpdate({
-        name: data.name,
+        studio_name: data.studio_name,
         slogan: data.slogan,
         descripcion: data.descripcion,
       });
@@ -71,7 +71,7 @@ export function IdentidadFormZen({
   };
 
   const hasChanges =
-    formData.nombre !== data.name ||
+    formData.nombre !== data.studio_name ||
     formData.slogan !== (data.slogan || '') ||
     formData.descripcion !== (data.descripcion || '');
 

@@ -86,9 +86,9 @@ export async function obtenerDashboardStudio(studioSlug: string): Promise<Dashbo
 export async function obtenerEventosRecientes(studioSlug: string): Promise<DashboardEvento[]> {
   return await retryDatabaseOperation(async () => {
     try {
-      const eventos = await prisma.eventos.findMany({
+      const eventos = await prisma.studio_eventos.findMany({
         where: {
-          studios: { slug: studioSlug },
+          studio: { slug: studioSlug },
         },
         select: {
           id: true,
@@ -124,9 +124,9 @@ export async function obtenerEventosRecientes(studioSlug: string): Promise<Dashb
 export async function obtenerClientesRecientes(studioSlug: string): Promise<DashboardCliente[]> {
   return await retryDatabaseOperation(async () => {
     try {
-      const clientes = await prisma.clientes.findMany({
+      const clientes = await prisma.studio_clientes.findMany({
         where: {
-          studios: { slug: studioSlug },
+          studio: { slug: studioSlug },
         },
         select: {
           id: true,

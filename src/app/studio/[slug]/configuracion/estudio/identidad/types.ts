@@ -1,11 +1,11 @@
 export interface IdentidadData {
   id: string;
-  name: string;
+  studio_name: string;
   slug: string;
   slogan: string | null;
   descripcion: string | null;
   palabras_clave: string[];
-  logoUrl: string | null;
+  logo_url: string | null;
   isotipo_url: string | null;
 }
 
@@ -14,7 +14,7 @@ export interface IdentidadUpdate {
   slogan?: string;
   descripcion?: string;
   palabras_clave?: string;
-  logoUrl?: string;
+  logo_url?: string;
   isotipo_url?: string;
 }
 
