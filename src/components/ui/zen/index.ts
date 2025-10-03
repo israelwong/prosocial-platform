@@ -17,6 +17,11 @@ export { SeparadorZen } from './SeparadorZen';
 export { ZenTextarea } from './forms/ZenTextarea';
 
 // =============================================================================
+// MEDIA COMPONENTS (DISPONIBLES)
+// =============================================================================
+export { ZenAvatar, ZenAvatarImage, ZenAvatarFallback } from './media/ZenAvatar';
+
+// =============================================================================
 // LAYOUT COMPONENTS (DISPONIBLES)
 // =============================================================================
 export {

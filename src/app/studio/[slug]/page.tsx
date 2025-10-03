@@ -1,14 +1,10 @@
-import { redirect } from 'next/navigation';
-
-// Página raíz del studio - redirige al dashboard manteniendo URL limpia
-export default async function StudioRootPage({
-    params,
-}: {
-    params: Promise<{ slug: string }>;
-}) {
-    const { slug } = await params;
-
-    // CAMBIO CRÍTICO: Redirigir a la URL limpia, no a la estructura interna
-    // Esto mantiene zen.pro/mi-estudio → zen.pro/mi-estudio/dashboard
-    redirect(`/${slug}/dashboard`);
+// Página raíz del studio - aquí se renderizará el contenido de ZEN Pages
+export default async function StudioRootPage() {
+    return (
+        <div className="w-full h-full bg-zinc-950 flex items-center justify-center">
+            <h1 className="text-3xl font-bold text-blue-300">
+                ZEN Pages - Full Width Content
+            </h1>
+        </div>
+    );
 }

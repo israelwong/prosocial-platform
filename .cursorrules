@@ -40,6 +40,7 @@ src/
 │   ├── agente/             # Agentes CRM
 │   └── studio/[slug]/      # Suscriptores
 │       ├── manager/        # ZEN Manager
+│       ├── pages/           # ZEN Pages
 │       ├── magic/          # ZEN Magic
 │       ├── marketing/      # ZEN Marketing
 │       ├── payment/        # ZEN Payment (add-on)
@@ -55,6 +56,9 @@ src/
 │   │   └── shared/
 │   └── modules/           # Lógica de gestión de módulos
 └── types/                 # TypeScript types
+
+**Portal de Clientes (parte de Manager):**
+`src/app/studio/[slug]/manager/eventos/[id]/portal/`
 ```
 
 ## 🎨 DISEÑO ZEN (PRIORIDAD #1)
@@ -129,7 +133,7 @@ model studio_modules {
   is_active  Boolean  @default(false)
   created_at DateTime @default(now())
 
-  studio projects @relation(fields: [studio_id], references: [id])
+  studio studios @relation(fields: [studio_id], references: [id])
 
   @@unique([studio_id, module_id])
   @@index([studio_id, is_active])
@@ -215,9 +219,13 @@ import { prisma } from "@/lib/prisma";
 import { checkStudioModule } from "@/lib/modules";
 import { LeadCreateSchema } from "./leads.schemas";
 
-export async function crearLead(studioSlug: string, data: unknown) {
+export async function crearLead(
+  studioId: string,
+  studioSlug: string,
+  data: unknown
+) {
   // 1. Verificar módulo activo
-  const hasModule = await checkStudioModule(studioSlug, "manager");
+  const hasModule = await checkStudioModule(studioId, "manager");
   if (!hasModule) {
     throw new Error("Módulo ZEN Manager no activo");
   }

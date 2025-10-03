@@ -1,23 +1,17 @@
 'use client';
 
 import React from 'react';
-import { ZenHeader } from '@/components/ui/zen';
 
-// Este es el layout raíz, común a TODAS las páginas del estudio
-// Header global persistente en todas las páginas del studio
-export default function StudioLayout({
+// Este es el layout raíz más externo para cualquier ruta de [slug]
+// No aplica estilos globales para permitir layouts anidados full-width o centrados.
+export default function StudioRootLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-zinc-950 text-white">
-            {/* Header global persistente */}
-            <ZenHeader />
-            {/* Contenido principal - altura restante después del header */}
-            <div className="h-[calc(100vh-4rem)]">
-                {children}
-            </div>
+        <div>
+            {children}
         </div>
     );
 }

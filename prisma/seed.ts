@@ -1,7 +1,11 @@
 import { prisma } from '../src/lib/prisma';
+import { seedModules } from './seeds/modules-seed';
 
 async function main() {
     console.log('🌱 Iniciando seed con nueva arquitectura Supabase Auth...');
+
+    // 0. Seed de Módulos de Plataforma
+    await seedModules();
 
     // 1. Seed de plataformas de redes sociales
     await seedSocialNetworks();

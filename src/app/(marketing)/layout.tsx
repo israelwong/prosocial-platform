@@ -1,4 +1,4 @@
-import Navbar from "@/components/main/Navbar";
+// import { Navbar } from "@/app/studio/[slug]/components/Navbar";
 import { PlatformFooter } from "@/components/platform";
 import { GoogleTagManager } from '@next/third-parties/google';
 import type { Metadata } from "next";
@@ -39,7 +39,6 @@ export default function MarketingLayout({
 }>) {
     return (
         <div className="antialiased h-screen flex flex-col">
-            <Navbar />
             <main className="flex-grow">
                 {children}
             </main>
