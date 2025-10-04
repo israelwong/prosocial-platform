@@ -134,21 +134,19 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                     <ZenSidebarMenu>
                                         {/* Items directos (si existen) */}
                                         {group.items && group.items.length > 0 && (
-                                            <ZenSidebarMenuItem>
-                                                <ZenSidebarMenuSub className="space-y-1 py-2">
-                                                    {group.items.map((item) => (
-                                                        <ZenSidebarMenuItem key={item.id}>
-                                                            <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                <Link href={`/${studioSlug}/configuracion${item.href}`}>
-                                                                    <span className="truncate">{item.name}</span>
-                                                                </Link>
-                                                            </ZenSidebarMenuButton>
-                                                        </ZenSidebarMenuItem>
-                                                    ))}
-                                                </ZenSidebarMenuSub>
-                                            </ZenSidebarMenuItem>
+                                            <div className="space-y-1">
+                                                {group.items.map((item) => (
+                                                    <ZenSidebarMenuItem key={item.id}>
+                                                        <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
+                                                            <Link href={`/${studioSlug}/configuracion${item.href}`}>
+                                                                <span className="truncate">{item.name}</span>
+                                                            </Link>
+                                                        </ZenSidebarMenuButton>
+                                                    </ZenSidebarMenuItem>
+                                                ))}
+                                            </div>
                                         )}
-                                        
+
                                         {/* Subgrupos (si existen) */}
                                         {group.subgroups && group.subgroups.length > 0 && (
                                             <div className="pl-2 ml-2 border-l border-zinc-800">
