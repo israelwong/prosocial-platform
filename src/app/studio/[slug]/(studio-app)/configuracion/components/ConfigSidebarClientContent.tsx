@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
     ZenInput, ZenSidebar, ZenSidebarContent, ZenSidebarHeader, ZenSidebarFooter,
     ZenSidebarGroup, ZenSidebarGroupLabel, ZenSidebarGroupContent, ZenSidebarMenu,
-    ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuSubItem, ZenSidebarMenuSubButton, ZenSidebarMenuButton
+    ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuButton
 } from '@/components/ui/zen';
 import { StudioHeaderModal } from './StudioHeaderModal';
 import {
@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { NavigationConfig } from './ConfiguracionSidebarZenV2';
-import { cn } from '@/lib/utils';
 
 // Mapa de iconos (actualizado con todos los iconos)
 const iconMap: { [key: string]: LucideIcon } = {
@@ -131,9 +130,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                 </button>
                             </ZenSidebarGroupLabel>
                             {isExpanded && (
-                                <ZenSidebarGroupContent className={cn(
-                                    group.subgroups && 'pl-2 ml-2 border-l border-zinc-800 space-y-1'
-                                )}>
+                                <ZenSidebarGroupContent className="space-y-1">
                                     <ZenSidebarMenu>
                                         {/* Items directos (si existen) */}
                                         {group.items && group.items.length > 0 && (
@@ -154,7 +151,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                         
                                         {/* Subgrupos (si existen) */}
                                         {group.subgroups && group.subgroups.length > 0 && (
-                                            <>
+                                            <div className="pl-2 ml-2 border-l border-zinc-800">
                                                 {group.subgroups.map((subgroup) => {
                                                     const isSubgroupExpanded = expandedSubgroups.includes(subgroup.id);
                                                     return (
@@ -179,7 +176,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                         </ZenSidebarMenuItem>
                                                     );
                                                 })}
-                                            </>
+                                            </div>
                                         )}
                                     </ZenSidebarMenu>
                                 </ZenSidebarGroupContent>
