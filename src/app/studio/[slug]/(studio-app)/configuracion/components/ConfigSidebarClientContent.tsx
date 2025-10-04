@@ -134,7 +134,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                     <ZenSidebarMenu>
                                         {/* Renderizado mixto (si existe) */}
                                         {group.mixedItems && group.mixedItems.length > 0 ? (
-                                            <div className="space-y-1">
+                                            <div className="space-y-0">
                                                 {group.mixedItems.map((item) => {
                                                     // Verificar si es un item directo o un subgrupo
                                                     const isSubgroup = 'items' in item;
@@ -151,7 +151,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                                         <ChevronDown className={`w-4 h-4 transition-transform ${isSubgroupExpanded ? 'rotate-180' : ''}`} />
                                                                     </ZenSidebarMenuButton>
                                                                     {isSubgroupExpanded && (
-                                                                        <ZenSidebarMenuSub className="space-y-1 py-2">
+                                                                        <ZenSidebarMenuSub className="space-y-1 py-2 ml-3">
                                                                             {subgroup.items.map((subItem: NavItem) => (
                                                                                 <ZenSidebarMenuItem key={subItem.id}>
                                                                                     <ZenSidebarMenuButton asChild isActive={isActive(subItem.href)}>
