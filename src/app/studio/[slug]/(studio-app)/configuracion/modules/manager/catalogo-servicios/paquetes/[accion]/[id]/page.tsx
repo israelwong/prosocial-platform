@@ -1,25 +1,62 @@
 import React from 'react';
 import { obtenerCatalogo } from '@/lib/actions/studio/config/catalogo.actions';
 import { obtenerPaquete } from '@/lib/actions/studio/negocio/paquetes.actions';
-import { obtenerTipoEventoPorId } from '@/lib/actions/studio/negocio/tipos-evento.actions';
 import { obtenerConfiguracionPrecios } from '@/lib/actions/studio/config/configuracion-precios.actions';
-import { PaqueteFormulario } from '../../components/PaqueteFormulario';
+import { CotizacionFormularioClient } from '../../components/PaqueteFormulario';
 import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
 
 interface PaqueteFormPageProps {
-    params: {
+    params: Promise<{
         slug: string;
         accion: 'crear' | 'editar';
         id: string;
-    };
+    }>;
 }
 
 export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) {
-    const { slug, accion, id } = params;
+    const { slug, accion, id } = await params;
 
     // Validar acción
     if (accion !== 'crear' && accion !== 'editar') {
         redirect(`/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+    }
+
+    // Obtener studio por slug para obtener el ID real
+    const studio = await prisma.studios.findUnique({
+        where: { slug: slug }
+    });
+
+    if (!studio) {
+        redirect(`/studio/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+    }
+
+    // Lógica diferente para crear vs editar
+    let eventoTipoId: string;
+
+    if (accion === 'crear') {
+        // En crear, el id es el eventoTipoId
+        const eventoTipo = await prisma.studio_evento_tipos.findUnique({
+            where: { id: id }
+        });
+
+        if (!eventoTipo) {
+            redirect(`/studio/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+        }
+
+        eventoTipoId = id;
+    } else {
+        // En editar, el id es el paqueteId, necesitamos obtener el eventoTipoId del paquete
+        const paquete = await prisma.studio_paquetes.findUnique({
+            where: { id: id },
+            select: { eventoTipoId: true }
+        });
+
+        if (!paquete) {
+            redirect(`/studio/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+        }
+
+        eventoTipoId = paquete.eventoTipoId;
     }
 
     // Obtener catálogo y configuración
@@ -58,38 +95,24 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
 
     // Modo edición: obtener paquete existente
     let paquete = null;
-    let tipoEvento = null;
 
     if (accion === 'editar') {
         const paqueteResult = await obtenerPaquete(id);
         if (!paqueteResult.success || !paqueteResult.data) {
-            redirect(`/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+            redirect(`/studio/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
         }
         paquete = paqueteResult.data;
-
-        // Obtener información del tipo de evento
-        const tipoEventoResult = await obtenerTipoEventoPorId(paquete.eventoTipoId);
-        if (tipoEventoResult.success && tipoEventoResult.data) {
-            tipoEvento = tipoEventoResult.data;
-        }
-    } else {
-        // Modo crear: id es el eventoTipoId
-        const tipoEventoResult = await obtenerTipoEventoPorId(id);
-        if (!tipoEventoResult.success || !tipoEventoResult.data) {
-            redirect(`/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
-        }
-        tipoEvento = tipoEventoResult.data;
     }
 
     return (
         <div className="px-6">
-            <PaqueteFormulario
+            <CotizacionFormularioClient
                 catalogo={catalogo}
-                paquete={paquete}
-                tipoEvento={tipoEvento}
-                studioSlug={slug}
-                modo={accion}
+                eventoId={eventoTipoId}
+                cotizacion={paquete}
                 studioConfig={studioConfig}
+                studioId={studio.id}
+                studioSlug={slug}
             />
         </div>
     );

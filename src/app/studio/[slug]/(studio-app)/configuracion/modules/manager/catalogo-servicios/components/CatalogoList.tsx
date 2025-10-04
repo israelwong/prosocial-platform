@@ -459,7 +459,7 @@ export function CatalogoList({
             {/* Barra de búsqueda */}
             <SearchBar
                 onSearch={setSearchQuery}
-                placeholder="Buscar por nombre de servicio, categoría o sección..."
+                onClear={() => setSearchQuery('')}
             />
 
             {/* Indicador de resultados de búsqueda */}

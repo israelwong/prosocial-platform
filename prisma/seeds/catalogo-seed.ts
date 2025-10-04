@@ -8,7 +8,7 @@ async function seedCatalogo() {
 
     try {
         // 1. Buscar el proyecto "demo-studio"
-        const demoStudio = await prisma.projects.findUnique({
+        const demoStudio = await prisma.studios.findUnique({
             where: { slug: 'demo-studio' },
         });
 
@@ -24,7 +24,7 @@ async function seedCatalogo() {
         console.log('🧹 Limpiando catálogo existente...');
 
         // Eliminar servicios y sus gastos asociados
-        await prisma.project_servicio_gastos.deleteMany({
+        await prisma.studio_servicio_gastos.deleteMany({
             where: {
                 servicios: {
                     studioId: demoStudio.id,
@@ -32,29 +32,29 @@ async function seedCatalogo() {
             },
         });
 
-        await prisma.project_servicios.deleteMany({
+        await prisma.studio_servicios.deleteMany({
             where: { studioId: demoStudio.id },
         });
 
         // Eliminar relaciones de categorías con secciones
-        await prisma.project_seccion_categorias.deleteMany({});
+        await prisma.studio_seccion_categorias.deleteMany({});
 
         // Eliminar categorías
-        await prisma.project_servicio_categorias.deleteMany({});
+        await prisma.studio_servicio_categorias.deleteMany({});
 
         // Eliminar secciones
-        await prisma.project_servicio_secciones.deleteMany({});
+        await prisma.studio_servicio_secciones.deleteMany({});
 
         console.log('✅ Catálogo limpiado exitosamente\n');
 
         // 3. Obtener configuración del estudio para calcular precios
-        const config = await prisma.project_configuraciones.findFirst({
+        const config = await prisma.studio_configuraciones.findFirst({
             where: {
-                projectId: demoStudio.id,
+                studio_id: demoStudio.id,
                 status: 'active',
             },
             orderBy: {
-                updatedAt: 'desc',
+                updated_at: 'desc',
             },
         });
 
@@ -80,7 +80,7 @@ async function seedCatalogo() {
             console.log(`📂 Creando sección: "${seccionData.seccion}"...`);
 
             // Crear sección
-            const seccion = await prisma.project_servicio_secciones.create({
+            const seccion = await prisma.studio_servicio_secciones.create({
                 data: {
                     nombre: seccionData.seccion,
                     descripcion: seccionData.descripcion,
@@ -101,7 +101,7 @@ async function seedCatalogo() {
                 console.log(`   📁 Creando categoría: "${categoriaData.categoria}"...`);
 
                 // Crear categoría
-                const categoria = await prisma.project_servicio_categorias.create({
+                const categoria = await prisma.studio_servicio_categorias.create({
                     data: {
                         nombre: categoriaData.categoria,
                         orden: indexCategoria,
@@ -109,7 +109,7 @@ async function seedCatalogo() {
                 });
 
                 // Crear relación sección-categoría
-                await prisma.project_seccion_categorias.create({
+                await prisma.studio_seccion_categorias.create({
                     data: {
                         seccionId: seccion.id,
                         categoriaId: categoria.id,
@@ -121,7 +121,7 @@ async function seedCatalogo() {
                 // Iterar sobre servicios
                 for (const [indexServicio, servicioData] of categoriaData.servicios.entries()) {
                     // Crear servicio (sin utilidad ni precio_publico - se calculan al vuelo)
-                    await prisma.project_servicios.create({
+                    await prisma.studio_servicios.create({
                         data: {
                             studioId: demoStudio.id,
                             servicioCategoriaId: categoria.id,
