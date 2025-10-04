@@ -24,7 +24,7 @@ interface PaqueteFormularioProps {
     paquete: PaqueteConServiciosCompletos | null;
     tipoEvento: TipoEventoData | null;
     studioSlug: string;
-    modo: 'nuevo' | 'editar';
+    modo: 'crear' | 'editar';
     studioConfig: {
         utilidad_servicio: number;
         utilidad_producto: number;
@@ -333,7 +333,7 @@ export function PaqueteFormulario({
 
         setGuardando(true);
         toast.loading(
-            modo === 'nuevo' ? 'Creando paquete...' : 'Actualizando paquete...'
+            modo === 'crear' ? 'Creando paquete...' : 'Actualizando paquete...'
         );
 
         try {
@@ -355,7 +355,7 @@ export function PaqueteFormulario({
             };
 
             const result =
-                modo === 'nuevo'
+                modo === 'crear'
                     ? await crearPaquete(studioSlug, data)
                     : await actualizarPaquete(studioSlug, data);
 
@@ -363,7 +363,7 @@ export function PaqueteFormulario({
 
             if (result.success) {
                 toast.success(
-                    modo === 'nuevo'
+                    modo === 'crear'
                         ? 'Paquete creado correctamente'
                         : 'Paquete actualizado correctamente'
                 );
@@ -442,7 +442,7 @@ export function PaqueteFormulario({
             <div className="flex items-center justify-between bg-zinc-900/50 border-b border-zinc-800/50 px-6 py-4 -mx-6 z-10">
                 <div className="flex items-center gap-4">
                     <h1 className="text-lg font-medium text-zinc-100">
-                        {modo === 'nuevo' ? 'Crear Paquete' : 'Editar Paquete'}
+                        {modo === 'crear' ? 'Crear Paquete' : 'Editar Paquete'}
                     </h1>
                     {tipoEvento && (
                         <div className="flex items-center gap-3">
@@ -764,7 +764,7 @@ export function PaqueteFormulario({
                                     >
                                         {guardando
                                             ? 'Guardando...'
-                                            : modo === 'nuevo'
+                                            : modo === 'crear'
                                                 ? 'Guardar'
                                                 : 'Actualizar'}
                                     </ZenButton>

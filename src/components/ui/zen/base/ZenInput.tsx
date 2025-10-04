@@ -19,6 +19,10 @@ export interface ZenInputProps extends Omit<React.InputHTMLAttributes<HTMLInputE
   hint?: string;
   /** Icono a mostrar al lado del label (componente de Lucide) */
   icon?: React.ComponentType<{ className?: string }>;
+  /** Posición del icono (left o right) */
+  iconPosition?: 'left' | 'right';
+  /** Clases CSS adicionales para el icono */
+  iconClassName?: string;
   /** Tamaño del input */
   size?: 'sm' | 'md' | 'lg';
   /** Clases CSS adicionales para el input */
@@ -57,7 +61,9 @@ const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
     required = false,
     error,
     hint,
-    icon: Icon,
+    icon: IconComponent,
+    iconPosition = 'left',
+    iconClassName,
     size = 'md',
     className,
     id,
@@ -91,9 +97,9 @@ const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
 
     // Tamaños
     const sizeStyles = {
-      sm: ZEN_SPACING.padding.input.sm + ' text-sm',
-      md: ZEN_SPACING.padding.input.md + ' text-base',
-      lg: ZEN_SPACING.padding.input.lg + ' text-lg',
+      sm: `${ZEN_SPACING.padding.input.sm} text-sm`,
+      md: `${ZEN_SPACING.padding.input.md} text-base`,
+      lg: `${ZEN_SPACING.padding.input.lg} text-lg`,
     };
 
     // Estilos de error
@@ -102,47 +108,65 @@ const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
       'ring-2 ring-red-500/20'
     ) : '';
 
+    // Determinar si hay un icono
+    const hasIcon = !!IconComponent;
+    // Estilos de padding para el icono
+    const iconPadding = {
+      left: hasIcon ? 'pl-10' : '',
+      right: hasIcon ? 'pr-10' : '',
+    };
+
     return (
       <div className={cn(ZEN_SPACING.zen.formFieldGap)}>
         {/* Label con icono opcional */}
-        <label
-          htmlFor={inputId}
-          className={cn(
-            // Tipografía ZEN para labels
-            'text-sm font-medium leading-normal',
-            ZEN_COLORS.text.secondary,
-            'flex items-center gap-2',
-            'mb-2'
-          )}
-        >
-          {Icon && <Icon className="h-4 w-4" />}
-          <span>
+        {label && (
+          <label
+            htmlFor={inputId}
+            className={cn(
+              // Tipografía ZEN para labels
+              'text-sm font-medium leading-normal',
+              ZEN_COLORS.text.secondary,
+              'flex items-center gap-2',
+              'mb-2'
+            )}
+          >
             {label}
             {required && (
               <span className={cn('ml-1', ZEN_COLORS.semantic.error.text)}>
                 *
               </span>
             )}
-          </span>
-        </label>
+          </label>
+        )}
 
-        {/* Input */}
-        <input
-          ref={ref}
-          id={inputId}
-          className={cn(
-            baseInputStyles,
-            sizeStyles[size],
-            errorStyles,
-            className
+        {/* Input con icono */}
+        <div className="relative">
+          {hasIcon && (
+            <div className={cn(
+              'pointer-events-none absolute inset-y-0 flex items-center',
+              iconPosition === 'left' ? 'left-0 pl-3' : 'right-0 pr-3'
+            )}>
+              <IconComponent className={cn('h-5 w-5 text-zinc-400', iconClassName)} />
+            </div>
           )}
-          aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={cn(
-            error && errorId,
-            hint && hintId
-          )}
-          {...props}
-        />
+          <input
+            ref={ref}
+            id={inputId}
+            className={cn(
+              baseInputStyles,
+              sizeStyles[size],
+              errorStyles,
+              iconPadding[iconPosition],
+              className
+            )}
+            aria-invalid={error ? 'true' : 'false'}
+            aria-describedby={cn(
+              error && errorId,
+              hint && hintId
+            )}
+            {...props}
+          />
+        </div>
 
         {/* Mensaje de error */}
         {error && (

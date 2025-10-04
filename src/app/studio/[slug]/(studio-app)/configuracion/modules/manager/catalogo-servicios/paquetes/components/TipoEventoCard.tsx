@@ -16,7 +16,7 @@ export function TipoEventoCard({ tipoEvento, studioSlug }: TipoEventoCardProps) 
     const paquetesActivos = tipoEvento.paquetes?.filter((p) => p.status === 'active') || [];
 
     const handleCrearPaquete = () => {
-        router.push(`/${studioSlug}/configuracion/catalogo/paquetes/nuevo/${tipoEvento.id}`);
+        router.push(`/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes/crear/${tipoEvento.id}`);
     };
 
     return (

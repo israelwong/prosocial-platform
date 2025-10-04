@@ -16,8 +16,10 @@ export default async function DashboardLayout({
                 <DashboardSidebarZen studioSlug={params.slug} />
                 <div className="flex flex-col flex-1 overflow-hidden">
                     <AppHeader studioSlug={params.slug} />
-                    <main className="flex-1 overflow-y-auto">
-                        {children}
+                    <main className="flex-1 overflow-y-auto bg-zinc-900/50">
+                        <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
+                            {children}
+                        </div>
                     </main>
                 </div>
             </div>

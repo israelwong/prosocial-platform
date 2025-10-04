@@ -1,64 +1,52 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import React, { useState } from 'react';
+import { ZenInput, ZenButton } from '@/components/ui/zen';
 import { Search, X } from 'lucide-react';
-import { ZenInput } from '@/components/ui/zen';
 
 interface SearchBarProps {
     onSearch: (query: string) => void;
-    placeholder?: string;
+    onClear: () => void;
+    initialQuery?: string;
 }
 
-// Debounce helper
-function debounce<T extends (...args: unknown[]) => void>(
-    func: T,
-    wait: number
-): (...args: Parameters<T>) => void {
-    let timeout: NodeJS.Timeout;
-    return (...args: Parameters<T>) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func(...args), wait);
-    };
-}
+export function SearchBar({ onSearch, onClear, initialQuery = '' }: SearchBarProps) {
+    const [query, setQuery] = useState(initialQuery);
 
-export function SearchBar({ onSearch, placeholder }: SearchBarProps) {
-    const [query, setQuery] = useState('');
-
-    // Debounce para evitar búsquedas excesivas
-    const debouncedSearch = useMemo(
-        () => debounce((q: string) => onSearch(q), 300),
-        [onSearch]
-    );
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setQuery(value);
-        debouncedSearch(value);
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSearch(query);
     };
 
     const handleClear = () => {
         setQuery('');
-        onSearch('');
+        onClear();
     };
 
     return (
-        <div className="relative">
-            <ZenInput
-                value={query}
-                onChange={handleChange}
-                placeholder={placeholder || "Buscar servicios por nombre, categoría o sección..."}
-                icon={Search}
-                iconPosition="left"
-            />
-            {query && (
-                <button
-                    onClick={handleClear}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
-                    aria-label="Limpiar búsqueda"
-                >
-                    <X className="h-4 w-4" />
-                </button>
-            )}
-        </div>
+        <form onSubmit={handleSearch} className="flex w-full items-center gap-2">
+            <div className="relative flex-grow">
+                <ZenInput
+                    placeholder="Buscar por nombre o descripción..."
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    icon={Search}
+                    iconPosition="left"
+                    className="w-full"
+                />
+                {query && (
+                    <ZenButton
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full"
+                        onClick={handleClear}
+                    >
+                        <X className="h-4 w-4" />
+                    </ZenButton>
+                )}
+            </div>
+            <ZenButton type="submit">Buscar</ZenButton>
+        </form>
     );
 }

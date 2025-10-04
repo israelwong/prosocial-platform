@@ -7,19 +7,19 @@ import { PaqueteFormulario } from '../../components/PaqueteFormulario';
 import { redirect } from 'next/navigation';
 
 interface PaqueteFormPageProps {
-    params: Promise<{
+    params: {
         slug: string;
-        accion: 'nuevo' | 'editar';
+        accion: 'crear' | 'editar';
         id: string;
-    }>;
+    };
 }
 
 export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) {
-    const { slug, accion, id } = await params;
+    const { slug, accion, id } = params;
 
     // Validar acción
-    if (accion !== 'nuevo' && accion !== 'editar') {
-        redirect(`/${slug}/configuracion/catalogo/paquetes`);
+    if (accion !== 'crear' && accion !== 'editar') {
+        redirect(`/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
     }
 
     // Obtener catálogo y configuración
@@ -63,7 +63,7 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
     if (accion === 'editar') {
         const paqueteResult = await obtenerPaquete(id);
         if (!paqueteResult.success || !paqueteResult.data) {
-            redirect(`/${slug}/configuracion/catalogo/paquetes`);
+            redirect(`/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
         }
         paquete = paqueteResult.data;
 
@@ -73,10 +73,10 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
             tipoEvento = tipoEventoResult.data;
         }
     } else {
-        // Modo nuevo: id es el eventoTipoId
+        // Modo crear: id es el eventoTipoId
         const tipoEventoResult = await obtenerTipoEventoPorId(id);
         if (!tipoEventoResult.success || !tipoEventoResult.data) {
-            redirect(`/${slug}/configuracion/catalogo/paquetes`);
+            redirect(`/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
         }
         tipoEvento = tipoEventoResult.data;
     }

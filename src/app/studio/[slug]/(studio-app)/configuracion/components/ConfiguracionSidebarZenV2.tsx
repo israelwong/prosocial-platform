@@ -16,11 +16,18 @@ export interface NavItem {
     icon: string;
 }
 
+export interface NavItemGroup {
+    id: string;
+    title: string;
+    items: NavItem[];
+}
+
 export interface NavGroup {
     id: string;
     title: string;
     icon: string;
-    items: NavItem[];
+    items?: NavItem[]; // Para grupos simples
+    subgroups?: NavItemGroup[]; // Para grupos complejos como Manager
     moduleSlug?: string;
 }
 
@@ -62,10 +69,33 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             title: 'ZEN Manager',
             icon: 'Package',
             moduleSlug: 'manager',
-            items: [
-                { id: 'tipos-evento', name: 'Tipos de Evento', href: '/modules/manager/tipos-evento', icon: 'Calendar' },
-                { id: 'catalogo-servicios', name: 'Catálogo de Servicios', href: '/modules/manager/catalogo-servicios', icon: 'Layers' },
-            ],
+            subgroups: [ // Usamos subgrupos en lugar de items
+                {
+                    id: 'oferta-comercial',
+                    title: 'Oferta Comercial',
+                    items: [
+                        { id: 'tipos-evento', name: 'Tipos de Evento', href: '/modules/manager/tipos-evento', icon: 'Calendar' },
+                        { id: 'catalogo-servicios', name: 'Catálogo de Servicios', href: '/modules/manager/catalogo-servicios', icon: 'Layers' },
+                        { id: 'paquetes', name: 'Paquetes', href: '/modules/manager/catalogo-servicios/paquetes', icon: 'Package' },
+                    ]
+                },
+                {
+                    id: 'precios-rentabilidad',
+                    title: 'Precios y Rentabilidad',
+                    items: [
+                        { id: 'precios-utilidad', name: 'Precios y Utilidad', href: '/modules/manager/precios-utilidad', icon: 'Coins' },
+                    ]
+                },
+                {
+                    id: 'gestion-recursos',
+                    title: 'Gestión de Recursos',
+                    items: [
+                        { id: 'personal', name: 'Personal', href: '/modules/manager/personal', icon: 'User' },
+                        { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/modules/manager/reglas-agendamiento', icon: 'Workflow' },
+                        { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/modules/manager/cuentas-bancarias', icon: 'CreditCard' },
+                    ]
+                }
+            ]
         },
         {
             id: 'pages',

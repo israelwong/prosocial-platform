@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
     ZenInput, ZenSidebar, ZenSidebarContent, ZenSidebarHeader, ZenSidebarFooter,
     ZenSidebarGroup, ZenSidebarGroupLabel, ZenSidebarGroupContent, ZenSidebarMenu,
-    ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuSubItem, ZenSidebarMenuSubButton
+    ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuSubItem, ZenSidebarMenuSubButton, ZenSidebarMenuButton
 } from '@/components/ui/zen';
 import { StudioHeaderModal } from './StudioHeaderModal';
 import {
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { NavigationConfig } from './ConfiguracionSidebarZenV2';
+import { cn } from '@/lib/utils';
 
 // Mapa de iconos (actualizado con todos los iconos)
 const iconMap: { [key: string]: LucideIcon } = {
@@ -30,7 +31,8 @@ interface ConfigSidebarClientContentProps {
 export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: ConfigSidebarClientContentProps) {
     const pathname = usePathname();
     const [searchTerm, setSearchTerm] = useState('');
-    const [expandedGroup, setExpandedGroup] = useState<string | null>('estudio'); // Solo un string, inicializado
+    const [expandedGroup, setExpandedGroup] = useState<string | null>('manager');
+    const [expandedSubgroups, setExpandedSubgroups] = useState<string[]>(['oferta-comercial']); // <--- ESTADO RESTAURADO
 
     const allNavGroups = useMemo(() => [
         ...navigationConfig.global,
@@ -43,14 +45,50 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
             return allNavGroups;
         }
         const lowercasedFilter = searchTerm.toLowerCase();
-        return allNavGroups.map(group => ({
-            ...group,
-            items: group.items.filter(item => item.name.toLowerCase().includes(lowercasedFilter))
-        })).filter(group => group.items.length > 0);
+
+        return allNavGroups
+            .map(group => {
+                // Si el grupo tiene subgrupos (como ZEN Manager)
+                if (group.subgroups) {
+                    const filteredSubgroups = group.subgroups
+                        .map(subgroup => ({
+                            ...subgroup,
+                            items: subgroup.items.filter(item =>
+                                item.name.toLowerCase().includes(lowercasedFilter)
+                            ),
+                        }))
+                        .filter(subgroup => subgroup.items.length > 0);
+
+                    return { ...group, subgroups: filteredSubgroups, items: [] }; // items vacio para evitar errores
+                }
+
+                // Si el grupo tiene items directos (como Global, Platform)
+                if (group.items) {
+                    const filteredItems = group.items.filter(item =>
+                        item.name.toLowerCase().includes(lowercasedFilter)
+                    );
+                    return { ...group, items: filteredItems };
+                }
+
+                return { ...group, items: [], subgroups: [] };
+            })
+            .filter(
+                group =>
+                    (group.items && group.items.length > 0) ||
+                    (group.subgroups && group.subgroups.length > 0)
+            );
     }, [searchTerm, allNavGroups]);
 
     const toggleGroup = (groupId: string) => {
-        setExpandedGroup(prev => (prev === groupId ? null : groupId)); // Si es el mismo, ciérralo; si no, ábrelo
+        setExpandedGroup(prev => (prev === groupId ? null : groupId));
+    };
+
+    const toggleSubgroup = (subgroupId: string) => { // <--- FUNCIÓN RESTAURADA
+        setExpandedSubgroups(prev =>
+            prev.includes(subgroupId)
+                ? prev.filter(id => id !== subgroupId)
+                : [...prev, subgroupId]
+        );
     };
 
     const isActive = (href: string) => {
@@ -73,7 +111,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
             <ZenSidebarContent>
                 {filteredNavGroups.map((group) => {
                     const GroupIcon = iconMap[group.icon];
-                    const isExpanded = expandedGroup === group.id; // Comprobar si este grupo está expandido
+                    const isExpanded = expandedGroup === group.id;
                     return (
                         <ZenSidebarGroup key={group.id}>
                             <ZenSidebarGroupLabel>
@@ -93,21 +131,52 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                 </button>
                             </ZenSidebarGroupLabel>
                             {isExpanded && (
-                                <ZenSidebarGroupContent>
+                                <ZenSidebarGroupContent className={cn(
+                                    group.subgroups && 'pl-2 ml-2 border-l border-zinc-800 space-y-1'
+                                )}>
                                     <ZenSidebarMenu>
-                                        <ZenSidebarMenuItem>
-                                            <ZenSidebarMenuSub>
-                                                {group.items.map((item) => (
-                                                    <ZenSidebarMenuSubItem key={item.id}>
-                                                        <ZenSidebarMenuSubButton asChild isActive={isActive(item.href)}>
-                                                            <Link href={`/${studioSlug}/configuracion${item.href}`}>
-                                                                <span className="truncate">{item.name}</span>
-                                                            </Link>
-                                                        </ZenSidebarMenuSubButton>
-                                                    </ZenSidebarMenuSubItem>
-                                                ))}
-                                            </ZenSidebarMenuSub>
-                                        </ZenSidebarMenuItem>
+                                        {group.subgroups ? (
+                                            // Renderizar subgrupos COLAPSABLES
+                                            group.subgroups.map((subgroup) => {
+                                                const isSubgroupExpanded = expandedSubgroups.includes(subgroup.id);
+                                                return (
+                                                    <ZenSidebarMenuItem key={subgroup.id}>
+                                                        <ZenSidebarMenuButton onClick={() => toggleSubgroup(subgroup.id)} className="justify-between text-zinc-400 hover:text-zinc-100">
+                                                            <span>{subgroup.title}</span>
+                                                            <ChevronDown className={`w-4 h-4 transition-transform ${isSubgroupExpanded ? 'rotate-180' : ''}`} />
+                                                        </ZenSidebarMenuButton>
+                                                        {isSubgroupExpanded && (
+                                                            <ZenSidebarMenuSub className="ml-2 pl-2 space-y-1 py-2">
+                                                                {subgroup.items.map((item) => (
+                                                                    <ZenSidebarMenuSubItem key={item.id}>
+                                                                        <ZenSidebarMenuSubButton asChild isActive={isActive(item.href)}>
+                                                                            <Link href={`/${studioSlug}/configuracion${item.href}`}>
+                                                                                <span className="truncate">{item.name}</span>
+                                                                            </Link>
+                                                                        </ZenSidebarMenuSubButton>
+                                                                    </ZenSidebarMenuSubItem>
+                                                                ))}
+                                                            </ZenSidebarMenuSub>
+                                                        )}
+                                                    </ZenSidebarMenuItem>
+                                                );
+                                            })
+                                        ) : (
+                                            // Fallback para items directos
+                                            <ZenSidebarMenuItem>
+                                                <ZenSidebarMenuSub className="ml-2 pl-2 border-l border-zinc-800 space-y-1 py-2">
+                                                    {group.items?.map((item) => (
+                                                        <ZenSidebarMenuSubItem key={item.id}>
+                                                            <ZenSidebarMenuSubButton asChild isActive={isActive(item.href)}>
+                                                                <Link href={`/${studioSlug}/configuracion${item.href}`}>
+                                                                    <span className="truncate">{item.name}</span>
+                                                                </Link>
+                                                            </ZenSidebarMenuSubButton>
+                                                        </ZenSidebarMenuSubItem>
+                                                    ))}
+                                                </ZenSidebarMenuSub>
+                                            </ZenSidebarMenuItem>
+                                        )}
                                     </ZenSidebarMenu>
                                 </ZenSidebarGroupContent>
                             )}
