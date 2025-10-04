@@ -94,9 +94,6 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                 </ZenSidebarMenu>
             </ZenSidebarContent>
 
-            <ZenSidebarFooter>
-                {/* The ZenSidebarFooter was removed as per the edit hint, so this block is now empty */}
-            </ZenSidebarFooter>
         </ZenSidebar>
     );
 }

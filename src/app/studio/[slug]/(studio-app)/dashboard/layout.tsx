@@ -10,13 +10,14 @@ export default async function DashboardLayout({
     children: React.ReactNode;
     params: { slug: string };
 }) {
+    const { slug } = await params;
     return (
         <ZenSidebarProvider>
-            <div className="flex h-screen bg-zinc-900/50 overflow-hidden">
-                <DashboardSidebarZen studioSlug={params.slug} />
+            <div className="flex h-screen overflow-hidden">
+                <DashboardSidebarZen studioSlug={slug} />
                 <div className="flex flex-col flex-1 overflow-hidden">
-                    <AppHeader studioSlug={params.slug} />
-                    <main className="flex-1 overflow-y-auto bg-zinc-900/50">
+                    <AppHeader studioSlug={slug} />
+                    <main className="flex-1 overflow-y-auto bg-zinc-900/40">
                         <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
                             {children}
                         </div>

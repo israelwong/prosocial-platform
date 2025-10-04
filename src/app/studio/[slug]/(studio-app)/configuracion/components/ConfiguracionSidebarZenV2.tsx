@@ -149,7 +149,7 @@ interface ConfiguracionSidebarZenV2Props {
     studioSlug: string;
 }
 
-// Componente principal (Server Component)
+// Componente principal (Server Component) - ASEGURAR QUE SEA ASYNC
 export async function ConfiguracionSidebarZenV2({ className, studioSlug }: ConfiguracionSidebarZenV2Props) {
     // ---- LÓGICA DE FILTRADO DESACTIVADA TEMPORALMENTE PARA DESARROLLO ----
     // const studio = await prisma.studios.findUnique({
