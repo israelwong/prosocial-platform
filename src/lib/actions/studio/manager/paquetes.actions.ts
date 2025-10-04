@@ -307,3 +307,102 @@ export async function obtenerPaquetes(studioSlug: string) {
         };
     }
 }
+
+export async function actualizarPosicionPaquete(
+    paqueteId: string,
+    studioSlug: string,
+    newIndex: number,
+    newEventoTipoId?: string
+) {
+    try {
+        // Obtener studio por slug
+        const studio = await prisma.studios.findUnique({
+            where: { slug: studioSlug }
+        });
+
+        if (!studio) {
+            return {
+                success: false,
+                error: "Studio no encontrado"
+            };
+        }
+
+        // Obtener paquete actual
+        const paquete = await prisma.studio_paquetes.findUnique({
+            where: { id: paqueteId },
+            include: {
+                paquete_servicios: true
+            }
+        });
+
+        if (!paquete) {
+            return {
+                success: false,
+                error: "Paquete no encontrado"
+            };
+        }
+
+        // Si se mueve a otro tipo de evento
+        if (newEventoTipoId && newEventoTipoId !== paquete.eventoTipoId) {
+            await prisma.studio_paquetes.update({
+                where: { id: paqueteId },
+                data: {
+                    eventoTipoId: newEventoTipoId,
+                    updatedAt: new Date()
+                }
+            });
+        }
+
+        // Actualizar posiciones de otros paquetes en el mismo tipo de evento
+        const eventoTipoId = newEventoTipoId || paquete.eventoTipoId;
+
+        // Obtener todos los paquetes del mismo tipo de evento ordenados por posición
+        const paquetesDelTipo = await prisma.studio_paquetes.findMany({
+            where: {
+                eventoTipoId: eventoTipoId,
+                id: { not: paqueteId }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        // Reordenar posiciones
+        const paquetesParaActualizar = [];
+
+        for (let i = 0; i < paquetesDelTipo.length; i++) {
+            if (i < newIndex) {
+                paquetesParaActualizar.push({
+                    id: paquetesDelTipo[i].id,
+                    posicion: i
+                });
+            } else {
+                paquetesParaActualizar.push({
+                    id: paquetesDelTipo[i].id,
+                    posicion: i + 1
+                });
+            }
+        }
+
+        // Actualizar posiciones en batch
+        for (const update of paquetesParaActualizar) {
+            await prisma.studio_paquetes.update({
+                where: { id: update.id },
+                data: {
+                    updatedAt: new Date()
+                }
+            });
+        }
+
+        revalidatePath(`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+
+        return {
+            success: true,
+            message: "Posición actualizada exitosamente"
+        };
+    } catch (error) {
+        console.error("Error actualizando posición del paquete:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Error desconocido"
+        };
+    }
+}
