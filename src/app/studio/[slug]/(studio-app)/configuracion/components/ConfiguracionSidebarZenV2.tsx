@@ -22,6 +22,7 @@ export interface NavGroup {
     icon: string;
     items?: NavItem[]; // Para grupos simples
     subgroups?: NavItemGroup[]; // Para grupos complejos como Manager
+    mixedItems?: (NavItem | NavItemGroup)[]; // Para orden mixto
     moduleSlug?: string;
 }
 
@@ -63,12 +64,12 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             title: 'ZEN Manager',
             icon: 'Package',
             moduleSlug: 'manager',
-            items: [
+            mixedItems: [
+                // Items directos primero
                 { id: 'personal', name: 'Personal', href: '/modules/manager/personal', icon: 'User' },
                 { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/modules/manager/reglas-agendamiento', icon: 'Workflow' },
                 { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/modules/manager/cuentas-bancarias', icon: 'CreditCard' },
-            ],
-            subgroups: [
+                // Subgrupos después
                 {
                     id: 'oferta-comercial',
                     title: 'Oferta Comercial',
@@ -85,7 +86,7 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                         { id: 'precios-utilidad', name: 'Precios y Utilidad', href: '/modules/manager/precios-utilidad', icon: 'Coins' },
                     ]
                 }
-            ]
+            ],
         },
         {
             id: 'pages',
