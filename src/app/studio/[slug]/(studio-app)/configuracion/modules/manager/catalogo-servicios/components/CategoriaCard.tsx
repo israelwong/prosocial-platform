@@ -132,13 +132,13 @@ export function CategoriaCard({
 
                     {/* Botón agregar servicio */}
                     <ZenButton
-                        variant="ghost"
+                        variant="primary"
                         size="sm"
                         onClick={() => onAddServicio(categoria.id)}
-                        className="flex items-center gap-1 text-xs"
+                        className="flex items-center gap-1.5 text-xs font-medium shadow-sm hover:shadow-md transition-all duration-200"
                     >
-                        <Plus className="h-3.5 w-3.5" />
-                        Servicio
+                        <Plus className="h-4 w-4" />
+                        Agregar Servicio
                     </ZenButton>
                 </div>
 

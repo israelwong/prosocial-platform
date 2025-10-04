@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Pencil, Plus, Trash2, FolderOpen } from 'lucide-react';
+import { Pencil, Plus, Trash2, FolderOpen } from 'lucide-react';
 import { ZenBadge, ZenButton } from '@/components/ui/zen';
 import { CategoriaCard } from './CategoriaCard';
 import type { SeccionData, CategoriaData, ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
@@ -99,16 +99,6 @@ export function SeccionCard({
                 {/* Header de sección */}
                 <div className="flex items-center justify-between gap-3 mb-4">
                     <div className="flex items-center gap-3 overflow-hidden flex-1">
-                        {/* Drag Handle */}
-                        <button
-                            {...attributes}
-                            {...listeners}
-                            className="cursor-grab active:cursor-grabbing text-zinc-400 hover:text-zinc-300 p-1"
-                            aria-label="Arrastrar sección"
-                        >
-                            <GripVertical className="h-6 w-6" />
-                        </button>
-
                         {/* Contenido */}
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
@@ -170,7 +160,7 @@ export function SeccionCard({
 
                 {/* Lista de categorías */}
                 {!hideChildren && (
-                    <div className="ml-0 md:ml-8">
+                    <div>
                         {tieneCategorias ? (
                             <SortableContext
                                 items={seccion.categorias.map((c) => c.id)}

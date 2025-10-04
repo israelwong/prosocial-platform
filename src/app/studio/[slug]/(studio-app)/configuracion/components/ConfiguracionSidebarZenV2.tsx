@@ -1,12 +1,6 @@
 
 import React from 'react';
-import { prisma } from '@/lib/prisma';
-import { getActiveModules } from '@/lib/modules';
 import { ConfigSidebarClientContent } from './ConfigSidebarClientContent';
-import {
-    Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
-    LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2 // Nuevos iconos
-} from 'lucide-react';
 
 // Interfaces de tipos (icon es ahora string)
 export interface NavItem {
