@@ -63,7 +63,12 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             title: 'ZEN Manager',
             icon: 'Package',
             moduleSlug: 'manager',
-            subgroups: [ // Usamos subgrupos en lugar de items
+            items: [
+                { id: 'personal', name: 'Personal', href: '/modules/manager/personal', icon: 'User' },
+                { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/modules/manager/reglas-agendamiento', icon: 'Workflow' },
+                { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/modules/manager/cuentas-bancarias', icon: 'CreditCard' },
+            ],
+            subgroups: [
                 {
                     id: 'oferta-comercial',
                     title: 'Oferta Comercial',
@@ -78,15 +83,6 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                     title: 'Precios y Rentabilidad',
                     items: [
                         { id: 'precios-utilidad', name: 'Precios y Utilidad', href: '/modules/manager/precios-utilidad', icon: 'Coins' },
-                    ]
-                },
-                {
-                    id: 'gestion-recursos',
-                    title: 'Gestión de Recursos',
-                    items: [
-                        { id: 'personal', name: 'Personal', href: '/modules/manager/personal', icon: 'User' },
-                        { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/modules/manager/reglas-agendamiento', icon: 'Workflow' },
-                        { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/modules/manager/cuentas-bancarias', icon: 'CreditCard' },
                     ]
                 }
             ]
@@ -139,12 +135,11 @@ const NAVIGATION_CONFIG: NavigationConfig = {
 };
 
 interface ConfiguracionSidebarZenV2Props {
-    className?: string;
     studioSlug: string;
 }
 
 // Componente principal (Server Component) - ASEGURAR QUE SEA ASYNC
-export async function ConfiguracionSidebarZenV2({ className, studioSlug }: ConfiguracionSidebarZenV2Props) {
+export async function ConfiguracionSidebarZenV2({ studioSlug }: ConfiguracionSidebarZenV2Props) {
     // ---- LÓGICA DE FILTRADO DESACTIVADA TEMPORALMENTE PARA DESARROLLO ----
     // const studio = await prisma.studios.findUnique({
     //     where: { slug: studioSlug },

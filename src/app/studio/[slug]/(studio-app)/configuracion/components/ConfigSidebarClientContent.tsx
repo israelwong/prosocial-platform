@@ -32,7 +32,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
     const pathname = usePathname();
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedGroup, setExpandedGroup] = useState<string | null>('manager');
-    const [expandedSubgroups, setExpandedSubgroups] = useState<string[]>(['oferta-comercial', 'precios-rentabilidad', 'gestion-recursos']);
+    const [expandedSubgroups, setExpandedSubgroups] = useState<string[]>(['oferta-comercial', 'precios-rentabilidad']);
 
     const allNavGroups = useMemo(() => [
         ...navigationConfig.global,
