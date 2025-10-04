@@ -135,35 +135,11 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                     group.subgroups && 'pl-2 ml-2 border-l border-zinc-800 space-y-1'
                                 )}>
                                     <ZenSidebarMenu>
-                                        {group.subgroups ? (
-                                            group.subgroups.map((subgroup) => {
-                                                const isSubgroupExpanded = expandedSubgroups.includes(subgroup.id);
-                                                return (
-                                                    <ZenSidebarMenuItem key={subgroup.id}>
-                                                        <ZenSidebarMenuButton onClick={() => toggleSubgroup(subgroup.id)} className="justify-between text-zinc-400 hover:text-zinc-100">
-                                                            <span>{subgroup.title}</span>
-                                                            <ChevronDown className={`w-4 h-4 transition-transform ${isSubgroupExpanded ? 'rotate-180' : ''}`} />
-                                                        </ZenSidebarMenuButton>
-                                                        {isSubgroupExpanded && (
-                                                            <ZenSidebarMenuSub className="space-y-1 py-2">
-                                                                {subgroup.items.map((item) => (
-                                                                    <ZenSidebarMenuItem key={item.id}>
-                                                                        <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                            <Link href={`/${studioSlug}/configuracion${item.href}`}>
-                                                                                <span className="truncate">{item.name}</span>
-                                                                            </Link>
-                                                                        </ZenSidebarMenuButton>
-                                                                    </ZenSidebarMenuItem>
-                                                                ))}
-                                                            </ZenSidebarMenuSub>
-                                                        )}
-                                                    </ZenSidebarMenuItem>
-                                                );
-                                            })
-                                        ) : (
+                                        {/* Items directos (si existen) */}
+                                        {group.items && group.items.length > 0 && (
                                             <ZenSidebarMenuItem>
                                                 <ZenSidebarMenuSub className="ml-2 pl-2 border-l border-zinc-800 space-y-1 py-2">
-                                                    {group.items?.map((item) => (
+                                                    {group.items.map((item) => (
                                                         <ZenSidebarMenuItem key={item.id}>
                                                             <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
                                                                 <Link href={`/${studioSlug}/configuracion${item.href}`}>
@@ -174,6 +150,36 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                     ))}
                                                 </ZenSidebarMenuSub>
                                             </ZenSidebarMenuItem>
+                                        )}
+                                        
+                                        {/* Subgrupos (si existen) */}
+                                        {group.subgroups && group.subgroups.length > 0 && (
+                                            <>
+                                                {group.subgroups.map((subgroup) => {
+                                                    const isSubgroupExpanded = expandedSubgroups.includes(subgroup.id);
+                                                    return (
+                                                        <ZenSidebarMenuItem key={subgroup.id}>
+                                                            <ZenSidebarMenuButton onClick={() => toggleSubgroup(subgroup.id)} className="justify-between text-zinc-400 hover:text-zinc-100">
+                                                                <span>{subgroup.title}</span>
+                                                                <ChevronDown className={`w-4 h-4 transition-transform ${isSubgroupExpanded ? 'rotate-180' : ''}`} />
+                                                            </ZenSidebarMenuButton>
+                                                            {isSubgroupExpanded && (
+                                                                <ZenSidebarMenuSub className="space-y-1 py-2">
+                                                                    {subgroup.items.map((item) => (
+                                                                        <ZenSidebarMenuItem key={item.id}>
+                                                                            <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
+                                                                                <Link href={`/${studioSlug}/configuracion${item.href}`}>
+                                                                                    <span className="truncate">{item.name}</span>
+                                                                                </Link>
+                                                                            </ZenSidebarMenuButton>
+                                                                        </ZenSidebarMenuItem>
+                                                                    ))}
+                                                                </ZenSidebarMenuSub>
+                                                            )}
+                                                        </ZenSidebarMenuItem>
+                                                    );
+                                                })}
+                                            </>
                                         )}
                                     </ZenSidebarMenu>
                                 </ZenSidebarGroupContent>
