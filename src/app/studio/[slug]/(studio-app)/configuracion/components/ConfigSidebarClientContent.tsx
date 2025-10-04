@@ -138,7 +138,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                         {/* Items directos (si existen) */}
                                         {group.items && group.items.length > 0 && (
                                             <ZenSidebarMenuItem>
-                                                <ZenSidebarMenuSub className="ml-2 pl-2 border-l border-zinc-800 space-y-1 py-2">
+                                                <ZenSidebarMenuSub className="space-y-1 py-2">
                                                     {group.items.map((item) => (
                                                         <ZenSidebarMenuItem key={item.id}>
                                                             <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
