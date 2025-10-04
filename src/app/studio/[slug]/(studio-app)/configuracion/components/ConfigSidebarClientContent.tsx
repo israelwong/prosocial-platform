@@ -138,7 +138,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                 {group.mixedItems.map((item) => {
                                                     // Verificar si es un item directo o un subgrupo
                                                     const isSubgroup = 'items' in item;
-                                                    
+
                                                     if (isSubgroup) {
                                                         // Es un subgrupo
                                                         const subgroup = item as NavItemGroup;

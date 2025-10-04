@@ -68,7 +68,6 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                 // Items directos primero
                 { id: 'personal', name: 'Personal', href: '/modules/manager/personal', icon: 'User' },
                 { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/modules/manager/reglas-agendamiento', icon: 'Workflow' },
-                { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/modules/manager/cuentas-bancarias', icon: 'CreditCard' },
                 // Subgrupos después
                 {
                     id: 'oferta-comercial',
@@ -85,7 +84,8 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                     items: [
                         { id: 'precios-utilidad', name: 'Precios y Utilidad', href: '/modules/manager/precios-utilidad', icon: 'Coins' },
                     ]
-                }
+                },
+                { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/modules/manager/cuentas-bancarias', icon: 'CreditCard' },
             ],
         },
         {
