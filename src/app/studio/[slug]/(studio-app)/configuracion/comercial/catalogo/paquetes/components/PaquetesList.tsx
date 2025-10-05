@@ -176,7 +176,7 @@ export function PaquetesList({ paquetes, studioSlug }: PaquetesListProps) {
                                 </div>
 
                                 <div className="flex items-center gap-2 ml-4">
-                                    <Link href={`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes/editar/${paquete.id}`}>
+                                    <Link href={`/studio/${studioSlug}/configuracion/comercial/catalogo-servicios/paquetes/editar/${paquete.id}`}>
                                         <ZenButton variant="secondary" size="sm">
                                             <Edit className="w-4 h-4" />
                                         </ZenButton>

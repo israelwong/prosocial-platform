@@ -22,7 +22,7 @@ export function PaqueteItem({ paquete, studioSlug }: PaqueteItemProps) {
     }).format(paquete.precio || 0);
 
     const handleEditar = () => {
-        router.push(`/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes/editar/${paquete.id}`);
+        router.push(`/${studioSlug}/configuracion/comercial/catalogo-servicios/paquetes/editar/${paquete.id}`);
     };
 
     const handleEliminar = async () => {

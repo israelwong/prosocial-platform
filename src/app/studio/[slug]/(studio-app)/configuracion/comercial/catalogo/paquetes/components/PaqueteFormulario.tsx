@@ -253,7 +253,7 @@ export function CotizacionFormularioClient({
 
                 // Redireccionar después de un breve delay
                 setTimeout(() => {
-                    router.push(`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes`)
+                    router.push(`/studio/${studioSlug}/configuracion/comercial/catalogo-servicios/paquetes`)
                 }, 1500)
             } else {
                 toast.error('Error al guardar paquete', {
