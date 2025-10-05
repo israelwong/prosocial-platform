@@ -1,1063 +1,795 @@
-import { prisma } from '../src/lib/prisma';
-import { seedModules } from './seeds/modules-seed';
+// prisma/seed.ts
+/**
+ * SEED MAESTRO V2.1
+ * 
+ * Inicializa TODA la base de datos con datos funcionales de prueba:
+ * - Platform core (módulos, planes, canales)
+ * - Demo Studio completo
+ * - Usuarios multi-contexto
+ * - Pipelines V2.0
+ * - Catálogo de servicios
+ * 
+ * Uso: npx prisma db seed
+ */
+
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+// ============================================
+// CONSTANTES
+// ============================================
+
+const DEMO_STUDIO_ID = 'demo-studio-id';
+const DEMO_STUDIO_SLUG = 'demo-studio';
+
+// ============================================
+// MAIN SEED
+// ============================================
 
 async function main() {
-    console.log('🌱 Iniciando seed con nueva arquitectura Supabase Auth...');
+    console.log('🌱 Iniciando SEED MAESTRO V2.1...\n');
 
-    // 0. Seed de Módulos de Plataforma
-    await seedModules();
-
-    // 1. Seed de plataformas de redes sociales
+    // 1. Platform Core
+    await seedPlatformModules();
     await seedSocialNetworks();
-
-    // 2. Seed de canales de adquisición
     await seedAcquisitionChannels();
 
-    // 3. Seed de plataformas de publicidad
-    await seedAdvertisingPlatforms();
-
-    // 4. Seed de categorías y servicios
-    await seedCategoriasYServicios();
-
-    // 5. Seed de pipelines y etapas
-    await seedPipelineStages();
-
-    // 6. Seed de planes
+    // 2. Billing
     await seedPlans();
 
-    // 7. Seed de métodos de pago
-    await seedMetodosPago();
-
-    // 8. Seed de categorías de personal
-    await seedCategoriasPersonal();
-
-    // 9. Seed de perfiles de personal
-    await seedPerfilesPersonal();
-
-    // 10. Seed de usuarios de plataforma
-    await seedPlatformUsers();
-
-    // 11. Seed de proyecto demo-studio
+    // 3. Demo Studio
     await seedDemoStudio();
 
-    console.log('🎉 Seed completado exitosamente!');
+    // 4. Usuarios Multi-Contexto
+    await seedUsers();
+
+    // 5. Pipelines V2.0
+    await seedPipelines();
+
+    // 6. Catálogo
+    await seedCatalogo();
+
+    // 7. Tipos de Evento
+    await seedTiposEvento();
+
+    // 8. Demo Lead
+    await seedDemoLead();
+
+    console.log('\n✅ SEED MAESTRO COMPLETADO\n');
+    console.log('📊 Resumen:');
+    console.log('  ✅ Módulos de plataforma');
+    console.log('  ✅ Planes con límites');
+    console.log('  ✅ Demo Studio configurado');
+    console.log('  ✅ Usuarios multi-contexto');
+    console.log('  ✅ Pipelines Marketing + Manager');
+    console.log('  ✅ Catálogo de servicios');
+    console.log('  ✅ Tipos de evento');
+    console.log('  ✅ Demo Lead asociado\n');
+    console.log('🔗 Acceso:');
+    console.log('  Super Admin: admin@prosocial.mx');
+    console.log('  Studio Owner: owner@demo-studio.com');
+    console.log('  Studio URL: /demo-studio\n');
 }
 
-async function seedSocialNetworks() {
-    console.log('📱 Seeding plataformas de redes sociales...');
+// ============================================
+// 1. PLATFORM MODULES
+// ============================================
 
-    const plataformas = [
+async function seedPlatformModules() {
+    console.log('🧩 Seeding platform modules...');
+
+    const modules = [
+        // CORE MODULES (incluidos en planes)
         {
-            id: 'facebook',
+            slug: 'manager',
+            name: 'ZEN Manager',
+            description: 'Sistema de gestión operacional - Kanban, Gantt, equipo',
+            category: 'CORE' as const,
+            base_price: null,
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+        {
+            slug: 'magic',
+            name: 'ZEN Magic',
+            description: 'Asistente inteligente con IA - Claude integration',
+            category: 'CORE' as const,
+            base_price: null,
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+        {
+            slug: 'marketing',
+            name: 'ZEN Marketing',
+            description: 'CRM y pipeline de ventas - Leads, cotizaciones',
+            category: 'CORE' as const,
+            base_price: null,
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+        {
+            slug: 'pages',
+            name: 'ZEN Pages',
+            description: 'Landing page pública - Portfolios, lead forms',
+            category: 'CORE' as const,
+            base_price: null,
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+
+        // ADDON MODULES (pago adicional)
+        {
+            slug: 'payment',
+            name: 'ZEN Payment',
+            description: 'Procesamiento de pagos - Stripe Connect',
+            category: 'ADDON' as const,
+            base_price: 199, // MXN/mes
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+        {
+            slug: 'cloud',
+            name: 'ZEN Cloud',
+            description: 'Almacenamiento extra - CDN, galerías',
+            category: 'ADDON' as const,
+            base_price: 299, // MXN/mes
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+        {
+            slug: 'conversations',
+            name: 'ZEN Conversations',
+            description: 'Chat en tiempo real - WhatsApp, SMS',
+            category: 'ADDON' as const,
+            base_price: 249, // MXN/mes
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+        {
+            slug: 'invitation',
+            name: 'ZEN Invitation',
+            description: 'Invitaciones digitales - RSVP, QR codes',
+            category: 'ADDON' as const,
+            base_price: 149, // MXN/mes
+            billing_type: 'MONTHLY',
+            is_active: true,
+        },
+    ];
+
+    for (const moduleData of modules) {
+        await prisma.platform_modules.upsert({
+            where: { slug: moduleData.slug },
+            update: { updated_at: new Date() },
+            create: {
+                ...moduleData,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+        });
+        console.log(`  ✅ ${moduleData.name} (${moduleData.category})`);
+    }
+}
+
+// ============================================
+// 2. SOCIAL NETWORKS
+// ============================================
+
+async function seedSocialNetworks() {
+    console.log('📱 Seeding social networks...');
+
+    const networks = [
+        {
             name: 'Facebook',
             slug: 'facebook',
-            description: 'Red social para conectar con amigos y familia',
             color: '#1877F2',
             icon: 'facebook',
             baseUrl: 'https://facebook.com/',
             order: 1,
-            isActive: true,
-            updatedAt: new Date()
         },
         {
-            id: 'instagram',
             name: 'Instagram',
             slug: 'instagram',
-            description: 'Plataforma para compartir fotos y videos',
             color: '#E4405F',
             icon: 'instagram',
             baseUrl: 'https://instagram.com/',
             order: 2,
-            isActive: true,
-            updatedAt: new Date()
         },
         {
-            id: 'threads',
-            name: 'Threads',
-            slug: 'threads',
-            description: 'Red social de conversaciones de Meta',
-            color: '#000000',
-            icon: 'threads',
-            baseUrl: 'https://threads.net/',
-            order: 3,
-            isActive: true,
-            updatedAt: new Date()
-        },
-        {
-            id: 'youtube',
-            name: 'YouTube',
-            slug: 'youtube',
-            description: 'Plataforma de videos y contenido multimedia',
-            color: '#FF0000',
-            icon: 'youtube',
-            baseUrl: 'https://youtube.com/',
-            order: 4,
-            isActive: true,
-            updatedAt: new Date()
-        },
-        {
-            id: 'tiktok',
             name: 'TikTok',
             slug: 'tiktok',
-            description: 'Plataforma de videos cortos y entretenimiento',
             color: '#000000',
             icon: 'tiktok',
-            baseUrl: 'https://tiktok.com/',
-            order: 5,
-            isActive: true,
-            updatedAt: new Date()
-        }
+            baseUrl: 'https://tiktok.com/@',
+            order: 3,
+        },
+        {
+            name: 'YouTube',
+            slug: 'youtube',
+            color: '#FF0000',
+            icon: 'youtube',
+            baseUrl: 'https://youtube.com/@',
+            order: 4,
+        },
     ];
 
-    for (const plataforma of plataformas) {
+    for (const network of networks) {
         await prisma.platform_social_networks.upsert({
-            where: { id: plataforma.id },
-            update: plataforma,
-            create: plataforma
+            where: { slug: network.slug },
+            update: { updatedAt: new Date() },
+            create: {
+                ...network,
+                isActive: true,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
         });
-        console.log(`✅ Plataforma: ${plataforma.name}`);
+        console.log(`  ✅ ${network.name}`);
     }
 }
 
-async function seedAcquisitionChannels() {
-    console.log('📊 Seeding canales de adquisición...');
+// ============================================
+// 3. ACQUISITION CHANNELS
+// ============================================
 
-    const canales = [
+async function seedAcquisitionChannels() {
+    console.log('📊 Seeding acquisition channels...');
+
+    const channels = [
         {
-            id: 'canal-referidos',
             name: 'Referidos',
             description: 'Clientes referidos por otros clientes',
             color: '#10B981',
             icon: 'users',
-            isActive: true,
-            isVisible: true,
             order: 1,
-            updatedAt: new Date()
         },
         {
-            id: 'canal-redes-sociales',
             name: 'Redes Sociales',
-            description: 'Leads provenientes de redes sociales',
+            description: 'Leads de Instagram, Facebook, TikTok',
             color: '#3B82F6',
             icon: 'share-2',
-            isActive: true,
-            isVisible: true,
             order: 2,
-            updatedAt: new Date()
         },
         {
-            id: 'canal-google-ads',
             name: 'Google Ads',
-            description: 'Publicidad en Google Ads',
+            description: 'Publicidad en Google',
             color: '#F59E0B',
             icon: 'search',
-            isActive: true,
-            isVisible: true,
             order: 3,
-            updatedAt: new Date()
         },
         {
-            id: 'canal-web-organico',
             name: 'Web Orgánico',
             description: 'Tráfico orgánico del sitio web',
             color: '#8B5CF6',
             icon: 'globe',
-            isActive: true,
-            isVisible: true,
             order: 4,
-            updatedAt: new Date()
         },
-        {
-            id: 'canal-eventos',
-            name: 'Eventos',
-            description: 'Ferias, bodas, eventos presenciales',
-            color: '#EF4444',
-            icon: 'calendar',
-            isActive: true,
-            isVisible: true,
-            order: 5,
-            updatedAt: new Date()
-        }
     ];
 
-    for (const canal of canales) {
+    for (const channel of channels) {
         await prisma.platform_acquisition_channels.upsert({
-            where: { id: canal.id },
-            update: canal,
-            create: canal
-        });
-        console.log(`✅ Canal: ${canal.name}`);
-    }
-}
-
-async function seedAdvertisingPlatforms() {
-    console.log('📢 Seeding plataformas de publicidad...');
-
-    const plataformas = [
-        {
-            id: 'google-ads',
-            name: 'Google Ads',
-            description: 'Plataforma de publicidad de Google',
-            type: 'search',
-            color: '#4285F4',
-            icon: 'search',
-            isActive: true,
-            order: 1,
-            updatedAt: new Date()
-        },
-        {
-            id: 'facebook-ads',
-            name: 'Facebook Ads',
-            description: 'Plataforma de publicidad de Meta (Facebook/Instagram)',
-            type: 'social',
-            color: '#1877F2',
-            icon: 'facebook',
-            isActive: true,
-            order: 2,
-            updatedAt: new Date()
-        },
-        {
-            id: 'instagram-ads',
-            name: 'Instagram Ads',
-            description: 'Publicidad en Instagram',
-            type: 'social',
-            color: '#E4405F',
-            icon: 'instagram',
-            isActive: true,
-            order: 3,
-            updatedAt: new Date()
-        },
-        {
-            id: 'youtube-ads',
-            name: 'YouTube Ads',
-            description: 'Publicidad en YouTube',
-            type: 'video',
-            color: '#FF0000',
-            icon: 'youtube',
-            isActive: true,
-            order: 4,
-            updatedAt: new Date()
-        }
-    ];
-
-    for (const plataforma of plataformas) {
-        await prisma.platform_advertising_platforms.upsert({
-            where: { id: plataforma.id },
-            update: plataforma,
-            create: plataforma
-        });
-        console.log(`✅ Plataforma publicitaria: ${plataforma.name}`);
-    }
-}
-
-async function seedCategoriasYServicios() {
-    console.log('📂 Seeding categorías y servicios...');
-
-    // Crear categorías de servicios
-    const categorias = [
-        {
-            id: 'cat-comercial-ventas',
-            name: 'Comercial y Ventas',
-            description: 'Herramientas para gestión comercial y ventas',
-            icon: 'DollarSign',
-            posicion: 1,
-            active: true
-        },
-        {
-            id: 'cat-portal-cotizacion',
-            name: 'Portal de Cotización',
-            description: 'Sistema de cotizaciones y presentaciones',
-            icon: 'FileText',
-            posicion: 2,
-            active: true
-        },
-        {
-            id: 'cat-gestion-finanzas',
-            name: 'Gestión y Finanzas',
-            description: 'Herramientas de gestión empresarial y financiera',
-            icon: 'BarChart3',
-            posicion: 3,
-            active: true
-        }
-    ];
-
-    for (const categoria of categorias) {
-        await prisma.service_categories.upsert({
-            where: { id: categoria.id },
-            update: categoria,
-            create: categoria
-        });
-        console.log(`✅ Categoría: ${categoria.name}`);
-    }
-
-    // Crear servicios básicos
-    const servicios = [
-        {
-            id: 'srv-portafolio-landing',
-            name: 'Portafolio (Landing Page)',
-            slug: 'portafolio-landing-page',
-            description: 'Landing page personalizada para mostrar el portafolio del estudio',
-            categoryId: 'cat-comercial-ventas',
-            active: true,
-            posicion: 1
-        },
-        {
-            id: 'srv-crm-gestion-contactos',
-            name: 'CRM y Gestión de Contactos',
-            slug: 'crm-gestion-contactos',
-            description: 'Sistema de gestión de relaciones con clientes y contactos',
-            categoryId: 'cat-comercial-ventas',
-            active: true,
-            posicion: 2
-        },
-        {
-            id: 'srv-pipeline-kanban-estandar',
-            name: 'Pipeline (Kanban) Estándar',
-            slug: 'pipeline-kanban-estandar',
-            description: 'Pipeline de ventas con Kanban estándar',
-            categoryId: 'cat-comercial-ventas',
-            active: true,
-            posicion: 3
-        }
-    ];
-
-    for (const servicio of servicios) {
-        await prisma.platform_services.upsert({
-            where: { id: servicio.id },
-            update: servicio,
-            create: servicio
-        });
-        console.log(`✅ Servicio: ${servicio.name}`);
-    }
-}
-
-async function seedPipelineStages() {
-    console.log('🌱 Seeding pipeline types and stages...');
-
-    // Crear tipo de pipeline comercial
-    const pipelineType = await prisma.platform_pipeline_types.upsert({
-        where: { id: 'pipeline-comercial' },
-        update: {
-            nombre: 'Pipeline Comercial',
-            descripcion: 'Pipeline para gestión de leads comerciales y ventas',
-            color: '#3B82F6',
-            activo: true,
-            orden: 1,
-            updatedAt: new Date()
-        },
-        create: {
-            id: 'pipeline-comercial',
-            nombre: 'Pipeline Comercial',
-            descripcion: 'Pipeline para gestión de leads comerciales y ventas',
-            color: '#3B82F6',
-            activo: true,
-            orden: 1,
-            updatedAt: new Date()
-        }
-    });
-    console.log(`✅ Pipeline type: ${pipelineType.nombre}`);
-
-    // Etapas para Pipeline Comercial
-    const etapasComercial = [
-        {
-            id: 'stage-comercial-nuevos',
-            nombre: 'Nuevos Leads',
-            descripcion: 'Leads recién capturados que necesitan contacto inicial',
-            color: '#3B82F6',
-            orden: 1,
-            isActive: true,
-            pipeline_type_id: 'pipeline-comercial'
-        },
-        {
-            id: 'stage-comercial-contactados',
-            nombre: 'Contactados',
-            descripcion: 'Leads que han sido contactados por primera vez',
-            color: '#8B5CF6',
-            orden: 2,
-            isActive: true,
-            pipeline_type_id: 'pipeline-comercial'
-        },
-        {
-            id: 'stage-comercial-interesados',
-            nombre: 'Interesados',
-            descripcion: 'Leads que mostraron interés en los servicios',
-            color: '#EAB308',
-            orden: 3,
-            isActive: true,
-            pipeline_type_id: 'pipeline-comercial'
-        },
-        {
-            id: 'stage-comercial-cotizacion',
-            nombre: 'En Cotización',
-            descripcion: 'Leads que están en proceso de cotización',
-            color: '#F59E0B',
-            orden: 4,
-            isActive: true,
-            pipeline_type_id: 'pipeline-comercial'
-        },
-        {
-            id: 'stage-comercial-convertidos',
-            nombre: 'Convertidos',
-            descripcion: 'Leads que se convirtieron en clientes',
-            color: '#10B981',
-            orden: 5,
-            isActive: true,
-            pipeline_type_id: 'pipeline-comercial'
-        },
-        {
-            id: 'stage-comercial-perdidos',
-            nombre: 'Perdidos',
-            descripcion: 'Leads que no se pudieron convertir',
-            color: '#6B7280',
-            orden: 6,
-            isActive: true,
-            pipeline_type_id: 'pipeline-comercial'
-        }
-    ];
-
-    for (const etapa of etapasComercial) {
-        await prisma.platform_pipeline_stages.upsert({
-            where: { id: etapa.id },
-            update: {
-                ...etapa,
-                updatedAt: new Date()
-            },
+            where: { name: channel.name },
+            update: { updatedAt: new Date() },
             create: {
-                ...etapa,
-                updatedAt: new Date()
-            }
+                ...channel,
+                isActive: true,
+                isVisible: true,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            },
         });
-        console.log(`✅ Etapa comercial: ${etapa.nombre}`);
+        console.log(`  ✅ ${channel.name}`);
     }
 }
+
+// ============================================
+// 4. PLANS (con límites normalizados)
+// ============================================
 
 async function seedPlans() {
-    console.log('🌱 Seeding plans...');
+    console.log('💳 Seeding plans with limits...');
 
-    // Plan Básico
-    const planBasico = await prisma.platform_plans.upsert({
+    // PLAN BASIC
+    const planBasic = await prisma.platform_plans.upsert({
         where: { slug: 'basic' },
         update: {},
         create: {
-            name: 'Plan Básico',
-            description: 'Perfecto para estudios pequeños que están comenzando',
+            name: 'Basic',
             slug: 'basic',
-            price_monthly: 29.99,
-            price_yearly: 299.99,
+            description: 'Para estudios pequeños que están comenzando',
+            price_monthly: 399, // MXN
+            price_yearly: 3990, // MXN (ahorro 17%)
+            stripe_product_id: 'prod_basic_demo',
+            stripe_price_id: 'price_basic_demo',
             features: {
-                eventos_mensuales: 10,
-                clientes_maximos: 50,
-                storage_gb: 5,
-                soporte: 'email',
-                reportes_basicos: true,
-                integracion_stripe: true,
-                dominio_personalizado: false,
-                api_access: false
+                modules: ['manager'],
+                support: 'email',
+                analytics: 'basic',
             },
-            limits: {
-                eventos_simultaneos: 3,
-                usuarios_equipo: 2,
-                cotizaciones_mensuales: 20,
-                backup_automatico: false
-            },
-            stripe_price_id: 'price_demo_basic',
-            stripe_product_id: 'prod_demo_basic',
             popular: false,
             active: true,
-            orden: 1
-        }
+            orden: 1,
+        },
     });
 
-    // Plan Pro
+    // Límites del plan Basic
+    await prisma.plan_limits.createMany({
+        data: [
+            { plan_id: planBasic.id, limit_type: 'EVENTS_PER_MONTH', limit_value: 10, unit: 'eventos' },
+            { plan_id: planBasic.id, limit_type: 'STORAGE_GB', limit_value: 5, unit: 'GB' },
+            { plan_id: planBasic.id, limit_type: 'TEAM_MEMBERS', limit_value: 3, unit: 'usuarios' },
+            { plan_id: planBasic.id, limit_type: 'PORTFOLIOS', limit_value: 2, unit: 'portfolios' },
+        ],
+        skipDuplicates: true,
+    });
+    console.log(`  ✅ ${planBasic.name} (10 eventos/mes, 5GB)`);
+
+    // PLAN PRO
     const planPro = await prisma.platform_plans.upsert({
         where: { slug: 'pro' },
         update: {},
         create: {
-            name: 'Plan Pro',
-            description: 'Ideal para estudios en crecimiento',
+            name: 'Pro',
             slug: 'pro',
-            price_monthly: 59.99,
-            price_yearly: 599.99,
+            description: 'Para estudios en crecimiento',
+            price_monthly: 699, // MXN
+            price_yearly: 6990, // MXN (ahorro 17%)
+            stripe_product_id: 'prod_pro_demo',
+            stripe_price_id: 'price_pro_demo',
             features: {
-                eventos_mensuales: 50,
-                clientes_maximos: 200,
-                storage_gb: 25,
-                soporte: 'email_telefono',
-                reportes_avanzados: true,
-                integracion_stripe: true,
-                dominio_personalizado: true,
-                api_access: true
+                modules: ['manager', 'marketing', 'magic', 'pages'],
+                support: 'email_chat',
+                analytics: 'advanced',
             },
-            limits: {
-                eventos_simultaneos: 10,
-                usuarios_equipo: 5,
-                cotizaciones_mensuales: 100,
-                backup_automatico: true
-            },
-            stripe_price_id: 'price_demo_pro',
-            stripe_product_id: 'prod_demo_pro',
             popular: true,
             active: true,
-            orden: 2
-        }
+            orden: 2,
+        },
     });
 
-    console.log('✅ Plans seeded successfully:');
-    console.log(`  - ${planBasico.name} (${planBasico.slug})`);
-    console.log(`  - ${planPro.name} (${planPro.slug})`);
+    await prisma.plan_limits.createMany({
+        data: [
+            { plan_id: planPro.id, limit_type: 'EVENTS_PER_MONTH', limit_value: 30, unit: 'eventos' },
+            { plan_id: planPro.id, limit_type: 'STORAGE_GB', limit_value: 25, unit: 'GB' },
+            { plan_id: planPro.id, limit_type: 'TEAM_MEMBERS', limit_value: 10, unit: 'usuarios' },
+            { plan_id: planPro.id, limit_type: 'PORTFOLIOS', limit_value: 10, unit: 'portfolios' },
+            { plan_id: planPro.id, limit_type: 'GANTT_TEMPLATES', limit_value: 5, unit: 'templates' },
+        ],
+        skipDuplicates: true,
+    });
+    console.log(`  ✅ ${planPro.name} (30 eventos/mes, 25GB) ⭐`);
+
+    // PLAN ENTERPRISE
+    const planEnterprise = await prisma.platform_plans.upsert({
+        where: { slug: 'enterprise' },
+        update: {},
+        create: {
+            name: 'Enterprise',
+            slug: 'enterprise',
+            description: 'Para estudios grandes con alto volumen',
+            price_monthly: 999, // MXN
+            price_yearly: 9990, // MXN (ahorro 17%)
+            stripe_product_id: 'prod_enterprise_demo',
+            stripe_price_id: 'price_enterprise_demo',
+            features: {
+                modules: ['manager', 'marketing', 'magic', 'pages'],
+                support: 'priority',
+                analytics: 'enterprise',
+                custom_domain: true,
+            },
+            popular: false,
+            active: true,
+            orden: 3,
+        },
+    });
+
+    await prisma.plan_limits.createMany({
+        data: [
+            { plan_id: planEnterprise.id, limit_type: 'EVENTS_PER_MONTH', limit_value: -1, unit: 'eventos' }, // ilimitado
+            { plan_id: planEnterprise.id, limit_type: 'STORAGE_GB', limit_value: 100, unit: 'GB' },
+            { plan_id: planEnterprise.id, limit_type: 'TEAM_MEMBERS', limit_value: -1, unit: 'usuarios' },
+            { plan_id: planEnterprise.id, limit_type: 'PORTFOLIOS', limit_value: -1, unit: 'portfolios' },
+            { plan_id: planEnterprise.id, limit_type: 'GANTT_TEMPLATES', limit_value: -1, unit: 'templates' },
+        ],
+        skipDuplicates: true,
+    });
+    console.log(`  ✅ ${planEnterprise.name} (ilimitado)`);
 }
 
-async function seedPlatformUsers() {
-    console.log('👥 Seeding usuarios de plataforma...');
+// ============================================
+// 5. DEMO STUDIO
+// ============================================
 
-    // Super Admin
-    const superAdmin = await prisma.platform_user_profiles.upsert({
+async function seedDemoStudio() {
+    console.log('🏢 Seeding demo studio...');
+
+    const demoStudio = await prisma.studios.upsert({
+        where: { slug: DEMO_STUDIO_SLUG },
+        update: { updated_at: new Date() },
+        create: {
+            id: DEMO_STUDIO_ID,
+            studio_name: 'Demo Studio',
+            slug: DEMO_STUDIO_SLUG,
+            email: 'contacto@demo-studio.com',
+            phone: '+52 33 1234 5678',
+            address: 'Av. Revolución 1234, Guadalajara, JAL',
+            slogan: 'Capturamos tus momentos inolvidables',
+            descripcion: 'Estudio fotográfico profesional especializado en bodas, XV años y eventos sociales',
+            palabras_clave: 'fotografía, bodas, eventos, Guadalajara',
+            subscription_status: 'TRIAL',
+            is_active: true,
+            created_at: new Date(),
+            updated_at: new Date(),
+        },
+    });
+    console.log(`  ✅ ${demoStudio.studio_name}`);
+
+    // Configuración del studio
+    await prisma.studio_configuraciones.create({
+        data: {
+            studio_id: demoStudio.id,
+            nombre: 'Configuración Principal',
+            utilidad_servicio: 35, // 35% de utilidad en servicios
+            utilidad_producto: 40, // 40% de utilidad en productos
+            comision_venta: 5, // 5% de comisión por venta
+            sobreprecio: 0,
+            status: 'active',
+        },
+    });
+    console.log(`  ✅ Configuración creada`);
+
+    // Activar módulos CORE
+    const modulesToActivate = ['manager', 'marketing', 'magic', 'pages'];
+
+    for (const moduleSlug of modulesToActivate) {
+        const moduleData = await prisma.platform_modules.findUnique({
+            where: { slug: moduleSlug },
+        });
+
+        if (moduleData) {
+            await prisma.studio_modules.upsert({
+                where: {
+                    studio_id_module_id: {
+                        studio_id: demoStudio.id,
+                        module_id: moduleData.id,
+                    },
+                },
+                update: { is_active: true, updated_at: new Date() },
+                create: {
+                    studio_id: demoStudio.id,
+                    module_id: moduleData.id,
+                    is_active: true,
+                    activated_at: new Date(),
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                },
+            });
+            console.log(`  ✅ Módulo activado: ${moduleData.name}`);
+        }
+    }
+}
+
+// ============================================
+// 6. USERS (Multi-Contexto)
+// ============================================
+
+async function seedUsers() {
+    console.log('👥 Seeding users...');
+
+    // 1. Super Admin
+    const superAdmin = await prisma.users.upsert({
         where: { email: 'admin@prosocial.mx' },
         update: {},
         create: {
-            supabaseUserId: 'admin-supabase-id', // ID simulado de Supabase Auth
+            supabase_id: 'superadmin-supabase-uuid',
             email: 'admin@prosocial.mx',
-            role: 'SUPER_ADMIN',
-            fullName: 'Super Administrador',
-            isActive: true,
-            updatedAt: new Date()
-        }
+            full_name: 'Super Administrador',
+            is_active: true,
+        },
     });
-    console.log(`✅ Super Admin: ${superAdmin.fullName}`);
 
-    // Agente
-    const agente = await prisma.platform_user_profiles.upsert({
-        where: { email: 'agente@prosocial.mx' },
+    await prisma.user_platform_roles.upsert({
+        where: {
+            user_id_role: {
+                user_id: superAdmin.id,
+                role: 'SUPER_ADMIN',
+            },
+        },
         update: {},
         create: {
-            supabaseUserId: 'agente-supabase-id', // ID simulado de Supabase Auth
-            email: 'agente@prosocial.mx',
-            role: 'AGENTE',
-            fullName: 'Agente Comercial',
-            isActive: true,
-            updatedAt: new Date()
-        }
+            user_id: superAdmin.id,
+            role: 'SUPER_ADMIN',
+            is_active: true,
+            granted_at: new Date(),
+        },
     });
-    console.log(`✅ Agente: ${agente.fullName}`);
+    console.log(`  ✅ Super Admin: ${superAdmin.email}`);
 
-    // Suscriptor (dueño del demo-studio)
-    const suscriptor = await prisma.platform_user_profiles.upsert({
+    // 2. Studio Owner
+    const owner = await prisma.users.upsert({
         where: { email: 'owner@demo-studio.com' },
         update: {},
         create: {
-            supabaseUserId: 'suscriptor-supabase-id', // ID simulado de Supabase Auth
+            supabase_id: 'owner-supabase-uuid',
             email: 'owner@demo-studio.com',
-            role: 'SUSCRIPTOR',
-            fullName: 'Propietario Demo Studio',
-            isActive: true,
-            updatedAt: new Date()
-        }
-    });
-    console.log(`✅ Suscriptor: ${suscriptor.fullName}`);
-
-    return { superAdmin, agente, suscriptor };
-}
-
-async function seedDemoStudio() {
-    console.log('🏢 Seeding demo-studio project...');
-
-    // Obtener el suscriptor
-    const suscriptor = await prisma.platform_user_profiles.findUnique({
-        where: { email: 'owner@demo-studio.com' }
+            full_name: 'Carlos Méndez',
+            phone: '+52 33 1234 5678',
+            is_active: true,
+        },
     });
 
-    if (!suscriptor) {
-        throw new Error('Suscriptor no encontrado');
-    }
-
-    // Crear el proyecto demo-studio
-    const demoProject = await prisma.projects.upsert({
-        where: { slug: 'demo-studio' },
+    // Rol de plataforma: SUSCRIPTOR
+    await prisma.user_platform_roles.upsert({
+        where: {
+            user_id_role: {
+                user_id: owner.id,
+                role: 'SUSCRIPTOR',
+            },
+        },
         update: {},
         create: {
-            name: 'Demo Studio',
-            slug: 'demo-studio',
-            email: 'contacto@demo-studio.com',
-            address: '123 Demo Street, Demo City',
-            descripcion: 'Estudio de fotografía demo para pruebas y desarrollo',
-            subscriptionStatus: 'TRIAL',
-            planId: 'basic', // Referencia al plan básico
-            active: true,
-            platformUserId: suscriptor.id, // Asociar con el suscriptor
-            updatedAt: new Date()
-        }
+            user_id: owner.id,
+            role: 'SUSCRIPTOR',
+            is_active: true,
+            granted_at: new Date(),
+        },
     });
-    console.log(`✅ Proyecto: ${demoProject.name} (${demoProject.slug})`);
 
-    // Crear personal del estudio (con/sin login)
-    const demoPersonal = [
-        {
-            id: 'demo-photographer',
-            fullName: 'Juan Pérez',
-            phone: '+1234567891',
-            type: 'EMPLEADO' as const,
-            role: 'photographer',
-            status: 'active',
-            isActive: true,
-            projectId: demoProject.id,
-            platformUserId: null // Sin login
+    // Rol en studio: OWNER
+    await prisma.user_studio_roles.upsert({
+        where: {
+            user_id_studio_id_role: {
+                user_id: owner.id,
+                studio_id: DEMO_STUDIO_ID,
+                role: 'OWNER',
+            },
         },
-        {
-            id: 'demo-editor',
-            fullName: 'María García',
-            phone: '+1234567892',
-            type: 'EMPLEADO' as const,
-            role: 'editor',
-            status: 'active',
-            isActive: true,
-            projectId: demoProject.id,
-            platformUserId: null // Sin login
+        update: {},
+        create: {
+            user_id: owner.id,
+            studio_id: DEMO_STUDIO_ID,
+            role: 'OWNER',
+            is_active: true,
+            invited_at: new Date(),
+            accepted_at: new Date(),
         },
-        {
-            id: 'demo-provider',
-            fullName: 'Carlos Rodríguez',
-            phone: '+1234567893',
-            type: 'PROVEEDOR' as const,
-            role: 'provider',
-            status: 'active',
-            isActive: true,
-            projectId: demoProject.id,
-            platformUserId: null // Sin login
-        }
+    });
+    console.log(`  ✅ Studio Owner: ${owner.email}`);
+
+    // 3. Fotógrafo (personal operativo)
+    const photographer = await prisma.users.upsert({
+        where: { email: 'fotografo@demo-studio.com' },
+        update: {},
+        create: {
+            supabase_id: 'photographer-supabase-uuid',
+            email: 'fotografo@demo-studio.com',
+            full_name: 'Juan Pérez',
+            phone: '+52 33 8765 4321',
+            is_active: true,
+        },
+    });
+
+    await prisma.user_studio_roles.upsert({
+        where: {
+            user_id_studio_id_role: {
+                user_id: photographer.id,
+                studio_id: DEMO_STUDIO_ID,
+                role: 'PHOTOGRAPHER',
+            },
+        },
+        update: {},
+        create: {
+            user_id: photographer.id,
+            studio_id: DEMO_STUDIO_ID,
+            role: 'PHOTOGRAPHER',
+            is_active: true,
+            invited_at: new Date(),
+            accepted_at: new Date(),
+        },
+    });
+    console.log(`  ✅ Photographer: ${photographer.email}`);
+}
+
+// ============================================
+// 7. PIPELINES V2.0
+// ============================================
+
+async function seedPipelines() {
+    console.log('📊 Seeding pipelines V2.0...');
+
+    // MARKETING PIPELINE
+    const marketingStages = [
+        { slug: 'lead-nuevo', name: 'Lead Nuevo', stage_type: 'PROSPECTING' as const, color: '#3B82F6', order: 0 },
+        { slug: 'contactado', name: 'Contactado', stage_type: 'PROSPECTING' as const, color: '#8B5CF6', order: 1 },
+        { slug: 'calificado', name: 'Calificado', stage_type: 'QUALIFICATION' as const, color: '#10B981', order: 2 },
+        { slug: 'propuesta', name: 'Propuesta Enviada', stage_type: 'PROPOSAL' as const, color: '#F59E0B', order: 3 },
+        { slug: 'negociacion', name: 'Negociación', stage_type: 'PROPOSAL' as const, color: '#EF4444', order: 4 },
+        { slug: 'ganado', name: 'Ganado', stage_type: 'CONVERSION' as const, color: '#059669', order: 5, is_system: true },
+        { slug: 'perdido', name: 'Perdido', stage_type: 'CLOSED_LOST' as const, color: '#6B7280', order: 6, is_system: true },
     ];
 
-    for (const personal of demoPersonal) {
-        const createdPersonal = await prisma.project_users.upsert({
-            where: { id: personal.id },
-            update: personal,
-            create: personal
+    for (const stage of marketingStages) {
+        await prisma.marketing_pipeline_stages.upsert({
+            where: {
+                studio_id_slug: {
+                    studio_id: DEMO_STUDIO_ID,
+                    slug: stage.slug,
+                },
+            },
+            update: {},
+            create: {
+                studio_id: DEMO_STUDIO_ID,
+                ...stage,
+                is_active: true,
+                is_system: stage.is_system || false,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
         });
-        console.log(`✅ Personal: ${createdPersonal.fullName} (${createdPersonal.type})`);
-
-        // Crear perfiles profesionales para los usuarios
-        if (personal.type === 'EMPLEADO') {
-            let profile: 'FOTOGRAFO' | 'EDITOR' | 'RETOCADOR' | 'CAMAROGRAFO' | 'OPERADOR_DRON' | 'ASISTENTE' | 'COORDINADOR';
-
-            if (personal.role === 'photographer') {
-                profile = 'FOTOGRAFO';
-            } else if (personal.role === 'editor') {
-                profile = 'EDITOR';
-            } else {
-                profile = 'ASISTENTE';
-            }
-
-            await prisma.project_user_professional_profiles.create({
-                data: {
-                    userId: createdPersonal.id,
-                    profile: profile,
-                    description: `Perfil profesional de ${createdPersonal.fullName}`,
-                    isActive: true
-                }
-            });
-            console.log(`  ✅ Perfil profesional: ${profile}`);
-        }
     }
+    console.log(`  ✅ Marketing Pipeline (${marketingStages.length} stages)`);
 
-    // Crear algunos leads de ejemplo
-    const demoLeads = [
-        {
-            id: 'lead-demo-1',
-            name: 'Ana Martínez',
-            email: 'ana.martinez@email.com',
-            phone: '+1234567894',
-            studioName: 'Boda Ana & Carlos',
-            studioSlug: null,
-            lastContactDate: new Date(),
+    // MANAGER PIPELINE
+    const managerStages = [
+        { slug: 'planeacion', name: 'Planeación', stage_type: 'PLANNING' as const, color: '#3B82F6', order: 0 },
+        { slug: 'preparacion', name: 'Preparación', stage_type: 'PLANNING' as const, color: '#8B5CF6', order: 1 },
+        { slug: 'produccion', name: 'Producción', stage_type: 'PRODUCTION' as const, color: '#EF4444', order: 2 },
+        { slug: 'post-produccion', name: 'Post-Producción', stage_type: 'POST_PRODUCTION' as const, color: '#F59E0B', order: 3 },
+        { slug: 'entrega', name: 'Entrega', stage_type: 'DELIVERY' as const, color: '#06B6D4', order: 4 },
+        { slug: 'garantia', name: 'Garantía', stage_type: 'WARRANTY' as const, color: '#10B981', order: 5 },
+        { slug: 'completado', name: 'Completado', stage_type: 'COMPLETED' as const, color: '#059669', order: 6, is_system: true },
+    ];
+
+    for (const stage of managerStages) {
+        await prisma.manager_pipeline_stages.upsert({
+            where: {
+                studio_id_slug: {
+                    studio_id: DEMO_STUDIO_ID,
+                    slug: stage.slug,
+                },
+            },
+            update: {},
+            create: {
+                studio_id: DEMO_STUDIO_ID,
+                ...stage,
+                is_active: true,
+                is_system: stage.is_system || false,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+        });
+    }
+    console.log(`  ✅ Manager Pipeline (${managerStages.length} stages)`);
+}
+
+// ============================================
+// 8. CATÁLOGO (sample)
+// ============================================
+
+async function seedCatalogo() {
+    console.log('📁 Seeding catálogo...');
+
+    // Secciones
+    const seccion = await prisma.studio_servicio_secciones.upsert({
+        where: { nombre: 'Cobertura del Evento' },
+        update: {},
+        create: {
+            nombre: 'Cobertura del Evento',
+            descripcion: 'Servicios de fotografía y video el día del evento',
+            orden: 0,
+        },
+    });
+
+    // Categoría
+    const categoria = await prisma.studio_servicio_categorias.upsert({
+        where: { nombre: 'Fotografía de evento' },
+        update: {},
+        create: {
+            nombre: 'Fotografía de evento',
+            orden: 0,
+        },
+    });
+
+    // Relación sección-categoría
+    await prisma.studio_seccion_categorias.createMany({
+        data: {
+            seccionId: seccion.id,
+            categoriaId: categoria.id,
+        },
+        skipDuplicates: true,
+    });
+
+    // Servicios (solo costo y gasto - utilidad se calcula al vuelo)
+    const servicios = [
+        { nombre: 'Fotógrafo principal por hora', costo: 500, orden: 0 },
+        { nombre: 'Asistente de iluminación por hora', costo: 200, orden: 1 },
+        { nombre: 'Revelado digital de fotos', costo: 1500, orden: 2 },
+    ];
+
+    await prisma.studio_servicios.createMany({
+        data: servicios.map(servicio => ({
+            studioId: DEMO_STUDIO_ID,
+            servicioCategoriaId: categoria.id,
+            nombre: servicio.nombre,
+            costo: servicio.costo,
+            gasto: 0,
+            tipo_utilidad: 'servicio',
+            orden: servicio.orden,
+            status: 'active',
+        })),
+        skipDuplicates: true,
+    });
+    console.log(`  ✅ Catálogo (${servicios.length} servicios)`);
+}
+
+// ============================================
+// 9. TIPOS DE EVENTO
+// ============================================
+
+async function seedTiposEvento() {
+    console.log('🎉 Seeding tipos de evento...');
+
+    const tipos = [
+        { nombre: 'Boda', orden: 0 },
+        { nombre: 'XV Años', orden: 1 },
+        { nombre: 'Sesión Familiar', orden: 2 },
+        { nombre: 'Sesión Embarazo', orden: 3 },
+        { nombre: 'Evento Corporativo', orden: 4 },
+    ];
+
+    await prisma.studio_evento_tipos.createMany({
+        data: tipos.map(tipo => ({
+            studio_id: DEMO_STUDIO_ID,
+            nombre: tipo.nombre,
+            status: 'active',
+            orden: tipo.orden,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })),
+        skipDuplicates: true,
+    });
+    console.log(`  ✅ ${tipos.length} tipos de evento`);
+}
+
+// ============================================
+// 10. DEMO LEAD
+// ============================================
+
+async function seedDemoLead() {
+    console.log('👤 Seeding demo lead...');
+
+    const demoLead = await prisma.platform_leads.create({
+        data: {
+            studioId: DEMO_STUDIO_ID,
+            name: 'Carlos Méndez',
+            email: 'owner@demo-studio.com',
+            phone: '+52 33 1234 5678',
+            studioName: 'Demo Studio',
+            studioSlug: DEMO_STUDIO_SLUG,
             interestedPlan: 'pro',
-            monthlyBudget: 2000.00,
-            probableStartDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
+            score: 8,
             priority: 'high',
-            stageId: 'stage-comercial-interesados',
-            acquisitionChannelId: 'canal-referidos',
-            firstInteractionDate: new Date(),
-            originalSource: 'Referido por cliente anterior',
-            interactionCount: 3,
-            leadType: 'prospect',
-            updatedAt: new Date()
+            stageId: null, // No hay stages configurados aún
+            acquisitionChannelId: null, // Se puede asignar después
+            agentId: null, // Se puede asignar después
+            probableStartDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
+            createdAt: new Date(),
+            updatedAt: new Date(),
         },
-        {
-            id: 'lead-demo-2',
-            name: 'Roberto Silva',
-            email: 'roberto.silva@email.com',
-            phone: '+1234567895',
-            studioName: 'Sesión Familiar Silva',
-            studioSlug: null,
-            lastContactDate: new Date(),
-            interestedPlan: 'basic',
-            monthlyBudget: 500.00,
-            probableStartDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 días
-            priority: 'medium',
-            stageId: 'stage-comercial-contactados',
-            acquisitionChannelId: 'canal-redes-sociales',
-            firstInteractionDate: new Date(),
-            originalSource: 'Instagram',
-            interactionCount: 1,
-            leadType: 'prospect',
-            updatedAt: new Date()
-        }
-    ];
-
-    for (const lead of demoLeads) {
-        await prisma.platform_leads.upsert({
-            where: { id: lead.id },
-            update: lead,
-            create: lead
-        });
-        console.log(`✅ Lead: ${lead.name} (${lead.studioName})`);
-    }
-
-    // Crear redes sociales del demo studio
-    const demoSocialNetworks = [
-        {
-            projectId: demoProject.id,
-            plataformaId: 'instagram',
-            url: 'https://instagram.com/demo-studio',
-            activo: true
-        },
-        {
-            projectId: demoProject.id,
-            plataformaId: 'facebook',
-            url: 'https://facebook.com/demo-studio',
-            activo: true
-        }
-    ];
-
-    for (const socialNetwork of demoSocialNetworks) {
-        await prisma.project_redes_sociales.create({
-            data: socialNetwork
-        });
-        console.log(`✅ Red social: ${socialNetwork.url}`);
-    }
-
-    console.log('🎉 Demo studio seeded successfully!');
-}
-
-async function seedMetodosPago() {
-    console.log('💳 Seeding métodos de pago...');
-
-    // Obtener el proyecto demo-studio
-    const demoProject = await prisma.projects.findFirst({
-        where: { slug: 'demo-studio' }
     });
 
-    if (!demoProject) {
-        console.log('⚠️ No se encontró el proyecto demo-studio, saltando seed de métodos de pago');
-        return;
-    }
-
-    const metodosPago = [
-        {
-            metodo_pago: 'Efectivo',
-            comision_porcentaje_base: 0,
-            comision_fija_monto: 0,
-            num_msi: 0,
-            comision_msi_porcentaje: 0,
-            orden: 1,
-            payment_method: 'cash',
-            status: 'active',
-            projectId: demoProject.id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            metodo_pago: 'Depósito Bancario',
-            comision_porcentaje_base: 0,
-            comision_fija_monto: 0,
-            num_msi: 0,
-            comision_msi_porcentaje: 0,
-            orden: 2,
-            payment_method: 'bank_transfer',
-            status: 'active',
-            projectId: demoProject.id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            metodo_pago: 'Transferencia SPEI',
-            comision_porcentaje_base: 0,
-            comision_fija_monto: 0,
-            num_msi: 0,
-            comision_msi_porcentaje: 0,
-            orden: 3,
-            payment_method: 'spei',
-            status: 'active',
-            projectId: demoProject.id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        },
-        {
-            metodo_pago: 'OXXO',
-            comision_porcentaje_base: 0,
-            comision_fija_monto: 0,
-            num_msi: 0,
-            comision_msi_porcentaje: 0,
-            orden: 4,
-            payment_method: 'oxxo',
-            status: 'active',
-            projectId: demoProject.id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        }
-    ];
-
-    for (const metodo of metodosPago) {
-        // Verificar si ya existe
-        const existingMetodo = await prisma.project_metodos_pago.findFirst({
-            where: {
-                projectId: demoProject.id,
-                metodo_pago: metodo.metodo_pago
-            }
-        });
-
-        if (!existingMetodo) {
-            await prisma.project_metodos_pago.create({
-                data: metodo
-            });
-            console.log(`✅ Método de pago: ${metodo.metodo_pago}`);
-        } else {
-            console.log(`⚠️ Método de pago ya existe: ${metodo.metodo_pago}`);
-        }
-    }
-
-    console.log('🎉 Métodos de pago seeded successfully!');
+    console.log(`  ✅ Demo Lead: ${demoLead.name} (${demoLead.email})`);
 }
 
-async function seedCategoriasPersonal() {
-    console.log('👥 Seeding categorías de personal...');
-
-    // Buscar el proyecto demo-studio
-    const demoProject = await prisma.projects.findUnique({
-        where: { slug: 'demo-studio' }
-    });
-
-    if (!demoProject) {
-        console.log('⚠️ Proyecto demo-studio no encontrado, saltando seed de categorías de personal');
-        return;
-    }
-
-    const categorias = [
-        // OPERATIVO
-        {
-            projectId: demoProject.id,
-            nombre: 'Fotógrafo Principal',
-            descripcion: 'Fotógrafo principal del evento',
-            tipo: 'OPERATIVO' as const,
-            color: '#3B82F6',
-            icono: 'camera',
-            esDefault: true,
-            orden: 1,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Camarógrafo',
-            descripcion: 'Especialista en video y grabación',
-            tipo: 'OPERATIVO' as const,
-            color: '#EF4444',
-            icono: 'video',
-            esDefault: true,
-            orden: 2,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Asistente de Fotografía',
-            descripcion: 'Asistente en sesiones fotográficas',
-            tipo: 'OPERATIVO' as const,
-            color: '#10B981',
-            icono: 'camera',
-            esDefault: true,
-            orden: 3,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Drone Operator',
-            descripcion: 'Especialista en fotografía aérea',
-            tipo: 'OPERATIVO' as const,
-            color: '#8B5CF6',
-            icono: 'drone',
-            esDefault: true,
-            orden: 4,
-            isActive: true
-        },
-        // ADMINISTRATIVO
-        {
-            projectId: demoProject.id,
-            nombre: 'Recepcionista',
-            descripcion: 'Atención al cliente y gestión administrativa',
-            tipo: 'ADMINISTRATIVO' as const,
-            color: '#F59E0B',
-            icono: 'user-check',
-            esDefault: true,
-            orden: 5,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Coordinador de Eventos',
-            descripcion: 'Coordinación y logística de eventos',
-            tipo: 'ADMINISTRATIVO' as const,
-            color: '#06B6D4',
-            icono: 'calendar',
-            esDefault: true,
-            orden: 6,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Editor de Video',
-            descripcion: 'Post-producción y edición de video',
-            tipo: 'ADMINISTRATIVO' as const,
-            color: '#84CC16',
-            icono: 'film',
-            esDefault: true,
-            orden: 7,
-            isActive: true
-        },
-        // PROVEEDOR
-        {
-            projectId: demoProject.id,
-            nombre: 'Proveedor de Impresión',
-            descripcion: 'Servicios de impresión y acabados',
-            tipo: 'PROVEEDOR' as const,
-            color: '#6B7280',
-            icono: 'printer',
-            esDefault: true,
-            orden: 8,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Proveedor de Mesa de Dulces',
-            descripcion: 'Servicios de catering y mesa de dulces',
-            tipo: 'PROVEEDOR' as const,
-            color: '#EC4899',
-            icono: 'cake',
-            esDefault: true,
-            orden: 9,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Proveedor de Decoración',
-            descripcion: 'Servicios de decoración floral y temática',
-            tipo: 'PROVEEDOR' as const,
-            color: '#F97316',
-            icono: 'flower',
-            esDefault: true,
-            orden: 10,
-            isActive: true
-        }
-    ];
-
-    for (const categoria of categorias) {
-        const existingCategoria = await prisma.project_categorias_personal.findFirst({
-            where: {
-                projectId: categoria.projectId,
-                nombre: categoria.nombre
-            }
-        });
-
-        if (!existingCategoria) {
-            await prisma.project_categorias_personal.create({
-                data: categoria
-            });
-            console.log(`✅ Categoría: ${categoria.nombre} (${categoria.tipo})`);
-        } else {
-            console.log(`⚠️ Categoría ya existe: ${categoria.nombre}`);
-        }
-    }
-
-    console.log('🎉 Categorías de personal seeded successfully!');
-}
-
-async function seedPerfilesPersonal() {
-    console.log('👤 Seeding perfiles de personal...');
-
-    // Buscar el proyecto demo-studio
-    const demoProject = await prisma.projects.findUnique({
-        where: { slug: 'demo-studio' }
-    });
-
-    if (!demoProject) {
-        console.log('⚠️ Proyecto demo-studio no encontrado, saltando seed de perfiles de personal');
-        return;
-    }
-
-    const perfiles = [
-        {
-            projectId: demoProject.id,
-            nombre: 'Fotógrafo',
-            descripcion: 'Especialista en fotografía de eventos',
-            orden: 1,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Camarógrafo',
-            descripcion: 'Especialista en grabación de video',
-            orden: 2,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Editor de Video',
-            descripcion: 'Post-producción y edición de video',
-            orden: 3,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Retocador de Fotos',
-            descripcion: 'Edición y retoque fotográfico',
-            orden: 4,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Asistente de Producción',
-            descripcion: 'Apoyo en producción y logística',
-            orden: 5,
-            isActive: true
-        },
-        {
-            projectId: demoProject.id,
-            nombre: 'Drone Operator',
-            descripcion: 'Especialista en fotografía aérea',
-            orden: 6,
-            isActive: true
-        }
-    ];
-
-    for (const perfil of perfiles) {
-        const existingPerfil = await prisma.project_perfiles_personal.findFirst({
-            where: {
-                projectId: perfil.projectId,
-                nombre: perfil.nombre
-            }
-        });
-
-        if (!existingPerfil) {
-            await prisma.project_perfiles_personal.create({
-                data: perfil
-            });
-            console.log(`✅ Perfil: ${perfil.nombre}`);
-        } else {
-            console.log(`⚠️ Perfil ya existe: ${perfil.nombre}`);
-        }
-    }
-
-    console.log('🎉 Perfiles de personal seeded successfully!');
-}
+// ============================================
+// EXECUTE
+// ============================================
 
 main()
     .catch((e) => {
         console.error('❌ Error en seed:', e);
         process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
     });

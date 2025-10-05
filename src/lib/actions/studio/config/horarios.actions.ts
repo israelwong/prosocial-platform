@@ -324,7 +324,12 @@ export async function inicializarHorariosPorDefecto(studioSlug: string) {
         });
 
         if (existingHorarios > 0) {
-            throw new Error("El studio ya tiene horarios configurados");
+            // Si ya tiene horarios, retornar éxito sin crear nuevos
+            return {
+                success: true,
+                message: "El studio ya tiene horarios configurados",
+                data: { horariosExistentes: existingHorarios }
+            };
         }
 
         // 3. Crear horarios por defecto
@@ -352,7 +357,11 @@ export async function inicializarHorariosPorDefecto(studioSlug: string) {
         // 4. Revalidar cache
         revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/horarios`);
 
-        return horariosCreados;
+        return {
+            success: true,
+            message: "Horarios inicializados exitosamente",
+            data: horariosCreados
+        };
     });
 }
 
