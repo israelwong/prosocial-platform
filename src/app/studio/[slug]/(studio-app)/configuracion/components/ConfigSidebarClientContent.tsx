@@ -11,7 +11,7 @@ import {
 import { StudioHeaderModal } from './StudioHeaderModal';
 import {
     Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
-    ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2
+    ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2, LogOut
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { NavigationConfig, NavItem, NavItemGroup } from './ConfiguracionSidebarZenV2';
@@ -107,7 +107,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                     />
                 </div>
             </ZenSidebarHeader>
-            <ZenSidebarContent>
+            <ZenSidebarContent className="px-4">
                 {filteredNavGroups.map((group) => {
                     const GroupIcon = iconMap[group.icon];
                     const isExpanded = expandedGroup === group.id;
@@ -241,10 +241,10 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
             <ZenSidebarFooter>
                 <ZenSidebarMenu>
                     <ZenSidebarMenuItem>
-                        <Link href={`/studio/${studioSlug}/dashboard`} className="flex items-center gap-3 text-zinc-400 hover:text-white">
-                            <BarChart3 className="w-4 h-4" />
-                            <span>Volver al Dashboard</span>
-                        </Link>
+                        <ZenSidebarMenuButton className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                            <LogOut className="w-4 h-4" />
+                            <span>Cerrar Sesión</span>
+                        </ZenSidebarMenuButton>
                     </ZenSidebarMenuItem>
                 </ZenSidebarMenu>
             </ZenSidebarFooter>

@@ -3,8 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
-import { ChevronDown, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { useParams, usePathname } from 'next/navigation';
+import { ChevronDown, LayoutDashboard, Settings, User, CreditCard } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,9 +20,15 @@ interface StudioHeaderModalProps {
 }
 
 export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
-    // className is used for potential future styling
+    // className is available for future styling if needed
+    void className; // Suppress unused parameter warning
     const params = useParams();
+    const pathname = usePathname();
     const slug = params.slug as string;
+
+    // Detectar si estamos en dashboard o configuración
+    const isDashboard = pathname.includes('/dashboard');
+    const isConfiguracion = pathname.includes('/configuracion');
 
     // Usar hook para datos del studio
     const {
@@ -163,37 +169,58 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                 align="start"
                 side="right"
             >
+                {/* Gestionar */}
                 <div className="px-2 py-1.5">
-                    <div className="text-xs font-medium text-zinc-400">Teams</div>
+                    <div className="text-xs font-medium text-zinc-400">Gestionar</div>
                 </div>
                 <DropdownMenuSeparator className="bg-zinc-700" />
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href={`/${slug}/dashboard`}
+                        href={`/${slug}/configuracion/global/cuenta/perfil`}
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
-                        <LayoutDashboard className="h-4 w-4" />
-                        Dashboard
+                        <User className="h-4 w-4" />
+                        Perfil
                     </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href={`/${slug}/configuracion`}
+                        href={`/${slug}/configuracion/global/cuenta/suscripcion`}
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
-                        <Settings className="h-4 w-4" />
-                        Configurar
+                        <CreditCard className="h-4 w-4" />
+                        Suscripción
                     </Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="bg-zinc-700" />
 
-                <DropdownMenuItem className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700">
-                    <LogOut className="h-4 w-4" />
-                    Cerrar Sesión
-                </DropdownMenuItem>
+                {/* Navegación según ruta actual */}
+                {isConfiguracion && (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href={`/${slug}/dashboard`}
+                            className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
+                        >
+                            <LayoutDashboard className="h-4 w-4" />
+                            Dashboard
+                        </Link>
+                    </DropdownMenuItem>
+                )}
+
+                {isDashboard && (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            href={`/${slug}/configuracion`}
+                            className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
+                        >
+                            <Settings className="h-4 w-4" />
+                            Configuración
+                        </Link>
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

@@ -1,18 +1,9 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
-import { Bell, User, Settings, LogOut } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { BreadcrumbHeader } from './BreadcrumbHeader';
-import { ZenButton, ZenAvatar, ZenAvatarFallback } from '@/components/ui/zen';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/shadcn/dropdown-menu';
+import { ZenButton } from '@/components/ui/zen';
 
 interface AppHeaderProps {
     studioSlug: string;
@@ -29,41 +20,6 @@ export function AppHeader({ studioSlug }: AppHeaderProps) {
                     <Bell className="h-5 w-5" />
                     <span className="sr-only">Notificaciones</span>
                 </ZenButton>
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <ZenButton
-                            variant="ghost"
-                            className="relative h-8 w-8 rounded-full"
-                        >
-                            <ZenAvatar className="h-8 w-8">
-                                <ZenAvatarFallback>UD</ZenAvatarFallback>
-                            </ZenAvatar>
-                        </ZenButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
-                        <DropdownMenuLabel className="font-normal">
-                            <div className="flex flex-col space-y-1">
-                                <p className="text-sm font-medium leading-none">Usuario Demo</p>
-                                <p className="text-xs leading-none text-zinc-400">
-                                    owner@demo-studio.com
-                                </p>
-                            </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`/${studioSlug}/configuracion/global/cuenta/perfil`}>
-                                <Settings className="mr-2 h-4 w-4" />
-                                <span>Configuración de Perfil</span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <LogOut className="mr-2 h-4 w-4" />
-                            <span>Cerrar Sesión</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
         </header>
     );

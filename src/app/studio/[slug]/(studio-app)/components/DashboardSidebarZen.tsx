@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-    Kanban, Calendar, Users, Settings, BarChart3, Bot, LayoutTemplate, Sparkles
+    Kanban, Calendar, Users, Settings, BarChart3, Bot, LayoutTemplate, Sparkles, LogOut
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { getActiveModules } from '@/lib/modules';
@@ -49,7 +49,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                 <StudioHeaderModal />
             </ZenSidebarHeader>
 
-            <ZenSidebarContent>
+            <ZenSidebarContent className="px-4">
                 <ZenSidebarMenu>
                     {/* Sección Principal Siempre Visible */}
                     <div className="px-3 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">Principal</div>
@@ -93,6 +93,17 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                     </ZenSidebarMenuItem>
                 </ZenSidebarMenu>
             </ZenSidebarContent>
+
+            <ZenSidebarFooter>
+                <ZenSidebarMenu>
+                    <ZenSidebarMenuItem>
+                        <ZenSidebarMenuButton className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                            <LogOut className="w-4 h-4" />
+                            <span>Cerrar Sesión</span>
+                        </ZenSidebarMenuButton>
+                    </ZenSidebarMenuItem>
+                </ZenSidebarMenu>
+            </ZenSidebarFooter>
 
         </ZenSidebar>
     );
