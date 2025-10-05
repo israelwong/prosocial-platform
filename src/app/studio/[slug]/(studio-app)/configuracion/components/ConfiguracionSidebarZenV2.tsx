@@ -36,88 +36,72 @@ export interface NavigationConfig {
 const NAVIGATION_CONFIG: NavigationConfig = {
     global: [
         {
-            id: 'estudio',
-            title: 'Estudio',
-            icon: 'Building2',
-            items: [
-                { id: 'identidad', name: 'Identidad de Marca', href: '/global/estudio/identidad', icon: 'Star' },
-                { id: 'contacto', name: 'Información de Contacto', href: '/global/estudio/contacto', icon: 'User' },
-                { id: 'redes-sociales', name: 'Redes Sociales', href: '/global/estudio/redes-sociales', icon: 'Zap' },
-                { id: 'horarios', name: 'Horarios de Atención', href: '/global/estudio/horarios', icon: 'Clock' },
-            ],
-        },
-        {
             id: 'cuenta',
             title: 'Cuenta',
-            icon: 'User',
+            icon: 'UserCircle',
             items: [
-                { id: 'perfil', name: 'Perfil', href: '/global/cuenta/perfil', icon: 'User' },
-                { id: 'suscripcion', name: 'Suscripción', href: '/global/cuenta/suscripcion', icon: 'CreditCard' },
-                { id: 'notificaciones', name: 'Notificaciones', href: '/global/cuenta/notificaciones', icon: 'Bell' },
-                { id: 'seguridad', name: 'Seguridad', href: '/global/cuenta/seguridad', icon: 'Lock' },
+                { id: 'perfil', name: 'Perfil', href: '/cuenta/perfil', icon: 'User' },
+                { id: 'seguridad', name: 'Seguridad', href: '/cuenta/seguridad', icon: 'Lock' },
+                { id: 'suscripcion', name: 'Suscripción', href: '/cuenta/suscripcion', icon: 'CreditCard' },
             ],
         },
     ],
     modules: [
         {
-            id: 'manager',
-            title: 'ZEN Manager',
-            icon: 'Package',
-            moduleSlug: 'manager',
+            id: 'comercial',
+            title: 'Comercial',
+            icon: 'ShoppingCart',
+            moduleSlug: 'comercial',
             mixedItems: [
                 // Items directos primero
-                { id: 'personal', name: 'Personal', href: '/modules/manager/personal', icon: 'User' },
-                { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/modules/manager/reglas-agendamiento', icon: 'Workflow' },
+                { id: 'crm', name: 'CRM', href: '/comercial/crm', icon: 'Users' },
+                { id: 'condiciones-comerciales', name: 'Condiciones Comerciales', href: '/comercial/condiciones-comerciales', icon: 'FileText' },
+                { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/comercial/reglas-agendamiento', icon: 'Clock' },
+                { id: 'tipos-evento', name: 'Tipos de Evento', href: '/comercial/tipos-evento', icon: 'Calendar' },
+                { id: 'inteligencia-financiera', name: 'Inteligencia Financiera', href: '/comercial/inteligencia-financiera', icon: 'Coins' },
                 // Subgrupos después
                 {
-                    id: 'oferta-comercial',
-                    title: 'Oferta Comercial',
+                    id: 'catalogo',
+                    title: 'Catálogo',
                     items: [
-                        { id: 'tipos-evento', name: 'Tipos de Evento', href: '/modules/manager/tipos-evento', icon: 'Calendar' },
-                        { id: 'catalogo-servicios', name: 'Catálogo de Servicios', href: '/modules/manager/catalogo-servicios', icon: 'Layers' },
-                        { id: 'paquetes', name: 'Paquetes', href: '/modules/manager/catalogo-servicios/paquetes', icon: 'Package' },
+                        { id: 'catalogo-servicios', name: 'Servicios', href: '/comercial/catalogo/servicios', icon: 'Layers' },
+                        { id: 'catalogo-paquetes', name: 'Paquetes', href: '/comercial/catalogo/paquetes', icon: 'Package' },
                     ]
                 },
                 {
-                    id: 'precios-rentabilidad',
-                    title: 'Precios y Rentabilidad',
+                    id: 'metodos-pago',
+                    title: 'Métodos de Pago',
                     items: [
-                        { id: 'precios-utilidad', name: 'Precios y Utilidad', href: '/modules/manager/precios-utilidad', icon: 'Coins' },
+                        { id: 'cuentas-negocio', name: 'Cuentas de Negocio', href: '/comercial/metodos-de-pago/cuentas-de-negocio', icon: 'Building' },
+                        { id: 'stripe', name: 'Stripe', href: '/comercial/metodos-de-pago/stripe', icon: 'CreditCard' },
                     ]
                 },
-                { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/modules/manager/cuentas-bancarias', icon: 'CreditCard' },
+            ],
+        },
+        {
+            id: 'manager',
+            title: 'Manager',
+            icon: 'Briefcase',
+            moduleSlug: 'manager',
+            items: [
+                { id: 'personal', name: 'Personal', href: '/manager/personal', icon: 'Users2' },
+                { id: 'pipeline', name: 'Pipeline', href: '/manager/pipeline', icon: 'Workflow' },
             ],
         },
         {
             id: 'pages',
-            title: 'ZEN Pages',
-            icon: 'LayoutTemplate',
+            title: 'Pages',
+            icon: 'Globe',
             moduleSlug: 'pages',
             items: [
-                { id: 'dominios', name: 'Dominios', href: '/modules/pages/dominios', icon: 'Globe' },
-                { id: 'apariencia', name: 'Apariencia Global', href: '/modules/pages/apariencia', icon: 'Palette' },
-                { id: 'integraciones-mkt', name: 'Integraciones Marketing', href: '/modules/pages/integraciones-mkt', icon: 'Puzzle' },
-            ],
-        },
-        {
-            id: 'marketing',
-            title: 'ZEN Marketing',
-            icon: 'Sparkles',
-            moduleSlug: 'marketing',
-            items: [
-                { id: 'pipelines', name: 'Pipelines CRM', href: '/modules/marketing/pipelines', icon: 'Workflow' },
-                { id: 'emails', name: 'Plantillas de Email', href: '/modules/marketing/emails', icon: 'Mail' },
-                { id: 'automations', name: 'Automatizaciones', href: '/modules/marketing/automations', icon: 'Zap' },
-            ],
-        },
-        {
-            id: 'magic',
-            title: 'ZEN Magic',
-            icon: 'Bot',
-            moduleSlug: 'magic',
-            items: [
-                { id: 'creditos', name: 'Créditos IA', href: '/modules/magic/creditos', icon: 'Coins' },
-                { id: 'retoque', name: 'Configuración Retoque', href: '/modules/magic/retoque', icon: 'Wand2' },
+                { id: 'identidad', name: 'Identidad', href: '/pages/identidad', icon: 'Star' },
+                { id: 'contacto', name: 'Contacto', href: '/pages/contacto', icon: 'Phone' },
+                { id: 'redes-sociales', name: 'Redes Sociales', href: '/pages/redes-sociales', icon: 'Zap' },
+                { id: 'horarios', name: 'Horarios', href: '/pages/horarios', icon: 'Clock' },
+                { id: 'portafolio', name: 'Portafolio', href: '/pages/portafolio', icon: 'Image' },
+                { id: 'promociones', name: 'Promociones', href: '/pages/promociones', icon: 'Gift' },
+                { id: 'seo-sem', name: 'SEO / SEM', href: '/pages/seo-sem', icon: 'Search' },
+                { id: 'faq', name: 'FAQ', href: '/pages/faq', icon: 'HelpCircle' },
             ],
         },
     ],
@@ -129,7 +113,7 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             items: [
                 { id: 'modulos', name: 'Módulos Activos', href: '/platform/modulos', icon: 'Layers' },
                 { id: 'integraciones', name: 'Integraciones', href: '/platform/integraciones', icon: 'Plug' },
-                { id: 'avanzado', name: 'Avanzado', href: '/platform/avanzado', icon: 'SlidersHorizontal' },
+                { id: 'notificaciones', name: 'Notificaciones', href: '/platform/notificaciones', icon: 'Bell' },
             ],
         },
     ],
