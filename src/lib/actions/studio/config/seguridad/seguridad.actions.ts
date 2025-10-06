@@ -32,9 +32,17 @@ export async function cambiarContraseña(
             };
         }
 
-        // Verificar contraseña actual (requiere re-autenticación)
+        // Verificar contraseña actual usando re-autenticación
         console.log('🔍 Verificando contraseña actual para:', user.email);
-        const { data: verifyData, error: verifyError } = await supabase.auth.signInWithPassword({
+        
+        // Crear una nueva instancia de Supabase para la verificación
+        const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+        const verifySupabase = createSupabaseClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+
+        const { data: verifyData, error: verifyError } = await verifySupabase.auth.signInWithPassword({
             email: user.email!,
             password: validatedData.currentPassword
         });
