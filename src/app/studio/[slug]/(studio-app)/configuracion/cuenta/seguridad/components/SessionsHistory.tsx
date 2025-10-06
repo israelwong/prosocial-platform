@@ -59,12 +59,18 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         if (!userAgent) return <Monitor className="h-4 w-4" />;
         
         const ua = userAgent.toLowerCase();
+        
+        // Detectar móviles
         if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
             return <Smartphone className="h-4 w-4" />;
         }
+        
+        // Detectar tablets
         if (ua.includes('tablet') || ua.includes('ipad')) {
             return <Tablet className="h-4 w-4" />;
         }
+        
+        // Por defecto, desktop
         return <Monitor className="h-4 w-4" />;
     };
 
@@ -72,11 +78,24 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         if (!userAgent) return 'Dispositivo desconocido';
         
         const ua = userAgent.toLowerCase();
-        if (ua.includes('chrome')) return 'Chrome';
-        if (ua.includes('firefox')) return 'Firefox';
-        if (ua.includes('safari')) return 'Safari';
-        if (ua.includes('edge')) return 'Edge';
-        return 'Navegador desconocido';
+        
+        // Detectar sistema operativo
+        let os = 'Sistema desconocido';
+        if (ua.includes('windows')) os = 'Windows';
+        else if (ua.includes('macintosh') || ua.includes('mac os')) os = 'macOS';
+        else if (ua.includes('linux')) os = 'Linux';
+        else if (ua.includes('android')) os = 'Android';
+        else if (ua.includes('iphone') || ua.includes('ipad')) os = 'iOS';
+        
+        // Detectar navegador
+        let browser = 'Navegador desconocido';
+        if (ua.includes('chrome') && !ua.includes('edg')) browser = 'Chrome';
+        else if (ua.includes('firefox')) browser = 'Firefox';
+        else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
+        else if (ua.includes('edg')) browser = 'Edge';
+        else if (ua.includes('opera')) browser = 'Opera';
+        
+        return `${browser} en ${os}`;
     };
 
     const formatDate = (date: Date) => {
@@ -95,7 +114,10 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
             case 'logout': return 'Cierre de sesión';
             case 'password_change': return 'Cambio de contraseña';
             case 'session_created': return 'Sesión creada';
-            default: return action;
+            case 'security_settings_updated': return 'Configuraciones de seguridad actualizadas';
+            case 'profile_updated': return 'Perfil actualizado';
+            case 'avatar_updated': return 'Foto de perfil actualizada';
+            default: return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         }
     };
 
