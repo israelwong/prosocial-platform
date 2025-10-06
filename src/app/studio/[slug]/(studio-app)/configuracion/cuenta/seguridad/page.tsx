@@ -1,5 +1,5 @@
 import React from 'react';
-import { PasswordChangeForm, SecuritySettings } from './components';
+import { PasswordChangeForm, SecuritySettings, SessionsHistory } from './components';
 
 interface SeguridadPageProps {
     params: {
@@ -20,8 +20,8 @@ export default async function SeguridadPage({ params }: SeguridadPageProps) {
                 </p>
             </div>
 
-            {/* Layout de 2 columnas con altura igual */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:items-stretch">
+            {/* Layout de 3 columnas con altura igual */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:items-stretch">
                 {/* Columna 1: Cambio de contraseña */}
                 <div className="flex flex-col h-full">
                     <PasswordChangeForm studioSlug={slug} />
@@ -30,6 +30,11 @@ export default async function SeguridadPage({ params }: SeguridadPageProps) {
                 {/* Columna 2: Configuraciones de seguridad */}
                 <div className="flex flex-col h-full">
                     <SecuritySettings studioSlug={slug} />
+                </div>
+
+                {/* Columna 3: Historial de sesiones */}
+                <div className="flex flex-col h-full">
+                    <SessionsHistory studioSlug={slug} />
                 </div>
             </div>
 
