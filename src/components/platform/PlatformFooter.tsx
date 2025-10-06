@@ -13,7 +13,7 @@ interface PlatformFooterProps {
     showLegal?: boolean;
 }
 
-export function PlatformFooter({ 
+export function PlatformFooter({
     className = "",
     showContact = true,
     showSocial = true,
@@ -22,7 +22,7 @@ export function PlatformFooter({
     const { config } = usePlatformConfig();
 
     const currentYear = new Date().getFullYear();
-    const companyName = config?.nombre_empresa || 'ProSocial Platform';
+    const companyName = config?.nombre_empresa || 'Zen Studio';
 
     return (
         <footer className={`bg-zinc-900 border-t border-zinc-800 ${className}`}>
@@ -61,7 +61,7 @@ export function PlatformFooter({
                             </h3>
                             <div className="mt-4 space-y-2">
                                 {config?.terminos_condiciones && (
-                                    <a 
+                                    <a
                                         href={config.terminos_condiciones}
                                         className="block text-sm text-zinc-400 hover:text-white transition-colors"
                                     >
@@ -69,7 +69,7 @@ export function PlatformFooter({
                                     </a>
                                 )}
                                 {config?.politica_privacidad && (
-                                    <a 
+                                    <a
                                         href={config.politica_privacidad}
                                         className="block text-sm text-zinc-400 hover:text-white transition-colors"
                                     >
@@ -77,7 +77,7 @@ export function PlatformFooter({
                                     </a>
                                 )}
                                 {config?.aviso_legal && (
-                                    <a 
+                                    <a
                                         href={config.aviso_legal}
                                         className="block text-sm text-zinc-400 hover:text-white transition-colors"
                                     >

@@ -4,7 +4,7 @@ import React from 'react';
 import { Bell, Sparkles } from 'lucide-react';
 import { BreadcrumbHeader } from './BreadcrumbHeader';
 import { ZenButton } from '@/components/ui/zen';
-import { useZenMagicChat } from './ZenMagicChatProvider';
+import { useZenMagicChat } from './ZenMagic';
 
 interface AppHeaderProps {
     studioSlug: string;

@@ -116,7 +116,7 @@ export default function HomePage() {
                 <div className="container mx-auto max-w-4xl text-center">
                     <h2 className="text-4xl font-bold mb-6">¿Listo para transformar tu estudio?</h2>
                     <p className="text-xl text-gray-300 mb-8">
-                        Únete a cientos de creativos que ya están usando ProSocial Platform para hacer crecer su negocio.
+                        Únete a cientos de creativos que ya están usando Zen Studio para hacer crecer su negocio.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <a
@@ -140,7 +140,7 @@ export default function HomePage() {
                 <div className="container mx-auto max-w-6xl">
                     <div className="grid md:grid-cols-4 gap-8">
                         <div>
-                            <h3 className="text-xl font-bold mb-4">ProSocial Platform</h3>
+                            <h3 className="text-xl font-bold mb-4">Zen Studio</h3>
                             <p className="text-gray-400">
                                 La plataforma integral para gestión de estudios creativos.
                             </p>
@@ -171,7 +171,7 @@ export default function HomePage() {
                         </div>
                     </div>
                     <div className="border-t border-zinc-700 mt-8 pt-8 text-center text-gray-400">
-                        <p>&copy; 2024 ProSocial Platform. Todos los derechos reservados.</p>
+                        <p>&copy; 2024 Zen Studio. Todos los derechos reservados.</p>
                     </div>
                 </div>
             </footer>

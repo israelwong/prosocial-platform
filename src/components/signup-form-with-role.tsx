@@ -123,7 +123,7 @@ export function SignupFormWithRole({ className, ...props }: React.ComponentProps
                 <CardHeader>
                     <CardTitle className="text-2xl">Registrarse</CardTitle>
                     <CardDescription>
-                        Crea tu cuenta en ProSocial Platform
+                        Crea tu cuenta en Zen Studio
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -164,7 +164,7 @@ export function SignupFormWithRole({ className, ...props }: React.ComponentProps
                                             📸 Suscriptor (Estudio de Fotografía)
                                         </SelectItem>
                                         <SelectItem value={UserRole.AGENTE}>
-                                            💼 Agente ProSocial
+                                            💼 Agente Zen Studio
                                         </SelectItem>
                                         <SelectItem value={UserRole.SUPER_ADMIN}>
                                             🔧 Super Administrador

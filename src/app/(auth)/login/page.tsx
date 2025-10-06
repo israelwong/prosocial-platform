@@ -7,7 +7,7 @@ export default function Page() {
       <div className="w-full max-w-sm">
         <AuthHeader
           // title="Bienvenido"
-          subtitle="Ingresa a tu cuenta para acceder al tu panel de administración en ProSocial Platform"
+          subtitle="Ingresa a tu cuenta para acceder al tu panel de administración en Zen Studio"
         />
         <LoginForm />
       </div>

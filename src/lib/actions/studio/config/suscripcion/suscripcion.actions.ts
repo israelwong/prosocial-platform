@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { SuscripcionData } from '@/app/studio/[slug]/(studio-app)/configuracion/cuenta/suscripcion/types';
+import { SuscripcionData } from './types';
 
 /**
  * Obtener datos de suscripción del usuario

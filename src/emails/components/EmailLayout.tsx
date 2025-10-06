@@ -28,7 +28,7 @@ export function EmailLayout({ children, title, previewText, platformData }: Emai
     return (
         <Html>
             <Head>
-                <title>{title || platformData?.nombre || 'ProSocial Platform'}</title>
+                <title>{title || platformData?.nombre || 'Zen Studio'}</title>
                 {previewText && (
                     <meta name="description" content={previewText} />
                 )}
@@ -41,7 +41,7 @@ export function EmailLayout({ children, title, previewText, platformData }: Emai
                             src={platformData?.logotipo || 'https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg'}
                             width="160"
                             height="32"
-                            alt={platformData?.nombre || 'ProSocial Platform'}
+                            alt={platformData?.nombre || 'Zen Studio'}
                             style={logo}
                         />
                     </Section>
@@ -55,7 +55,7 @@ export function EmailLayout({ children, title, previewText, platformData }: Emai
                     <Section style={footer}>
                         <Hr style={hr} />
                         <Text style={footerText}>
-                            © 2024 {platformData?.nombre || 'ProSocial Platform'}. Todos los derechos reservados.
+                            © 2024 {platformData?.nombre || 'Zen Studio'}. Todos los derechos reservados.
                         </Text>
                         <Text style={footerText}>
                             <Link href={platformData?.sitio_web || "https://prosocialmx.com"} style={footerLink}>

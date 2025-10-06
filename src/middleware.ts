@@ -25,14 +25,14 @@ export async function middleware(request: NextRequest) {
 
   // Verificar si es una ruta de studio (después de reescritura)
   // Las rutas /studio/[slug] son públicas (páginas de studio)
-  if (pathname.startsWith('/studio/') && !pathname.includes('/dashboard') && !pathname.includes('/configuracion') && !pathname.includes('/manager')) {
+  if (pathname.startsWith('/studio/') && !pathname.includes('/app')) {
     console.log('🔍 Ruta pública de studio, permitiendo acceso')
     return response
   }
 
   // Verificar autenticación para rutas protegidas
-  // Rutas que requieren autenticación: /studio/[slug]/dashboard, /studio/[slug]/configuracion, etc.
-  if (pathname.startsWith('/studio/') && (pathname.includes('/dashboard') || pathname.includes('/configuracion') || pathname.includes('/manager'))) {
+  // Rutas que requieren autenticación: /studio/[slug]/app y subrutas
+  if (pathname.startsWith('/studio/') && pathname.includes('/app')) {
     console.log('🔍 Verificando autenticación para ruta protegida del studio')
 
     const { data: { user }, error } = await supabase.auth.getUser()

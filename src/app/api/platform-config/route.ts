@@ -12,7 +12,7 @@ export async function GET() {
       // Si no existe configuración, devolver valores por defecto
       return NextResponse.json({
         id: null,
-        nombre_empresa: 'ProSocial Platform',
+        nombre_empresa: 'Zen Studio',
         logo_url: null,
         favicon_url: null,
         comercial_telefono: null,
@@ -43,7 +43,7 @@ export async function GET() {
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error fetching platform config:', error)
-    
+
     // Manejar errores de conexión específicos
     if (error instanceof Error && (
       error.message.includes('Can\'t reach database server') ||
@@ -55,7 +55,7 @@ export async function GET() {
         { status: 503 }
       )
     }
-    
+
     return NextResponse.json(
       { error: 'Error al obtener la configuración de la plataforma' },
       { status: 500 }
@@ -67,7 +67,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    
+
     // Validar campos requeridos
     if (!body.nombre_empresa) {
       return NextResponse.json(
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error saving platform config:', error)
-    
+
     // Manejar errores de conexión específicos
     if (error instanceof Error && (
       error.message.includes('Can\'t reach database server') ||
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         { status: 503 }
       )
     }
-    
+
     return NextResponse.json(
       { error: 'Error al guardar la configuración de la plataforma' },
       { status: 500 }
@@ -150,7 +150,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json(config)
   } catch (error) {
     console.error('Error updating platform config:', error)
-    
+
     // Manejar errores de conexión específicos
     if (error instanceof Error && (
       error.message.includes('Can\'t reach database server') ||
@@ -162,7 +162,7 @@ export async function PUT(request: NextRequest) {
         { status: 503 }
       )
     }
-    
+
     return NextResponse.json(
       { error: 'Error al actualizar la configuración de la plataforma' },
       { status: 500 }
@@ -190,7 +190,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ message: 'Configuración eliminada exitosamente' })
   } catch (error) {
     console.error('Error deleting platform config:', error)
-    
+
     // Manejar errores de conexión específicos
     if (error instanceof Error && (
       error.message.includes('Can\'t reach database server') ||
@@ -202,7 +202,7 @@ export async function DELETE(request: NextRequest) {
         { status: 503 }
       )
     }
-    
+
     return NextResponse.json(
       { error: 'Error al eliminar la configuración de la plataforma' },
       { status: 500 }

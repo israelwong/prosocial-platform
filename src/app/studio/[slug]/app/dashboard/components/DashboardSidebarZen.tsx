@@ -9,8 +9,8 @@ import {
     ZenSidebar, ZenSidebarContent, ZenSidebarHeader, ZenSidebarFooter, ZenSidebarMenu,
     ZenSidebarMenuItem, ZenSidebarMenuButton
 } from '@/components/ui/zen';
-import { StudioHeaderModal } from '../configuracion/components/StudioHeaderModal';
-import { ActiveLink } from './ActiveLink'; // Componente cliente para manejar el estado activo
+import { StudioHeaderModal } from '../../../components/StudioHeaderModal';
+import { ActiveLink } from '../../../components/ActiveLink'; // Componente cliente para manejar el estado activo
 
 // Definición de la apariencia de cada módulo
 const moduleConfig = {
@@ -40,7 +40,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
     const activeModules = await getActiveModules(studio.id);
 
     const mainNavItems = [
-        { href: `/${studioSlug}/dashboard`, icon: BarChart3, label: 'Dashboard' },
+        { href: `/${studioSlug}/app/dashboard`, icon: BarChart3, label: 'Dashboard' },
     ];
 
     return (
@@ -86,7 +86,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                 {/* Navegación Fija */}
                 <ZenSidebarMenu>
                     <ZenSidebarMenuItem>
-                        <ActiveLink href={`/${studioSlug}/configuracion`}>
+                        <ActiveLink href={`/${studioSlug}/app/configuracion`}>
                             <Settings className="w-4 h-4" />
                             <span>Configuración</span>
                         </ActiveLink>

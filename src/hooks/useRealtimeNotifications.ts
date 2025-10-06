@@ -20,10 +20,10 @@ interface UseRealtimeNotificationsOptions {
   onNotificationRead?: (notificationId: string) => void;
 }
 
-export function useRealtimeNotifications({ 
-  studioSlug, 
-  onNotification, 
-  onNotificationRead 
+export function useRealtimeNotifications({
+  studioSlug,
+  onNotification,
+  onNotificationRead
 }: UseRealtimeNotificationsOptions) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -31,7 +31,7 @@ export function useRealtimeNotifications({
   const [error, setError] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [reconnectionAttempts, setReconnectionAttempts] = useState(0);
-  
+
   // Referencias para control de conexiones
   const channelRef = useRef<any>(null);
   const supabaseRef = useRef<any>(null);
@@ -43,22 +43,22 @@ export function useRealtimeNotifications({
       setLoading(true);
       setError(null);
       logRealtime('STUDIO_NOTIFICACIONES', 'Cargando notificaciones iniciales', { studioSlug });
-      
+
       // TODO: Implementar Server Action para obtener notificaciones
       // const data = await obtenerNotificacionesStudio(studioSlug);
-      
+
       // Por ahora, usar datos de ejemplo
       const mockNotifications: Notification[] = [
         {
           id: '1',
-          title: 'Bienvenido a ProSocial',
+          title: 'Bienvenido a Zen Studio',
           message: 'Tu studio ha sido configurado exitosamente',
           type: 'success',
           timestamp: new Date().toISOString(),
           read: false
         }
       ];
-      
+
       if (isMountedRef.current) {
         setNotifications(mockNotifications);
         setUnreadCount(mockNotifications.filter(n => !n.read).length);
@@ -78,9 +78,9 @@ export function useRealtimeNotifications({
   // Función para manejar nuevas notificaciones
   const handleNewNotification = useCallback((payload: any) => {
     if (!isMountedRef.current) return;
-    
+
     logRealtime('STUDIO_NOTIFICACIONES', 'Nueva notificación recibida', payload);
-    
+
     const newNotification: Notification = {
       id: payload.id || Date.now().toString(),
       title: payload.title || 'Nueva notificación',
@@ -90,7 +90,7 @@ export function useRealtimeNotifications({
       read: false,
       actionUrl: payload.actionUrl
     };
-    
+
     setNotifications(prev => [newNotification, ...prev]);
     setUnreadCount(prev => prev + 1);
     onNotification?.(newNotification);
@@ -99,18 +99,18 @@ export function useRealtimeNotifications({
   // Función para marcar notificación como leída
   const markAsRead = useCallback((notificationId: string) => {
     if (!isMountedRef.current) return;
-    
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === notificationId 
+
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === notificationId
           ? { ...notification, read: true }
           : notification
       )
     );
-    
+
     setUnreadCount(prev => Math.max(0, prev - 1));
     onNotificationRead?.(notificationId);
-    
+
     logRealtime('STUDIO_NOTIFICACIONES', 'Notificación marcada como leída', { notificationId });
   }, [onNotificationRead]);
 
@@ -171,7 +171,7 @@ export function useRealtimeNotifications({
               setIsConnected(false);
               setReconnectionAttempts(prev => prev + 1);
               logRealtime('STUDIO_NOTIFICACIONES', 'Error en canal de notificaciones', { status, error: err, attempts: reconnectionAttempts + 1 });
-              
+
               // Intentar reconexión si no hemos excedido el límite
               if (reconnectionAttempts < REALTIME_CONFIG.MAX_RECONNECTION_ATTEMPTS) {
                 setTimeout(() => {

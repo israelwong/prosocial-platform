@@ -13,7 +13,7 @@ export function AuthHeader({ subtitle }: AuthHeaderProps) {
             <Link href="/" className="flex items-center space-x-2">
                 <Image
                     src="https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/logotipo.svg"
-                    alt="ProSocial MX"
+                    alt="Zen Studio"
                     width={160}
                     height={32}
                     className="h-8 w-auto"

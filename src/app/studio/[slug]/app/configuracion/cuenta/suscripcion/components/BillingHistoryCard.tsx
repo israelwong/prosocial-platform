@@ -3,16 +3,16 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Badge } from '@/components/ui/shadcn/badge';
-import { 
-    Download, 
-    Eye, 
-    CheckCircle, 
-    Clock, 
+import {
+    Download,
+    Eye,
+    CheckCircle,
+    Clock,
     XCircle,
     Calendar,
     CreditCard
 } from 'lucide-react';
-import { SuscripcionData } from '../types';
+import { SuscripcionData } from '@/lib/actions/studio/config/suscripcion/types';
 
 interface BillingHistoryCardProps {
     data: SuscripcionData;
@@ -95,7 +95,7 @@ export function BillingHistoryCard({ data }: BillingHistoryCardProps) {
                     Historial de Facturación
                 </CardTitle>
             </CardHeader>
-            
+
             <CardContent>
                 <div className="space-y-3">
                     {billing_history.map((bill) => (
@@ -113,7 +113,7 @@ export function BillingHistoryCard({ data }: BillingHistoryCardProps) {
                                             <span className="text-white font-medium">
                                                 {bill.description}
                                             </span>
-                                            <Badge 
+                                            <Badge
                                                 className={`text-xs ${getStatusColor(bill.status)}`}
                                             >
                                                 {getStatusText(bill.status)}
@@ -124,7 +124,7 @@ export function BillingHistoryCard({ data }: BillingHistoryCardProps) {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div className="flex items-center gap-3">
                                     <div className="text-right">
                                         <div className="text-white font-medium">
@@ -134,7 +134,7 @@ export function BillingHistoryCard({ data }: BillingHistoryCardProps) {
                                             {bill.currency}
                                         </div>
                                     </div>
-                                    
+
                                     <div className="flex gap-2">
                                         <button
                                             className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-lg transition-colors"
@@ -154,7 +154,7 @@ export function BillingHistoryCard({ data }: BillingHistoryCardProps) {
                         </div>
                     ))}
                 </div>
-                
+
                 {billing_history.length > 5 && (
                     <div className="mt-4 pt-4 border-t border-zinc-800">
                         <button className="w-full py-2 text-zinc-400 hover:text-white text-sm transition-colors">

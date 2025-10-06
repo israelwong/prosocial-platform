@@ -10,7 +10,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Zen Universe",
+  title: "Zen Studio",
   description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía con sistema de leads, campañas y agentes comerciales",
   keywords: ["CRM para estudios"],
   authors: [{ name: "Israel Wong" }],
@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     apple: "https://fhwfdwrrnwkbnwxabkcq.supabase.co/storage/v1/object/public/ProSocialPlatform/platform/isotipo.svg",
   },
   openGraph: {
-    title: "Zen Universe",
+    title: "Zen Studio",
     description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía",
-    siteName: "Zen Universe",
+    siteName: "Zen Studio",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zen Universe",
+    title: "Zen Studio",
     description: "Plataforma SaaS multi-tenant para gestión de estudios de fotografía",
   },
 };

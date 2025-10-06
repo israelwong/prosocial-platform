@@ -4,17 +4,17 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Badge } from '@/components/ui/shadcn/badge';
 import { Button } from '@/components/ui/shadcn/button';
-import { 
-    CheckCircle, 
-    XCircle, 
-    Calendar, 
-    CreditCard, 
+import {
+    CheckCircle,
+    XCircle,
+    Calendar,
+    CreditCard,
     Settings,
     Crown,
     Star,
     Building
 } from 'lucide-react';
-import { SuscripcionData } from '../types';
+import { SuscripcionData } from '@/lib/actions/studio/config/suscripcion/types';
 
 interface CurrentPlanCardProps {
     data: SuscripcionData;
@@ -112,7 +112,7 @@ export function CurrentPlanCard({ data, studioSlug }: CurrentPlanCardProps) {
                     </div>
                 </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
                 {/* Estado de la suscripción */}
                 <div className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-lg">

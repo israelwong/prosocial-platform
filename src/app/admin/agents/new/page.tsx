@@ -94,7 +94,7 @@ export default function NewAgentPage() {
         if (!createdAgent?.authUser) return;
 
         const credentials = `
-🔐 CREDENCIALES DE ACCESO - PROSOCIAL PLATFORM
+🔐 CREDENCIALES DE ACCESO - ZEN STUDIO
 
 👤 Agente: ${createdAgent.nombre}
 📧 Email: ${createdAgent.authUser.email}

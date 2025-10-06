@@ -45,14 +45,14 @@ export function PlatformLogo({
             <div className={`flex items-center space-x-3 ${className}`}>
                 <NextImage
                     src={fallbackSrc}
-                    alt="ProSocial Platform"
+                    alt="Zen Studio"
                     width={width}
                     height={height}
                     className="h-auto"
                 />
                 {showText && (
                     <h1 className={textClassName}>
-                        ProSocial Platform
+                        Zen Studio
                     </h1>
                 )}
             </div>

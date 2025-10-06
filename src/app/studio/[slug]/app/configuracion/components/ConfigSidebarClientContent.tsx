@@ -8,7 +8,7 @@ import {
     ZenSidebarGroup, ZenSidebarGroupLabel, ZenSidebarGroupContent, ZenSidebarMenu,
     ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuButton
 } from '@/components/ui/zen';
-import { StudioHeaderModal } from './StudioHeaderModal';
+import { StudioHeaderModal } from '../../../components/StudioHeaderModal';
 import {
     Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
     ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2, LogOut,
@@ -95,7 +95,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
     };
 
     const isActive = (href: string) => {
-        return pathname === `/${studioSlug}/configuracion${href}`;
+        return pathname === `/${studioSlug}/app/configuracion${href}`;
     };
 
     return (
@@ -159,7 +159,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                                             {subgroup.items.map((subItem: NavItem) => (
                                                                                 <ZenSidebarMenuItem key={subItem.id}>
                                                                                     <ZenSidebarMenuButton asChild isActive={isActive(subItem.href)}>
-                                                                                        <Link href={`/${studioSlug}/configuracion${subItem.href}`}>
+                                                                                        <Link href={`/${studioSlug}/app/configuracion${subItem.href}`}>
                                                                                             <span className="truncate">{subItem.name}</span>
                                                                                         </Link>
                                                                                     </ZenSidebarMenuButton>
@@ -177,7 +177,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                             <div key={directItem.id} className="pl-2 ml-2 border-l border-zinc-800">
                                                                 <ZenSidebarMenuItem>
                                                                     <ZenSidebarMenuButton asChild isActive={isActive(directItem.href)}>
-                                                                        <Link href={`/${studioSlug}/configuracion${directItem.href}`}>
+                                                                        <Link href={`/${studioSlug}/app/configuracion${directItem.href}`}>
                                                                             <span className="truncate">{directItem.name}</span>
                                                                         </Link>
                                                                     </ZenSidebarMenuButton>
@@ -195,7 +195,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                         {group.items.map((item) => (
                                                             <ZenSidebarMenuItem key={item.id}>
                                                                 <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                    <Link href={`/${studioSlug}/configuracion${item.href}`}>
+                                                                    <Link href={`/${studioSlug}/app/configuracion${item.href}`}>
                                                                         <span className="truncate">{item.name}</span>
                                                                     </Link>
                                                                 </ZenSidebarMenuButton>
@@ -220,7 +220,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                                             {subgroup.items.map((item) => (
                                                                                 <ZenSidebarMenuItem key={item.id}>
                                                                                     <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                                        <Link href={`/${studioSlug}/configuracion${item.href}`}>
+                                                                                        <Link href={`/${studioSlug}/app/configuracion${item.href}`}>
                                                                                             <span className="truncate">{item.name}</span>
                                                                                         </Link>
                                                                                     </ZenSidebarMenuButton>

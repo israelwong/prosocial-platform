@@ -25,7 +25,7 @@ export function Logo({ variant = 'isotipo', size = 'md', className }: LogoProps)
         <div className={cn('flex items-center', className)}>
             <Image
                 src={logoSrc}
-                alt="ProSocial Platform"
+                alt="Zen Studio"
                 width={dimensions.width}
                 height={dimensions.height}
                 className="object-contain"

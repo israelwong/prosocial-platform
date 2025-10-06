@@ -29,8 +29,8 @@ export function AgentCredentialsEmail({
     isNewAgent = false,
     platformData
 }: AgentCredentialsEmailProps) {
-    const platformName = platformData?.nombre || 'ProSocial Platform';
-    
+    const platformName = platformData?.nombre || 'Zen Studio';
+
     const previewText = isNewAgent
         ? `Bienvenido a ${platformName}, ${agentName}`
         : `Nuevas credenciales para tu cuenta de ${platformName}`;

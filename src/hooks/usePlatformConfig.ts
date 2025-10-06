@@ -43,8 +43,8 @@ let globalPromise: Promise<PlatformConfig | null> | null = null;
 // Configuración por defecto
 const getDefaultConfig = (): PlatformConfig => ({
     id: 'default',
-    nombre_empresa: 'ProSocial Platform',
-    nombre_plataforma: 'ProSocial Platform',
+    nombre_empresa: 'Zen Studio',
+    nombre_plataforma: 'Zen Studio',
     descripcion: 'Plataforma de gestión de estudios de fotografía',
     isotipo: null,
     logotipo: null,
@@ -66,7 +66,7 @@ const getDefaultConfig = (): PlatformConfig => ({
     terminos_condiciones: null,
     politica_privacidad: null,
     aviso_legal: null,
-    meta_title: 'ProSocial Platform',
+    meta_title: 'Zen Studio',
     meta_description: 'Plataforma de gestión de estudios de fotografía',
     meta_keywords: 'fotografía, estudios, gestión, CRM',
     favicon: null,
@@ -119,7 +119,7 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
         globalPromise = (async () => {
             try {
                 const response = await fetch('/api/platform-config');
-                
+
                 if (!response.ok) {
                     // Intentar obtener el mensaje de error del servidor
                     let errorMessage = 'Error al cargar la configuración';
@@ -129,7 +129,7 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
                     } catch {
                         // Si no se puede parsear el error, usar el mensaje por defecto
                     }
-                    
+
                     // Si es un error de conexión a la base de datos, usar configuración por defecto
                     if (response.status >= 500) {
                         console.warn('Error de servidor, usando configuración por defecto:', errorMessage);
@@ -137,7 +137,7 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
                         globalConfig = defaultConfig;
                         return defaultConfig;
                     }
-                    
+
                     throw new Error(errorMessage);
                 }
 
@@ -147,7 +147,7 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
                 console.error('Error fetching platform config:', err);
-                
+
                 // Si es un error de red o conexión, usar configuración por defecto
                 if (errorMessage.includes('fetch') || errorMessage.includes('network') || errorMessage.includes('connection')) {
                     console.warn('Error de conexión, usando configuración por defecto');
@@ -155,7 +155,7 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
                     globalConfig = defaultConfig;
                     return defaultConfig;
                 }
-                
+
                 throw new Error(errorMessage);
             }
         })();
@@ -197,7 +197,7 @@ export function usePlatformConfig(): UsePlatformConfigReturn {
 // Hook para obtener solo el nombre de la empresa (más ligero)
 export function usePlatformName(): string {
     const { config } = usePlatformConfig();
-    return config?.nombre_empresa || 'ProSocial Platform';
+    return config?.nombre_empresa || 'Zen Studio';
 }
 
 // Hook para obtener solo el logo (más ligero)
@@ -216,7 +216,7 @@ export function usePlatformIsotipo(): string | null {
 export function usePlatformBranding() {
     const { config } = usePlatformConfig();
     return {
-        nombre: config?.nombre_empresa || 'ProSocial Platform',
+        nombre: config?.nombre_empresa || 'Zen Studio',
         isotipo: config?.favicon_url || null, // Isotipo = solo el icono (favicon)
         logotipo: config?.logo_url || null, // Logotipo = icono + nombre (logo_url)
         favicon: config?.favicon_url || null,

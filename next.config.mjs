@@ -32,20 +32,10 @@ const nextConfig = {
         ],
       },
       // Reescritura para rutas protegidas de studios
-      // /demo-studio/dashboard -> /studio/demo-studio/dashboard
+      // /demo-studio/app -> /studio/demo-studio/app
       {
-        source: "/:slug/dashboard",
-        destination: "/studio/:slug/dashboard",
-      },
-      // /demo-studio/configuracion -> /studio/demo-studio/configuracion
-      {
-        source: "/:slug/configuracion/:path*",
-        destination: "/studio/:slug/configuracion/:path*",
-      },
-      // /demo-studio/manager -> /studio/demo-studio/manager
-      {
-        source: "/:slug/manager/:path*",
-        destination: "/studio/:slug/manager/:path*",
+        source: "/:slug/app/:path*",
+        destination: "/studio/:slug/app/:path*",
       },
     ];
   },
