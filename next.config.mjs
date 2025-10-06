@@ -16,6 +16,40 @@ const nextConfig = {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 
+  async rewrites() {
+    return [
+      // Reescritura para páginas públicas de studios
+      // /demo-studio -> /studio/demo-studio
+      {
+        source: "/:slug",
+        destination: "/studio/:slug",
+        has: [
+          {
+            type: "header",
+            key: "accept",
+            value: "text/html.*",
+          },
+        ],
+      },
+      // Reescritura para rutas protegidas de studios
+      // /demo-studio/dashboard -> /studio/demo-studio/dashboard
+      {
+        source: "/:slug/dashboard",
+        destination: "/studio/:slug/dashboard",
+      },
+      // /demo-studio/configuracion -> /studio/demo-studio/configuracion
+      {
+        source: "/:slug/configuracion/:path*",
+        destination: "/studio/:slug/configuracion/:path*",
+      },
+      // /demo-studio/manager -> /studio/demo-studio/manager
+      {
+        source: "/:slug/manager/:path*",
+        destination: "/studio/:slug/manager/:path*",
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
