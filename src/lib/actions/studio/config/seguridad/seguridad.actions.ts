@@ -33,29 +33,37 @@ export async function cambiarContraseña(
         }
 
         // Verificar contraseña actual (requiere re-autenticación)
-        const { error: verifyError } = await supabase.auth.signInWithPassword({
+        console.log('🔍 Verificando contraseña actual para:', user.email);
+        const { data: verifyData, error: verifyError } = await supabase.auth.signInWithPassword({
             email: user.email!,
             password: validatedData.currentPassword
         });
 
         if (verifyError) {
+            console.error('❌ Error al verificar contraseña:', verifyError.message);
             return {
                 success: false,
                 error: 'La contraseña actual es incorrecta'
             };
         }
 
+        console.log('✅ Contraseña actual verificada correctamente');
+
         // Actualizar contraseña
+        console.log('🔄 Actualizando contraseña...');
         const { error: updateError } = await supabase.auth.updateUser({
             password: validatedData.newPassword
         });
 
         if (updateError) {
+            console.error('❌ Error al actualizar contraseña:', updateError.message);
             return {
                 success: false,
                 error: 'Error al actualizar la contraseña'
             };
         }
+
+        console.log('✅ Contraseña actualizada exitosamente');
 
         // Log del cambio de contraseña
         await logSecurityAction(user.id, 'password_change', true, {
