@@ -51,3 +51,9 @@ COMPONENTES_A_COPIAR.md
 
 # documentation (local development)
 docs/
+
+# scripts directory
+scripts/
+
+# prisma seed files
+prisma/*seed*

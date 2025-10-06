@@ -191,7 +191,7 @@ export async function obtenerPlanesDisponibles() {
     try {
         const plans = await prisma.platform_plans.findMany({
             where: { active: true },
-            orderBy: { orden: 'asc' }
+            orderBy: { orden: 'asc' as const }
         });
 
         return {
