@@ -80,6 +80,33 @@ export async function cambiarContraseña(
 }
 
 /**
+ * Obtener o crear usuario en la base de datos
+ */
+async function getOrCreateUser(supabaseUser: any) {
+    // Buscar el usuario en nuestra tabla usando supabase_id
+    let dbUser = await prisma.users.findUnique({
+        where: { supabase_id: supabaseUser.id }
+    });
+
+    // Si no existe, crear el usuario
+    if (!dbUser) {
+        console.log('🔧 Creando usuario en base de datos:', supabaseUser.email);
+        dbUser = await prisma.users.create({
+            data: {
+                supabase_id: supabaseUser.id,
+                email: supabaseUser.email!,
+                full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
+                is_active: true,
+                email_verified: supabaseUser.email_confirmed_at ? true : false
+            }
+        });
+        console.log('✅ Usuario creado:', dbUser.email);
+    }
+
+    return dbUser;
+}
+
+/**
  * Obtener configuraciones de seguridad del usuario
  */
 export async function obtenerConfiguracionesSeguridad(
@@ -93,15 +120,8 @@ export async function obtenerConfiguracionesSeguridad(
             return null;
         }
 
-        // Buscar el usuario en nuestra tabla usando supabase_id
-        const dbUser = await prisma.users.findUnique({
-            where: { supabase_id: user.id }
-        });
-
-        if (!dbUser) {
-            console.error('Usuario no encontrado en la base de datos');
-            return null;
-        }
+        // Obtener o crear usuario en la base de datos
+        const dbUser = await getOrCreateUser(user);
 
         // Buscar configuraciones existentes
         let settings = await prisma.user_security_settings.findUnique({
@@ -150,17 +170,8 @@ export async function actualizarConfiguracionesSeguridad(
             };
         }
 
-        // Buscar el usuario en nuestra tabla usando supabase_id
-        const dbUser = await prisma.users.findUnique({
-            where: { supabase_id: user.id }
-        });
-
-        if (!dbUser) {
-            return {
-                success: false,
-                error: 'Usuario no encontrado en la base de datos'
-            };
-        }
+        // Obtener o crear usuario en la base de datos
+        const dbUser = await getOrCreateUser(user);
 
         // Actualizar o crear configuraciones
         const settings = await prisma.user_security_settings.upsert({
@@ -258,17 +269,8 @@ export async function cerrarTodasLasSesiones(
             };
         }
 
-        // Buscar el usuario en nuestra tabla usando supabase_id
-        const dbUser = await prisma.users.findUnique({
-            where: { supabase_id: user.id }
-        });
-
-        if (!dbUser) {
-            return {
-                success: false,
-                error: 'Usuario no encontrado en la base de datos'
-            };
-        }
+        // Obtener o crear usuario en la base de datos
+        const dbUser = await getOrCreateUser(user);
 
         // Supabase Auth no permite cerrar sesiones específicas
         // Solo podemos cerrar la sesión actual
