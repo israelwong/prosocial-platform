@@ -21,10 +21,22 @@ export async function obtenerDatosSuscripcion(studioSlug: string) {
             };
         }
 
+        // Buscar el usuario en nuestra tabla usando supabase_id
+        const dbUser = await prisma.users.findUnique({
+            where: { supabase_id: user.id }
+        });
+
+        if (!dbUser) {
+            return {
+                success: false,
+                error: 'Usuario no encontrado en la base de datos'
+            };
+        }
+
         // Buscar el studio del usuario
         const userStudioRole = await prisma.user_studio_roles.findFirst({
             where: { 
-                user_id: user.id,
+                user_id: dbUser.id,
                 role: 'OWNER'
             },
             include: { studio: true }
@@ -43,7 +55,7 @@ export async function obtenerDatosSuscripcion(studioSlug: string) {
         const subscription = await prisma.subscriptions.findFirst({
             where: { studio_id: studio.id },
             include: {
-                plan: true,
+                plans: true,
                 items: {
                     where: { deactivated_at: null }, // Solo items activos
                     include: { plan: true }
@@ -68,17 +80,17 @@ export async function obtenerDatosSuscripcion(studioSlug: string) {
             {
                 id: 'demo_bill_1',
                 subscription_id: subscription.id,
-                amount: subscription.plan.price_monthly,
+                amount: subscription.plans.price_monthly,
                 currency: 'MXN',
                 status: 'paid' as const,
-                description: `Factura ${subscription.plan.name} - ${new Date().toLocaleDateString('es-ES')}`,
+                description: `Factura ${subscription.plans.name} - ${new Date().toLocaleDateString('es-ES')}`,
                 created_at: new Date()
             }
         ];
 
         const data: SuscripcionData = {
             subscription,
-            plan: subscription.plan,
+            plan: subscription.plans,
             limits,
             items: subscription.items,
             billing_history
@@ -142,10 +154,22 @@ export async function cambiarPlan(
             };
         }
 
+        // Buscar el usuario en nuestra tabla usando supabase_id
+        const dbUser = await prisma.users.findUnique({
+            where: { supabase_id: user.id }
+        });
+
+        if (!dbUser) {
+            return {
+                success: false,
+                error: 'Usuario no encontrado en la base de datos'
+            };
+        }
+
         // Buscar el studio del usuario
         const userStudioRole = await prisma.user_studio_roles.findFirst({
             where: { 
-                user_id: user.id,
+                user_id: dbUser.id,
                 role: 'OWNER'
             },
             include: { studio: true }
@@ -220,7 +244,7 @@ export async function cambiarPlan(
         // Log del cambio de plan
         await prisma.user_access_logs.create({
             data: {
-                user_id: user.id,
+                user_id: dbUser.id,
                 action: 'plan_changed',
                 ip_address: 'N/A',
                 user_agent: 'N/A',
@@ -266,10 +290,22 @@ export async function cancelarSuscripcion(studioSlug: string) {
             };
         }
 
+        // Buscar el usuario en nuestra tabla usando supabase_id
+        const dbUser = await prisma.users.findUnique({
+            where: { supabase_id: user.id }
+        });
+
+        if (!dbUser) {
+            return {
+                success: false,
+                error: 'Usuario no encontrado en la base de datos'
+            };
+        }
+
         // Buscar el studio del usuario
         const userStudioRole = await prisma.user_studio_roles.findFirst({
             where: { 
-                user_id: user.id,
+                user_id: dbUser.id,
                 role: 'OWNER'
             },
             include: { studio: true }
@@ -308,7 +344,7 @@ export async function cancelarSuscripcion(studioSlug: string) {
         // Log de la cancelación
         await prisma.user_access_logs.create({
             data: {
-                user_id: user.id,
+                user_id: dbUser.id,
                 action: 'subscription_cancelled',
                 ip_address: 'N/A',
                 user_agent: 'N/A',
