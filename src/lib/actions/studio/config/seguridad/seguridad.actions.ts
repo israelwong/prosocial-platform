@@ -88,21 +88,31 @@ export async function obtenerConfiguracionesSeguridad(
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-
+        
         if (userError || !user) {
+            return null;
+        }
+
+        // Buscar el usuario en nuestra tabla usando supabase_id
+        const dbUser = await prisma.users.findUnique({
+            where: { supabase_id: user.id }
+        });
+
+        if (!dbUser) {
+            console.error('Usuario no encontrado en la base de datos');
             return null;
         }
 
         // Buscar configuraciones existentes
         let settings = await prisma.user_security_settings.findUnique({
-            where: { user_id: user.id }
+            where: { user_id: dbUser.id }
         });
 
         // Si no existen, crear con valores por defecto
         if (!settings) {
             settings = await prisma.user_security_settings.create({
                 data: {
-                    user_id: user.id,
+                    user_id: dbUser.id,
                     email_notifications: true,
                     device_alerts: true,
                     session_timeout: 30
@@ -128,11 +138,11 @@ export async function actualizarConfiguracionesSeguridad(
     try {
         // Validar datos
         const validatedData = SecuritySettingsSchema.parse(data);
-
+        
         // Obtener usuario actual
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-
+        
         if (userError || !user) {
             return {
                 success: false,
@@ -140,9 +150,21 @@ export async function actualizarConfiguracionesSeguridad(
             };
         }
 
+        // Buscar el usuario en nuestra tabla usando supabase_id
+        const dbUser = await prisma.users.findUnique({
+            where: { supabase_id: user.id }
+        });
+
+        if (!dbUser) {
+            return {
+                success: false,
+                error: 'Usuario no encontrado en la base de datos'
+            };
+        }
+
         // Actualizar o crear configuraciones
         const settings = await prisma.user_security_settings.upsert({
-            where: { user_id: user.id },
+            where: { user_id: dbUser.id },
             update: {
                 email_notifications: validatedData.email_notifications,
                 device_alerts: validatedData.device_alerts,
@@ -150,7 +172,7 @@ export async function actualizarConfiguracionesSeguridad(
                 updated_at: new Date()
             },
             create: {
-                user_id: user.id,
+                user_id: dbUser.id,
                 email_notifications: validatedData.email_notifications,
                 device_alerts: validatedData.device_alerts,
                 session_timeout: validatedData.session_timeout
@@ -158,7 +180,7 @@ export async function actualizarConfiguracionesSeguridad(
         });
 
         // Log del cambio de configuraciones
-        await logSecurityAction(user.id, 'security_settings_updated', true, {
+        await logSecurityAction(dbUser.id, 'security_settings_updated', true, {
             settings: validatedData
         });
 
@@ -190,13 +212,22 @@ export async function obtenerHistorialAccesos(
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-
+        
         if (userError || !user) {
             return [];
         }
 
+        // Buscar el usuario en nuestra tabla usando supabase_id
+        const dbUser = await prisma.users.findUnique({
+            where: { supabase_id: user.id }
+        });
+
+        if (!dbUser) {
+            return [];
+        }
+
         const logs = await prisma.user_access_logs.findMany({
-            where: { user_id: user.id },
+            where: { user_id: dbUser.id },
             orderBy: { created_at: 'desc' },
             take: limit,
             skip: offset
@@ -219,11 +250,23 @@ export async function cerrarTodasLasSesiones(
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-
+        
         if (userError || !user) {
             return {
                 success: false,
                 error: 'Usuario no autenticado'
+            };
+        }
+
+        // Buscar el usuario en nuestra tabla usando supabase_id
+        const dbUser = await prisma.users.findUnique({
+            where: { supabase_id: user.id }
+        });
+
+        if (!dbUser) {
+            return {
+                success: false,
+                error: 'Usuario no encontrado en la base de datos'
             };
         }
 
@@ -239,7 +282,7 @@ export async function cerrarTodasLasSesiones(
         }
 
         // Log del cierre de sesiones
-        await logSecurityAction(user.id, 'session_ended', true, {
+        await logSecurityAction(dbUser.id, 'session_ended', true, {
             action: 'close_all_sessions'
         });
 
