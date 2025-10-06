@@ -33,7 +33,7 @@ export async function GET(
                         createdAt: true
                     },
                     orderBy: {
-                        createdAt: 'desc'
+                        created_at: 'desc'
                     }
                 },
                 _count: {
