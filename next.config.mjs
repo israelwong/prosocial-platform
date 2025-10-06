@@ -2,7 +2,11 @@
 const nextConfig = {
   serverExternalPackages: ["@prisma/client", "@supabase/supabase-js"],
   images: {
-    domains: ["bgtapcutchryzhzooony.supabase.co", "zen.pro"],
+    domains: [
+      "bgtapcutchryzhzooony.supabase.co",
+      "fhwfdwrrnwkbnwxabkcq.supabase.co",
+      "zen.pro",
+    ],
   },
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

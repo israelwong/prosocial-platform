@@ -116,76 +116,82 @@ export function PerfilFormSimple({
     return (
         <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
-                <CardTitle className="text-white flex items-center space-x-2">
+                <CardTitle className="text-white flex items-center space-x-2 border-b border-zinc-800 pb-4">
                     <User className="h-5 w-5" />
-                    <span>Información Personal</span>
+                    <span>Información del perfil</span>
                 </CardTitle>
             </CardHeader>
+
             <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                     {/* Layout de 2 columnas */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Columna 1: Avatar */}
-                        <div className="space-y-3">
-                            <label className="text-sm font-medium text-zinc-200">
-                                Avatar
-                            </label>
-                            <AvatarManagerZen
-                                url={localAvatarUrl}
-                                onUpdate={handleAvatarUpdate}
-                                onLocalUpdate={handleAvatarLocalUpdate}
-                                studioSlug={studioSlug}
-                                loading={loading}
-                            />
+                        <div className="space-y-4">
+                            <div className="text-left">
+                                <AvatarManagerZen
+                                    url={localAvatarUrl}
+                                    onUpdate={handleAvatarUpdate}
+                                    onLocalUpdate={handleAvatarLocalUpdate}
+                                    studioSlug={studioSlug}
+                                    loading={loading}
+                                />
+                            </div>
                         </div>
 
                         {/* Columna 2: Información Personal */}
-                        <div className="space-y-4">
-                            {/* Nombre */}
-                            <ZenInput
-                                id="name"
-                                label="Nombre Completo"
-                                icon={User}
-                                required
-                                {...register('name')}
-                                placeholder="Tu nombre completo"
-                                error={errors.name?.message}
-                            />
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-lg font-medium text-white mb-4">Información Personal</h3>
 
-                            {/* Email */}
-                            <ZenInput
-                                id="email"
-                                label="Correo Electrónico"
-                                icon={Mail}
-                                required
-                                type="email"
-                                {...register('email')}
-                                placeholder="tu@email.com"
-                                error={errors.email?.message}
-                            />
+                                <div className="space-y-4">
+                                    {/* Nombre */}
+                                    <ZenInput
+                                        id="name"
+                                        label="Nombre Completo"
+                                        icon={User}
+                                        required
+                                        {...register('name')}
+                                        placeholder="Tu nombre completo"
+                                        error={errors.name?.message}
+                                    />
 
-                            {/* Teléfono */}
-                            <ZenInput
-                                id="phone"
-                                label="Teléfono"
-                                icon={Phone}
-                                required
-                                {...register('phone')}
-                                placeholder="+52 55 1234 5678"
-                                error={errors.phone?.message}
-                            />
+                                    {/* Email */}
+                                    <ZenInput
+                                        id="email"
+                                        label="Correo Electrónico"
+                                        icon={Mail}
+                                        required
+                                        type="email"
+                                        {...register('email')}
+                                        placeholder="tu@email.com"
+                                        error={errors.email?.message}
+                                    />
+
+                                    {/* Teléfono */}
+                                    <ZenInput
+                                        id="phone"
+                                        label="Teléfono"
+                                        icon={Phone}
+                                        required
+                                        {...register('phone')}
+                                        placeholder="+52 55 1234 5678"
+                                        error={errors.phone?.message}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Botón de guardar */}
-                    <div className="flex justify-end pt-4">
+                    {/* Botón de guardar - Centrado */}
+                    <div className="flex justify-end pt-6 border-t border-zinc-800">
                         <ZenButton
                             type="submit"
                             loading={loading}
                             loadingText="Actualizando..."
                             icon={Save}
                             iconPosition="left"
-                            className="bg-blue-600 hover:bg-blue-700"
+                            className="bg-blue-600 hover:bg-blue-700 px-8 py-3"
                         >
                             Actualizar Perfil
                         </ZenButton>

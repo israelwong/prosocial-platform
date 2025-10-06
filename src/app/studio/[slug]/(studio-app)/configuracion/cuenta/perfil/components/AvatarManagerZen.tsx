@@ -1,15 +1,12 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { ZenButton } from '@/components/ui/zen/base/ZenButton';
-import { ZenInput } from '@/components/ui/zen/base/ZenInput';
-import { ZenLabel } from '@/components/ui/zen/base/ZenLabel';
-import { Upload, ExternalLink, User } from 'lucide-react';
+import { Upload, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { Dropzone } from '@/components/ui/shadcn/dropzone';
-import { FilePreview } from '@/components/ui/shadcn/file-preview';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/shadcn/avatar';
+import { AvatarCropModal } from './AvatarCropModal';
 
 interface AvatarManagerZenProps {
   url?: string | null | undefined;
@@ -26,8 +23,8 @@ export function AvatarManagerZen({
   studioSlug,
   loading = false
 }: AvatarManagerZenProps) {
-  const [nuevaUrl, setNuevaUrl] = useState('');
-  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImageUrl, setCropImageUrl] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Hook para upload de archivos
@@ -46,50 +43,6 @@ export function AvatarManagerZen({
     }
   });
 
-  // Función para optimizar imagen
-  const optimizeImage = (file: File, maxSize: number = 2 * 1024 * 1024): Promise<File> => {
-    return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const img = new Image();
-
-      img.onload = () => {
-        // Redimensionar a 400x400 máximo manteniendo aspect ratio
-        const maxDimension = 400;
-        let { width, height } = img;
-
-        if (width > height) {
-          if (width > maxDimension) {
-            height = (height * maxDimension) / width;
-            width = maxDimension;
-          }
-        } else {
-          if (height > maxDimension) {
-            width = (width * maxDimension) / height;
-            height = maxDimension;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-
-        // Dibujar imagen redimensionada
-        ctx?.drawImage(img, 0, 0, width, height);
-
-        // Convertir a blob con calidad 0.8
-        canvas.toBlob((blob) => {
-          if (blob) {
-            const optimizedFile = new File([blob], file.name, { type: 'image/jpeg' });
-            resolve(optimizedFile);
-          } else {
-            resolve(file);
-          }
-        }, 'image/jpeg', 0.8);
-      };
-
-      img.src = URL.createObjectURL(file);
-    });
-  };
 
   const handleFileSelect = async (file: File) => {
     // Validar tipo de archivo
@@ -104,14 +57,23 @@ export function AvatarManagerZen({
       return;
     }
 
-    // Actualización optimista
-    onLocalUpdate(URL.createObjectURL(file));
+    // Abrir modal de crop con la imagen seleccionada
+    setCropImageUrl(URL.createObjectURL(file));
+    setShowCropModal(true);
+  };
 
+  const handleCropApply = async (cropData: { x: number; y: number; scale: number; rotation: number }, croppedImageUrl: string) => {
     try {
-      // Optimizar imagen antes de subir
-      const optimizedFile = await optimizeImage(file);
+      // Convertir la URL del blob a File
+      const response = await fetch(croppedImageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], 'avatar-cropped.jpg', { type: 'image/jpeg' });
 
-      const result = await uploadFile(optimizedFile);
+      // Actualización optimista - usar la imagen cropeada directamente
+      onLocalUpdate(croppedImageUrl);
+
+      // Subir el archivo cropeado
+      const result = await uploadFile(file);
       if (result.success && result.publicUrl) {
         await onUpdate(result.publicUrl);
         toast.success('¡Perfecto! Tu foto de perfil se ha actualizado correctamente');
@@ -120,35 +82,14 @@ export function AvatarManagerZen({
         onLocalUpdate(url || null);
         toast.error(result.error || 'No pudimos subir tu foto. Inténtalo de nuevo.');
       }
+
+      setShowCropModal(false);
     } catch (error) {
-      // Revertir cambios en caso de error
-      onLocalUpdate(url || null);
-      toast.error('Ocurrió un problema al subir tu foto. Por favor inténtalo de nuevo.');
-      console.error('Error al subir archivo:', error);
+      console.error('Error al aplicar crop:', error);
+      toast.error('Error al procesar la imagen');
     }
   };
 
-  const handleUpdateUrl = async () => {
-    if (!nuevaUrl.trim()) return;
-
-    const urlTrimmed = nuevaUrl.trim();
-
-    // Actualización optimista - actualizar UI inmediatamente
-    onLocalUpdate(urlTrimmed);
-    setNuevaUrl('');
-    setShowUrlInput(false);
-
-    try {
-      await onUpdate(urlTrimmed);
-      toast.success('¡Excelente! Tu foto de perfil se ha actualizado');
-    } catch {
-      // Revertir cambios en caso de error
-      onLocalUpdate(url || null);
-      setNuevaUrl(urlTrimmed);
-      setShowUrlInput(true);
-      toast.error('No pudimos actualizar tu foto. Verifica que la URL sea correcta');
-    }
-  };
 
   const handleRemoveUrl = async () => {
     // Guardar la URL original para rollback
@@ -171,12 +112,6 @@ export function AvatarManagerZen({
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleUpdateUrl();
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -184,7 +119,7 @@ export function AvatarManagerZen({
         <div className="space-y-4">
           {/* Previsualización del avatar grande minimalista */}
           <div className="flex flex-col items-center space-y-4">
-            <Avatar className="w-48 h-48">
+            <Avatar className="w-64 h-64">
               <AvatarImage
                 src={url}
                 alt="Avatar"
@@ -196,28 +131,41 @@ export function AvatarManagerZen({
             </Avatar>
 
             {/* Botones minimalistas */}
-            <div className="flex gap-3">
-              <ZenButton
-                variant="outline"
-                size="sm"
+            <div className="flex gap-2">
+              <button
                 onClick={() => fileInputRef.current?.click()}
-                loading={uploading}
                 disabled={uploading || loading}
-                className="text-zinc-300 hover:text-white border-zinc-600 hover:border-zinc-500"
+                className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Upload className="h-4 w-4 mr-2" />
-                Cambiar foto
-              </ZenButton>
+                <Upload className="h-3 w-3" />
+                Cambiar
+              </button>
 
-              <ZenButton
-                variant="outline"
-                size="sm"
+              <button
+                onClick={() => {
+                  console.log('Abriendo modal de crop con URL:', url);
+                  setCropImageUrl(url || '');
+                  setShowCropModal(true);
+                }}
+                disabled={uploading || loading}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+                Ajustar
+              </button>
+
+              <button
                 onClick={handleRemoveUrl}
                 disabled={uploading || loading}
-                className="text-red-400 hover:text-red-300 border-red-600 hover:border-red-500"
+                className="flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
                 Eliminar
-              </ZenButton>
+              </button>
             </div>
           </div>
         </div>
@@ -234,7 +182,7 @@ export function AvatarManagerZen({
               maxSize={10}
               maxFiles={1}
               disabled={uploading || loading}
-              className="h-44 border border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900/20 transition-all duration-300 rounded-lg group cursor-pointer relative overflow-hidden"
+              className="h-72 border border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900/20 transition-all duration-300 rounded-lg group cursor-pointer relative overflow-hidden"
             >
               <div className="flex flex-col items-center justify-center h-full p-6 text-center">
                 {/* Icono principal */}
@@ -316,64 +264,15 @@ export function AvatarManagerZen({
         </div>
       )}
 
-      {/* Input de URL con ZEN components */}
-      {showUrlInput && (
-        <div className="space-y-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
-          <ZenLabel htmlFor="url-avatar">
-            URL del Avatar
-          </ZenLabel>
-          <div className="flex space-x-2">
-            <ZenInput
-              id="url-avatar"
-              label=""
-              value={nuevaUrl}
-              onChange={(e) => setNuevaUrl(e.target.value)}
-              placeholder="https://ejemplo.com/avatar.jpg"
-              onKeyPress={handleKeyPress}
-              disabled={uploading || loading}
-              className="flex-1"
-            />
-            <ZenButton
-              onClick={handleUpdateUrl}
-              size="sm"
-              loading={uploading}
-              disabled={!nuevaUrl.trim() || uploading || loading}
-            >
-              Guardar
-            </ZenButton>
-            <ZenButton
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setShowUrlInput(false);
-                setNuevaUrl('');
-              }}
-              disabled={uploading || loading}
-            >
-              Cancelar
-            </ZenButton>
-          </div>
-        </div>
-      )}
 
-      {/* Botón para agregar URL si no hay archivo */}
-      {!url && !showUrlInput && (
-        <div className="mt-4">
-          <ZenButton
-            variant="outline"
-            size="sm"
-            onClick={() => setShowUrlInput(true)}
-            disabled={uploading || loading}
-            className="w-full hover:bg-zinc-800/50 transition-colors duration-200"
-          >
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Agregar URL
-          </ZenButton>
-          <p className="text-xs text-zinc-500 text-center mt-2">
-            O proporciona una URL directa a tu imagen
-          </p>
-        </div>
-      )}
+
+      {/* Modal de crop */}
+      <AvatarCropModal
+        isOpen={showCropModal}
+        onClose={() => setShowCropModal(false)}
+        imageUrl={cropImageUrl}
+        onCrop={handleCropApply}
+      />
     </div>
   );
 }

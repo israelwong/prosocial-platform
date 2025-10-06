@@ -86,6 +86,7 @@
     "react-email": "^4.2.11",
     "react-hook-form": "^7.62.0",
     "react-hot-toast": "^2.6.0",
+    "react-image-crop": "^11.0.10",
     "react-photo-album": "^3.1.0",
     "react-qrcode-logo": "^4.0.0",
     "react-type-animation": "^3.2.0",
