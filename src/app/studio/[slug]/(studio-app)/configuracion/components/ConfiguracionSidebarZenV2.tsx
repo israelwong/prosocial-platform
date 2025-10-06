@@ -54,7 +54,7 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             moduleSlug: 'comercial',
             mixedItems: [
                 // Items directos primero
-                { id: 'crm', name: 'CRM', href: '/comercial/crm', icon: 'Users' },
+                { id: 'crm', name: 'Etapas del CRM', href: '/comercial/crm', icon: 'Users' },
                 { id: 'condiciones-comerciales', name: 'Condiciones Comerciales', href: '/comercial/condiciones-comerciales', icon: 'FileText' },
                 { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/comercial/reglas-agendamiento', icon: 'Clock' },
                 { id: 'tipos-evento', name: 'Tipos de Evento', href: '/comercial/tipos-evento', icon: 'Calendar' },
