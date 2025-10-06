@@ -48,60 +48,106 @@ const NAVIGATION_CONFIG: NavigationConfig = {
     ],
     modules: [
         {
-            id: 'comercial',
-            title: 'Comercial',
+            id: 'studio',
+            title: 'Studio',
+            icon: 'Camera',
+            moduleSlug: 'studio',
+            items: [
+                { id: 'identidad', name: 'Identidad', href: '/studio/identidad', icon: 'Star' },
+                { id: 'contacto', name: 'Contacto', href: '/studio/contacto', icon: 'Phone' },
+                { id: 'horarios', name: 'Horarios', href: '/studio/horarios', icon: 'Clock' },
+                { id: 'redes-sociales', name: 'Redes Sociales', href: '/studio/redes-sociales', icon: 'Zap' },
+            ],
+        },
+        {
+            id: 'operacion',
+            title: 'Operación',
+            icon: 'Cog',
+            moduleSlug: 'operacion',
+            items: [
+                { id: 'personal', name: 'Personal', href: '/operacion/personal', icon: 'Users2' },
+                { id: 'pipeline', name: 'Pipeline', href: '/operacion/pipeline', icon: 'Workflow' },
+                { id: 'tipos-evento', name: 'Tipos de Evento', href: '/operacion/tipos-evento', icon: 'Calendar' },
+            ],
+        },
+        {
+            id: 'catalogo',
+            title: 'Catálogo',
+            icon: 'Package',
+            moduleSlug: 'catalogo',
+            items: [
+                { id: 'servicios', name: 'Servicios', href: '/catalogo/servicios', icon: 'Layers' },
+                { id: 'paquetes', name: 'Paquetes', href: '/catalogo/paquetes', icon: 'Package' },
+            ],
+        },
+        {
+            id: 'ventas',
+            title: 'Ventas',
             icon: 'ShoppingCart',
-            moduleSlug: 'comercial',
-            mixedItems: [
-                // Items directos primero
-                { id: 'crm', name: 'Etapas del CRM', href: '/comercial/crm', icon: 'Users' },
-                { id: 'condiciones-comerciales', name: 'Condiciones Comerciales', href: '/comercial/condiciones-comerciales', icon: 'FileText' },
-                { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/comercial/reglas-agendamiento', icon: 'Clock' },
-                { id: 'tipos-evento', name: 'Tipos de Evento', href: '/comercial/tipos-evento', icon: 'Calendar' },
-                { id: 'inteligencia-financiera', name: 'Inteligencia Financiera', href: '/comercial/inteligencia-financiera', icon: 'Coins' },
-                // Subgrupos después
-                {
-                    id: 'catalogo',
-                    title: 'Catálogo',
-                    items: [
-                        { id: 'catalogo-servicios', name: 'Servicios', href: '/comercial/catalogo/servicios', icon: 'Layers' },
-                        { id: 'catalogo-paquetes', name: 'Paquetes', href: '/comercial/catalogo/paquetes', icon: 'Package' },
-                    ]
-                },
-                {
-                    id: 'metodos-pago',
-                    title: 'Métodos de Pago',
-                    items: [
-                        { id: 'cuentas-negocio', name: 'Cuentas de Negocio', href: '/comercial/metodos-de-pago/cuentas-de-negocio', icon: 'Building' },
-                        { id: 'stripe', name: 'Stripe', href: '/comercial/metodos-de-pago/stripe', icon: 'CreditCard' },
-                    ]
-                },
-            ],
-        },
-        {
-            id: 'manager',
-            title: 'Manager',
-            icon: 'Briefcase',
-            moduleSlug: 'manager',
+            moduleSlug: 'ventas',
             items: [
-                { id: 'personal', name: 'Personal', href: '/manager/personal', icon: 'Users2' },
-                { id: 'pipeline', name: 'Pipeline', href: '/manager/pipeline', icon: 'Workflow' },
+                { id: 'crm', name: 'Etapas del CRM', href: '/ventas/crm', icon: 'Users' },
+                { id: 'condiciones-comerciales', name: 'Condiciones Comerciales', href: '/ventas/condiciones-comerciales', icon: 'FileText' },
+                { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/ventas/reglas-agendamiento', icon: 'Clock' },
+                { id: 'inteligencia-financiera', name: 'Inteligencia Financiera', href: '/ventas/inteligencia-financiera', icon: 'Coins' },
             ],
         },
         {
-            id: 'pages',
-            title: 'Pages',
+            id: 'pagos',
+            title: 'Pagos',
+            icon: 'CreditCard',
+            moduleSlug: 'pagos',
+            items: [
+                { id: 'metodos-pago', name: 'Métodos de Pago', href: '/pagos/metodos-pago', icon: 'CreditCard' },
+                { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/pagos/cuentas-bancarias', icon: 'Building' },
+                { id: 'stripe', name: 'Stripe', href: '/pagos/stripe', icon: 'CreditCard' },
+            ],
+        },
+        {
+            id: 'pagina',
+            title: 'Página Web',
             icon: 'Globe',
-            moduleSlug: 'pages',
+            moduleSlug: 'pagina',
             items: [
-                { id: 'identidad', name: 'Identidad', href: '/pages/identidad', icon: 'Star' },
-                { id: 'contacto', name: 'Contacto', href: '/pages/contacto', icon: 'Phone' },
-                { id: 'redes-sociales', name: 'Redes Sociales', href: '/pages/redes-sociales', icon: 'Zap' },
-                { id: 'horarios', name: 'Horarios', href: '/pages/horarios', icon: 'Clock' },
-                { id: 'portafolio', name: 'Portafolio', href: '/pages/portafolio', icon: 'Image' },
-                { id: 'promociones', name: 'Promociones', href: '/pages/promociones', icon: 'Gift' },
-                { id: 'seo-sem', name: 'SEO / SEM', href: '/pages/seo-sem', icon: 'Search' },
-                { id: 'faq', name: 'FAQ', href: '/pages/faq', icon: 'HelpCircle' },
+                { id: 'portafolio', name: 'Portafolio', href: '/pagina/portafolio', icon: 'Image' },
+                { id: 'seo', name: 'SEO', href: '/pagina/seo', icon: 'Search' },
+                { id: 'editor', name: 'Editor', href: '/pagina/editor', icon: 'Edit' },
+                { id: 'lead-forms', name: 'Lead Forms', href: '/pagina/lead-forms', icon: 'FormInput' },
+                { id: 'faq', name: 'FAQ', href: '/pagina/faq', icon: 'HelpCircle' },
+                { id: 'promociones', name: 'Promociones', href: '/pagina/promociones', icon: 'Gift' },
+            ],
+        },
+        {
+            id: 'integraciones',
+            title: 'Integraciones',
+            icon: 'Plug',
+            moduleSlug: 'integraciones',
+            items: [
+                { id: 'apis', name: 'APIs', href: '/integraciones/apis', icon: 'Code' },
+                { id: 'webhooks', name: 'Webhooks', href: '/integraciones/webhooks', icon: 'Webhook' },
+                { id: 'conectores', name: 'Conectores', href: '/integraciones/conectores', icon: 'LinkIcon' },
+            ],
+        },
+        {
+            id: 'analytics',
+            title: 'Analytics',
+            icon: 'BarChart3',
+            moduleSlug: 'analytics',
+            items: [
+                { id: 'metricas', name: 'Métricas', href: '/analytics/metricas', icon: 'TrendingUp' },
+                { id: 'reportes', name: 'Reportes', href: '/analytics/reportes', icon: 'FileText' },
+                { id: 'dashboard', name: 'Dashboard', href: '/analytics/dashboard', icon: 'LayoutDashboard' },
+            ],
+        },
+        {
+            id: 'sistema',
+            title: 'Sistema',
+            icon: 'Server',
+            moduleSlug: 'sistema',
+            items: [
+                { id: 'permisos', name: 'Permisos', href: '/sistema/permisos', icon: 'Shield' },
+                { id: 'backups', name: 'Backups', href: '/sistema/backups', icon: 'Database' },
+                { id: 'logs', name: 'Logs', href: '/sistema/logs', icon: 'FileText' },
             ],
         },
     ],

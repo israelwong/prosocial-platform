@@ -184,7 +184,7 @@ async function seedSocialNetworks() {
             slug: 'facebook',
             color: '#1877F2',
             icon: 'facebook',
-            baseUrl: 'https://facebook.com/',
+            base_url: 'https://facebook.com/',
             order: 1,
         },
         {
@@ -192,7 +192,7 @@ async function seedSocialNetworks() {
             slug: 'instagram',
             color: '#E4405F',
             icon: 'instagram',
-            baseUrl: 'https://instagram.com/',
+            base_url: 'https://instagram.com/',
             order: 2,
         },
         {
@@ -200,7 +200,7 @@ async function seedSocialNetworks() {
             slug: 'tiktok',
             color: '#000000',
             icon: 'tiktok',
-            baseUrl: 'https://tiktok.com/@',
+            base_url: 'https://tiktok.com/@',
             order: 3,
         },
         {
@@ -208,7 +208,7 @@ async function seedSocialNetworks() {
             slug: 'youtube',
             color: '#FF0000',
             icon: 'youtube',
-            baseUrl: 'https://youtube.com/@',
+            base_url: 'https://youtube.com/@',
             order: 4,
         },
     ];
@@ -216,12 +216,12 @@ async function seedSocialNetworks() {
     for (const network of networks) {
         await prisma.platform_social_networks.upsert({
             where: { slug: network.slug },
-            update: { updatedAt: new Date() },
+            update: { updated_at: new Date() },
             create: {
                 ...network,
-                isActive: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                is_active: true,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
         });
         console.log(`  ✅ ${network.name}`);
@@ -269,13 +269,13 @@ async function seedAcquisitionChannels() {
     for (const channel of channels) {
         await prisma.platform_acquisition_channels.upsert({
             where: { name: channel.name },
-            update: { updatedAt: new Date() },
+            update: { updated_at: new Date() },
             create: {
                 ...channel,
-                isActive: true,
-                isVisible: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                is_active: true,
+                is_visible: true,
+                created_at: new Date(),
+                updated_at: new Date(),
             },
         });
         console.log(`  ✅ ${channel.name}`);
@@ -693,8 +693,8 @@ async function seedCatalogo() {
     // Relación sección-categoría
     await prisma.studio_seccion_categorias.createMany({
         data: {
-            seccionId: seccion.id,
-            categoriaId: categoria.id,
+            seccion_id: seccion.id,
+            categoria_id: categoria.id,
         },
         skipDuplicates: true,
     });
@@ -708,8 +708,8 @@ async function seedCatalogo() {
 
     await prisma.studio_servicios.createMany({
         data: servicios.map(servicio => ({
-            studioId: DEMO_STUDIO_ID,
-            servicioCategoriaId: categoria.id,
+            studio_id: DEMO_STUDIO_ID,
+            servicio_categoria_id: categoria.id,
             nombre: servicio.nombre,
             costo: servicio.costo,
             gasto: 0,
@@ -743,8 +743,8 @@ async function seedTiposEvento() {
             nombre: tipo.nombre,
             status: 'active',
             orden: tipo.orden,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            created_at: new Date(),
+            updated_at: new Date(),
         })),
         skipDuplicates: true,
     });
@@ -760,21 +760,21 @@ async function seedDemoLead() {
 
     const demoLead = await prisma.platform_leads.create({
         data: {
-            studioId: DEMO_STUDIO_ID,
+            studio_id: DEMO_STUDIO_ID,
             name: 'Carlos Méndez',
             email: 'owner@demo-studio.com',
             phone: '+52 33 1234 5678',
-            studioName: 'Demo Studio',
-            studioSlug: DEMO_STUDIO_SLUG,
-            interestedPlan: 'pro',
+            studio_name: 'Demo Studio',
+            studio_slug: DEMO_STUDIO_SLUG,
+            interested_plan: 'pro',
             score: 8,
             priority: 'high',
-            stageId: null, // No hay stages configurados aún
-            acquisitionChannelId: null, // Se puede asignar después
-            agentId: null, // Se puede asignar después
-            probableStartDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            stage_id: null, // No hay stages configurados aún
+            acquisition_channel_id: null, // Se puede asignar después
+            agent_id: null, // Se puede asignar después
+            probable_start_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 días
+            created_at: new Date(),
+            updated_at: new Date(),
         },
     });
 

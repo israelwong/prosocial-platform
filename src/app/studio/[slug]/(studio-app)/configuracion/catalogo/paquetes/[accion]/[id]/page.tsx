@@ -41,7 +41,7 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
         });
 
         if (!eventoTipo) {
-            redirect(`/studio/${slug}/configuracion/comercial/catalogo/paquetes`);
+            redirect(`/studio/${slug}/configuracion/catalogo/paquetes`);
         }
 
         eventoTipoId = id;
@@ -53,7 +53,7 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
         });
 
         if (!paquete) {
-            redirect(`/studio/${slug}/configuracion/comercial/catalogo/paquetes`);
+            redirect(`/studio/${slug}/configuracion/catalogo/paquetes`);
         }
 
         eventoTipoId = paquete.eventoTipoId;
@@ -99,7 +99,7 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
     if (accion === 'editar') {
         const paqueteResult = await obtenerPaquete(id);
         if (!paqueteResult.success || !paqueteResult.data) {
-            redirect(`/studio/${slug}/configuracion/comercial/catalogo/paquetes`);
+            redirect(`/studio/${slug}/configuracion/catalogo/paquetes`);
         }
         paquete = paqueteResult.data;
     }

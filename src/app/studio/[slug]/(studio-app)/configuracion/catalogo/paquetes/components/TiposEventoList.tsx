@@ -178,7 +178,7 @@ function SortablePaqueteItem({
 
                 {/* Acciones */}
                 <div className="flex items-center gap-2 ml-4">
-                    <Link href={`/studio/${studioSlug}/configuracion/comercial/catalogo-servicios/paquetes/editar/${paquete.id}`}>
+                    <Link href={`/studio/${studioSlug}/configuracion/catalogo/paquetes/editar/${paquete.id}`}>
                         <ZenButton variant="secondary" size="sm">
                             <Edit className="w-4 h-4" />
                         </ZenButton>
@@ -488,7 +488,7 @@ export function TiposEventoList({ tiposEvento, studioSlug, paquetes = [] }: Tipo
                                                 {paquetes.length} paquete{paquetes.length !== 1 ? 's' : ''}
                                             </ZenBadge>
                                         </div>
-                                        <Link href={`/studio/${studioSlug}/configuracion/comercial/catalogo-servicios/paquetes/crear/${tipoEvento.id}`}>
+                                        <Link href={`/studio/${studioSlug}/configuracion/catalogo/paquetes/crear/${tipoEvento.id}`}>
                                             <ZenButton size="sm">
                                                 <Plus className="w-4 h-4 mr-2" />
                                                 Crear Paquete

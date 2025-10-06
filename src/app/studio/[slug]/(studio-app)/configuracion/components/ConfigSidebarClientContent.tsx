@@ -12,7 +12,8 @@ import { StudioHeaderModal } from './StudioHeaderModal';
 import {
     Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
     ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2, LogOut,
-    UserCircle, ShoppingCart, Briefcase
+    UserCircle, ShoppingCart, Briefcase, Camera, Cog, Server, Shield, Database, FileText, Webhook, FormInput, LayoutDashboard,
+    TrendingUp, Code, Link as LinkIcon, Image, Search, Edit, Gift, HelpCircle, Phone, Users2, Settings
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { NavigationConfig, NavItem, NavItemGroup } from './ConfiguracionSidebarZenV2';
@@ -21,7 +22,8 @@ import type { NavigationConfig, NavItem, NavItemGroup } from './ConfiguracionSid
 const iconMap: { [key: string]: LucideIcon } = {
     Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
     LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2,
-    UserCircle, ShoppingCart, Briefcase
+    UserCircle, ShoppingCart, Briefcase, Camera, Cog, Server, Shield, Database, FileText, Webhook, FormInput, LayoutDashboard,
+    TrendingUp, Code, LinkIcon, Image, Search, Edit, Gift, HelpCircle, Phone, Users2, Settings, BarChart3
 };
 
 interface ConfigSidebarClientContentProps {

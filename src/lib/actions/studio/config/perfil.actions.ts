@@ -2,8 +2,8 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { PerfilSchema, PerfilUpdateSchema } from '@/lib/actions/schemas/perfil-schemas';
-import { PerfilData } from '@/app/studio/[slug]/configuracion/cuenta/perfil/types';
+import { PerfilSchema } from '@/lib/actions/schemas/perfil-schemas';
+import { PerfilData } from '@/app/studio/[slug]/(studio-app)/configuracion/cuenta/perfil/types';
 
 interface ActionResult<T = unknown> {
     success: boolean;
@@ -38,7 +38,7 @@ export async function obtenerPerfil(studioSlug: string): Promise<ActionResult<Pe
         // Buscar el lead asociado al proyecto
         const lead = await prisma.platform_leads.findFirst({
             where: {
-                studioId: proyecto.id
+                studio_id: proyecto.id
             }
         });
 
@@ -57,8 +57,9 @@ export async function obtenerPerfil(studioSlug: string): Promise<ActionResult<Pe
             name: lead.name,
             email: lead.email,
             phone: lead.phone,
-            createdAt: lead.createdAt,
-            updatedAt: lead.updatedAt
+            avatarUrl: lead.avatar_url as string | undefined,
+            createdAt: lead.created_at,
+            updatedAt: lead.updated_at
         };
 
         console.log('✅ Perfil procesado:', perfilData);
@@ -106,7 +107,7 @@ export async function actualizarPerfil(
         // Buscar el lead asociado al proyecto
         const leadExistente = await prisma.platform_leads.findFirst({
             where: {
-                studioId: proyecto.id
+                studio_id: proyecto.id
             }
         });
 
@@ -141,7 +142,7 @@ export async function actualizarPerfil(
                 name: validatedData.name,
                 email: validatedData.email,
                 phone: validatedData.phone,
-                updated_at: new Date()
+                avatar_url: validatedData.avatarUrl
             }
         });
 
@@ -150,8 +151,9 @@ export async function actualizarPerfil(
             name: leadActualizado.name,
             email: leadActualizado.email,
             phone: leadActualizado.phone,
-            createdAt: leadActualizado.createdAt,
-            updatedAt: leadActualizado.updatedAt
+            avatarUrl: leadActualizado.avatar_url ? leadActualizado.avatar_url : undefined,
+            createdAt: leadActualizado.created_at,
+            updatedAt: leadActualizado.updated_at
         };
 
         revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/perfil`);
