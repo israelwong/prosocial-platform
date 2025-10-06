@@ -1,5 +1,4 @@
 import React from 'react';
-import { Shield } from 'lucide-react';
 import { PasswordChangeForm, SecuritySettings } from './components';
 
 interface SeguridadPageProps {
@@ -21,21 +20,21 @@ export default async function SeguridadPage({ params }: SeguridadPageProps) {
                 </p>
             </div>
 
-            {/* Layout de 2 columnas */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Layout de 2 columnas con altura igual */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:items-stretch">
                 {/* Columna 1: Cambio de contraseña */}
-                <div className="space-y-6">
+                <div className="flex flex-col h-full">
                     <PasswordChangeForm studioSlug={slug} />
                 </div>
 
                 {/* Columna 2: Configuraciones de seguridad */}
-                <div className="space-y-6">
+                <div className="flex flex-col h-full">
                     <SecuritySettings studioSlug={slug} />
                 </div>
             </div>
 
             {/* Información adicional */}
-            <div className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-lg">
+            {/* <div className="p-6 bg-zinc-900/50 border border-zinc-800 rounded-lg">
                 <div className="flex items-start gap-4">
                     <Shield className="h-6 w-6 text-blue-400 mt-1 flex-shrink-0" />
                     <div>
@@ -51,7 +50,7 @@ export default async function SeguridadPage({ params }: SeguridadPageProps) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 }

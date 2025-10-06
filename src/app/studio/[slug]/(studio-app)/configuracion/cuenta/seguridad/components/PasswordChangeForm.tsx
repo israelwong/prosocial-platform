@@ -54,16 +54,16 @@ export function PasswordChangeForm({ studioSlug }: PasswordChangeFormProps) {
         }
     };
 
-    return (
-        <Card className="bg-zinc-900/50 border-zinc-800">
-            <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                    <Key className="h-5 w-5" />
-                    Cambiar Contraseña
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+  return (
+    <Card className="bg-zinc-900/50 border-zinc-800 h-full flex flex-col">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center gap-2">
+          <Key className="h-5 w-5" />
+          Cambiar Contraseña
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex-1 flex flex-col">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 flex-1 flex flex-col">
                     {/* Contraseña actual */}
                     <div className="relative">
                         <ZenInput
