@@ -16,9 +16,10 @@ interface SecuritySettingsProps {
 }
 
 export function SecuritySettingsComponent({ studioSlug }: SecuritySettingsProps) {
-    const [loading, setLoading] = useState(false);
-    const [initialLoading, setInitialLoading] = useState(true);
-    const [settings, setSettings] = useState<SecuritySettings | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [settings, setSettings] = useState<SecuritySettings | null>(null);
+  const [sessionTimeout, setSessionTimeout] = useState(30);
 
     const {
         register,
@@ -44,6 +45,7 @@ export function SecuritySettingsComponent({ studioSlug }: SecuritySettingsProps)
                     setValue('email_notifications', data.email_notifications);
                     setValue('device_alerts', data.device_alerts);
                     setValue('session_timeout', data.session_timeout);
+                    setSessionTimeout(data.session_timeout);
                 }
             } catch (error) {
                 console.error('Error al cargar configuraciones:', error);
@@ -163,11 +165,19 @@ export function SecuritySettingsComponent({ studioSlug }: SecuritySettingsProps)
                                 type="range"
                                 min="1"
                                 max="365"
-                                {...register('session_timeout', { valueAsNumber: true })}
-                                className="flex-1 h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer"
+                                value={sessionTimeout}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value);
+                                    setSessionTimeout(value);
+                                    setValue('session_timeout', value);
+                                }}
+                                className="flex-1 h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer slider"
+                                style={{
+                                    background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((sessionTimeout - 1) / (365 - 1)) * 100}%, #374151 ${((sessionTimeout - 1) / (365 - 1)) * 100}%, #374151 100%)`
+                                }}
                             />
                             <div className="text-white font-medium min-w-[3rem] text-center">
-                                {settings?.session_timeout || 30} días
+                                {sessionTimeout} días
                             </div>
                         </div>
                         {errors.session_timeout && (
@@ -188,8 +198,42 @@ export function SecuritySettingsComponent({ studioSlug }: SecuritySettingsProps)
                             Guardar Configuraciones
                         </ZenButton>
                     </div>
-                </form>
-            </CardContent>
-        </Card>
-    );
+        </form>
+      </CardContent>
+      
+      {/* Estilos personalizados para el slider */}
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #3b82f6;
+          cursor: pointer;
+          border: 2px solid #ffffff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: #3b82f6;
+          cursor: pointer;
+          border: 2px solid #ffffff;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .slider::-webkit-slider-track {
+          height: 8px;
+          border-radius: 4px;
+        }
+        
+        .slider::-moz-range-track {
+          height: 8px;
+          border-radius: 4px;
+        }
+      `}</style>
+    </Card>
+  );
 }
