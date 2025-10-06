@@ -1,31 +1,66 @@
-'use client';
-
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
+import { CurrentPlanCard, BillingHistoryCard } from './components';
+import { obtenerDatosSuscripcion } from '@/lib/actions/studio/config/suscripcion/suscripcion.actions';
 
-export default function SuscripcionPage() {
+interface SuscripcionPageProps {
+    params: {
+        slug: string;
+    };
+}
+
+export default async function SuscripcionPage({ params }: SuscripcionPageProps) {
+    const { slug } = await params;
+    
+    // Obtener datos de suscripción
+    const result = await obtenerDatosSuscripcion(slug);
+    
+    if (!result.success || !result.data) {
+        return (
+            <div className="space-y-8">
+                {/* Header */}
+                <div className="space-y-2">
+                    <h1 className="text-2xl font-bold text-white">Suscripción</h1>
+                    <p className="text-zinc-400">
+                        Gestiona tu plan de suscripción y facturación
+                    </p>
+                </div>
+
+                {/* Error State */}
+                <div className="p-6 bg-red-900/20 border border-red-800 rounded-lg">
+                    <div className="flex items-center gap-3">
+                        <div className="h-6 w-6 text-red-400">⚠️</div>
+                        <div>
+                            <h3 className="text-red-300 font-medium">Error al cargar suscripción</h3>
+                            <p className="text-red-400 text-sm mt-1">{result.error}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-white">Suscripción</h1>
-                <p className="text-zinc-400 mt-1">
-                    Gestiona tu plan de suscripción
+        <div className="space-y-8">
+            {/* Header */}
+            <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-white">Suscripción</h1>
+                <p className="text-zinc-400">
+                    Gestiona tu plan de suscripción y facturación
                 </p>
             </div>
 
-            <Card className="bg-zinc-900 border-zinc-800">
-                <CardHeader>
-                    <CardTitle className="text-white">Plan Actual</CardTitle>
-                    <CardDescription className="text-zinc-400">
-                        Información de tu suscripción actual
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="h-64 flex items-center justify-center text-zinc-500">
-                        Información de Suscripción - En desarrollo
-                    </div>
-                </CardContent>
-            </Card>
+            {/* Layout de 2 columnas */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Columna 1: Plan actual */}
+                <div className="space-y-6">
+                    <CurrentPlanCard data={result.data} studioSlug={slug} />
+                </div>
+
+                {/* Columna 2: Historial de facturación */}
+                <div className="space-y-6">
+                    <BillingHistoryCard data={result.data} />
+                </div>
+            </div>
         </div>
     );
 }
