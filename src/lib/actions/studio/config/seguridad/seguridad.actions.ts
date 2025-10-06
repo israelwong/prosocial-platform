@@ -261,13 +261,17 @@ export async function obtenerHistorialAccesos(
     studioSlug: string,
     limit: number = 20,
     offset: number = 0
-): Promise<AccessLog[]> {
+) {
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError || !user) {
-            return [];
+            return {
+                success: false,
+                error: 'Usuario no autenticado',
+                data: []
+            };
         }
 
         // Buscar el usuario en nuestra tabla usando supabase_id
@@ -276,7 +280,11 @@ export async function obtenerHistorialAccesos(
         });
 
         if (!dbUser) {
-            return [];
+            return {
+                success: false,
+                error: 'Usuario no encontrado en la base de datos',
+                data: []
+            };
         }
 
         const logs = await prisma.user_access_logs.findMany({
@@ -286,11 +294,18 @@ export async function obtenerHistorialAccesos(
             skip: offset
         });
 
-        return logs;
+        return {
+            success: true,
+            data: logs
+        };
 
     } catch (error) {
         console.error('Error al obtener historial de accesos:', error);
-        return [];
+        return {
+            success: false,
+            error: 'Error interno del servidor',
+            data: []
+        };
     }
 }
 
