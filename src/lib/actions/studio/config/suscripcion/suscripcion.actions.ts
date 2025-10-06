@@ -13,7 +13,7 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
         // Obtener usuario actual
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -35,7 +35,7 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
 
         // Buscar el studio del usuario
         const userStudioRole = await prisma.user_studio_roles.findFirst({
-            where: { 
+            where: {
                 user_id: dbUser.id,
                 role: 'OWNER'
             },
@@ -80,7 +80,7 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
             {
                 id: 'demo_bill_1',
                 subscription_id: subscription.id,
-                amount: subscription.plans.price_monthly?.toNumber() || 0,
+                amount: subscription.plans.price_monthly || 0,
                 currency: 'MXN',
                 status: 'paid' as const,
                 description: `Factura ${subscription.plans.name} - ${new Date().toLocaleDateString('es-ES')}`,
@@ -94,8 +94,8 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
             name: subscription.plans.name,
             slug: subscription.plans.slug,
             description: subscription.plans.description || '',
-            price_monthly: subscription.plans.price_monthly?.toNumber() || 0,
-            price_yearly: subscription.plans.price_yearly?.toNumber() || 0,
+            price_monthly: subscription.plans.price_monthly || 0,
+            price_yearly: subscription.plans.price_yearly || 0,
             features: subscription.plans.features as { highlights: string[]; modules: string[] },
             popular: subscription.plans.popular,
             active: subscription.plans.active,
@@ -118,9 +118,9 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
             module_id: item.module_id || undefined,
             overage_type: item.overage_type || undefined,
             overage_quantity: item.overage_quantity || undefined,
-            unit_price: item.unit_price.toNumber(),
+            unit_price: item.unit_price,
             quantity: item.quantity,
-            subtotal: item.subtotal.toNumber(),
+            subtotal: item.subtotal,
             description: item.description || undefined,
             activated_at: item.activated_at,
             deactivated_at: item.deactivated_at || undefined
@@ -129,7 +129,7 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
         const mappedBillingHistory = billing_history.map(bill => ({
             id: bill.id,
             subscription_id: bill.subscription_id,
-            amount: bill.amount?.toNumber() || 0,
+            amount: bill.amount,
             currency: bill.currency,
             status: bill.status as 'paid' | 'pending' | 'failed',
             description: bill.description,
@@ -209,7 +209,7 @@ export async function cambiarPlan(
         // Obtener usuario actual
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -231,7 +231,7 @@ export async function cambiarPlan(
 
         // Buscar el studio del usuario
         const userStudioRole = await prisma.user_studio_roles.findFirst({
-            where: { 
+            where: {
                 user_id: dbUser.id,
                 role: 'OWNER'
             },
@@ -282,7 +282,7 @@ export async function cambiarPlan(
 
         // Desactivar items anteriores
         await prisma.subscription_items.updateMany({
-            where: { 
+            where: {
                 subscription_id: currentSubscription.id,
                 deactivated_at: null
             },
@@ -291,7 +291,7 @@ export async function cambiarPlan(
 
         // Crear nuevo item para el plan
         const price = billingCycle === 'yearly' ? (newPlan.price_yearly || 0) : (newPlan.price_monthly || 0);
-        
+
         await prisma.subscription_items.create({
             data: {
                 subscription_id: currentSubscription.id,
@@ -345,7 +345,7 @@ export async function cancelarSuscripcion(studioSlug: string) {
         // Obtener usuario actual
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -367,7 +367,7 @@ export async function cancelarSuscripcion(studioSlug: string) {
 
         // Buscar el studio del usuario
         const userStudioRole = await prisma.user_studio_roles.findFirst({
-            where: { 
+            where: {
                 user_id: dbUser.id,
                 role: 'OWNER'
             },
