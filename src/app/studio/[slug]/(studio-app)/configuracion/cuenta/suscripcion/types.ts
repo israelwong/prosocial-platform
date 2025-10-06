@@ -44,7 +44,7 @@ export interface Subscription {
 export interface SubscriptionItem {
     id: string;
     subscription_id: string;
-    item_type: 'PLAN' | 'ADDON' | 'OVERAGE';
+    item_type: 'PLAN' | 'ADDON' | 'OVERAGE' | 'DISCOUNT';
     plan_id?: string;
     module_id?: string;
     overage_type?: string;

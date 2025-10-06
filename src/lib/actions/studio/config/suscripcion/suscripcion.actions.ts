@@ -3,12 +3,12 @@
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { SuscripcionData, Plan, Subscription } from '@/app/studio/[slug]/(studio-app)/configuracion/cuenta/suscripcion/types';
+import { SuscripcionData } from '@/app/studio/[slug]/(studio-app)/configuracion/cuenta/suscripcion/types';
 
 /**
  * Obtener datos de suscripción del usuario
  */
-export async function obtenerDatosSuscripcion(studioSlug: string) {
+export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-disable-line @typescript-eslint/no-unused-vars
     try {
         // Obtener usuario actual
         const supabase = await createClient();
@@ -80,7 +80,7 @@ export async function obtenerDatosSuscripcion(studioSlug: string) {
             {
                 id: 'demo_bill_1',
                 subscription_id: subscription.id,
-                amount: subscription.plans.price_monthly,
+                amount: subscription.plans.price_monthly?.toNumber() || 0,
                 currency: 'MXN',
                 status: 'paid' as const,
                 description: `Factura ${subscription.plans.name} - ${new Date().toLocaleDateString('es-ES')}`,
@@ -88,12 +88,75 @@ export async function obtenerDatosSuscripcion(studioSlug: string) {
             }
         ];
 
+        // Mapear datos para que coincidan con los tipos
+        const plan = {
+            id: subscription.plans.id,
+            name: subscription.plans.name,
+            slug: subscription.plans.slug,
+            description: subscription.plans.description || '',
+            price_monthly: subscription.plans.price_monthly?.toNumber() || 0,
+            price_yearly: subscription.plans.price_yearly?.toNumber() || 0,
+            features: subscription.plans.features as { highlights: string[]; modules: string[] },
+            popular: subscription.plans.popular,
+            active: subscription.plans.active,
+            orden: subscription.plans.orden
+        };
+
+        const mappedLimits = limits.map(limit => ({
+            id: limit.id,
+            plan_id: limit.plan_id,
+            limit_type: limit.limit_type,
+            limit_value: limit.limit_value,
+            unit: limit.unit || ''
+        }));
+
+        const mappedItems = subscription.items.map(item => ({
+            id: item.id,
+            subscription_id: item.subscription_id,
+            item_type: item.item_type as 'PLAN' | 'ADDON' | 'OVERAGE' | 'DISCOUNT',
+            plan_id: item.plan_id || undefined,
+            module_id: item.module_id || undefined,
+            overage_type: item.overage_type || undefined,
+            overage_quantity: item.overage_quantity || undefined,
+            unit_price: item.unit_price.toNumber(),
+            quantity: item.quantity,
+            subtotal: item.subtotal.toNumber(),
+            description: item.description || undefined,
+            activated_at: item.activated_at,
+            deactivated_at: item.deactivated_at || undefined
+        }));
+
+        const mappedBillingHistory = billing_history.map(bill => ({
+            id: bill.id,
+            subscription_id: bill.subscription_id,
+            amount: bill.amount?.toNumber() || 0,
+            currency: bill.currency,
+            status: bill.status as 'paid' | 'pending' | 'failed',
+            description: bill.description,
+            created_at: bill.created_at
+        }));
+
+        const subscriptionData = {
+            id: subscription.id,
+            studio_id: subscription.studio_id,
+            stripe_subscription_id: subscription.stripe_subscription_id,
+            stripe_customer_id: subscription.stripe_customer_id,
+            plan_id: subscription.plan_id,
+            status: subscription.status as 'TRIAL' | 'ACTIVE' | 'CANCELLED' | 'PAUSED' | 'EXPIRED',
+            current_period_start: subscription.current_period_start,
+            current_period_end: subscription.current_period_end,
+            billing_cycle_anchor: subscription.billing_cycle_anchor,
+            created_at: subscription.created_at,
+            updated_at: subscription.updated_at,
+            plan
+        };
+
         const data: SuscripcionData = {
-            subscription,
-            plan: subscription.plans,
-            limits,
-            items: subscription.items,
-            billing_history
+            subscription: subscriptionData,
+            plan,
+            limits: mappedLimits,
+            items: mappedItems,
+            billing_history: mappedBillingHistory
         };
 
         return {
@@ -227,7 +290,7 @@ export async function cambiarPlan(
         });
 
         // Crear nuevo item para el plan
-        const price = billingCycle === 'yearly' ? newPlan.price_yearly : newPlan.price_monthly;
+        const price = billingCycle === 'yearly' ? (newPlan.price_yearly || 0) : (newPlan.price_monthly || 0);
         
         await prisma.subscription_items.create({
             data: {
