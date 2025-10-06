@@ -88,19 +88,38 @@ async function getOrCreateUser(supabaseUser: any) {
         where: { supabase_id: supabaseUser.id }
     });
 
-    // Si no existe, crear el usuario
+    // Si no existe, buscar por email para ver si ya existe con otro supabase_id
     if (!dbUser) {
-        console.log('🔧 Creando usuario en base de datos:', supabaseUser.email);
-        dbUser = await prisma.users.create({
-            data: {
-                supabase_id: supabaseUser.id,
-                email: supabaseUser.email!,
-                full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
-                is_active: true,
-                email_verified: supabaseUser.email_confirmed_at ? true : false
-            }
+        const existingUser = await prisma.users.findUnique({
+            where: { email: supabaseUser.email! }
         });
-        console.log('✅ Usuario creado:', dbUser.email);
+
+        if (existingUser) {
+            // Usuario existe pero con diferente supabase_id, actualizar
+            console.log('🔄 Actualizando supabase_id para usuario existente:', supabaseUser.email);
+            dbUser = await prisma.users.update({
+                where: { id: existingUser.id },
+                data: {
+                    supabase_id: supabaseUser.id,
+                    full_name: supabaseUser.user_metadata?.full_name || existingUser.full_name,
+                    email_verified: supabaseUser.email_confirmed_at ? true : existingUser.email_verified
+                }
+            });
+            console.log('✅ Usuario actualizado:', dbUser.email);
+        } else {
+            // Usuario no existe, crear nuevo
+            console.log('🔧 Creando usuario en base de datos:', supabaseUser.email);
+            dbUser = await prisma.users.create({
+                data: {
+                    supabase_id: supabaseUser.id,
+                    email: supabaseUser.email!,
+                    full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
+                    is_active: true,
+                    email_verified: supabaseUser.email_confirmed_at ? true : false
+                }
+            });
+            console.log('✅ Usuario creado:', dbUser.email);
+        }
     }
 
     return dbUser;
