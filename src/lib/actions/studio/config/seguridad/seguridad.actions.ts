@@ -39,7 +39,14 @@ export async function cambiarContraseña(
         const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
         const verifySupabase = createSupabaseClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            {
+                auth: {
+                    persistSession: true,
+                    autoRefreshToken: true,
+                    detectSessionInUrl: false
+                }
+            }
         );
 
         const { data: verifyData, error: verifyError } = await verifySupabase.auth.signInWithPassword({
