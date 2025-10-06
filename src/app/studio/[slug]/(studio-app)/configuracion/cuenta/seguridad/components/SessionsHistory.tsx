@@ -75,7 +75,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
     };
 
     const getDeviceName = (userAgent: string) => {
-        if (!userAgent) return 'Dispositivo desconocido';
+        if (!userAgent || userAgent.trim() === '') return 'Dispositivo desconocido';
         
         const ua = userAgent.toLowerCase();
         
@@ -94,6 +94,11 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
         else if (ua.includes('edg')) browser = 'Edge';
         else if (ua.includes('opera')) browser = 'Opera';
+        
+        // Si no se puede detectar nada, mostrar información básica
+        if (os === 'Sistema desconocido' && browser === 'Navegador desconocido') {
+            return 'Dispositivo desconocido';
+        }
         
         return `${browser} en ${os}`;
     };
@@ -114,7 +119,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
             case 'logout': return 'Cierre de sesión';
             case 'password_change': return 'Cambio de contraseña';
             case 'session_created': return 'Sesión creada';
-            case 'security_settings_updated': return 'Configuraciones de seguridad actualizadas';
+            case 'security_settings_updated': return 'Configuraciones de seguridad modificadas';
             case 'profile_updated': return 'Perfil actualizado';
             case 'avatar_updated': return 'Foto de perfil actualizada';
             default: return action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
