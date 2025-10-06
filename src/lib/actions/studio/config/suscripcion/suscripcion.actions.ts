@@ -80,7 +80,7 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
             {
                 id: 'demo_bill_1',
                 subscription_id: subscription.id,
-                amount: subscription.plans.price_monthly || 0,
+                amount: subscription.plans.price_monthly?.toNumber() || 0,
                 currency: 'MXN',
                 status: 'paid' as const,
                 description: `Factura ${subscription.plans.name} - ${new Date().toLocaleDateString('es-ES')}`,
@@ -94,8 +94,8 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
             name: subscription.plans.name,
             slug: subscription.plans.slug,
             description: subscription.plans.description || '',
-            price_monthly: subscription.plans.price_monthly || 0,
-            price_yearly: subscription.plans.price_yearly || 0,
+            price_monthly: subscription.plans.price_monthly?.toNumber() || 0,
+            price_yearly: subscription.plans.price_yearly?.toNumber() || 0,
             features: subscription.plans.features as { highlights: string[]; modules: string[] },
             popular: subscription.plans.popular,
             active: subscription.plans.active,
@@ -118,9 +118,9 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
             module_id: item.module_id || undefined,
             overage_type: item.overage_type || undefined,
             overage_quantity: item.overage_quantity || undefined,
-            unit_price: item.unit_price,
+            unit_price: item.unit_price.toNumber(),
             quantity: item.quantity,
-            subtotal: item.subtotal,
+            subtotal: item.subtotal.toNumber(),
             description: item.description || undefined,
             activated_at: item.activated_at,
             deactivated_at: item.deactivated_at || undefined
@@ -148,7 +148,18 @@ export async function obtenerDatosSuscripcion(studioSlug: string) { // eslint-di
             billing_cycle_anchor: subscription.billing_cycle_anchor,
             created_at: subscription.created_at,
             updated_at: subscription.updated_at,
-            plan
+            plan: {
+                id: plan.id,
+                name: plan.name,
+                slug: plan.slug,
+                description: plan.description,
+                price_monthly: plan.price_monthly as number,
+                price_yearly: plan.price_yearly as number,
+                features: plan.features,
+                popular: plan.popular,
+                active: plan.active,
+                orden: plan.orden
+            }
         };
 
         const data: SuscripcionData = {
