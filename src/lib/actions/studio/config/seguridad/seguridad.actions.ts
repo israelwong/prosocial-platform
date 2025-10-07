@@ -107,12 +107,17 @@ export async function cambiarContraseña(
  */
 async function getOrCreateUser(supabaseUser: {
     id: string;
-    email: string;
+    email: string | undefined;
     user_metadata?: {
         full_name?: string;
     };
     email_confirmed_at?: string;
 }) {
+    // Validar que el email existe
+    if (!supabaseUser.email) {
+        throw new Error('Usuario sin email válido');
+    }
+
     // Buscar el usuario en nuestra tabla usando supabase_id
     let dbUser = await prisma.users.findUnique({
         where: { supabase_id: supabaseUser.id }
@@ -121,7 +126,7 @@ async function getOrCreateUser(supabaseUser: {
     // Si no existe, buscar por email para ver si ya existe con otro supabase_id
     if (!dbUser) {
         const existingUser = await prisma.users.findUnique({
-            where: { email: supabaseUser.email! }
+            where: { email: supabaseUser.email }
         });
 
         if (existingUser) {
@@ -142,8 +147,8 @@ async function getOrCreateUser(supabaseUser: {
             dbUser = await prisma.users.create({
                 data: {
                     supabase_id: supabaseUser.id,
-                    email: supabaseUser.email!,
-                    full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
+                    email: supabaseUser.email,
+                    full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0] || 'Usuario',
                     is_active: true,
                     email_verified: supabaseUser.email_confirmed_at ? true : false
                 }
