@@ -14,11 +14,9 @@ import {
 import {
   obtenerIdentidadStudio,
   actualizarIdentidadBasica,
-  actualizarPalabrasClave,
   actualizarLogo
 } from '@/lib/actions/studio/config/identidad.actions';
 import { IdentidadFormZen } from './components/IdentidadFormZen';
-import { PalabrasClaveManagerZen } from './components/PalabrasClaveManagerZen';
 import { LogoManagerZen } from './components/LogoManagerZen';
 import { IdentidadSkeletonZen } from './components/IdentidadSkeletonZen';
 import { IdentidadData, IdentidadUpdate } from './types';
@@ -82,15 +80,6 @@ export default function IdentidadPageZen() {
     }
   };
 
-  const handleUpdatePalabrasClave = async (palabras: string[]) => {
-    try {
-      await actualizarPalabrasClave(slug, palabras);
-      // No recargar datos - la actualización optimista ya actualizó la UI
-    } catch (error) {
-      console.error('Error updating palabras clave:', error);
-      throw error;
-    }
-  };
 
   const handleUpdateLogo = async (tipo: 'logo' | 'isotipo', url: string) => {
     try {
@@ -156,24 +145,6 @@ export default function IdentidadPageZen() {
             data={identidadData}
             onUpdate={handleUpdateIdentidad}
             onLocalUpdate={handleLocalUpdate}
-            loading={loading}
-          />
-        </ZenCardContent>
-      </ZenCard>
-
-      {/* Palabras Clave - ZEN CARD */}
-      <ZenCard variant="default" padding="none">
-        <ZenCardHeader>
-          <ZenCardTitle>Palabras Clave</ZenCardTitle>
-          <ZenCardDescription>
-            Términos que describen tu negocio para SEO y búsquedas
-          </ZenCardDescription>
-        </ZenCardHeader>
-        <ZenCardContent>
-          <PalabrasClaveManagerZen
-            palabrasClave={identidadData.palabras_clave}
-            onUpdate={handleUpdatePalabrasClave}
-            onLocalUpdate={(palabras) => handleLocalUpdate({ palabras_clave: palabras })}
             loading={loading}
           />
         </ZenCardContent>

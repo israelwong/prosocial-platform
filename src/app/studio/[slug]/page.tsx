@@ -1,14 +1,16 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import Image from 'next/image'
+import { StudioFavicon } from './components/StudioFavicon'
 
 interface StudioPageProps {
-    params: {
+    params: Promise<{
         slug: string
-    }
+    }>
 }
 
 export default async function StudioPublicPage({ params }: StudioPageProps) {
-    const { slug } = params
+    const { slug } = await params
 
     // Buscar el studio por slug
     const studio = await prisma.studios.findUnique({
@@ -19,6 +21,7 @@ export default async function StudioPublicPage({ params }: StudioPageProps) {
             slug: true,
             descripcion: true,
             logo_url: true,
+            isotipo_url: true,
             website: true,
             phone: true,
             email: true,
@@ -33,15 +36,22 @@ export default async function StudioPublicPage({ params }: StudioPageProps) {
 
     return (
         <div className="min-h-screen bg-zinc-950">
+            <StudioFavicon
+                logoUrl={studio.logo_url}
+                isotipoUrl={studio.isotipo_url}
+                studioName={studio.studio_name}
+            />
             {/* Header */}
             <div className="bg-zinc-900 border-b border-zinc-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             {studio.logo_url && (
-                                <img
+                                <Image
                                     src={studio.logo_url}
                                     alt={studio.studio_name}
+                                    width={48}
+                                    height={48}
                                     className="h-12 w-12 rounded-lg object-cover"
                                 />
                             )}

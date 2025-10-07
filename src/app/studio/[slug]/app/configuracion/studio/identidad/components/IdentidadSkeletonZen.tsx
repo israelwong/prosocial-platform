@@ -12,6 +12,7 @@ import { ZenCard } from '@/components/ui/zen';
  * - ✅ Layout responsive que coincide con el contenido real
  * - ✅ Colores zinc coherentes con el tema
  * - ✅ Espaciado consistente con design tokens
+ * - ✅ Solo incluye: Información Básica y Logos (sin palabras clave)
  */
 export function IdentidadSkeletonZen() {
     return (
@@ -34,20 +35,6 @@ export function IdentidadSkeletonZen() {
                         <div className="h-10 bg-zinc-700 rounded"></div>
                         <div className="h-20 bg-zinc-700 rounded"></div>
                     </div>
-                </div>
-            </ZenCard>
-
-            {/* Palabras Clave Skeleton */}
-            <ZenCard variant="default" padding="md">
-                <div className="animate-pulse">
-                    <div className="h-6 bg-zinc-700 rounded w-1/4 mb-2"></div>
-                    <div className="h-4 bg-zinc-700 rounded w-1/2 mb-4"></div>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                        <div className="h-8 bg-zinc-700 rounded w-20"></div>
-                        <div className="h-8 bg-zinc-700 rounded w-24"></div>
-                        <div className="h-8 bg-zinc-700 rounded w-16"></div>
-                    </div>
-                    <div className="h-10 bg-zinc-700 rounded"></div>
                 </div>
             </ZenCard>
 

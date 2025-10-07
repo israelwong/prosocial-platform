@@ -75,7 +75,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                     />
                     <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center hidden">
                         <span className="text-white font-bold text-sm">
-                            {identidadData.name.charAt(0).toUpperCase()}
+                            {identidadData.studio_name?.charAt(0)?.toUpperCase() || 'S'}
                         </span>
                     </div>
                 </div>
@@ -104,7 +104,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                     />
                     <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center hidden">
                         <span className="text-white font-bold text-sm">
-                            {identidadData.name.charAt(0).toUpperCase()}
+                            {identidadData.studio_name?.charAt(0)?.toUpperCase() || 'S'}
                         </span>
                     </div>
                 </div>

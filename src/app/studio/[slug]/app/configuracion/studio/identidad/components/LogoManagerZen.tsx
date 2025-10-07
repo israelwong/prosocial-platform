@@ -1,16 +1,15 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import Image from 'next/image';
 import { ZenButton } from '@/components/ui/zen/base/ZenButton';
 import { ZenInput } from '@/components/ui/zen/base/ZenInput';
 import { ZenLabel } from '@/components/ui/zen/base/ZenLabel';
-import { ZenBadge } from '@/components/ui/zen/base/ZenBadge';
 import { Upload, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { ALLOWED_MIME_TYPES } from '@/lib/actions/schemas/media-schemas';
 import { Dropzone } from '@/components/ui/shadcn/dropzone';
-import { FilePreview } from '@/components/ui/shadcn/file-preview';
 
 interface LogoManagerZenProps {
   tipo: 'logo' | 'isotipo';
@@ -137,30 +136,51 @@ export function LogoManagerZen({
   return (
     <div className="space-y-4">
       {url ? (
-        <div className="space-y-3">
-          {/* Previsualización del archivo con ZEN styling */}
-          <div className="relative group">
-            <FilePreview
-              file={url}
-              onRemove={handleRemoveUrl}
-              onView={() => window.open(url, '_blank')}
-              showActions={true}
-            />
+        <div className="space-y-4">
+          {/* Previsualización del logo grande minimalista */}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-64 h-32 bg-zinc-800 rounded-lg flex items-center justify-center overflow-hidden p-4">
+              <Image
+                src={url}
+                alt={titulo}
+                width={256}
+                height={128}
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
 
+            {/* Botones minimalistas */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || loading}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Upload className="h-3 w-3" />
+                Cambiar
+              </button>
+
+              <button
+                onClick={() => window.open(url, '_blank')}
+                disabled={uploading || loading}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ExternalLink className="h-3 w-3" />
+                Ver
+              </button>
+
+              <button
+                onClick={handleRemoveUrl}
+                disabled={uploading || loading}
+                className="flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Eliminar
+              </button>
+            </div>
           </div>
-
-          {/* Botón para cambiar archivo con ZEN */}
-          <ZenButton
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={() => fileInputRef.current?.click()}
-            loading={uploading}
-            disabled={uploading || loading}
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Cambiar {titulo}
-          </ZenButton>
         </div>
       ) : (
         <div className="space-y-3">
@@ -175,59 +195,37 @@ export function LogoManagerZen({
               maxSize={5}
               maxFiles={1}
               disabled={uploading || loading}
-              className="h-44 border-2 border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900/20 transition-all duration-300 rounded-xl group cursor-pointer relative overflow-hidden"
+              className="h-72 border border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900/20 transition-all duration-300 rounded-lg group cursor-pointer relative overflow-hidden"
             >
-              {/* Efecto de gradiente sutil */}
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-zinc-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-              <div className="text-center p-8 relative z-10">
-                {/* Icono principal con animación */}
-                <div className="relative mb-4">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-zinc-800/50 flex items-center justify-center group-hover:bg-zinc-700/50 transition-colors duration-300">
-                    <Upload className="h-8 w-8 text-zinc-500 group-hover:text-zinc-300 transition-colors duration-300" />
-                  </div>
-                  {/* Indicador de estado activo */}
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full" />
-                  </div>
+              <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+                {/* Icono principal */}
+                <div className="w-12 h-12 mb-3 rounded-full bg-zinc-800 flex items-center justify-center group-hover:bg-zinc-700 transition-colors duration-200">
+                  <Upload className="h-6 w-6 text-zinc-400 group-hover:text-zinc-300 transition-colors duration-200" />
                 </div>
 
                 {/* Texto principal */}
-                <h3 className="text-zinc-200 text-base font-semibold mb-2 group-hover:text-white transition-colors duration-300">
+                <h3 className="text-zinc-200 text-sm font-medium mb-1">
                   Subir {titulo}
                 </h3>
 
                 {/* Especificaciones técnicas */}
-                <div className="mb-4">
-                  <p className="text-zinc-400 text-sm group-hover:text-zinc-300 transition-colors duration-300">
-                    PNG, SVG (máx. 5MB)
-                  </p>
-                </div>
+                <p className="text-zinc-400 text-xs mb-3">
+                  PNG, SVG (hasta 5MB)
+                </p>
 
                 {/* Instrucciones de uso */}
-                <div className="flex items-center justify-center gap-3 text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors duration-300">
-                  <div className="flex items-center gap-1">
-                    <div className="w-1 h-1 bg-zinc-500 rounded-full" />
-                    <span>Arrastra y suelta</span>
-                  </div>
-                  <div className="w-1 h-1 bg-zinc-600 rounded-full" />
-                  <div className="flex items-center gap-1">
-                    <span>o haz clic para seleccionar</span>
-                  </div>
-                </div>
+                <p className="text-zinc-500 text-xs">
+                  Arrastra y suelta o haz clic para seleccionar
+                </p>
               </div>
             </Dropzone>
 
             {/* Indicador de estado de carga */}
             {uploading && (
-              <div className="absolute inset-0 bg-zinc-900/90 backdrop-blur-sm rounded-xl flex items-center justify-center z-20">
-                <div className="text-center p-6">
-                  <div className="relative mb-4">
-                    <div className="animate-spin h-8 w-8 border-3 border-blue-500 border-t-transparent rounded-full mx-auto" />
-                    <div className="absolute inset-0 animate-ping h-8 w-8 border border-blue-400 rounded-full mx-auto opacity-20" />
-                  </div>
-                  <p className="text-zinc-200 text-sm font-medium mb-1">Subiendo archivo...</p>
-                  <p className="text-zinc-400 text-xs">Por favor espera</p>
+              <div className="absolute inset-0 bg-zinc-900/90 backdrop-blur-sm rounded-lg flex items-center justify-center z-20">
+                <div className="text-center">
+                  <div className="animate-spin h-6 w-6 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-2" />
+                  <p className="text-zinc-200 text-sm">Subiendo...</p>
                 </div>
               </div>
             )}
