@@ -24,7 +24,7 @@ async function getAgents(): Promise<Agent[]> {
                     }
                 },
                 orderBy: {
-                    createdAt: 'desc'
+                    created_at: 'desc'
                 }
             });
         });

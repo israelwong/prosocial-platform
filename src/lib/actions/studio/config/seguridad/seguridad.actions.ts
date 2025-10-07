@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { PasswordChangeSchema, SecuritySettingsSchema } from '@/lib/actions/schemas/seguridad/seguridad-schemas';
 import { revalidatePath } from 'next/cache';
-import type { SecuritySettings, AccessLog, SecurityFormData } from '@/app/studio/[slug]/(studio-app)/configuracion/cuenta/seguridad/types';
+import type { SecuritySettings, AccessLog, SecurityFormData } from '@/app/studio/[slug]/app/configuracion/cuenta/seguridad/types';
 
 // ========================================
 // SERVER ACTIONS - SEGURIDAD
