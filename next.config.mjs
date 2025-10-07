@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ["@prisma/client", "@supabase/supabase-js"],
+  
+  // Configuración para evitar problemas con rutas largas en Vercel
+  outputFileTracingExcludes: {
+    '*': [
+      // Excluir archivos que pueden causar problemas en Vercel
+      'node_modules/@swc/core-*/**',
+      'node_modules/@next/swc-*/**',
+    ],
+  },
   images: {
     domains: [
       "bgtapcutchryzhzooony.supabase.co",
