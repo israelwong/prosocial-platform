@@ -1,16 +1,12 @@
-import { LoginForm } from '@/components/login-form'
-import { AuthHeader } from '@/components/auth-header'
-
-export default function Page() {
+export default function LoginPage() {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-zinc-950">
-      <div className="w-full max-w-sm">
-        <AuthHeader
-          // title="Bienvenido"
-          subtitle="Ingresa a tu cuenta para acceder al tu panel de administración en ProSocial Platform"
-        />
-        <LoginForm />
-      </div>
+    <div className="bg-zinc-900 p-8 rounded-lg border border-zinc-800">
+      <h1 className="text-2xl font-bold text-emerald-400 mb-4">
+        Iniciar Sesión
+      </h1>
+      <p className="text-zinc-400">
+        Página de login - En desarrollo
+      </p>
     </div>
-  )
+  );
 }
