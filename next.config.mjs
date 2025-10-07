@@ -18,19 +18,6 @@ const nextConfig = {
 
   async rewrites() {
     return [
-      // Reescritura para páginas públicas de studios
-      // /demo-studio -> /studio/demo-studio
-      {
-        source: "/:slug",
-        destination: "/studio/:slug",
-        has: [
-          {
-            type: "header",
-            key: "accept",
-            value: "text/html.*",
-          },
-        ],
-      },
       // Reescritura para rutas protegidas de studios
       // /demo-studio/app -> /studio/demo-studio/app
       {
