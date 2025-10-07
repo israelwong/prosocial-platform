@@ -2,7 +2,11 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { SecuritySettings, PasswordChangeForm, SessionsHistory } from './components';
+import {
+    // SecuritySettings, 
+    // SessionsHistory, 
+    PasswordChangeForm
+} from './components';
 import { Shield } from 'lucide-react';
 
 export default function SeguridadPage() {
@@ -35,14 +39,14 @@ export default function SeguridadPage() {
                     </div>
 
                     {/* Columna 2: Configuraciones de Seguridad */}
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                         <SecuritySettings studioSlug={studioSlug} />
-                    </div>
+                    </div> */}
 
                     {/* Columna 3: Historial de Sesiones */}
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                         <SessionsHistory studioSlug={studioSlug} />
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
