@@ -28,7 +28,7 @@ import {
     obtenerCuentasBancarias,
     eliminarCuentaBancaria,
     actualizarOrdenCuentasBancarias
-} from '@/lib/actions/studio/config/cuentas-bancarias.actions';
+} from '@/lib/actions/studio/config/cuentas-bancarias/cuentas-bancarias.actions';
 import { CuentaBancariaData } from '../types';
 import { CuentaBancariaForm } from './CuentaBancariaForm';
 import { CuentaBancariaItem } from './CuentaBancariaItem';

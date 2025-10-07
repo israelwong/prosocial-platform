@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import {
     crearCuentaBancaria,
     actualizarCuentaBancaria
-} from '@/lib/actions/studio/config/cuentas-bancarias.actions';
+} from '@/lib/actions/studio/config/cuentas-bancarias/cuentas-bancarias.actions';
 import { CuentaBancariaSchema, type CuentaBancariaForm as CuentaBancariaFormType } from '@/lib/actions/schemas/cuentas-bancarias-schemas';
 import { CuentaBancariaData } from '../types';
 
