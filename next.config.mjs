@@ -16,6 +16,17 @@ const nextConfig = {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 
+  // Optimizaciones para Vercel
+  experimental: {
+    serverComponentsExternalPackages: [
+      "@prisma/client",
+      "@supabase/supabase-js",
+    ],
+  },
+  
+  // Configuración de output para Vercel
+  output: "standalone",
+
   async headers() {
     return [
       {
