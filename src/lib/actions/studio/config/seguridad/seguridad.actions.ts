@@ -80,11 +80,11 @@ export async function cambiarContraseña(
 
         console.log('✅ Contraseña actualizada exitosamente');
 
-        // TODO: Implementar logSecurityAction cuando exista la tabla user_access_logs
-        // await logSecurityAction(user.id, 'password_change', true, {
-        //     ip_address: 'N/A', // Se puede obtener del request
-        //     user_agent: 'N/A'
-        // });
+        // Log del cambio de contraseña
+        await logSecurityAction(user.id, 'password_change', true, {
+            ip_address: 'N/A', // Se puede obtener del request
+            user_agent: 'N/A'
+        });
 
         revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/seguridad`);
 
@@ -165,32 +165,22 @@ export async function obtenerConfiguracionesSeguridad(
         // Obtener o crear usuario en la base de datos
         const dbUser = await getOrCreateUser(user);
 
-        // TODO: Implementar tabla user_security_settings en el schema
-        // let settings = await prisma.user_security_settings.findUnique({
-        //     where: { user_id: dbUser.id }
-        // });
+        // Buscar configuraciones existentes
+        let settings = await prisma.user_security_settings.findUnique({
+            where: { user_id: dbUser.id }
+        });
 
-        // if (!settings) {
-        //     settings = await prisma.user_security_settings.create({
-        //         data: {
-        //             user_id: dbUser.id,
-        //             email_notifications: true,
-        //             device_alerts: true,
-        //             session_timeout: 30
-        //         }
-        //     });
-        // }
-
-        // Retornar valores por defecto temporalmente
-        const settings = {
-            id: 'temp',
-            user_id: dbUser.id,
-            email_notifications: true,
-            device_alerts: true,
-            session_timeout: 30,
-            created_at: new Date(),
-            updated_at: new Date()
-        };
+        // Si no existen, crear con valores por defecto
+        if (!settings) {
+            settings = await prisma.user_security_settings.create({
+                data: {
+                    user_id: dbUser.id,
+                    email_notifications: true,
+                    device_alerts: true,
+                    session_timeout: 30
+                }
+            });
+        }
 
         return settings;
 
@@ -225,38 +215,27 @@ export async function actualizarConfiguracionesSeguridad(
         // Obtener o crear usuario en la base de datos
         const dbUser = await getOrCreateUser(user);
 
-        // TODO: Implementar tabla user_security_settings en el schema
-        // const settings = await prisma.user_security_settings.upsert({
-        //     where: { user_id: dbUser.id },
-        //     update: {
-        //         email_notifications: validatedData.email_notifications,
-        //         device_alerts: validatedData.device_alerts,
-        //         session_timeout: validatedData.session_timeout,
-        //         updated_at: new Date()
-        //     },
-        //     create: {
-        //         user_id: dbUser.id,
-        //         email_notifications: validatedData.email_notifications,
-        //         device_alerts: validatedData.device_alerts,
-        //         session_timeout: validatedData.session_timeout
-        //     }
-        // });
+        // Actualizar o crear configuraciones
+        const settings = await prisma.user_security_settings.upsert({
+            where: { user_id: dbUser.id },
+            update: {
+                email_notifications: validatedData.email_notifications,
+                device_alerts: validatedData.device_alerts,
+                session_timeout: validatedData.session_timeout,
+                updated_at: new Date()
+            },
+            create: {
+                user_id: dbUser.id,
+                email_notifications: validatedData.email_notifications,
+                device_alerts: validatedData.device_alerts,
+                session_timeout: validatedData.session_timeout
+            }
+        });
 
-        // TODO: Implementar logSecurityAction cuando exista la tabla user_access_logs
-        // await logSecurityAction(dbUser.id, 'security_settings_updated', true, {
-        //     settings: validatedData
-        // });
-
-        // Retornar datos simulados temporalmente
-        const settings = {
-            id: 'temp',
-            user_id: dbUser.id,
-            email_notifications: validatedData.email_notifications,
-            device_alerts: validatedData.device_alerts,
-            session_timeout: validatedData.session_timeout,
-            created_at: new Date(),
-            updated_at: new Date()
-        };
+        // Log del cambio de configuraciones
+        await logSecurityAction(dbUser.id, 'security_settings_updated', true, {
+            settings: validatedData
+        });
 
         revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/seguridad`);
 
@@ -308,16 +287,12 @@ export async function obtenerHistorialAccesos(
             };
         }
 
-        // TODO: Implementar tabla user_access_logs en el schema
-        // const logs = await prisma.user_access_logs.findMany({
-        //     where: { user_id: dbUser.id },
-        //     orderBy: { created_at: 'desc' },
-        //     take: limit,
-        //     skip: offset
-        // });
-
-        // Retornar array vacío temporalmente
-        const logs: any[] = [];
+        const logs = await prisma.user_access_logs.findMany({
+            where: { user_id: dbUser.id },
+            orderBy: { created_at: 'desc' },
+            take: limit,
+            skip: offset
+        });
 
         return {
             success: true,
@@ -365,10 +340,10 @@ export async function cerrarTodasLasSesiones(
             };
         }
 
-        // TODO: Implementar logSecurityAction cuando exista la tabla user_access_logs
-        // await logSecurityAction(dbUser.id, 'session_ended', true, {
-        //     action: 'close_all_sessions'
-        // });
+        // Log del cierre de sesiones
+        await logSecurityAction(dbUser.id, 'session_ended', true, {
+            action: 'close_all_sessions'
+        });
 
         return {
             success: true,
@@ -387,25 +362,24 @@ export async function cerrarTodasLasSesiones(
 /**
  * Función auxiliar para loggear acciones de seguridad
  */
-// TODO: Implementar función logSecurityAction cuando exista la tabla user_access_logs
-// async function logSecurityAction(
-//     userId: string,
-//     action: string,
-//     success: boolean,
-//     details?: any
-// ) {
-//     try {
-//         await prisma.user_access_logs.create({
-//             data: {
-//                 user_id: userId,
-//                 action,
-//                 success,
-//                 details,
-//                 ip_address: details?.ip_address || 'N/A',
-//                 user_agent: details?.user_agent || 'N/A'
-//             }
-//         });
-//     } catch (error) {
-//         console.error('Error al loggear acción de seguridad:', error);
-//     }
-// }
+async function logSecurityAction(
+    userId: string,
+    action: string,
+    success: boolean,
+    details?: any
+) {
+    try {
+        await prisma.user_access_logs.create({
+            data: {
+                user_id: userId,
+                action,
+                success,
+                details,
+                ip_address: details?.ip_address || 'N/A',
+                user_agent: details?.user_agent || 'N/A'
+            }
+        });
+    } catch (error) {
+        console.error('Error al loggear acción de seguridad:', error);
+    }
+}

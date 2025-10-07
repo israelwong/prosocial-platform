@@ -149,6 +149,10 @@ model users {
   platform_roles user_platform_roles[] // Roles en la plataforma (SUPER_ADMIN, AGENTE)
   studio_roles   user_studio_roles[] // Roles en studios (OWNER, PHOTOGRAPHER, CLIENT)
 
+  // Seguridad - ITERACIÓN 1
+  security_settings user_security_settings?
+  access_logs       user_access_logs[]
+
   @@index([email])
   @@index([supabase_id])
   @@index([is_active])
@@ -2805,4 +2809,40 @@ model studio_client_portal_access {
   @@index([access_code])
   @@index([client_email])
   @@index([studio_id, is_active])
+}
+
+// ========================================
+// SEGURIDAD - ITERACIÓN 1
+// ========================================
+
+model user_security_settings {
+  id                    String   @id @default(cuid())
+  user_id               String   @unique
+  email_notifications   Boolean  @default(true)
+  device_alerts         Boolean  @default(true)
+  session_timeout       Int      @default(30) // días
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+}
+
+model user_access_logs {
+  id          String   @id @default(cuid())
+  user_id     String
+  action      String   // login, logout, password_change, session_created
+  ip_address  String?
+  user_agent  String?
+  success     Boolean
+  details     Json?    // Información adicional
+  created_at  DateTime @default(now())
+  
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  
+  @@index([user_id])
+  @@index([action])
+  @@index([created_at])
+  @@index([success])
 }
