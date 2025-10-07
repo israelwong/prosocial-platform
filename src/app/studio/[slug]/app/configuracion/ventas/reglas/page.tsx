@@ -1,17 +1,12 @@
-'use client';
-
 import React from 'react';
-import { useParams } from 'next/navigation';
-import { ReglasAgendamientoList } from './components/ReglasAgendamientoList';
 
-export default function ReglasAgendamientoPage() {
-    const params = useParams();
-    const slug = params.slug as string;
-
-    return (
-        <div className="space-y-6">
-            {/* Contenido principal con ZEN Design System */}
-            <ReglasAgendamientoList studioSlug={slug} />
-        </div>
-    );
+export default function ReglasPage() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-white mb-4">reglas</h1>
+      <p className="text-zinc-400">
+        Esta página está en desarrollo. Próximamente estará disponible.
+      </p>
+    </div>
+  );
 }

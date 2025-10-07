@@ -1,17 +1,12 @@
-'use client';
-
 import React from 'react';
-import { useParams } from 'next/navigation';
-import { CondicionesComercialesList } from './components/CondicionesComercialesList';
 
-export default function CondicionesComercialesPage() {
-  const params = useParams();
-  const slug = params.slug as string;
-
+export default function CondicionesPage() {
   return (
-    <div className="space-y-6">
-      {/* Contenido principal con ZEN Design System */}
-      <CondicionesComercialesList studioSlug={slug} />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-white mb-4">condiciones</h1>
+      <p className="text-zinc-400">
+        Esta página está en desarrollo. Próximamente estará disponible.
+      </p>
     </div>
   );
 }

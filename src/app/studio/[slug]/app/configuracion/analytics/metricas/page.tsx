@@ -1,9 +1,9 @@
 import React from 'react';
 
-export default function MétricasPage() {
+export default function MetricasPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-white mb-4">Métricas</h1>
+      <h1 className="text-2xl font-bold text-white mb-4">metricas</h1>
       <p className="text-zinc-400">
         Esta página está en desarrollo. Próximamente estará disponible.
       </p>

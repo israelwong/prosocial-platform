@@ -1,17 +1,12 @@
-'use client';
-
 import React from 'react';
-import { useParams } from 'next/navigation';
-import { CuentasBancariasList } from './components/CuentasBancariasList';
 
-export default function CuentasBancariasPage() {
-  const params = useParams();
-  const slug = params.slug as string;
-
+export default function CuentasPage() {
   return (
-    <div className="space-y-6">
-      {/* Contenido principal con ZEN Design System */}
-      <CuentasBancariasList studioSlug={slug} />
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-white mb-4">cuentas</h1>
+      <p className="text-zinc-400">
+        Esta página está en desarrollo. Próximamente estará disponible.
+      </p>
     </div>
   );
 }

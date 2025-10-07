@@ -3,7 +3,7 @@ import React from 'react';
 export default function SistemaPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-white mb-4">Sistema</h1>
+      <h1 className="text-2xl font-bold text-white mb-4">sistema</h1>
       <p className="text-zinc-400">
         Esta página está en desarrollo. Próximamente estará disponible.
       </p>
