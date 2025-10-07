@@ -19,3 +19,154 @@ Tip: Interested in query caching in just a few lines of code? Try Accelerate tod
    Skipping validation of types
    Skipping linting
    Collecting page data ...
+   Generating static pages (0/75) ...
+   Generating static pages (18/75) 
+   Generating static pages (37/75) 
+   Generating static pages (56/75) 
+ ✓ Generating static pages (75/75)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                              Size  First Load JS
+┌ ○ /                                                                   287 B         102 kB
+├ ○ /_not-found                                                          1 kB         103 kB
+├ ○ /about                                                              287 B         102 kB
+├ ○ /admin                                                              536 B         102 kB
+├ ○ /admin/agents                                                     9.14 kB         212 kB
+├ ƒ /admin/agents/[id]                                                  169 B         105 kB
+├ ƒ /admin/agents/[id]/edit                                           5.25 kB         178 kB
+├ ○ /admin/agents/new                                                 5.64 kB         179 kB
+├ ○ /admin/analytics                                                    287 B         102 kB
+├ ○ /admin/analytics/facturacion                                      3.57 kB         113 kB
+├ ○ /admin/analytics/finanzas                                         3.58 kB         113 kB
+├ ○ /admin/analytics/marketing                                        3.58 kB         113 kB
+├ ○ /admin/analytics/ventas                                           3.58 kB         113 kB
+├ ○ /admin/campanas/activas                                           6.67 kB         187 kB
+├ ○ /admin/campanas/historial                                         3.51 kB         173 kB
+├ ○ /admin/campanas/plataformas                                       5.91 kB         206 kB
+├ ○ /admin/canales                                                    9.24 kB         210 kB
+├ ○ /admin/configuracion                                              5.35 kB         205 kB
+├ ○ /admin/dashboard                                                    287 B         102 kB
+├ ○ /admin/descuentos                                                 4.89 kB         118 kB
+├ ○ /admin/descuentos/agentes                                         5.57 kB         196 kB
+├ ○ /admin/descuentos/configuracion                                   6.63 kB         203 kB
+├ ○ /admin/descuentos/general                                         5.44 kB         196 kB
+├ ƒ /admin/descuentos/general/[id]                                    6.58 kB         207 kB
+├ ○ /admin/descuentos/general/nuevo                                      6 kB         206 kB
+├ ○ /admin/descuentos/reportes                                        8.12 kB         154 kB
+├ ○ /admin/pipeline                                                   7.67 kB         215 kB
+├ ○ /admin/plans                                                      16.4 kB         244 kB
+├ ƒ /admin/plans/[id]/edit                                            13.8 kB         244 kB
+├ ○ /admin/plans/new                                                    287 B         102 kB
+├ ○ /admin/plataformas-redes                                          9.96 kB         194 kB
+├ ○ /admin/redes-sociales                                             11.4 kB         186 kB
+├ ○ /admin/revenue                                                    5.64 kB         159 kB
+├ ○ /admin/services                                                   10.9 kB         227 kB
+├ ○ /admin/services/categorias                                        6.28 kB         204 kB
+├ ○ /agente                                                           6.93 kB         160 kB
+├ ○ /agente/crm/kanban                                                7.77 kB         216 kB
+├ ○ /agente/dashboard                                                 4.65 kB         168 kB
+├ ○ /agente/leads                                                     7.54 kB         205 kB
+├ ƒ /agente/leads/[id]                                                9.38 kB         159 kB
+├ ○ /agente/studios                                                   6.38 kB         116 kB
+├ ƒ /api/admin/agents                                                   287 B         102 kB
+├ ƒ /api/admin/agents/[id]                                              287 B         102 kB
+├ ƒ /api/admin/agents/[id]/auth-status                                  287 B         102 kB
+├ ƒ /api/admin/agents/[id]/resend-credentials                           287 B         102 kB
+├ ƒ /api/admin/descuentos                                               287 B         102 kB
+├ ƒ /api/admin/descuentos/[id]                                          287 B         102 kB
+├ ƒ /api/admin/descuentos/agentes                                       287 B         102 kB
+├ ƒ /api/admin/descuentos/reportes                                      287 B         102 kB
+├ ƒ /api/admin/plataformas-redes                                        287 B         102 kB
+├ ƒ /api/admin/plataformas-redes/[id]                                   287 B         102 kB
+├ ƒ /api/admin/studios                                                  287 B         102 kB
+├ ƒ /api/admin/studios/[id]                                             287 B         102 kB
+├ ƒ /api/agents                                                         287 B         102 kB
+├ ƒ /api/auth/create-profile                                            287 B         102 kB
+├ ƒ /api/campanas                                                       287 B         102 kB
+├ ƒ /api/campanas/[id]                                                  287 B         102 kB
+├ ƒ /api/canales                                                        287 B         102 kB
+├ ƒ /api/canales/[id]                                                   287 B         102 kB
+├ ƒ /api/clients                                                        287 B         102 kB
+├ ƒ /api/leads                                                          287 B         102 kB
+├ ƒ /api/leads/[id]                                                     287 B         102 kB
+├ ƒ /api/pipeline                                                       287 B         102 kB
+├ ƒ /api/plans                                                          287 B         102 kB
+├ ƒ /api/plans/[id]                                                     287 B         102 kB
+├ ƒ /api/plans/[id]/create-stripe-price                                 287 B         102 kB
+├ ƒ /api/plans/[id]/migrate-subscriptions                               287 B         102 kB
+├ ƒ /api/plans/[id]/services                                            287 B         102 kB
+├ ƒ /api/plans/normalize-order                                          287 B         102 kB
+├ ƒ /api/plataformas                                                    287 B         102 kB
+├ ƒ /api/plataformas-redes                                              287 B         102 kB
+├ ƒ /api/plataformas/[id]                                               287 B         102 kB
+├ ƒ /api/platform-config                                                287 B         102 kB
+├ ƒ /api/projects                                                       287 B         102 kB
+├ ƒ /api/projects/[id]                                                  287 B         102 kB
+├ ƒ /api/service-categories                                             287 B         102 kB
+├ ƒ /api/service-categories/[id]                                        287 B         102 kB
+├ ƒ /api/services                                                       287 B         102 kB
+├ ƒ /api/services/[id]                                                  287 B         102 kB
+├ ƒ /api/studio/[slug]/setup-status                                     287 B         102 kB
+├ ƒ /api/webhooks/stripe-coupons                                        287 B         102 kB
+├ ƒ /api/webhooks/stripe-subscriptions                                  287 B         102 kB
+├ ƒ /confirm                                                            287 B         102 kB
+├ ○ /contact                                                            287 B         102 kB
+├ ○ /error                                                              169 B         105 kB
+├ ○ /forgot-password                                                  3.97 kB         160 kB
+├ ○ /login                                                            4.09 kB         166 kB
+├ ○ /pricing                                                            287 B         102 kB
+├ ƒ /protected                                                          287 B         102 kB
+├ ƒ /redirect                                                           287 B         102 kB
+├ ○ /sign-up                                                          6.63 kB         190 kB
+├ ○ /sign-up-success                                                    287 B         102 kB
+├ ○ /signup                                                           3.26 kB         171 kB
+├ ○ /studio                                                             287 B         102 kB
+├ ƒ /studio/[slug]                                                      987 B         108 kB
+├ ƒ /studio/[slug]/app                                                  287 B         102 kB
+├ ƒ /studio/[slug]/app/configuracion                                  7.32 kB         120 kB
+├ ƒ /studio/[slug]/app/configuracion/catalogo/paquetes                 6.8 kB         208 kB
+├ ƒ /studio/[slug]/app/configuracion/catalogo/paquetes/[accion]/[id]  4.22 kB         174 kB
+├ ƒ /studio/[slug]/app/configuracion/catalogo/servicios               13.7 kB         204 kB
+├ ƒ /studio/[slug]/app/configuracion/cuenta/perfil                    13.5 kB         242 kB
+├ ƒ /studio/[slug]/app/configuracion/cuenta/seguridad                 9.85 kB         206 kB
+├ ƒ /studio/[slug]/app/configuracion/cuenta/suscripcion               5.76 kB         115 kB
+├ ƒ /studio/[slug]/app/configuracion/cuenta/suscripcion/plan            287 B         102 kB
+├ ƒ /studio/[slug]/app/configuracion/operacion/personal               15.2 kB         248 kB
+├ ƒ /studio/[slug]/app/configuracion/operacion/pipeline                 287 B         102 kB
+├ ƒ /studio/[slug]/app/configuracion/operacion/pipeline/gantt           287 B         102 kB
+├ ƒ /studio/[slug]/app/configuracion/operacion/tipos                  5.57 kB         203 kB
+├ ƒ /studio/[slug]/app/configuracion/pagina/faq                         238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/pagina/portafolio                  238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/pagina/promociones                 238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/pagina/seo                       2.95 kB         173 kB
+├ ƒ /studio/[slug]/app/configuracion/pagos/metodos/cuentas            8.01 kB         239 kB
+├ ƒ /studio/[slug]/app/configuracion/pagos/metodos/stripe               287 B         102 kB
+├ ƒ /studio/[slug]/app/configuracion/platform                           238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/platform/integraciones             238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/platform/modulos                   238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/platform/notificaciones            238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/studio/contacto                  11.4 kB         231 kB
+├ ƒ /studio/[slug]/app/configuracion/studio/horarios                  8.56 kB         182 kB
+├ ƒ /studio/[slug]/app/configuracion/studio/identidad                 7.96 kB         222 kB
+├ ƒ /studio/[slug]/app/configuracion/studio/redes                     13.8 kB         234 kB
+├ ƒ /studio/[slug]/app/configuracion/ventas/condiciones               6.71 kB         237 kB
+├ ƒ /studio/[slug]/app/configuracion/ventas/crm                         238 B         161 kB
+├ ƒ /studio/[slug]/app/configuracion/ventas/inteligencia              5.45 kB         205 kB
+├ ƒ /studio/[slug]/app/configuracion/ventas/reglas                    7.46 kB         238 kB
+├ ƒ /studio/[slug]/app/dashboard                                        287 B         102 kB
+├ ƒ /studio/[slug]/app/dashboard/agenda                                 287 B         102 kB
+├ ƒ /studio/[slug]/app/dashboard/contactos                              287 B         102 kB
+├ ƒ /studio/[slug]/app/dashboard/finanzas                               287 B         102 kB
+├ ƒ /studio/[slug]/app/dashboard/kanban                                 287 B         102 kB
+├ ○ /unauthorized                                                     3.67 kB         113 kB
+└ ○ /update-password                                                  3.86 kB         157 kB
++ First Load JS shared by all                                          102 kB
+  ├ chunks/1255-f206d8cb7c37a3ff.js                                   45.5 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js                               54.2 kB
+  └ other shared chunks (total)                                       1.96 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
