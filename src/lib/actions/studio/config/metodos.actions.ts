@@ -1,10 +1,10 @@
-// Ruta: src/lib/actions/studio/config/metodos-pago.actions.ts
+// Ruta: src/lib/actions/studio/config/metodos.actions.ts
 
 'use server';
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { MetodoPagoSchema, type MetodoPagoForm } from "@/lib/actions/schemas/metodos-pago-schemas";
+import { MetodoPagoSchema, type MetodoPagoForm } from "@/lib/actions/schemas/metodos-schemas";
 
 // Obtener todos los métodos de pago de un studio
 export async function obtenerMetodosPago(studioSlug: string) {

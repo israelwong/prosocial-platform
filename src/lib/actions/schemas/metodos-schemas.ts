@@ -1,4 +1,4 @@
-// Ruta: src/lib/actions/schemas/metodos-pago-schemas.ts
+// Ruta: src/lib/actions/schemas/metodos-schemas.ts
 
 import { z } from 'zod';
 

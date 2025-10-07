@@ -1,4 +1,4 @@
-// Ruta: src/lib/actions/studio/config/metodos-pago-sembrados.actions.ts
+// Ruta: src/lib/actions/studio/config/metodos-sembrados.actions.ts
 
 'use server';
 
