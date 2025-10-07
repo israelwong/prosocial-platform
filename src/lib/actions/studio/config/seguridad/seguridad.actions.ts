@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { PasswordChangeSchema, SecuritySettingsSchema } from '@/lib/actions/schemas/seguridad/seguridad-schemas';
 import { revalidatePath } from 'next/cache';
-import type { SecuritySettings, AccessLog, SecurityFormData } from '@/app/studio/[slug]/app/configuracion/cuenta/seguridad/types';
+import type { SecuritySettings, AccessLog, SecurityFormData } from './types';
 
 // ========================================
 // SERVER ACTIONS - SEGURIDAD
@@ -34,7 +34,7 @@ export async function cambiarContraseña(
 
         // Verificar contraseña actual usando re-autenticación
         console.log('🔍 Verificando contraseña actual para:', user.email);
-        
+
         // Crear una nueva instancia de Supabase para la verificación
         const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
         const verifySupabase = createSupabaseClient(
@@ -49,7 +49,7 @@ export async function cambiarContraseña(
             }
         );
 
-        const { data: verifyData, error: verifyError } = await verifySupabase.auth.signInWithPassword({
+        const { error: verifyError } = await verifySupabase.auth.signInWithPassword({
             email: user.email!,
             password: validatedData.currentPassword
         });
@@ -105,7 +105,14 @@ export async function cambiarContraseña(
 /**
  * Obtener o crear usuario en la base de datos
  */
-async function getOrCreateUser(supabaseUser: any) {
+async function getOrCreateUser(supabaseUser: {
+    id: string;
+    email: string;
+    user_metadata?: {
+        full_name?: string;
+    };
+    email_confirmed_at?: string;
+}) {
     // Buscar el usuario en nuestra tabla usando supabase_id
     let dbUser = await prisma.users.findUnique({
         where: { supabase_id: supabaseUser.id }
@@ -152,12 +159,12 @@ async function getOrCreateUser(supabaseUser: any) {
  * Obtener configuraciones de seguridad del usuario
  */
 export async function obtenerConfiguracionesSeguridad(
-    studioSlug: string
+    _studioSlug: string
 ): Promise<SecuritySettings | null> {
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return null;
         }
@@ -200,11 +207,11 @@ export async function actualizarConfiguracionesSeguridad(
     try {
         // Validar datos
         const validatedData = SecuritySettingsSchema.parse(data);
-        
+
         // Obtener usuario actual
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -265,7 +272,7 @@ export async function obtenerHistorialAccesos(
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -313,12 +320,12 @@ export async function obtenerHistorialAccesos(
  * Cerrar todas las sesiones excepto la actual
  */
 export async function cerrarTodasLasSesiones(
-    studioSlug: string
+    _studioSlug: string
 ) {
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -366,7 +373,7 @@ async function logSecurityAction(
     userId: string,
     action: string,
     success: boolean,
-    details?: any
+    details?: Record<string, unknown>
 ) {
     try {
         await prisma.user_access_logs.create({
