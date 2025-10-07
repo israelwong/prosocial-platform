@@ -53,7 +53,7 @@ export function BreadcrumbHeader({ className, studioSlug }: BreadcrumbHeaderProp
             // Siempre empezar con "Configuración"
             breadcrumb.push({
                 label: 'Configuración',
-                href: `/studio/${studioSlug}/configuracion`,
+                href: `/${studioSlug}/app/configuracion`,
                 active: false
             });
 

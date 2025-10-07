@@ -27,8 +27,8 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
     const slug = params.slug as string;
 
     // Detectar si estamos en dashboard o configuración
-    const isDashboard = pathname.includes('/dashboard');
-    const isConfiguracion = pathname.includes('/configuracion');
+    const isDashboard = pathname.includes('/app/dashboard');
+    const isConfiguracion = pathname.includes('/app/configuracion');
 
     // Usar hook para datos del studio
     const {
@@ -75,7 +75,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                     />
                     <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center hidden">
                         <span className="text-white font-bold text-sm">
-                            {identidadData.name.charAt(0).toUpperCase()}
+                            {identidadData.studio_name?.charAt(0)?.toUpperCase() || 'S'}
                         </span>
                     </div>
                 </div>
@@ -104,7 +104,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                     />
                     <div className="w-8 h-8 bg-blue-600 rounded-lg items-center justify-center hidden">
                         <span className="text-white font-bold text-sm">
-                            {identidadData.name.charAt(0).toUpperCase()}
+                            {identidadData.studio_name?.charAt(0)?.toUpperCase() || 'S'}
                         </span>
                     </div>
                 </div>
@@ -177,7 +177,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href={`/${slug}/configuracion/global/cuenta/perfil`}
+                        href={`/${slug}/app/configuracion/cuenta/perfil`}
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <User className="h-4 w-4" />
@@ -187,7 +187,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href={`/${slug}/configuracion/global/cuenta/suscripcion`}
+                        href={`/${slug}/app/configuracion/cuenta/suscripcion`}
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <CreditCard className="h-4 w-4" />
@@ -201,7 +201,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                 {isConfiguracion && (
                     <DropdownMenuItem asChild>
                         <Link
-                            href={`/${slug}/dashboard`}
+                            href={`/${slug}/app/dashboard`}
                             className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                         >
                             <LayoutDashboard className="h-4 w-4" />
@@ -213,7 +213,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                 {isDashboard && (
                     <DropdownMenuItem asChild>
                         <Link
-                            href={`/${slug}/configuracion`}
+                            href={`/${slug}/app/configuracion`}
                             className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                         >
                             <Settings className="h-4 w-4" />
