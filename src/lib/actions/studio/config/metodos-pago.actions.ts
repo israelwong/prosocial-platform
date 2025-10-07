@@ -110,7 +110,7 @@ export async function crearMetodoPago(studioSlug: string, data: MetodoPagoForm) 
             data: dataToSave,
         });
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/metodos-pago`);
+        revalidatePath(`/studio/${studioSlug}/app/configuracion/pagos/metodos`);
 
         return {
             success: true,
@@ -163,7 +163,7 @@ export async function actualizarMetodoPago(studioSlug: string, metodoId: string,
             data: dataToSave,
         });
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/metodos-pago`);
+        revalidatePath(`/studio/${studioSlug}/app/configuracion/pagos/metodos`);
 
         return {
             success: true,
@@ -194,7 +194,7 @@ export async function eliminarMetodoPago(studioSlug: string, metodoId: string) {
             where: { id: metodoId },
         });
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/metodos-pago`);
+        revalidatePath(`/studio/${studioSlug}/app/configuracion/pagos/metodos`);
 
         return {
             success: true,
@@ -230,7 +230,7 @@ export async function actualizarOrdenMetodosPago(studioSlug: string, metodos: { 
             )
         );
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/negocio/metodos-pago`);
+        revalidatePath(`/studio/${studioSlug}/app/configuracion/pagos/metodos`);
 
         return {
             success: true,

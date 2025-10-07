@@ -98,7 +98,7 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             icon: 'CreditCard',
             moduleSlug: 'pagos',
             items: [
-                { id: 'metodos-pago', name: 'Métodos de Pago', href: '/pagos/metodos-pago', icon: 'CreditCard' },
+                { id: 'metodos', name: 'Métodos de Pago', href: '/pagos/metodos', icon: 'CreditCard' },
                 { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/pagos/cuentas-bancarias', icon: 'Building' },
                 { id: 'stripe', name: 'Stripe', href: '/pagos/stripe', icon: 'CreditCard' },
             ],
