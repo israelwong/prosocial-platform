@@ -74,7 +74,7 @@ export const LeadExportSchema = z.object({
 export const LeadImportSchema = z.object({
     archivo: z.string(), // Base64 del archivo
     formato: z.enum(["excel", "csv"]),
-    mapeo: z.record(z.string()), // Mapeo de columnas
+    mapeo: z.record(z.string(), z.string()), // Mapeo de columnas
     actualizarExistentes: z.boolean().default(false),
 });
 

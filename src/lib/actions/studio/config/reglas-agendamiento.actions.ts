@@ -44,15 +44,15 @@ export async function obtenerReglasAgendamiento(
         // Mapear los datos para asegurar compatibilidad de tipos
         const reglasMapeadas = reglas.map(regla => ({
             id: regla.id,
-            studio_id: regla.studio_id,
+            projectId: regla.studio_id,
             nombre: regla.nombre,
             descripcion: regla.descripcion || null,
             recurrencia: regla.recurrencia as 'por_dia' | 'por_hora',
-            capacidadOperativa: regla.capacidadOperativa,
+            capacidadOperativa: regla.capacidad_operativa,
             status: regla.status as 'active' | 'inactive',
             orden: regla.orden,
-            createdAt: regla.createdAt,
-            updatedAt: regla.updatedAt
+            createdAt: regla.created_at,
+            updatedAt: regla.updated_at
         }));
 
         return {
@@ -112,9 +112,22 @@ export async function crearReglaAgendamiento(
             }
         });
 
+        const reglaMapeada = {
+            id: regla.id,
+            projectId: regla.studio_id,
+            nombre: regla.nombre,
+            descripcion: regla.descripcion || null,
+            recurrencia: regla.recurrencia as 'por_dia' | 'por_hora',
+            capacidadOperativa: regla.capacidad_operativa,
+            status: regla.status as 'active' | 'inactive',
+            orden: regla.orden,
+            createdAt: regla.created_at,
+            updatedAt: regla.updated_at
+        };
+
         return {
             success: true,
-            data: regla
+            data: reglaMapeada
         };
 
     } catch (error) {
@@ -176,9 +189,22 @@ export async function actualizarReglaAgendamiento(
             }
         });
 
+        const reglaMapeada = {
+            id: regla.id,
+            projectId: regla.studio_id,
+            nombre: regla.nombre,
+            descripcion: regla.descripcion || null,
+            recurrencia: regla.recurrencia as 'por_dia' | 'por_hora',
+            capacidadOperativa: regla.capacidad_operativa,
+            status: regla.status as 'active' | 'inactive',
+            orden: regla.orden,
+            createdAt: regla.created_at,
+            updatedAt: regla.updated_at
+        };
+
         return {
             success: true,
-            data: regla
+            data: reglaMapeada
         };
 
     } catch (error) {
@@ -237,7 +263,18 @@ export async function eliminarReglaAgendamiento(
 
         return {
             success: true,
-            data: { id: reglaId }
+            data: {
+                id: reglaId,
+                projectId: studio.id,
+                nombre: reglaExistente.nombre,
+                descripcion: reglaExistente.descripcion || null,
+                recurrencia: reglaExistente.recurrencia as 'por_dia' | 'por_hora',
+                capacidadOperativa: reglaExistente.capacidad_operativa,
+                status: reglaExistente.status as 'active' | 'inactive',
+                orden: reglaExistente.orden,
+                createdAt: reglaExistente.created_at,
+                updatedAt: reglaExistente.updated_at
+            }
         };
 
     } catch (error) {
@@ -292,7 +329,18 @@ export async function actualizarOrdenReglasAgendamiento(
 
         return {
             success: true,
-            data: { updated: reglas.length }
+            data: {
+                id: reglas[0]?.id || '',
+                projectId: studio.id,
+                nombre: '',
+                descripcion: null,
+                recurrencia: 'por_dia' as 'por_dia' | 'por_hora',
+                capacidadOperativa: 0,
+                status: 'active' as 'active' | 'inactive',
+                orden: 0,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
         };
 
     } catch (error) {

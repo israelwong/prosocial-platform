@@ -16,7 +16,7 @@ export const TelefonoCreateSchema = z.object({
         .regex(/^[\+]?[0-9\s\-\(\)]+$/, "Formato de teléfono inválido")
         .max(20, "El número de teléfono es muy largo"),
     tipo: z.enum(TIPOS_TELEFONO, {
-        errorMap: () => ({ message: "Tipo de teléfono inválido" })
+        message: "Tipo de teléfono inválido"
     }),
     activo: z.boolean().default(true),
 });
@@ -63,7 +63,7 @@ export const ContactoDataSchema = z.object({
 // Schema para actualizar datos de contacto
 export const ContactoDataUpdateSchema = z.object({
     field: z.enum(["direccion", "website"], {
-        errorMap: () => ({ message: "Campo inválido" })
+        message: "Campo inválido"
     }),
     value: z.string().max(500, "El valor es muy largo"),
 });

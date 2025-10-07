@@ -11,8 +11,7 @@ import {
     CreditCard,
     Settings,
     Crown,
-    Star,
-    Building
+    Star
 } from 'lucide-react';
 import { SuscripcionData } from '@/lib/actions/studio/config/suscripcion/types';
 
@@ -21,7 +20,7 @@ interface CurrentPlanCardProps {
     studioSlug: string;
 }
 
-export function CurrentPlanCard({ data, studioSlug }: CurrentPlanCardProps) {
+export function CurrentPlanCard({ data }: CurrentPlanCardProps) {
     const { subscription, plan, limits } = data;
 
     const getPlanIcon = (planSlug: string) => {
@@ -33,14 +32,6 @@ export function CurrentPlanCard({ data, studioSlug }: CurrentPlanCardProps) {
         }
     };
 
-    const getPlanColor = (planSlug: string) => {
-        switch (planSlug) {
-            case 'free': return 'bg-green-900/30 text-green-300 border-green-800';
-            case 'pro': return 'bg-blue-900/30 text-blue-300 border-blue-800';
-            case 'enterprise': return 'bg-purple-900/30 text-purple-300 border-purple-800';
-            default: return 'bg-zinc-900/30 text-zinc-300 border-zinc-800';
-        }
-    };
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -79,7 +70,7 @@ export function CurrentPlanCard({ data, studioSlug }: CurrentPlanCardProps) {
         }).format(price);
     };
 
-    const getLimitText = (limit: any) => {
+    const getLimitText = (limit: { limit_value: number; unit: string }) => {
         if (limit.limit_value === -1) return 'Ilimitado';
         return `${limit.limit_value} ${limit.unit}`;
     };

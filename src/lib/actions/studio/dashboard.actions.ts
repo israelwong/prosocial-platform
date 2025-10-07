@@ -29,7 +29,7 @@ export interface DashboardEvento {
   cliente: {
     nombre: string;
     email: string;
-  }[];
+  } | null;
 }
 
 export interface DashboardCliente {
@@ -70,12 +70,18 @@ export async function obtenerDashboardStudio(studioSlug: string): Promise<Dashbo
 
     // En modo desarrollo, usar datos por defecto
     return {
-      ...studio,
-      subscriptionStatus: studio.subscriptionStatus || "active",
+      id: studio.id,
+      name: studio.studio_name,
+      slug: studio.slug,
+      email: studio.email,
+      address: studio.address,
+      website: studio.website,
+      subscriptionStatus: studio.subscription_status || "active",
       plan: {
         name: "Plan Desarrollo",
         priceMonthly: 0,
       },
+      _count: studio._count,
     };
   });
 }
@@ -95,7 +101,7 @@ export async function obtenerEventosRecientes(studioSlug: string): Promise<Dashb
           nombre: true,
           fecha_evento: true,
           status: true,
-          cliente: {
+          clientes: {
             select: {
               nombre: true,
               email: true,
@@ -107,10 +113,16 @@ export async function obtenerEventosRecientes(studioSlug: string): Promise<Dashb
       });
 
       return eventos.map(evento => ({
-        ...evento,
-        cliente: evento.cliente || [],
+        id: evento.id,
+        nombre: evento.nombre || "Evento sin nombre",
+        fecha_evento: evento.fecha_evento,
+        status: evento.status,
+        cliente: evento.clientes ? {
+          nombre: evento.clientes.nombre,
+          email: evento.clientes.email,
+        } : null,
       }));
-    } catch (error) {
+    } catch {
       // En modo desarrollo, retornar array vacío si hay error
       console.log('No hay eventos disponibles en modo desarrollo');
       return [];
@@ -140,7 +152,7 @@ export async function obtenerClientesRecientes(studioSlug: string): Promise<Dash
       });
 
       return clientes;
-    } catch (error) {
+    } catch {
       // En modo desarrollo, retornar array vacío si hay error
       console.log('No hay clientes disponibles en modo desarrollo');
       return [];

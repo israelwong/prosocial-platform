@@ -195,7 +195,7 @@ model user_studio_roles {
   lead_notes      marketing_lead_notes[]
 
   // Relaciones inversas - Manager
-  managed_events manager_events[]         @relation("EventProjectManager")
+  managed_events manager_events[]         @relation("EventStudioManager")
   client_events  manager_events[]         @relation("EventClient")
   event_tasks    manager_event_tasks[]
   event_team     manager_event_team[]
@@ -2312,7 +2312,7 @@ model manager_events {
   stage           manager_pipeline_stages @relation(fields: [stage_id], references: [id])
   client          user_studio_roles       @relation("EventClient", fields: [client_id], references: [id])
   event_type      studio_evento_tipos     @relation(fields: [event_type_id], references: [id])
-  project_manager user_studio_roles?      @relation("EventProjectManager", fields: [studio_manager_id], references: [id])
+  studio_manager user_studio_roles?       @relation("EventStudioManager", fields: [studio_manager_id], references: [id])
   originated_lead marketing_leads?        @relation(fields: [originated_from_lead_id], references: [id])
 
   gantt                       gantt_event_instances?

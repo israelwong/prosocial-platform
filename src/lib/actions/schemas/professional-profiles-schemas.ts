@@ -29,7 +29,7 @@ export const ProfessionalProfileFiltersSchema = z.object({
 export const UserProfileAssignmentSchema = z.object({
     userId: IdSchema,
     profileIds: z.array(IdSchema).min(1, "Debe seleccionar al menos un perfil"),
-    descriptions: z.record(z.string()).optional(), // Descripciones específicas por perfil
+    descriptions: z.record(z.string(), z.string()).optional(), // Descripciones específicas por perfil
 });
 
 // Tipos TypeScript derivados

@@ -87,12 +87,12 @@ export const StudioIntegrationsConfigSchema = z.object({
     email: z.object({
         activo: z.boolean().default(false),
         provider: z.enum(["gmail", "outlook", "custom"]).optional(),
-        config: z.record(z.string()).optional(),
+        config: z.record(z.string(), z.string()).optional(),
     }).optional(),
     calendario: z.object({
         activo: z.boolean().default(false),
         provider: z.enum(["google", "outlook", "apple"]).optional(),
-        config: z.record(z.string()).optional(),
+        config: z.record(z.string(), z.string()).optional(),
     }).optional(),
 });
 

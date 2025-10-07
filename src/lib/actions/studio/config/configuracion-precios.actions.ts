@@ -52,7 +52,7 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
 
         return {
             id: studio.id,
-            nombre: studio.name,
+            nombre: studio.studio_name,
             slug: studio.slug,
             utilidad_servicio: String((configuracion.utilidad_servicio ?? 0.30) * 100), // Convertir a porcentaje
             utilidad_producto: String((configuracion.utilidad_producto ?? 0.40) * 100),

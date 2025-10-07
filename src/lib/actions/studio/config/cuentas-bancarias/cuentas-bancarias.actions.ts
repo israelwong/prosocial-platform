@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { CuentaBancariaSchema, CuentaBancariaUpdateSchema } from '@/lib/actions/schemas/cuentas-bancarias-schemas';
-import { CuentaBancariaData } from '@/app/studio/[slug]/configuracion/negocio/cuentas-bancarias/types';
+import { CuentaBancariaData } from './types';
 
 interface ActionResult<T = unknown> {
     success: boolean;
@@ -41,7 +41,7 @@ export async function obtenerCuentasBancarias(studioSlug: string): Promise<Actio
                 activo: true
             },
             orderBy: {
-                createdAt: 'asc'
+                created_at: 'asc'
             }
         });
 
@@ -50,11 +50,11 @@ export async function obtenerCuentasBancarias(studioSlug: string): Promise<Actio
         const cuentasData: CuentaBancariaData[] = cuentas.map(cuenta => ({
             id: cuenta.id,
             banco: cuenta.banco,
-            numeroCuenta: cuenta.numeroCuenta,
+            numeroCuenta: cuenta.numero_cuenta,
             titular: cuenta.titular,
             activo: cuenta.activo,
-            createdAt: cuenta.createdAt,
-            updatedAt: cuenta.updatedAt
+            createdAt: cuenta.created_at,
+            updatedAt: cuenta.updated_at
         }));
 
         console.log('✅ Cuentas procesadas:', cuentasData.length);
@@ -103,7 +103,7 @@ export async function crearCuentaBancaria(
         const cuentaExistente = await prisma.studio_cuentas_bancarias.findFirst({
             where: {
                 studio_id: proyecto.id,
-                numeroCuenta: validatedData.numeroCuenta,
+                numero_cuenta: validatedData.numeroCuenta,
                 activo: true
             }
         });
@@ -120,22 +120,22 @@ export async function crearCuentaBancaria(
             data: {
                 studio_id: proyecto.id,
                 banco: validatedData.banco,
-                numeroCuenta: validatedData.numeroCuenta,
-                tipoCuenta: 'corriente', // Valor por defecto
+                numero_cuenta: validatedData.numeroCuenta,
+                tipo_cuenta: 'corriente', // Valor por defecto
                 titular: validatedData.titular,
                 activo: validatedData.activo,
-                esPrincipal: false // No permitir cuenta principal en versión simple
+                es_principal: false // No permitir cuenta principal en versión simple
             }
         });
 
         const cuentaData: CuentaBancariaData = {
             id: nuevaCuenta.id,
             banco: nuevaCuenta.banco,
-            numeroCuenta: nuevaCuenta.numeroCuenta,
+            numeroCuenta: nuevaCuenta.numero_cuenta,
             titular: nuevaCuenta.titular,
             activo: nuevaCuenta.activo,
-            createdAt: nuevaCuenta.createdAt,
-            updatedAt: nuevaCuenta.updatedAt
+            createdAt: nuevaCuenta.created_at,
+            updatedAt: nuevaCuenta.updated_at
         };
 
         revalidatePath(`/studio/${studioSlug}/configuracion/negocio/cuentas-bancarias`);
@@ -205,11 +205,11 @@ export async function actualizarCuentaBancaria(
         }
 
         // Verificar que la CLABE no esté duplicada (excluyendo la cuenta actual)
-        if (validatedData.numeroCuenta && validatedData.numeroCuenta !== cuentaExistente.numeroCuenta) {
+        if (validatedData.numeroCuenta && validatedData.numeroCuenta !== cuentaExistente.numero_cuenta) {
             const clabeDuplicada = await prisma.studio_cuentas_bancarias.findFirst({
                 where: {
                     studio_id: proyecto.id,
-                    numeroCuenta: validatedData.numeroCuenta,
+                    numero_cuenta: validatedData.numeroCuenta,
                     activo: true,
                     id: { not: cuentaId }
                 }
@@ -230,22 +230,22 @@ export async function actualizarCuentaBancaria(
             where: { id: cuentaId },
             data: {
                 banco: validatedData.banco,
-                numeroCuenta: validatedData.numeroCuenta,
-                tipoCuenta: 'corriente', // Mantener valor por defecto
+                numero_cuenta: validatedData.numeroCuenta,
+                tipo_cuenta: 'corriente', // Mantener valor por defecto
                 titular: validatedData.titular,
                 activo: validatedData.activo,
-                esPrincipal: false // No permitir cuenta principal en versión simple
+                es_principal: false // No permitir cuenta principal en versión simple
             }
         });
 
         const cuentaData: CuentaBancariaData = {
             id: cuentaActualizada.id,
             banco: cuentaActualizada.banco,
-            numeroCuenta: cuentaActualizada.numeroCuenta,
+            numeroCuenta: cuentaActualizada.numero_cuenta,
             titular: cuentaActualizada.titular,
             activo: cuentaActualizada.activo,
-            createdAt: cuentaActualizada.createdAt,
-            updatedAt: cuentaActualizada.updatedAt
+            createdAt: cuentaActualizada.created_at,
+            updatedAt: cuentaActualizada.updated_at
         };
 
         revalidatePath(`/studio/${studioSlug}/configuracion/negocio/cuentas-bancarias`);
@@ -315,7 +315,7 @@ export async function eliminarCuentaBancaria(
             where: { id: cuentaId },
             data: {
                 activo: false,
-                esPrincipal: false // También quitar como principal
+                es_principal: false // También quitar como principal
             }
         });
 

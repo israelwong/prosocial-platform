@@ -26,12 +26,7 @@ export async function obtenerContactoStudio(studioSlug: string) {
         // 1. Obtener studio con teléfonos
         const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
-            select: {
-                id: true,
-                studio_name: true,
-                slug: true,
-                address: true,
-                website: true,
+            include: {
                 telefonos: {
                     select: {
                         id: true,
@@ -40,8 +35,8 @@ export async function obtenerContactoStudio(studioSlug: string) {
                         tipo: true,
                         activo: true,
                         order: true,
-                        createdAt: true,
-                        updatedAt: true,
+                        created_at: true,
+                        updated_at: true,
                     },
                     orderBy: { order: "asc" },
                 },

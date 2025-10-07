@@ -4,7 +4,7 @@ import { IdSchema } from "./shared-schemas";
 // Constantes para días de la semana
 export const DIAS_SEMANA = [
   "lunes",
-  "martes", 
+  "martes",
   "miercoles",
   "jueves",
   "viernes",
@@ -15,7 +15,7 @@ export const DIAS_SEMANA = [
 // Schema para crear horario
 export const HorarioCreateSchema = z.object({
   dia_semana: z.enum(DIAS_SEMANA, {
-    errorMap: () => ({ message: "Día de la semana inválido" })
+    message: "Día de la semana inválido"
   }),
   hora_inicio: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: "Formato de hora inválido (HH:MM)"
@@ -28,10 +28,10 @@ export const HorarioCreateSchema = z.object({
   // Validar que la hora de fin sea mayor que la hora de inicio
   const [horaInicio, minutoInicio] = data.hora_inicio.split(':').map(Number);
   const [horaFin, minutoFin] = data.hora_fin.split(':').map(Number);
-  
+
   const minutosInicio = horaInicio * 60 + minutoInicio;
   const minutosFin = horaFin * 60 + minutoFin;
-  
+
   return minutosFin > minutosInicio;
 }, {
   message: "La hora de fin debe ser mayor que la hora de inicio",
@@ -80,7 +80,7 @@ export const HorariosEspecialesSchema = z.object({
   // Validar que la fecha de fin sea mayor que la fecha de inicio
   const fechaInicio = new Date(data.fecha_inicio);
   const fechaFin = new Date(data.fecha_fin);
-  
+
   return fechaFin > fechaInicio;
 }, {
   message: "La fecha de fin debe ser mayor que la fecha de inicio",
@@ -107,7 +107,7 @@ export type ZonaHorariaForm = z.infer<typeof ZonaHorariaSchema>;
 // Constantes para días de la semana con labels
 export const DIAS_SEMANA_LABELS = {
   lunes: "Lunes",
-  martes: "Martes", 
+  martes: "Martes",
   miercoles: "Miércoles",
   jueves: "Jueves",
   viernes: "Viernes",
@@ -124,10 +124,10 @@ export function getDiaSemanaLabel(dia: DiaSemana): string {
 export function validateHorario(horaInicio: string, horaFin: string): boolean {
   const [horaInicioNum, minutoInicio] = horaInicio.split(':').map(Number);
   const [horaFinNum, minutoFin] = horaFin.split(':').map(Number);
-  
+
   const minutosInicio = horaInicioNum * 60 + minutoInicio;
   const minutosFin = horaFinNum * 60 + minutoFin;
-  
+
   return minutosFin > minutosInicio;
 }
 

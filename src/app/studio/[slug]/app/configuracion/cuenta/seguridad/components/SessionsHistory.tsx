@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Button } from '@/components/ui/shadcn/button';
 import { Badge } from '@/components/ui/shadcn/badge';
-import { 
-    Monitor, 
-    Smartphone, 
-    Tablet, 
-    MapPin, 
-    Clock, 
-    CheckCircle, 
+import {
+    Monitor,
+    Smartphone,
+    Tablet,
+    MapPin,
+    Clock,
+    CheckCircle,
     XCircle,
     RefreshCw,
     AlertTriangle
@@ -32,7 +32,11 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         try {
             const result = await obtenerHistorialAccesos(studioSlug);
             if (result.success && result.data) {
-                setSessions(result.data);
+                setSessions(result.data.map(session => ({
+                    ...session,
+                    ip_address: session.ip_address || undefined,
+                    user_agent: session.user_agent || undefined
+                })));
             } else {
                 toast.error('Error al cargar historial de sesiones');
             }
@@ -57,28 +61,28 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
 
     const getDeviceIcon = (userAgent: string) => {
         if (!userAgent) return <Monitor className="h-4 w-4" />;
-        
+
         const ua = userAgent.toLowerCase();
-        
+
         // Detectar móviles
         if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
             return <Smartphone className="h-4 w-4" />;
         }
-        
+
         // Detectar tablets
         if (ua.includes('tablet') || ua.includes('ipad')) {
             return <Tablet className="h-4 w-4" />;
         }
-        
+
         // Por defecto, desktop
         return <Monitor className="h-4 w-4" />;
     };
 
     const getDeviceName = (userAgent: string) => {
         if (!userAgent || userAgent.trim() === '') return 'Dispositivo desconocido';
-        
+
         const ua = userAgent.toLowerCase();
-        
+
         // Detectar sistema operativo
         let os = 'Sistema desconocido';
         if (ua.includes('windows')) os = 'Windows';
@@ -86,7 +90,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         else if (ua.includes('linux')) os = 'Linux';
         else if (ua.includes('android')) os = 'Android';
         else if (ua.includes('iphone') || ua.includes('ipad')) os = 'iOS';
-        
+
         // Detectar navegador
         let browser = 'Navegador desconocido';
         if (ua.includes('chrome') && !ua.includes('edg')) browser = 'Chrome';
@@ -94,12 +98,12 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
         else if (ua.includes('edg')) browser = 'Edge';
         else if (ua.includes('opera')) browser = 'Opera';
-        
+
         // Si no se puede detectar nada, mostrar información básica
         if (os === 'Sistema desconocido' && browser === 'Navegador desconocido') {
             return 'Dispositivo desconocido';
         }
-        
+
         return `${browser} en ${os}`;
     };
 
@@ -164,7 +168,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
                     </Button>
                 </div>
             </CardHeader>
-            
+
             <CardContent className="flex-1 flex flex-col">
                 {sessions.length === 0 ? (
                     <div className="flex-1 flex items-center justify-center text-center">
@@ -191,7 +195,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
                                                 <span className="text-white font-medium">
                                                     {getActionLabel(session.action)}
                                                 </span>
-                                                <Badge 
+                                                <Badge
                                                     variant={session.success ? "default" : "destructive"}
                                                     className="text-xs"
                                                 >
@@ -203,7 +207,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
                                                     {session.success ? 'Exitoso' : 'Fallido'}
                                                 </Badge>
                                             </div>
-                                            
+
                                             <div className="text-sm text-zinc-400 space-y-1">
                                                 <div className="flex items-center gap-2">
                                                     <span>{getDeviceName(session.user_agent || '')}</span>

@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { PasswordChangeSchema, SecuritySettingsSchema } from '@/lib/actions/schemas/seguridad/seguridad-schemas';
 import { revalidatePath } from 'next/cache';
-import type { SecuritySettings, AccessLog, SecurityFormData } from './types';
+import type { SecuritySettings } from './types';
 
 // ========================================
 // SERVER ACTIONS - SEGURIDAD
@@ -107,7 +107,7 @@ export async function cambiarContraseña(
  */
 async function getOrCreateUser(supabaseUser: {
     id: string;
-    email: string | undefined;
+    email?: string;
     user_metadata?: {
         full_name?: string;
     };
@@ -164,7 +164,7 @@ async function getOrCreateUser(supabaseUser: {
  * Obtener configuraciones de seguridad del usuario
  */
 export async function obtenerConfiguracionesSeguridad(
-    _studioSlug: string
+    studioSlug: string
 ): Promise<SecuritySettings | null> {
     try {
         const supabase = await createClient();
@@ -325,7 +325,7 @@ export async function obtenerHistorialAccesos(
  * Cerrar todas las sesiones excepto la actual
  */
 export async function cerrarTodasLasSesiones(
-    _studioSlug: string
+    studioSlug: string
 ) {
     try {
         const supabase = await createClient();
@@ -386,9 +386,9 @@ async function logSecurityAction(
                 user_id: userId,
                 action,
                 success,
-                details,
-                ip_address: details?.ip_address || 'N/A',
-                user_agent: details?.user_agent || 'N/A'
+                details: details ? JSON.parse(JSON.stringify(details)) : null,
+                ip_address: typeof details?.ip_address === 'string' ? details.ip_address : 'N/A',
+                user_agent: typeof details?.user_agent === 'string' ? details.user_agent : 'N/A'
             }
         });
     } catch (error) {

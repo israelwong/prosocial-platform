@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { PerfilSchema } from '@/lib/actions/schemas/perfil-schemas';
-import { PerfilData } from '@/app/studio/[slug]/(studio-app)/configuracion/cuenta/perfil/types';
+import { PerfilData } from './types';
 
 interface ActionResult<T = unknown> {
     success: boolean;

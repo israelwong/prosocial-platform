@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { PerfilFormSimple, PerfilSkeleton } from './components';
-import { obtenerPerfil } from '@/lib/actions/studio/config/perfil.actions';
+import { obtenerPerfil } from '@/lib/actions/studio/config/perfil/perfil.actions';
 import { PerfilData } from './types';
 import { toast } from 'sonner';
 

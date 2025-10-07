@@ -11,7 +11,7 @@ export const TipoEventoSchema = z.object({
         .trim(),
     status: z
         .enum(['active', 'inactive'], {
-            errorMap: () => ({ message: 'Estado inválido' }),
+            message: 'Estado inválido',
         })
         .default('active'),
 });

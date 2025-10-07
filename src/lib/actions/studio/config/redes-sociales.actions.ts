@@ -98,7 +98,7 @@ export async function crearRedSocial(
     const existingRed = await prisma.studio_redes_sociales.findFirst({
       where: {
         studio_id: studio.id,
-        plataformaId: validatedData.plataformaId,
+        plataforma_id: validatedData.plataformaId,
         activo: true,
       },
     });
@@ -111,7 +111,7 @@ export async function crearRedSocial(
     const nuevaRedSocial = await prisma.studio_redes_sociales.create({
       data: {
         studio_id: studio.id,
-        plataformaId: validatedData.plataformaId,
+        plataforma_id: validatedData.plataformaId,
         url: validatedData.url,
         activo: validatedData.activo,
       },
