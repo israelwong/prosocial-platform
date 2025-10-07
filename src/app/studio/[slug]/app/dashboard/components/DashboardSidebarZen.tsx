@@ -14,7 +14,7 @@ import { ActiveLink } from '../../../components/ActiveLink'; // Componente clien
 
 // Definición de la apariencia de cada módulo
 const moduleConfig = {
-    manager: { icon: Kanban, title: 'ZEN Manager', href: '/manager' },
+    manager: { icon: Kanban, title: 'ZEN Manager', href: '/dashboard' },
     pages: { icon: LayoutTemplate, title: 'ZEN Pages', href: '/pages' },
     marketing: { icon: Sparkles, title: 'ZEN Marketing', href: '/marketing' },
     magic: { icon: Bot, title: 'ZEN Magic', href: '/magic' },

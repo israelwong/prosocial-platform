@@ -16,16 +16,16 @@ const nextConfig = {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 
-  async rewrites() {
-    return [
-      // Reescritura para rutas protegidas de studios
-      // /demo-studio/app -> /studio/demo-studio/app
-      {
-        source: "/:slug/app/:path*",
-        destination: "/studio/:slug/app/:path*",
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     // Reescritura para rutas protegidas de studios
+  //     // /demo-studio/app -> /studio/demo-studio/app
+  //     {
+  //       source: "/:slug/app/:path*",
+  //       destination: "/studio/:slug/app/:path*",
+  //     },
+  //   ];
+  // },
 
   async headers() {
     return [

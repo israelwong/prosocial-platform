@@ -1,7 +1,7 @@
 import React from 'react';
 import { HeaderNavigation } from '@/components/ui/shadcn/header-navigation';
 import { obtenerTiposEvento } from '@/lib/actions/studio/negocio/tipos-evento.actions';
-import { obtenerPaquetes } from '@/lib/actions/studio/manager/paquetes.actions';
+import { obtenerPaquetes } from '@/lib/actions/studio/dashboard/paquetes.actions';
 import { TiposEventoList } from './components/TiposEventoList';
 
 interface PaquetesPageProps {

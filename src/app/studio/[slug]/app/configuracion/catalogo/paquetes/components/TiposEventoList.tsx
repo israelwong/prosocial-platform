@@ -5,7 +5,7 @@ import { TipoEventoData } from '@/lib/actions/schemas/tipos-evento-schemas';
 import { ZenCard, ZenCardContent, ZenButton, ZenBadge } from '@/components/ui/zen';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/shadcn/dialog';
 import { formatCurrency } from '@/lib/utils/pricing';
-import { eliminarPaquete, duplicarPaquete, actualizarPosicionPaquete } from '@/lib/actions/studio/manager/paquetes.actions';
+import { eliminarPaquete, duplicarPaquete, actualizarPosicionPaquete } from '@/lib/actions/studio/dashboard/paquetes.actions';
 import { toast } from 'sonner';
 import { Plus, Edit, Copy, Trash2, GripVertical } from 'lucide-react';
 import Link from 'next/link';

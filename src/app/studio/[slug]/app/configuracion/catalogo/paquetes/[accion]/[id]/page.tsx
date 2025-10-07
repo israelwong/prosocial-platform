@@ -19,7 +19,7 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
 
     // Validar acción
     if (accion !== 'crear' && accion !== 'editar') {
-        redirect(`/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+        redirect(`/${slug}/configuracion/catalogo/paquetes`);
     }
 
     // Obtener studio por slug para obtener el ID real
@@ -28,7 +28,7 @@ export default async function PaqueteFormPage({ params }: PaqueteFormPageProps) 
     });
 
     if (!studio) {
-        redirect(`/studio/${slug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+        redirect(`/studio/${slug}/app/configuracion/catalogo/paquetes`);
     }
 
     // Lógica diferente para crear vs editar

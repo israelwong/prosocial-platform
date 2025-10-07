@@ -9,7 +9,7 @@ import { ZenCard, ZenInput, ZenTextarea, ZenButton, ZenBadge } from '@/component
 import { calcularPrecios, formatCurrency } from '@/lib/utils/pricing'
 import type { SeccionData } from '@/lib/actions/schemas/catalogo-schemas'
 import type { PaqueteConServiciosCompletos, PaqueteServicioData } from '@/lib/actions/schemas/paquete-schemas'
-import { crearPaquete, actualizarPaquete } from '@/lib/actions/studio/manager/paquetes.actions'
+import { crearPaquete, actualizarPaquete } from '@/lib/actions/studio/dashboard/paquetes.actions'
 
 interface CotizacionFormularioClientProps {
     catalogo: SeccionData[]

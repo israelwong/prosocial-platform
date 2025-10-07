@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { ZenCard, ZenCardContent, ZenButton, ZenBadge } from '@/components/ui/zen';
 import { formatCurrency } from '@/lib/utils/pricing';
-import { eliminarPaquete, duplicarPaquete } from '@/lib/actions/studio/manager/paquetes.actions';
+import { eliminarPaquete, duplicarPaquete } from '@/lib/actions/studio/dashboard/paquetes.actions';
 import { Edit, Copy, Trash2, Eye } from 'lucide-react';
 
 interface PaqueteData {
