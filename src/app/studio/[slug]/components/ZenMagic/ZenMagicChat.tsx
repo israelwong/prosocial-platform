@@ -120,7 +120,7 @@ export function ZenMagicChat({ isOpen, onClose, studioSlug }: ZenMagicChatProps)
                                     <span className="text-xs text-zinc-400">ZEN Magic</span>
                                 </div>
                             )}
-                            <ChatMessageRenderer content={msg.content} type={msg.type} />
+                            <ChatMessageRenderer content={msg.content} type={msg.type as "user" | "bot"} />
                             <p className="text-xs opacity-70 mt-1">
                                 {msg.timestamp.toLocaleTimeString()}
                             </p>

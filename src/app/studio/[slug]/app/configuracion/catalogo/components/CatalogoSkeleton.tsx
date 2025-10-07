@@ -17,7 +17,7 @@ export function CatalogoSkeleton() {
 
             {/* Secciones skeleton */}
             {[1, 2].map((i) => (
-                <ZenCard key={i} variant="default" padding="default">
+                <ZenCard key={i} variant="default" padding="md">
                     <ZenCardHeader>
                         <div className="flex items-center gap-3">
                             <div className="h-5 w-5 bg-zinc-700 rounded animate-pulse" />

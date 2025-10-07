@@ -4,10 +4,7 @@ import { BaseValidator } from './base-validator';
 import { ValidationResult } from '@/types/setup-validation';
 
 export class CondicionesValidator extends BaseValidator {
-    async validate(projectData: any): Promise<ValidationResult> {
-        const requiredFields: string[] = [];
-        const optionalFields = ['condiciones_comerciales'];
-
+    async validate(projectData: unknown): Promise<ValidationResult> {
         const completedFields: string[] = [];
         const missingFields: string[] = [];
         const errors: string[] = [];
@@ -15,42 +12,58 @@ export class CondicionesValidator extends BaseValidator {
         let completionPercentage = 0;
 
         // Validar condiciones comerciales
-        if (projectData.condiciones_comerciales && Array.isArray(projectData.condiciones_comerciales)) {
-            const activeCondiciones = projectData.condiciones_comerciales.filter((condicion: any) =>
-                condicion.status === 'active'
-            );
+        if (projectData && typeof projectData === 'object' && 'condiciones_comerciales' in projectData) {
+            const data = projectData as Record<string, unknown>;
+            const condiciones = data.condiciones_comerciales;
 
-            if (activeCondiciones.length > 0) {
-                completedFields.push('condiciones_comerciales');
-                completionPercentage = 100;
+            if (Array.isArray(condiciones)) {
+                const activeCondiciones = condiciones.filter((condicion: unknown) => {
+                    if (condicion && typeof condicion === 'object' && 'status' in condicion) {
+                        return (condicion as Record<string, unknown>).status === 'active';
+                    }
+                    return false;
+                });
 
-                // Validar que al menos una condición tenga configuración válida
-                let validCondiciones = 0;
+                if (activeCondiciones.length > 0) {
+                    completedFields.push('condiciones_comerciales');
+                    completionPercentage = 100;
 
-                for (const condicion of activeCondiciones) {
-                    if (condicion.nombre && condicion.nombre.trim().length > 0) {
-                        validCondiciones++;
+                    // Validar que al menos una condición tenga configuración válida
+                    let validCondiciones = 0;
+
+                    for (const condicion of activeCondiciones) {
+                        const condicionData = condicion as Record<string, unknown>;
+                        const nombre = condicionData.nombre;
+
+                        if (nombre && typeof nombre === 'string' && nombre.trim().length > 0) {
+                            validCondiciones++;
+                        }
+
+                        // Validar porcentajes si existen
+                        const porcentajeDescuento = condicionData.porcentaje_descuento;
+                        if (typeof porcentajeDescuento === 'number' &&
+                            (porcentajeDescuento < 0 || porcentajeDescuento > 100)) {
+                            errors.push(`Porcentaje de descuento inválido en: ${nombre || 'condición sin nombre'}`);
+                        }
+
+                        const porcentajeAnticipo = condicionData.porcentaje_anticipo;
+                        if (typeof porcentajeAnticipo === 'number' &&
+                            (porcentajeAnticipo < 0 || porcentajeAnticipo > 100)) {
+                            errors.push(`Porcentaje de anticipo inválido en: ${nombre || 'condición sin nombre'}`);
+                        }
                     }
 
-                    // Validar porcentajes si existen
-                    if (condicion.porcentaje_descuento &&
-                        (condicion.porcentaje_descuento < 0 || condicion.porcentaje_descuento > 100)) {
-                        errors.push(`Porcentaje de descuento inválido en: ${condicion.nombre}`);
+                    if (validCondiciones === 0) {
+                        errors.push('No hay condiciones comerciales válidas configuradas');
+                        completionPercentage = 50;
                     }
-
-                    if (condicion.porcentaje_anticipo &&
-                        (condicion.porcentaje_anticipo < 0 || condicion.porcentaje_anticipo > 100)) {
-                        errors.push(`Porcentaje de anticipo inválido en: ${condicion.nombre}`);
-                    }
-                }
-
-                if (validCondiciones === 0) {
-                    errors.push('No hay condiciones comerciales válidas configuradas');
-                    completionPercentage = 50;
+                } else {
+                    missingFields.push('condiciones_comerciales_activas');
+                    completionPercentage = 25; // Configurado pero sin condiciones activas
                 }
             } else {
-                missingFields.push('condiciones_comerciales_activas');
-                completionPercentage = 25; // Configurado pero sin condiciones activas
+                missingFields.push('condiciones_comerciales');
+                completionPercentage = 0;
             }
         } else {
             missingFields.push('condiciones_comerciales');

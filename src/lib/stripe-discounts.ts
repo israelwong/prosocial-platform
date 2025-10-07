@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-12-18.acacia",
+    apiVersion: "2025-02-24.acacia",
 });
 
 export interface DiscountCodeData {
@@ -218,7 +218,7 @@ export async function removeCouponFromSubscription(
 ): Promise<Stripe.Subscription> {
     try {
         const subscription = await stripe.subscriptions.update(subscriptionId, {
-            coupon: null,
+            coupon: undefined,
         });
         return subscription;
     } catch (error) {

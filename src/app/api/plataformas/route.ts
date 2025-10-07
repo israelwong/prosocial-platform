@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
                 color,
                 icon: icono,
                 description: descripcion,
-                createdAt: new Date(),
-                updatedAt: new Date()
+                created_at: new Date(),
+                updated_at: new Date()
             }
         });
 

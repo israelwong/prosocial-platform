@@ -3,7 +3,7 @@
 import { ValidationResult } from '@/types/setup-validation';
 
 export abstract class BaseValidator {
-    abstract validate(projectData: any): Promise<ValidationResult>;
+    abstract validate(projectData: unknown): Promise<ValidationResult>;
 
     protected calculateCompletionPercentage(
         completedFields: string[],
@@ -14,7 +14,7 @@ export abstract class BaseValidator {
     }
 
     protected checkField(
-        data: any,
+        data: unknown,
         fieldPath: string,
         isRequired: boolean = false
     ): boolean {
@@ -35,14 +35,17 @@ export abstract class BaseValidator {
         return value !== null && value !== undefined;
     }
 
-    private getNestedValue(obj: any, path: string): any {
-        return path.split('.').reduce((current, key) => {
-            return current?.[key];
+    private getNestedValue(obj: unknown, path: string): unknown {
+        return path.split('.').reduce((current: unknown, key: string) => {
+            if (current && typeof current === 'object' && key in current) {
+                return (current as Record<string, unknown>)[key];
+            }
+            return undefined;
         }, obj);
     }
 
     protected validateRequiredFields(
-        data: any,
+        data: unknown,
         requiredFields: string[]
     ): { completed: string[], missing: string[] } {
         const completed: string[] = [];
@@ -60,7 +63,7 @@ export abstract class BaseValidator {
     }
 
     protected validateOptionalFields(
-        data: any,
+        data: unknown,
         optionalFields: string[]
     ): { completed: string[], missing: string[] } {
         const completed: string[] = [];

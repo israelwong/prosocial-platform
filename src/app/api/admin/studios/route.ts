@@ -5,12 +5,19 @@ export async function GET() {
     try {
         // TODO: Verificar que el usuario sea administrador de la plataforma
 
-        const studios = await prisma.studio.findMany({
+        const studios = await prisma.studios.findMany({
             include: {
                 plan: {
                     select: {
                         name: true,
-                        activeProjectLimit: true
+                        plan_limits: {
+                            where: {
+                                limit_type: 'EVENTS_PER_MONTH'
+                            },
+                            select: {
+                                limit_value: true
+                            }
+                        }
                     }
                 },
                 _count: {
@@ -21,7 +28,7 @@ export async function GET() {
                     }
                 }
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { created_at: 'desc' }
         })
 
         // Calcular métricas adicionales
@@ -56,7 +63,7 @@ export async function POST(request: NextRequest) {
         } = body
 
         // Verificar que el slug no exista
-        const existingStudio = await prisma.studio.findUnique({
+        const existingStudio = await prisma.studios.findUnique({
             where: { slug }
         })
 
@@ -68,7 +75,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Buscar el plan
-        const plan = await prisma.plan.findUnique({
+        const plan = await prisma.platform_plans.findUnique({
             where: { slug: planId }
         })
 
@@ -80,23 +87,30 @@ export async function POST(request: NextRequest) {
         }
 
         // Crear el studio
-        const studio = await prisma.studio.create({
+        const studio = await prisma.studios.create({
             data: {
-                name,
+                studio_name: name,
                 slug,
                 email,
                 phone,
                 address,
-                planId: plan.id,
-                subscriptionStatus: 'trial', // Empezar con trial
-                subscriptionStart: new Date(),
-                commissionRate: 0.30 // 30% para ProSocial
+                plan_id: plan.id,
+                subscription_status: 'TRIAL', // Empezar con trial
+                subscription_start: new Date(),
+                commission_rate: 0.30 // 30% para ProSocial
             },
             include: {
                 plan: {
                     select: {
                         name: true,
-                        activeProjectLimit: true
+                        plan_limits: {
+                            where: {
+                                limit_type: 'EVENTS_PER_MONTH'
+                            },
+                            select: {
+                                limit_value: true
+                            }
+                        }
                     }
                 },
                 _count: {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
+import Stripe from "stripe";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -91,7 +92,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error("❌ Error procesando webhook:", error);
         return NextResponse.json(
-            { error: "Webhook processing failed", details: error.message },
+            { error: "Webhook processing failed", details: error instanceof Error ? error.message : "Unknown error" },
             { status: 500 }
         );
     }
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
 
 // 🎯 SUBSCRIPTION HANDLERS
 
-async function handleSubscriptionCreated(subscription: any) {
+async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     console.log("✅ Suscripción creada:", subscription.id);
     console.log("📊 Metadata:", subscription.metadata);
 
@@ -113,7 +114,7 @@ async function handleSubscriptionCreated(subscription: any) {
     try {
         // Buscar el plan por stripe_price_id
         const priceId = subscription.items.data[0].price.id;
-        const plan = await prisma.plan.findFirst({
+        const plan = await prisma.platform_plans.findFirst({
             where: { stripe_price_id: priceId },
         });
 
@@ -123,10 +124,16 @@ async function handleSubscriptionCreated(subscription: any) {
         }
 
         // Crear o actualizar suscripción en base de datos
-        const dbSubscription = await prisma.subscription.upsert({
+        const dbSubscription = await prisma.subscriptions.upsert({
             where: { stripe_subscription_id: subscription.id },
             update: {
-                status: subscription.status,
+                status: subscription.status === 'active' ? 'ACTIVE' :
+                    subscription.status === 'canceled' ? 'CANCELLED' :
+                        subscription.status === 'incomplete' ? 'EXPIRED' :
+                            subscription.status === 'incomplete_expired' ? 'EXPIRED' :
+                                subscription.status === 'past_due' ? 'EXPIRED' :
+                                    subscription.status === 'trialing' ? 'TRIAL' :
+                                        subscription.status === 'unpaid' ? 'EXPIRED' : 'ACTIVE',
                 current_period_start: new Date(subscription.current_period_start * 1000),
                 current_period_end: new Date(subscription.current_period_end * 1000),
                 billing_cycle_anchor: new Date(subscription.billing_cycle_anchor * 1000),
@@ -135,9 +142,15 @@ async function handleSubscriptionCreated(subscription: any) {
             create: {
                 studio_id,
                 stripe_subscription_id: subscription.id,
-                stripe_customer_id: subscription.customer,
+                stripe_customer_id: typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id,
                 plan_id: plan.id,
-                status: subscription.status,
+                status: subscription.status === 'active' ? 'ACTIVE' :
+                    subscription.status === 'canceled' ? 'CANCELLED' :
+                        subscription.status === 'incomplete' ? 'EXPIRED' :
+                            subscription.status === 'incomplete_expired' ? 'EXPIRED' :
+                                subscription.status === 'past_due' ? 'EXPIRED' :
+                                    subscription.status === 'trialing' ? 'TRIAL' :
+                                        subscription.status === 'unpaid' ? 'EXPIRED' : 'ACTIVE',
                 current_period_start: new Date(subscription.current_period_start * 1000),
                 current_period_end: new Date(subscription.current_period_end * 1000),
                 billing_cycle_anchor: new Date(subscription.billing_cycle_anchor * 1000),
@@ -145,7 +158,7 @@ async function handleSubscriptionCreated(subscription: any) {
         });
 
         // Actualizar estado del estudio
-        await prisma.studio.update({
+        await prisma.studios.update({
             where: { id: studio_id },
             data: {
                 is_active: subscription.status === "active",
@@ -165,13 +178,13 @@ async function handleSubscriptionCreated(subscription: any) {
     }
 }
 
-async function handleSubscriptionUpdated(subscription: any) {
+async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     console.log("🔄 Suscripción actualizada:", subscription.id);
 
     try {
         // Buscar el plan por stripe_price_id
         const priceId = subscription.items.data[0].price.id;
-        const plan = await prisma.plan.findFirst({
+        const plan = await prisma.platform_plans.findFirst({
             where: { stripe_price_id: priceId },
         });
 
@@ -181,11 +194,17 @@ async function handleSubscriptionUpdated(subscription: any) {
         }
 
         // Actualizar suscripción en base de datos
-        const updatedSubscription = await prisma.subscription.update({
+        const updatedSubscription = await prisma.subscriptions.update({
             where: { stripe_subscription_id: subscription.id },
             data: {
                 plan_id: plan.id,
-                status: subscription.status,
+                status: subscription.status === 'active' ? 'ACTIVE' :
+                    subscription.status === 'canceled' ? 'CANCELLED' :
+                        subscription.status === 'incomplete' ? 'EXPIRED' :
+                            subscription.status === 'incomplete_expired' ? 'EXPIRED' :
+                                subscription.status === 'past_due' ? 'EXPIRED' :
+                                    subscription.status === 'trialing' ? 'TRIAL' :
+                                        subscription.status === 'unpaid' ? 'EXPIRED' : 'ACTIVE',
                 current_period_start: new Date(subscription.current_period_start * 1000),
                 current_period_end: new Date(subscription.current_period_end * 1000),
                 billing_cycle_anchor: new Date(subscription.billing_cycle_anchor * 1000),
@@ -194,7 +213,7 @@ async function handleSubscriptionUpdated(subscription: any) {
         });
 
         // Actualizar estado del estudio
-        await prisma.studio.update({
+        await prisma.studios.update({
             where: { id: updatedSubscription.studio_id },
             data: {
                 is_active: subscription.status === "active",
@@ -214,21 +233,21 @@ async function handleSubscriptionUpdated(subscription: any) {
     }
 }
 
-async function handleSubscriptionDeleted(subscription: any) {
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     console.log("🗑️ Suscripción cancelada:", subscription.id);
 
     try {
         // Actualizar suscripción en base de datos
-        const updatedSubscription = await prisma.subscription.update({
+        const updatedSubscription = await prisma.subscriptions.update({
             where: { stripe_subscription_id: subscription.id },
             data: {
-                status: "canceled",
+                status: "CANCELLED",
                 updated_at: new Date(),
             },
         });
 
         // Desactivar estudio
-        await prisma.studio.update({
+        await prisma.studios.update({
             where: { id: updatedSubscription.studio_id },
             data: {
                 is_active: false,
@@ -246,9 +265,11 @@ async function handleSubscriptionDeleted(subscription: any) {
     }
 }
 
-async function handleSubscriptionTrialWillEnd(subscription: any) {
+async function handleSubscriptionTrialWillEnd(subscription: Stripe.Subscription) {
     console.log("⏰ Trial terminará pronto:", subscription.id);
-    console.log("📅 Trial end:", new Date(subscription.trial_end * 1000));
+    if (subscription.trial_end) {
+        console.log("📅 Trial end:", new Date(subscription.trial_end * 1000));
+    }
 
     // Aquí podrías enviar un email al usuario notificando que el trial terminará
     // Por ahora solo lo registramos
@@ -256,18 +277,18 @@ async function handleSubscriptionTrialWillEnd(subscription: any) {
 
 // 💳 INVOICE HANDLERS
 
-async function handleInvoicePaymentSucceeded(invoice: any) {
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     console.log("✅ Pago de factura exitoso:", invoice.id);
 
     if (invoice.subscription) {
         try {
             // Crear registro de billing cycle
-            const subscription = await prisma.subscription.findFirst({
-                where: { stripe_subscription_id: invoice.subscription },
+            const subscription = await prisma.subscriptions.findFirst({
+                where: { stripe_subscription_id: typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription.id },
             });
 
             if (subscription) {
-                await prisma.billingCycle.create({
+                await prisma.platform_billing_cycles.create({
                     data: {
                         subscription_id: subscription.id,
                         period_start: new Date(invoice.period_start * 1000),
@@ -290,17 +311,17 @@ async function handleInvoicePaymentSucceeded(invoice: any) {
     }
 }
 
-async function handleInvoicePaymentFailed(invoice: any) {
+async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     console.log("❌ Pago de factura fallido:", invoice.id);
 
     if (invoice.subscription) {
         try {
-            const subscription = await prisma.subscription.findFirst({
-                where: { stripe_subscription_id: invoice.subscription },
+            const subscription = await prisma.subscriptions.findFirst({
+                where: { stripe_subscription_id: typeof invoice.subscription === 'string' ? invoice.subscription : invoice.subscription.id },
             });
 
             if (subscription) {
-                await prisma.billingCycle.create({
+                await prisma.platform_billing_cycles.create({
                     data: {
                         subscription_id: subscription.id,
                         period_start: new Date(invoice.period_start * 1000),
@@ -322,21 +343,23 @@ async function handleInvoicePaymentFailed(invoice: any) {
     }
 }
 
-async function handleInvoiceCreated(invoice: any) {
+async function handleInvoiceCreated(invoice: Stripe.Invoice) {
     console.log("📄 Factura creada:", invoice.id);
     console.log("💰 Monto:", invoice.amount_due / 100);
-    console.log("📅 Fecha de vencimiento:", new Date(invoice.due_date * 1000));
+    if (invoice.due_date) {
+        console.log("📅 Fecha de vencimiento:", new Date(invoice.due_date * 1000));
+    }
 }
 
 // 🚨 CUSTOMER HANDLERS
 
-async function handleCustomerCreated(customer: any) {
+async function handleCustomerCreated(customer: Stripe.Customer) {
     console.log("👤 Cliente creado:", customer.id);
     console.log("📧 Email:", customer.email);
     console.log("📊 Metadata:", customer.metadata);
 }
 
-async function handleCustomerUpdated(customer: any) {
+async function handleCustomerUpdated(customer: Stripe.Customer) {
     console.log("🔄 Cliente actualizado:", customer.id);
     console.log("📧 Email:", customer.email);
 }

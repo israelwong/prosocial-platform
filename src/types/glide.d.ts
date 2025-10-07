@@ -50,7 +50,7 @@ declare module '@glidejs/glide' {
         move(distance: number): void
         disable(): void
         enable(): void
-        on(event: string | Array<string>, handler: Function): void
+        on(event: string | Array<string>, handler: (...args: unknown[]) => void): void
         isType(name: string): boolean
         play(interval?: number | boolean): void
         pause(): void

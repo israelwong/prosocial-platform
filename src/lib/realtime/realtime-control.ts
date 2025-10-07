@@ -30,7 +30,7 @@ export const REALTIME_CONFIG = {
 };
 
 // Función helper para logs centralizados
-export function logRealtime(component: string, message: string, data?: any) {
+export function logRealtime(component: string, message: string, data?: unknown) {
   if (REALTIME_CONFIG.ENABLE_REALTIME_LOGS) {
     console.log(`🔄 [${component}] ${message}`, data || '');
   }

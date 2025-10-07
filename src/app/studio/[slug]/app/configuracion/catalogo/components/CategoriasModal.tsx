@@ -155,8 +155,8 @@ export function CategoriasModal({
         setLoading(true);
         try {
             const [resultCategorias, resultSecciones] = await Promise.all([
-                obtenerCategorias(studioSlug),
-                obtenerSecciones(studioSlug),
+                obtenerCategorias(),
+                obtenerSecciones(),
             ]);
 
             if (resultCategorias.success && resultCategorias.data) {

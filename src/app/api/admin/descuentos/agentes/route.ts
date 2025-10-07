@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import Stripe from "stripe";
 
 // GET /api/admin/descuentos/agentes - Obtener códigos generados por agentes
 export async function GET(request: NextRequest) {
@@ -9,7 +10,7 @@ export async function GET(request: NextRequest) {
         const search = searchParams.get("search");
         const agenteId = searchParams.get("agente_id");
 
-        let whereClause: any = {};
+        const whereClause: Record<string, unknown> = {};
 
         // Filtrar por estado
         if (status && status !== "todos") {
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
         if (search) {
             whereClause.OR = [
                 { codigo_completo: { contains: search, mode: "insensitive" } },
-                { lead: { nombre: { contains: search, mode: "insensitive" } } },
+                { lead: { name: { contains: search, mode: "insensitive" } } },
                 { lead: { email: { contains: search, mode: "insensitive" } } },
                 { agente: { nombre: { contains: search, mode: "insensitive" } } },
             ];
@@ -49,9 +50,9 @@ export async function GET(request: NextRequest) {
                 lead: {
                     select: {
                         id: true,
-                        nombre: true,
+                        name: true,
                         email: true,
-                        telefono: true,
+                        phone: true,
                     },
                 },
                 agente: {
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest) {
 
         // Calcular fecha de expiración
         const fechaCreacion = new Date();
-        let fechaExpiracion = new Date();
+        const fechaExpiracion = new Date();
 
         switch (duracion_descuento) {
             case "1_mes":
@@ -216,9 +217,9 @@ export async function POST(request: NextRequest) {
 
         // Crear cupón en Stripe
         try {
-            const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-            const couponData: any = {
+            const couponData: Stripe.CouponCreateParams = {
                 id: codigoCompleto,
                 duration: "forever",
                 max_redemptions: 1,
@@ -257,7 +258,7 @@ export async function POST(request: NextRequest) {
                 lead: {
                     select: {
                         id: true,
-                        nombre: true,
+                        name: true,
                         email: true,
                     },
                 },

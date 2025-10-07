@@ -50,7 +50,7 @@ export interface SetupProgressLog {
     action: 'created' | 'updated' | 'completed' | 'error';
     oldStatus?: string;
     newStatus?: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
     source: 'manual' | 'ai' | 'system';
     createdAt: Date;
 }

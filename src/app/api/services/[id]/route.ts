@@ -75,7 +75,7 @@ export async function PUT(
 
                 // Reordenar posiciones
                 const servicesToUpdate = servicesInCategory.filter(s => s.id !== id);
-                servicesToUpdate.splice(posicion - 1, 0, { id, posicion: posicion } as any);
+                servicesToUpdate.splice(posicion - 1, 0, { id, posicion: posicion } as { id: string; posicion: number });
 
                 // Actualizar posiciones de todos los servicios afectados
                 for (let i = 0; i < servicesToUpdate.length; i++) {

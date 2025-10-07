@@ -12,10 +12,10 @@ export async function GET() {
                 nombre: true,
                 email: true,
                 telefono: true,
-                metaMensualLeads: true,
-                comisionConversion: true,
-                createdAt: true,
-                updatedAt: true
+                meta_mensual_leads: true,
+                comision_conversion: true,
+                created_at: true,
+                updated_at: true
             },
             orderBy: {
                 nombre: 'asc'
@@ -25,7 +25,7 @@ export async function GET() {
         // Convertir Decimal a number para el frontend
         const agentsFormatted = agents.map(agent => ({
             ...agent,
-            comisionConversion: Number(agent.comisionConversion)
+            comision_conversion: Number(agent.comision_conversion)
         }));
 
         return NextResponse.json(agentsFormatted);

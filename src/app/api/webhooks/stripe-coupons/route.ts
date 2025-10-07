@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-12-18.acacia",
+    apiVersion: "2025-02-24.acacia",
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -107,7 +107,7 @@ async function handleCouponCreated(coupon: Stripe.Coupon) {
                     descripcion: coupon.metadata?.descripcion || "",
                     tipo_descuento: coupon.percent_off ? "porcentaje" : "monto_fijo",
                     valor_descuento: coupon.percent_off || (coupon.amount_off ? coupon.amount_off / 100 : 0),
-                    tipo_aplicacion: coupon.metadata?.tipo_aplicacion as any || "ambos",
+                    tipo_aplicacion: (coupon.metadata?.tipo_aplicacion as string) || "ambos",
                     fecha_inicio: new Date(coupon.created * 1000),
                     fecha_fin: coupon.redeem_by ? new Date(coupon.redeem_by * 1000) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
                     uso_maximo: coupon.max_redemptions || null,
@@ -150,7 +150,7 @@ async function handleCouponUpdated(coupon: Stripe.Coupon) {
                     descripcion: coupon.metadata?.descripcion || existingCode.descripcion,
                     uso_actual: coupon.times_redeemed,
                     activo: coupon.valid,
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 },
             });
             console.log("Updated discount code from Stripe coupon update");
@@ -184,7 +184,7 @@ async function handleCouponDeleted(coupon: Stripe.Coupon) {
                 where: { id: existingCode.id },
                 data: {
                     activo: false,
-                    updatedAt: new Date(),
+                    updated_at: new Date(),
                 },
             });
             console.log("Deactivated discount code from Stripe coupon deletion");
@@ -221,7 +221,7 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
                     data: {
                         discount_code_id: discountCode.id,
                         subscription_id: invoice.subscription as string,
-                        monto_descuento: invoice.discount.amount_off || 0,
+                        monto_descuento: (invoice.discount as { amount_off?: number }).amount_off || 0,
                         fecha_uso: new Date(),
                     },
                 });
@@ -280,7 +280,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
                         data: {
                             discount_code_id: discountCode.id,
                             subscription_id: subscription.id,
-                            monto_descuento: subscription.discount.amount_off || 0,
+                            monto_descuento: (subscription.discount as { amount_off?: number }).amount_off || 0,
                             fecha_uso: new Date(),
                         },
                     });

@@ -108,7 +108,7 @@ export function validateUrl(url: string): boolean {
 /**
  * Helper para validar datos requeridos
  */
-export function validateRequiredFields(data: Record<string, any>, requiredFields: string[]) {
+export function validateRequiredFields(data: Record<string, unknown>, requiredFields: string[]) {
     const missingFields = requiredFields.filter(field => !data[field]);
 
     if (missingFields.length > 0) {

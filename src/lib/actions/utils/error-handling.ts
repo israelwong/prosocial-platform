@@ -15,12 +15,12 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-    constructor(message: string, details?: any) {
+    public readonly details?: unknown;
+
+    constructor(message: string, details?: unknown) {
         super(message, 400);
         this.name = "ValidationError";
-        if (details) {
-            this.details = details;
-        }
+        this.details = details;
     }
 }
 
@@ -61,7 +61,7 @@ export class RateLimitError extends AppError {
 
 // Función para manejar errores de Zod
 export function handleZodError(error: ZodError): string {
-    const errorMessages = error.errors.map((err) => {
+    const errorMessages = error.issues.map((err) => {
         const path = err.path.join(".");
         return `${path}: ${err.message}`;
     });
@@ -70,30 +70,33 @@ export function handleZodError(error: ZodError): string {
 }
 
 // Función para manejar errores de Prisma
-export function handlePrismaError(error: any): AppError {
+export function handlePrismaError(error: unknown): AppError {
+    const errorCode = (error as { code?: string })?.code;
+    const errorMeta = (error as { meta?: { target?: string[] } })?.meta;
+
     // Error de registro único duplicado
-    if (error.code === "P2002") {
-        const field = error.meta?.target?.[0] || "campo";
+    if (errorCode === "P2002") {
+        const field = errorMeta?.target?.[0] || "campo";
         return new ConflictError(`El ${field} ya existe`);
     }
 
     // Error de registro no encontrado
-    if (error.code === "P2025") {
+    if (errorCode === "P2025") {
         return new NotFoundError("Registro no encontrado");
     }
 
     // Error de relación no encontrada
-    if (error.code === "P2003") {
+    if (errorCode === "P2003") {
         return new ValidationError("Referencia a registro inexistente");
     }
 
     // Error de conexión
-    if (error.code === "P1001") {
+    if (errorCode === "P1001") {
         return new AppError("Error de conexión a la base de datos", 503);
     }
 
     // Error de timeout
-    if (error.code === "P1008") {
+    if (errorCode === "P1008") {
         return new AppError("Timeout de operación", 408);
     }
 
@@ -102,20 +105,22 @@ export function handlePrismaError(error: any): AppError {
 }
 
 // Función para manejar errores de Supabase
-export function handleSupabaseError(error: any): AppError {
-    if (error.message?.includes("Invalid login credentials")) {
+export function handleSupabaseError(error: unknown): AppError {
+    const errorMessage = (error as { message?: string })?.message || "";
+
+    if (errorMessage.includes("Invalid login credentials")) {
         return new AuthenticationError("Credenciales inválidas");
     }
 
-    if (error.message?.includes("Email not confirmed")) {
+    if (errorMessage.includes("Email not confirmed")) {
         return new AuthenticationError("Email no confirmado");
     }
 
-    if (error.message?.includes("User not found")) {
+    if (errorMessage.includes("User not found")) {
         return new NotFoundError("Usuario no encontrado");
     }
 
-    if (error.message?.includes("Email already registered")) {
+    if (errorMessage.includes("Email already registered")) {
         return new ConflictError("Email ya registrado");
     }
 
@@ -123,20 +128,22 @@ export function handleSupabaseError(error: any): AppError {
 }
 
 // Función para manejar errores de Stripe
-export function handleStripeError(error: any): AppError {
-    if (error.type === "StripeCardError") {
+export function handleStripeError(error: unknown): AppError {
+    const errorType = (error as { type?: string })?.type;
+
+    if (errorType === "StripeCardError") {
         return new ValidationError("Error en la tarjeta de crédito");
     }
 
-    if (error.type === "StripeRateLimitError") {
+    if (errorType === "StripeRateLimitError") {
         return new RateLimitError("Demasiadas solicitudes a Stripe");
     }
 
-    if (error.type === "StripeInvalidRequestError") {
+    if (errorType === "StripeInvalidRequestError") {
         return new ValidationError("Solicitud inválida a Stripe");
     }
 
-    if (error.type === "StripeAPIError") {
+    if (errorType === "StripeAPIError") {
         return new AppError("Error del servicio de pagos", 502);
     }
 

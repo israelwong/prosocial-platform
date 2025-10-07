@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
-import { Studio, Plan } from "@prisma/client";
+import { studios, platform_plans } from "@prisma/client";
 
 // Usar los tipos generados por Prisma
-type StudioWithPlan = Studio & {
-    plan: Plan;
+type StudioWithPlan = studios & {
+    plan: platform_plans;
     _count?: {
         eventos: number;
     };
@@ -35,9 +35,9 @@ export async function getStudioBySlug(
     slug: string
 ): Promise<StudioWithPlan | null> {
     try {
-        const { prisma } = await import("./db");
+        const { prisma } = await import("@/lib/prisma");
 
-        const studio = await prisma.studio.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug },
             include: {
                 plan: true,

@@ -21,7 +21,7 @@ export async function PUT(
 
         // Si se está cambiando el slug, verificar que no exista
         if (slug) {
-            const existingStudio = await prisma.studio.findFirst({
+            const existingStudio = await prisma.studios.findFirst({
                 where: {
                     slug,
                     NOT: { id }
@@ -37,7 +37,7 @@ export async function PUT(
         }
 
         // Actualizar el studio
-        const studio = await prisma.studio.update({
+        const studio = await prisma.studios.update({
             where: { id },
             data: {
                 name,
@@ -51,7 +51,14 @@ export async function PUT(
                 plan: {
                     select: {
                         name: true,
-                        activeProjectLimit: true
+                        plan_limits: {
+                            where: {
+                                limit_type: 'EVENTS_PER_MONTH'
+                            },
+                            select: {
+                                limit_value: true
+                            }
+                        }
                     }
                 },
                 _count: {
@@ -89,11 +96,11 @@ export async function DELETE(
         // TODO: Verificar que el usuario sea administrador de la plataforma
 
         // Soft delete - cambiar estado a cancelado
-        const studio = await prisma.studio.update({
+        const studio = await prisma.studios.update({
             where: { id },
             data: {
-                subscriptionStatus: 'cancelled',
-                active: false
+                subscription_status: 'CANCELLED',
+                is_active: false
             }
         })
 

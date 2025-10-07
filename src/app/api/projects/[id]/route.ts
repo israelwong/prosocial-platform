@@ -14,7 +14,7 @@ export async function GET(
         }
 
         // Obtener el studio
-        const studio = await prisma.studio.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug }
         })
 
@@ -23,14 +23,13 @@ export async function GET(
         }
 
         // Obtener evento específico del studio
-        const evento = await prisma.evento.findFirst({
+        const evento = await prisma.studio_eventos.findFirst({
             where: {
                 id: id,
-                studioId: studio.id
+                studio_id: studio.id
             },
             include: {
-                Cliente: true,
-                Cotizacion: true
+                cotizaciones: true
             }
         })
 
@@ -61,7 +60,7 @@ export async function PUT(
         }
 
         // Obtener el studio
-        const studio = await prisma.studio.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug }
         })
 
@@ -79,10 +78,10 @@ export async function PUT(
         } = body
 
         // Actualizar el evento
-        const evento = await prisma.evento.update({
+        const evento = await prisma.studio_eventos.update({
             where: {
                 id: id,
-                studioId: studio.id
+                studio_id: studio.id
             },
             data: {
                 nombre,
@@ -92,8 +91,7 @@ export async function PUT(
                 direccion
             },
             include: {
-                Cliente: true,
-                Cotizacion: true
+                cotizaciones: true
             }
         })
 
@@ -120,7 +118,7 @@ export async function DELETE(
         }
 
         // Obtener el studio
-        const studio = await prisma.studio.findUnique({
+        const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug }
         })
 
@@ -129,10 +127,10 @@ export async function DELETE(
         }
 
         // Soft delete - archivar el evento
-        const evento = await prisma.evento.update({
+        const evento = await prisma.studio_eventos.update({
             where: {
                 id: id,
-                studioId: studio.id
+                studio_id: studio.id
             },
             data: {
                 status: 'archived'

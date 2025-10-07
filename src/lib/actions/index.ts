@@ -96,10 +96,13 @@ export type {
 
 export type {
     // Schemas de personal
-    PersonnelType,
-    PersonnelProfile,
-    PersonalCreateForm,
-    PersonalUpdateForm,
-    PersonalFiltersForm,
-    ProfessionalProfileForm,
+    CreatePersonalData,
+    UpdatePersonalData,
+    CreateCategoriaPersonalData,
+    UpdateCategoriaPersonalData,
+    CreatePerfilPersonalData,
+    UpdatePerfilPersonalData,
+    PersonalData,
+    CategoriaPersonalData,
+    PerfilPersonalData,
 } from "./schemas/personal-schemas";

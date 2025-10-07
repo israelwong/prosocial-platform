@@ -46,7 +46,7 @@ export interface PersonalFromAPI {
     updatedAt: Date;
     professional_profiles: Array<{
         id: string;
-        profile: any; // Estructura flexible de la API
+        profile: Record<string, unknown>; // Estructura flexible de la API
         description: string | null;
         isActive: boolean;
     }>;

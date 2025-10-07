@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import Stripe from "stripe";
 
 // GET /api/admin/descuentos/[id] - Obtener código de descuento específico
 export async function GET(
@@ -16,9 +17,9 @@ export async function GET(
                         lead: {
                             select: {
                                 id: true,
-                                nombre: true,
+                                name: true,
                                 email: true,
-                                telefono: true,
+                                phone: true,
                             },
                         },
                         subscription: {
@@ -42,11 +43,11 @@ export async function GET(
         }
 
         // Calcular métricas
-        const conversiones = discountCode.discount_usage.length;
-        const ingresos = discountCode.discount_usage.reduce(
+        const conversiones = discountCode.discount_usage?.length || 0;
+        const ingresos = discountCode.discount_usage?.reduce(
             (sum, usage) => sum + Number(usage.monto_descuento),
             0
-        );
+        ) || 0;
         const tasa_conversion = discountCode.uso_maximo ?
             (conversiones / discountCode.uso_maximo) * 100 :
             null;
@@ -93,7 +94,7 @@ export async function PUT(
 
         // Verificar que el código existe
         const existingCode = await prisma.platform_discount_codes.findUnique({
-            where: { id: params.id },
+            where: { id },
         });
 
         if (!existingCode) {
@@ -141,7 +142,7 @@ export async function PUT(
         // Actualizar en Stripe si existe
         if (existingCode.stripe_coupon_id) {
             try {
-                const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+                const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
                 // Actualizar cupón en Stripe
                 await stripe.coupons.update(existingCode.stripe_coupon_id, {
@@ -159,7 +160,7 @@ export async function PUT(
 
         // Actualizar en la base de datos
         const updatedCode = await prisma.platform_discount_codes.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 ...(codigo && { codigo }),
                 ...(nombre && { nombre }),
@@ -223,7 +224,7 @@ export async function DELETE(
         // Eliminar cupón de Stripe si existe
         if (existingCode.stripe_coupon_id) {
             try {
-                const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+                const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
                 await stripe.coupons.del(existingCode.stripe_coupon_id);
             } catch (stripeError) {
                 console.error("Error deleting Stripe coupon:", stripeError);
@@ -233,7 +234,7 @@ export async function DELETE(
 
         // Eliminar de la base de datos
         await prisma.platform_discount_codes.delete({
-            where: { id: params.id },
+            where: { id },
         });
 
         return NextResponse.json({

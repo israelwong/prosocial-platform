@@ -6,9 +6,9 @@ import { withRetry, getFriendlyErrorMessage } from '@/lib/database/retry-helper'
 export async function GET() {
   try {
     const plataformas = await withRetry(async () => {
-      return await prisma.platform_plataformas_redes_sociales.findMany({
+      return await prisma.platform_social_networks.findMany({
         orderBy: {
-          orden: 'asc'
+          order: 'asc'
         }
       });
     });
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar que el slug sea único
-    const existingSlug = await prisma.platform_plataformas_redes_sociales.findUnique({
+    const existingSlug = await prisma.platform_social_networks.findUnique({
       where: { slug }
     });
 
@@ -58,17 +58,17 @@ export async function POST(request: NextRequest) {
     }
 
     const plataforma = await withRetry(async () => {
-      return await prisma.platform_plataformas_redes_sociales.create({
+      return await prisma.platform_social_networks.create({
         data: {
-          nombre,
+          name: nombre,
           slug,
-          descripcion: descripcion || null,
+          description: descripcion || null,
           color: color || null,
-          icono: icono || null,
-          urlBase: urlBase || null,
-          orden,
-          isActive,
-          updatedAt: new Date()
+          icon: icono || null,
+          base_url: urlBase || null,
+          order: orden,
+          is_active: isActive,
+          updated_at: new Date()
         }
       });
     });

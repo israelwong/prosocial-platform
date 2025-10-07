@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
         const status = searchParams.get('status');
         const isActive = searchParams.get('isActive');
 
-        const where: any = {};
+        const where: Record<string, unknown> = {};
 
         if (status) {
             where.status = status;
@@ -17,12 +17,12 @@ export async function GET(request: NextRequest) {
             where.isActive = isActive === 'true';
         }
 
-        const campanas = await prisma.platform_campanas.findMany({
+        const campanas = await prisma.platform_campaigns.findMany({
             where,
             include: {
-                platform_campana_plataformas: {
+                platform_campaign_platforms: {
                     include: {
-                        platform_plataformas_publicidad: true
+                        platform_advertising_platforms: true
                     }
                 },
                 _count: {
@@ -32,8 +32,8 @@ export async function GET(request: NextRequest) {
                 }
             },
             orderBy: [
-                { fechaInicio: 'desc' },
-                { createdAt: 'desc' }
+                { start_date: 'desc' },
+                { created_at: 'desc' }
             ]
         });
 
@@ -52,34 +52,33 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { plataformas, ...campañaData } = body;
 
-        const campaña = await prisma.platform_campanas.create({
+        const campaña = await prisma.platform_campaigns.create({
             data: {
-                nombre: campañaData.nombre,
-                descripcion: campañaData.descripcion,
-                presupuestoTotal: campañaData.presupuestoTotal,
-                fechaInicio: new Date(campañaData.fechaInicio),
-                fechaFin: new Date(campañaData.fechaFin),
-                isActive: campañaData.isActive,
+                name: campañaData.name,
+                description: campañaData.descripcion,
+                total_budget: campañaData.presupuestoTotal,
+                start_date: new Date(campañaData.start_date),
+                end_date: new Date(campañaData.end_date),
+                is_active: campañaData.is_active,
                 status: campañaData.status || 'planificada',
-                leadsGenerados: campañaData.leadsGenerados || 0,
-                leadsSuscritos: campañaData.leadsSuscritos || 0,
-                gastoReal: campañaData.gastoReal || 0,
-                updatedAt: new Date(),
-                platform_campana_plataformas: {
-                    create: plataformas?.map((p: any) => ({
-                        plataformaId: p.plataformaId,
-                        presupuesto: p.presupuesto,
-                        gastoReal: p.gastoReal || 0,
+                leads_generated: campañaData.leadsGenerados || 0,
+                leads_subscribed: campañaData.leadsSuscritos || 0,
+                actual_spend: campañaData.gastoReal || 0,
+                updated_at: new Date(),
+                platform_campaign_platforms: {
+                    create: plataformas?.map((p: { platform_id: string; budget: number; actual_spend?: number; leads?: number; conversions?: number }) => ({
+                        platform_id: p.platform_id,
+                        budget: p.budget,
+                        actual_spend: p.actual_spend || 0,
                         leads: p.leads || 0,
-                        conversiones: p.conversiones || 0,
-                        updatedAt: new Date()
+                        conversions: p.conversions || 0
                     })) || []
                 }
             },
             include: {
-                platform_campana_plataformas: {
+                platform_campaign_platforms: {
                     include: {
-                        platform_plataformas_publicidad: true
+                        platform_advertising_platforms: true
                     }
                 }
             }

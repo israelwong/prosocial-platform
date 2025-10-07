@@ -8,17 +8,17 @@ export async function GET(
     try {
         const { id } = await params;
 
-        const campaña = await prisma.platform_campanas.findUnique({
+        const campaña = await prisma.platform_campaigns.findUnique({
             where: { id },
             include: {
-                platform_campana_plataformas: {
+                platform_campaign_platforms: {
                     include: {
-                        platform_plataformas_publicidad: true
+                        platform_advertising_platforms: true
                     }
                 },
                 platform_leads: {
                     include: {
-                        platform_canales_adquisicion: true
+                        platform_acquisition_channels: true
                     }
                 },
                 _count: {
@@ -56,13 +56,13 @@ export async function PUT(
 
         const { plataformas, ...campañaData } = body;
 
-        const campaña = await prisma.platform_campanas.update({
+        const campaña = await prisma.platform_campaigns.update({
             where: { id },
             data: {
                 ...campañaData,
                 platform_campana_plataformas: plataformas ? {
                     deleteMany: {},
-                    create: plataformas.map((p: any) => ({
+                    create: plataformas.map((p: { plataformaId: string; presupuesto: number; gastoReal?: number; leads?: number; conversiones?: number }) => ({
                         plataformaId: p.plataformaId,
                         presupuesto: p.presupuesto,
                         gastoReal: p.gastoReal || 0,
@@ -72,9 +72,9 @@ export async function PUT(
                 } : undefined
             },
             include: {
-                platform_campana_plataformas: {
+                platform_campaign_platforms: {
                     include: {
-                        platform_plataformas_publicidad: true
+                        platform_advertising_platforms: true
                     }
                 }
             }
@@ -97,7 +97,7 @@ export async function DELETE(
     try {
         const { id } = await params;
 
-        await prisma.platform_campanas.delete({
+        await prisma.platform_campaigns.delete({
             where: { id }
         });
 

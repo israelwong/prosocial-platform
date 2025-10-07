@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const plataforma = await withRetry(async () => {
-      return await prisma.platform_plataformas_redes_sociales.findUnique({
+      return await prisma.platform_social_networks.findUnique({
         where: { id: params.id }
       });
     });
@@ -57,7 +57,7 @@ export async function PUT(
     }
 
     // Verificar que la plataforma existe
-    const existingPlataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
+    const existingPlataforma = await prisma.platform_social_networks.findUnique({
       where: { id: params.id }
     });
 
@@ -69,7 +69,7 @@ export async function PUT(
     }
 
     // Verificar que el slug sea único (excluyendo la plataforma actual)
-    const existingSlug = await prisma.platform_plataformas_redes_sociales.findFirst({
+    const existingSlug = await prisma.platform_social_networks.findFirst({
       where: {
         slug,
         id: { not: params.id }
@@ -84,18 +84,18 @@ export async function PUT(
     }
 
     const plataforma = await withRetry(async () => {
-      return await prisma.platform_plataformas_redes_sociales.update({
+      return await prisma.platform_social_networks.update({
         where: { id: params.id },
         data: {
-          nombre,
+          name: nombre,
           slug,
-          descripcion: descripcion || null,
+          description: descripcion || null,
           color: color || null,
-          icono: icono || null,
-          urlBase: urlBase || null,
-          orden,
-          isActive,
-          updatedAt: new Date()
+          icon: icono || null,
+          base_url: urlBase || null,
+          order: orden,
+          is_active: isActive,
+          updated_at: new Date()
         }
       });
     });
@@ -117,12 +117,12 @@ export async function DELETE(
 ) {
   try {
     // Verificar que la plataforma existe
-    const existingPlataforma = await prisma.platform_plataformas_redes_sociales.findUnique({
+    const existingPlataforma = await prisma.platform_social_networks.findUnique({
       where: { id: params.id },
       include: {
         _count: {
           select: {
-            project_redes_sociales: true
+            studio_redes_sociales: true
           }
         }
       }
@@ -136,7 +136,7 @@ export async function DELETE(
     }
 
     // Verificar si la plataforma está en uso
-    if (existingPlataforma._count.project_redes_sociales > 0) {
+    if (existingPlataforma._count.studio_redes_sociales > 0) {
       return NextResponse.json(
         { error: 'No se puede eliminar la plataforma porque está siendo utilizada por uno o más estudios' },
         { status: 400 }
@@ -144,7 +144,7 @@ export async function DELETE(
     }
 
     await withRetry(async () => {
-      return await prisma.platform_plataformas_redes_sociales.delete({
+      return await prisma.platform_social_networks.delete({
         where: { id: params.id }
       });
     });

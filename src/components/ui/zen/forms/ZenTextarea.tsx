@@ -75,7 +75,8 @@ const ZenTextarea = React.forwardRef<HTMLTextAreaElement, ZenTextareaProps>(
     ...props
   }, ref) => {
     // Generar ID único si no se proporciona
-    const textareaId = id || React.useId();
+    const generatedId = React.useId();
+    const textareaId = id || generatedId;
     const errorId = `${textareaId}-error`;
     const hintId = `${textareaId}-hint`;
     const countId = `${textareaId}-count`;

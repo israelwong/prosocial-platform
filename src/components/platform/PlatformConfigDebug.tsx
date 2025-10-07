@@ -9,11 +9,6 @@ export function PlatformConfigDebug() {
     const [isVisible, setIsVisible] = useState(true); // Abierto por defecto para pruebas
     const [isMinimized, setIsMinimized] = useState(false);
 
-    // Solo mostrar en desarrollo
-    if (process.env.NODE_ENV !== 'development') {
-        return null;
-    }
-
     // Toggle con Ctrl+Shift+D
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -26,6 +21,11 @@ export function PlatformConfigDebug() {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isVisible]);
+
+    // Solo mostrar en desarrollo
+    if (process.env.NODE_ENV !== 'development') {
+        return null;
+    }
 
     if (!isVisible) {
         return (

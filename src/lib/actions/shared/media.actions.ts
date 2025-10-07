@@ -1,9 +1,9 @@
 "use server";
 
 import { createClient } from '@supabase/supabase-js';
-import { 
-  FileUploadSchema, 
-  FileDeleteSchema, 
+import {
+  FileUploadSchema,
+  FileDeleteSchema,
   FileUpdateSchema,
   ALLOWED_MIME_TYPES,
   type FileUploadForm,
@@ -24,8 +24,8 @@ if (!supabaseUrl || !supabaseServiceKey) {
 
 const supabaseAdmin = supabaseUrl && supabaseServiceKey
   ? createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-    })
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+  })
   : null;
 
 const BUCKET_NAME = 'Studio'; // Bucket específico para Studio
@@ -89,7 +89,7 @@ function validateFileType(file: File, allowedTypes: readonly string[]): boolean 
 // --- Helper para obtener tipo de archivo por MIME ---
 function getFileTypeByMime(mimeType: string): string | null {
   for (const [type, mimes] of Object.entries(ALLOWED_MIME_TYPES)) {
-    if (mimes.includes(mimeType as any)) {
+    if (mimes.includes(mimeType as never)) {
       return type;
     }
   }
@@ -114,9 +114,9 @@ export async function uploadFileStorage(
     // Validar tipo de archivo
     const fileType = getFileTypeByMime(file.type);
     if (!fileType) {
-      return { 
-        success: false, 
-        error: `Tipo de archivo no permitido. Tipos soportados: ${Object.keys(ALLOWED_MIME_TYPES).join(', ')}` 
+      return {
+        success: false,
+        error: `Tipo de archivo no permitido. Tipos soportados: ${Object.keys(ALLOWED_MIME_TYPES).join(', ')}`
       };
     }
 
@@ -129,9 +129,9 @@ export async function uploadFileStorage(
     };
 
     if (file.size > maxSizes[fileType as keyof typeof maxSizes]) {
-      return { 
-        success: false, 
-        error: `El archivo es demasiado grande. Máximo ${maxSizes[fileType as keyof typeof maxSizes] / (1024 * 1024)}MB permitido para ${fileType}.` 
+      return {
+        success: false,
+        error: `El archivo es demasiado grande. Máximo ${maxSizes[fileType as keyof typeof maxSizes] / (1024 * 1024)}MB permitido para ${fileType}.`
       };
     }
 
@@ -242,9 +242,9 @@ export async function updateFileStorage(
 
     // Eliminar archivo anterior si existe
     if (oldPublicUrl) {
-      const deleteResult = await deleteFileStorage({ 
-        publicUrl: oldPublicUrl, 
-        studioSlug 
+      const deleteResult = await deleteFileStorage({
+        publicUrl: oldPublicUrl,
+        studioSlug
       });
       if (!deleteResult.success) {
         console.warn(`No se pudo eliminar el archivo anterior: ${deleteResult.error}`);

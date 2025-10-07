@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { obtenerIdentidadStudio } from '@/lib/actions/studio/config/identidad.actions';
-import type { IdentidadData } from '@/app/studio/[slug]/configuracion/cuenta/identidad/types';
+import type { IdentidadData } from '@/app/studio/[slug]/app/configuracion/studio/identidad/types';
 
 interface UseStudioDataOptions {
   studioSlug: string;
@@ -23,29 +23,31 @@ export function useStudioData({ studioSlug, onUpdate }: UseStudioDataOptions) {
         setLoading(true);
         setError(null);
         console.log('🔄 [STUDIO_DATA] Cargando datos del studio:', studioSlug);
-        
+
         const data = await obtenerIdentidadStudio(studioSlug);
         console.log('📊 [STUDIO_DATA] Datos recibidos:', data);
-        
-        setIdentidadData(data);
-        onUpdate?.(data);
-        console.log('✅ [STUDIO_DATA] Datos cargados exitosamente:', { name: data.name });
+
+        if ('studio_name' in data) {
+          setIdentidadData(data as IdentidadData);
+          onUpdate?.(data as IdentidadData);
+          console.log('✅ [STUDIO_DATA] Datos cargados exitosamente:', { name: data.studio_name });
+        }
       } catch (err) {
         console.error('❌ [STUDIO_DATA] Error loading studio data:', err);
         setError('Error al cargar datos del estudio');
-        
+
         // Fallback a datos por defecto
         const fallbackData: IdentidadData = {
           id: studioSlug,
-          name: 'Studio',
+          studio_name: 'Studio',
           slug: studioSlug,
           slogan: null,
           descripcion: null,
           palabras_clave: [],
-          logoUrl: null,
+          logo_url: null,
           isotipo_url: null
         };
-        
+
         setIdentidadData(fallbackData);
         onUpdate?.(fallbackData);
         console.log('⚠️ [STUDIO_DATA] Usando datos de fallback:', fallbackData);
@@ -56,7 +58,7 @@ export function useStudioData({ studioSlug, onUpdate }: UseStudioDataOptions) {
     };
 
     loadStudioData();
-  }, [studioSlug]); // Solo depender de studioSlug
+  }, [studioSlug, onUpdate]); // Incluir onUpdate en dependencias
 
   // Función para recargar datos
   const refetch = async () => {
@@ -66,13 +68,15 @@ export function useStudioData({ studioSlug, onUpdate }: UseStudioDataOptions) {
       setLoading(true);
       setError(null);
       console.log('🔄 [STUDIO_DATA] Recargando datos del studio:', studioSlug);
-      
+
       const data = await obtenerIdentidadStudio(studioSlug);
       console.log('📊 [STUDIO_DATA] Datos recargados:', data);
-      
-      setIdentidadData(data);
-      onUpdate?.(data);
-      console.log('✅ [STUDIO_DATA] Datos recargados exitosamente:', { name: data.name });
+
+      if ('studio_name' in data) {
+        setIdentidadData(data as IdentidadData);
+        onUpdate?.(data as IdentidadData);
+        console.log('✅ [STUDIO_DATA] Datos recargados exitosamente:', { name: data.studio_name });
+      }
     } catch (err) {
       console.error('❌ [STUDIO_DATA] Error reloading studio data:', err);
       setError('Error al recargar datos del estudio');

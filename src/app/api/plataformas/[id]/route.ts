@@ -9,12 +9,12 @@ export async function GET(
     try {
         const { id } = await params;
 
-        const plataforma = await prisma.platform_plataformas_publicidad.findUnique({
+        const plataforma = await prisma.platform_advertising_platforms.findUnique({
             where: { id },
             include: {
-                platform_campana_plataformas: {
+                platform_campaign_platforms: {
                     include: {
-                        platform_campanas: true
+                        platform_campaigns: true
                     }
                 }
             }
@@ -56,7 +56,7 @@ export async function PUT(
         }
 
         // Verificar si la plataforma existe
-        const existingPlataforma = await prisma.platform_plataformas_publicidad.findUnique({
+        const existingPlataforma = await prisma.platform_advertising_platforms.findUnique({
             where: { id }
         });
 
@@ -68,9 +68,9 @@ export async function PUT(
         }
 
         // Verificar si ya existe otra plataforma con el mismo nombre
-        const duplicatePlataforma = await prisma.platform_plataformas_publicidad.findFirst({
+        const duplicatePlataforma = await prisma.platform_advertising_platforms.findFirst({
             where: {
-                nombre: {
+                name: {
                     equals: nombre,
                     mode: 'insensitive'
                 },
@@ -87,15 +87,15 @@ export async function PUT(
             );
         }
 
-        const plataforma = await prisma.platform_plataformas_publicidad.update({
+        const plataforma = await prisma.platform_advertising_platforms.update({
             where: { id },
             data: {
-                nombre,
-                tipo,
+                name: nombre,
+                type: tipo,
                 color,
-                icono,
-                descripcion,
-                updatedAt: new Date()
+                icon: icono,
+                description: descripcion,
+                updated_at: new Date()
             }
         });
 
@@ -118,10 +118,10 @@ export async function DELETE(
         const { id } = await params;
 
         // Verificar si la plataforma existe
-        const existingPlataforma = await prisma.platform_plataformas_publicidad.findUnique({
+        const existingPlataforma = await prisma.platform_advertising_platforms.findUnique({
             where: { id },
             include: {
-                platform_campana_plataformas: true
+                platform_campaign_platforms: true
             }
         });
 
@@ -133,14 +133,14 @@ export async function DELETE(
         }
 
         // Verificar si la plataforma está siendo usada en campañas
-        if (existingPlataforma.platform_campana_plataformas.length > 0) {
+        if (existingPlataforma.platform_campaign_platforms.length > 0) {
             return NextResponse.json(
                 { error: 'No se puede eliminar una plataforma que está siendo usada en campañas' },
                 { status: 400 }
             );
         }
 
-        await prisma.platform_plataformas_publicidad.delete({
+        await prisma.platform_advertising_platforms.delete({
             where: { id }
         });
 

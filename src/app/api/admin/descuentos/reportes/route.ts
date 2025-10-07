@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
         // Calcular fechas según el período
         const now = new Date();
-        let fechaInicio = new Date();
+        const fechaInicio = new Date();
 
         switch (periodo) {
             case "7_dias":
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
                 break;
         }
 
-        let reportData: any = {};
+        let reportData: unknown;
 
         switch (tipoReporte) {
             case "general":
@@ -67,7 +67,7 @@ async function getGeneralReport(fechaInicio: Date, fechaFin: Date) {
     // Códigos generales
     const codigosGenerales = await prisma.platform_discount_codes.findMany({
         where: {
-            createdAt: {
+            created_at: {
                 gte: fechaInicio,
                 lte: fechaFin,
             },
@@ -77,7 +77,7 @@ async function getGeneralReport(fechaInicio: Date, fechaFin: Date) {
                 include: {
                     lead: {
                         select: {
-                            nombre: true,
+                            name: true,
                             email: true,
                         },
                     },
@@ -97,7 +97,7 @@ async function getGeneralReport(fechaInicio: Date, fechaFin: Date) {
         include: {
             lead: {
                 select: {
-                    nombre: true,
+                    name: true,
                     email: true,
                 },
             },
@@ -112,13 +112,13 @@ async function getGeneralReport(fechaInicio: Date, fechaFin: Date) {
 
     // Calcular métricas
     const totalCodigos = codigosGenerales.length + codigosAgentes.length;
-    const totalUsados = codigosGenerales.filter(c => c.discount_usage.length > 0).length +
+    const totalUsados = codigosGenerales.filter(c => c.discount_usage?.length > 0).length +
         codigosAgentes.filter(c => c.usado).length;
-    const totalConversiones = codigosGenerales.reduce((sum, c) => sum + c.discount_usage.length, 0) +
+    const totalConversiones = codigosGenerales.reduce((sum, c) => sum + (c.discount_usage?.length || 0), 0) +
         codigosAgentes.filter(c => c.usado).length;
 
     const totalIngresos = codigosGenerales.reduce((sum, c) =>
-        sum + c.discount_usage.reduce((usageSum, usage) => usageSum + Number(usage.monto_descuento), 0), 0
+        sum + (c.discount_usage?.reduce((usageSum, usage) => usageSum + Number(usage.monto_descuento), 0) || 0), 0
     );
 
     return {
@@ -129,8 +129,8 @@ async function getGeneralReport(fechaInicio: Date, fechaFin: Date) {
         tasaConversion: totalCodigos > 0 ? (totalUsados / totalCodigos) * 100 : 0,
         codigosGenerales: codigosGenerales.map(code => ({
             ...code,
-            conversiones: code.discount_usage.length,
-            ingresos: code.discount_usage.reduce((sum, usage) => sum + Number(usage.monto_descuento), 0),
+            conversiones: code.discount_usage?.length || 0,
+            ingresos: code.discount_usage?.reduce((sum, usage) => sum + Number(usage.monto_descuento), 0) || 0,
         })),
         codigosAgentes: codigosAgentes.map(code => ({
             ...code,
@@ -144,7 +144,7 @@ async function getGeneralReport(fechaInicio: Date, fechaFin: Date) {
 async function getAgentesReport(fechaInicio: Date, fechaFin: Date) {
     const agentes = await prisma.platform_agents.findMany({
         include: {
-            platform_agent_discount_codes: {
+            agent_discount_codes: {
                 where: {
                     fecha_creacion: {
                         gte: fechaInicio,
@@ -156,7 +156,7 @@ async function getAgentesReport(fechaInicio: Date, fechaFin: Date) {
     });
 
     return agentes.map(agente => {
-        const codigos = agente.platform_agent_discount_codes;
+        const codigos = agente.agent_discount_codes;
         const usados = codigos.filter(c => c.usado).length;
         const ingresos = codigos
             .filter(c => c.usado)
@@ -179,7 +179,7 @@ async function getCodigosReport(fechaInicio: Date, fechaFin: Date) {
     // Códigos generales
     const codigosGenerales = await prisma.platform_discount_codes.findMany({
         where: {
-            createdAt: {
+            created_at: {
                 gte: fechaInicio,
                 lte: fechaFin,
             },
@@ -207,12 +207,12 @@ async function getCodigosReport(fechaInicio: Date, fechaFin: Date) {
             tipo: "general",
             descuento: code.valor_descuento,
             tipo_descuento: code.tipo_descuento,
-            uso: code.discount_usage.length,
+            uso: code.discount_usage?.length || 0,
             maximo: code.uso_maximo,
-            conversiones: code.discount_usage.length,
-            ingresos: code.discount_usage.reduce((sum, usage) => sum + Number(usage.monto_descuento), 0),
+            conversiones: code.discount_usage?.length || 0,
+            ingresos: code.discount_usage?.reduce((sum, usage) => sum + Number(usage.monto_descuento), 0) || 0,
             estado: code.activo ? "activo" : "inactivo",
-            fecha_creacion: code.createdAt,
+            fecha_creacion: code.created_at,
         })),
         ...codigosAgentes.map(code => ({
             id: code.id,
@@ -279,7 +279,7 @@ async function getConversionReport(fechaInicio: Date, fechaFin: Date) {
     });
 
     // Agrupar por día
-    const conversionesPorDia: { [key: string]: any } = {};
+    const conversionesPorDia: Record<string, unknown> = {};
 
     conversionesGenerales.forEach(conversion => {
         const fecha = conversion.fecha_uso.toISOString().split('T')[0];
@@ -291,9 +291,9 @@ async function getConversionReport(fechaInicio: Date, fechaFin: Date) {
                 detalles: [],
             };
         }
-        conversionesPorDia[fecha].conversiones++;
-        conversionesPorDia[fecha].ingresos += Number(conversion.monto_descuento);
-        conversionesPorDia[fecha].detalles.push({
+        (conversionesPorDia[fecha] as { conversiones: number; ingresos: number; detalles: unknown[] }).conversiones++;
+        (conversionesPorDia[fecha] as { conversiones: number; ingresos: number; detalles: unknown[] }).ingresos += Number(conversion.monto_descuento);
+        (conversionesPorDia[fecha] as { conversiones: number; ingresos: number; detalles: unknown[] }).detalles.push({
             tipo: "general",
             codigo: conversion.discount_code.codigo,
             nombre: conversion.discount_code.nombre,
@@ -312,9 +312,9 @@ async function getConversionReport(fechaInicio: Date, fechaFin: Date) {
                     detalles: [],
                 };
             }
-            conversionesPorDia[fecha].conversiones++;
-            conversionesPorDia[fecha].ingresos += Number(conversion.valor_descuento);
-            conversionesPorDia[fecha].detalles.push({
+            (conversionesPorDia[fecha] as { conversiones: number; ingresos: number; detalles: unknown[] }).conversiones++;
+            (conversionesPorDia[fecha] as { conversiones: number; ingresos: number; detalles: unknown[] }).ingresos += Number(conversion.valor_descuento);
+            (conversionesPorDia[fecha] as { conversiones: number; ingresos: number; detalles: unknown[] }).detalles.push({
                 tipo: "agente",
                 codigo: conversion.codigo_completo,
                 nombre: `Código de ${conversion.agente.nombre}`,
@@ -324,8 +324,8 @@ async function getConversionReport(fechaInicio: Date, fechaFin: Date) {
     });
 
     return {
-        conversionesPorDia: Object.values(conversionesPorDia).sort((a: any, b: any) =>
-            new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
+        conversionesPorDia: Object.values(conversionesPorDia).sort((a: unknown, b: unknown) =>
+            new Date((a as { fecha: string }).fecha).getTime() - new Date((b as { fecha: string }).fecha).getTime()
         ),
         totalConversiones: conversionesGenerales.length + conversionesAgentes.length,
         totalIngresos: conversionesGenerales.reduce((sum, c) => sum + Number(c.monto_descuento), 0) +

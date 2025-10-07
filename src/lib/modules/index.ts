@@ -36,11 +36,11 @@ export async function checkStudioModule(
 ): Promise<boolean> {
   try {
     // 1. Buscar el módulo por slug
-    const module = await prisma.platform_modules.findUnique({
+    const moduleData = await prisma.platform_modules.findUnique({
       where: { slug: moduleSlug }
     });
 
-    if (!module) {
+    if (!moduleData) {
       console.warn(`[checkStudioModule] Module not found: ${moduleSlug}`);
       return false;
     }
@@ -50,7 +50,7 @@ export async function checkStudioModule(
       where: {
         studio_id_module_id: {
           studio_id: studioId,
-          module_id: module.id
+          module_id: moduleData.id
         }
       }
     });
@@ -186,7 +186,7 @@ export async function getAllModulesWithStatus(
       name: module.name,
       description: module.description,
       category: module.category,
-      base_price: module.base_price,
+      base_price: module.base_price ? Number(module.base_price) : null,
       is_active: activationMap.get(module.id)?.is_active || false,
       activated_at: activationMap.get(module.id)?.activated_at || null
     }));

@@ -4,7 +4,7 @@ import { BaseValidator } from './base-validator';
 import { ValidationResult } from '@/types/setup-validation';
 
 export class IdentidadValidator extends BaseValidator {
-    async validate(projectData: any): Promise<ValidationResult> {
+    async validate(projectData: unknown): Promise<ValidationResult> {
         const requiredFields = ['name', 'slug'];
         const optionalFields = ['logoUrl', 'slogan', 'descripcion'];
         const allFields = [...requiredFields, ...optionalFields];
@@ -32,12 +32,20 @@ export class IdentidadValidator extends BaseValidator {
         const errors: string[] = [];
 
         // Validaciones específicas
-        if (projectData.name && projectData.name.length < 3) {
-            errors.push('El nombre del estudio debe tener al menos 3 caracteres');
+        if (projectData && typeof projectData === 'object' && 'name' in projectData) {
+            const data = projectData as Record<string, unknown>;
+            const name = data.name;
+            if (name && typeof name === 'string' && name.length < 3) {
+                errors.push('El nombre del estudio debe tener al menos 3 caracteres');
+            }
         }
 
-        if (projectData.slug && !/^[a-z0-9-]+$/.test(projectData.slug)) {
-            errors.push('El slug solo puede contener letras minúsculas, números y guiones');
+        if (projectData && typeof projectData === 'object' && 'slug' in projectData) {
+            const data = projectData as Record<string, unknown>;
+            const slug = data.slug;
+            if (slug && typeof slug === 'string' && !/^[a-z0-9-]+$/.test(slug)) {
+                errors.push('El slug solo puede contener letras minúsculas, números y guiones');
+            }
         }
 
         return {

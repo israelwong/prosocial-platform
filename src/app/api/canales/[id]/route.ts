@@ -23,7 +23,7 @@ export async function PUT(
             updatedAt: new Date()
         };
 
-        const canal = await prisma.platform_canales_adquisicion.update({
+        const canal = await prisma.platform_acquisition_channels.update({
             where: { id },
             data: updateData
         });
@@ -31,11 +31,11 @@ export async function PUT(
         return NextResponse.json(canal);
     } catch (error) {
         console.error('Error updating canal:', error);
-        
+
         // Manejar errores específicos de Prisma
         if (error instanceof Error) {
             console.error('Error details:', error.message);
-            
+
             if (error.message.includes('Unique constraint') || error.message.includes('duplicate key')) {
                 return NextResponse.json(
                     { error: 'Ya existe un canal con este nombre' },
@@ -76,7 +76,7 @@ export async function DELETE(
     try {
         const { id } = await params;
 
-        await prisma.platform_canales_adquisicion.delete({
+        await prisma.platform_acquisition_channels.delete({
             where: { id }
         });
 

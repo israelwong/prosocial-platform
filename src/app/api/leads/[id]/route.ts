@@ -35,7 +35,7 @@ export async function PUT(
         }
 
         // Preparar datos de actualización
-        const updateData: any = {
+        const updateData: Record<string, unknown> = {
             updatedAt: new Date().toISOString()
         };
 

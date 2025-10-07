@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import Stripe from "stripe";
 
 // GET /api/admin/descuentos - Obtener todos los códigos de descuento
 export async function GET(request: NextRequest) {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
         const status = searchParams.get("status");
         const search = searchParams.get("search");
 
-        let whereClause: any = {};
+        const whereClause: Record<string, unknown> = {};
 
         // Filtrar por estado
         if (status && status !== "todos") {
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
 
         const discountCodes = await prisma.platform_discount_codes.findMany({
             where: whereClause,
-            orderBy: { createdAt: "desc" },
+            orderBy: { created_at: "desc" },
             include: {
                 discount_usage: {
                     select: {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
                         monto_descuento: true,
                         lead: {
                             select: {
-                                nombre: true,
+                                name: true,
                                 email: true,
                             },
                         },
@@ -47,10 +48,10 @@ export async function GET(request: NextRequest) {
         // Calcular métricas adicionales
         const codesWithMetrics = discountCodes.map(code => ({
             ...code,
-            conversiones: code.discount_usage.length,
-            ingresos: code.discount_usage.reduce((sum, usage) => sum + Number(usage.monto_descuento), 0),
+            conversiones: code.discount_usage?.length || 0,
+            ingresos: code.discount_usage?.reduce((sum: number, usage) => sum + Number(usage.monto_descuento), 0) || 0,
             tasa_conversion: code.uso_maximo ?
-                (code.discount_usage.length / code.uso_maximo) * 100 :
+                ((code.discount_usage?.length || 0) / code.uso_maximo) * 100 :
                 null,
         }));
 
@@ -131,9 +132,9 @@ export async function POST(request: NextRequest) {
         // Crear cupón en Stripe si está habilitado
         if (crear_en_stripe) {
             try {
-                const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+                const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-                const couponData: any = {
+                const couponData: Stripe.CouponCreateParams = {
                     id: codigo,
                     duration: "forever", // Por defecto permanente
                 };

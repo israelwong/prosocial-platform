@@ -4,7 +4,7 @@ import { BaseValidator } from './base-validator';
 import { ValidationResult } from '@/types/setup-validation';
 
 export class ContactoValidator extends BaseValidator {
-    async validate(projectData: any): Promise<ValidationResult> {
+    async validate(projectData: unknown): Promise<ValidationResult> {
         const requiredFields = ['email'];
         const optionalFields = ['phone', 'address', 'website'];
         const allFields = [...requiredFields, ...optionalFields];
@@ -31,16 +31,28 @@ export class ContactoValidator extends BaseValidator {
         const errors: string[] = [];
 
         // Validaciones específicas
-        if (projectData.email && !this.isValidEmail(projectData.email)) {
-            errors.push('El formato del email no es válido');
+        if (projectData && typeof projectData === 'object' && 'email' in projectData) {
+            const data = projectData as Record<string, unknown>;
+            const email = data.email;
+            if (email && typeof email === 'string' && !this.isValidEmail(email)) {
+                errors.push('El formato del email no es válido');
+            }
         }
 
-        if (projectData.phone && !this.isValidPhone(projectData.phone)) {
-            errors.push('El formato del teléfono no es válido');
+        if (projectData && typeof projectData === 'object' && 'phone' in projectData) {
+            const data = projectData as Record<string, unknown>;
+            const phone = data.phone;
+            if (phone && typeof phone === 'string' && !this.isValidPhone(phone)) {
+                errors.push('El formato del teléfono no es válido');
+            }
         }
 
-        if (projectData.website && !this.isValidUrl(projectData.website)) {
-            errors.push('El formato del sitio web no es válido');
+        if (projectData && typeof projectData === 'object' && 'website' in projectData) {
+            const data = projectData as Record<string, unknown>;
+            const website = data.website;
+            if (website && typeof website === 'string' && !this.isValidUrl(website)) {
+                errors.push('El formato del sitio web no es válido');
+            }
         }
 
         // Si hay errores, el porcentaje se ajusta pero no se fuerza a 99%

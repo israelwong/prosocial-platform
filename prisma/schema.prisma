@@ -393,7 +393,7 @@ model platform_agents {
   telefono               String
   activo                 Boolean                         @default(true)
   meta_mensual_leads       Int                             @default(20)
-  comisionConversion     Decimal                         @default(0.05)
+  comision_conversion     Decimal                         @default(0.05)
   created_at              DateTime                        @default(now())
   updated_at              DateTime                        @updatedAt
   agent_discount_codes   platform_agent_discount_codes[]
