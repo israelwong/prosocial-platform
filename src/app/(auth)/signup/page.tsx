@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useAuth } from '@/components/providers/auth-provider'
+import { createClient } from '@/lib/supabase/client'
 import { ZenButton } from '@/components/ui/zen'
 import { Input } from '@/components/ui/shadcn/input'
 import { Label } from '@/components/ui/shadcn/label'
@@ -17,7 +17,6 @@ export default function SignUpPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
-    const { signUp } = useAuth()
     const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -37,15 +36,27 @@ export default function SignUpPage() {
             return
         }
 
-        const { error } = await signUp(email, password, {
-            role: 'admin' // Por defecto, los nuevos usuarios son admin
-        })
+        try {
+            const supabase = createClient()
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        role: 'admin' // Por defecto, los nuevos usuarios son admin
+                    }
+                }
+            })
 
-        if (error) {
-            setError(error.message)
-            setLoading(false)
-        } else {
-            setSuccess(true)
+            if (error) {
+                setError(error.message)
+                setLoading(false)
+            } else {
+                setSuccess(true)
+                setLoading(false)
+            }
+        } catch (err) {
+            setError('Error al crear la cuenta')
             setLoading(false)
         }
     }
