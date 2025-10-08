@@ -5,12 +5,16 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Rutas que requieren autenticación
-  const protectedRoutes = ["/admin", "/agente", "/studio"];
+  const protectedRoutes = ["/admin", "/agente"];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
+  
+  // Verificar si es una ruta de studio dinámica [slug]
+  const isStudioRoute = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
+  const isStudioProtected = isStudioRoute && !isReservedPath(pathname);
 
-  if (isProtectedRoute) {
+  if (isProtectedRoute || isStudioProtected) {
     const supabase = await createClient();
 
     // Verificar autenticación
@@ -133,8 +137,12 @@ function checkRouteAccess(userRole: string, pathname: string): boolean {
       return pathname.startsWith("/agente");
 
     case "suscriptor":
-      // Suscriptor solo puede acceder a rutas de studio
-      return pathname.startsWith("/studio/");
+      // Suscriptor puede acceder a rutas de studio dinámicas [slug]
+      // Verificar si es una ruta de studio (no reservada)
+      const isStudioRoute = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
+      const reservedPaths = ["/admin", "/agente", "/api", "/login", "/sign-up", "/signin", "/signup", "/forgot-password", "/update-password", "/error", "/redirect", "/sign-up-success", "/complete-profile", "/confirm", "/unauthorized", "/protected", "/about", "/pricing", "/contact", "/features", "/blog", "/help", "/docs", "/demo", "/terms", "/privacy", "/_next", "/favicon.ico", "/robots.txt", "/sitemap.xml"];
+      const isReserved = reservedPaths.some(path => pathname.startsWith(path));
+      return isStudioRoute && !isReserved;
 
     default:
       return false;

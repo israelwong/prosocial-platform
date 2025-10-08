@@ -51,7 +51,21 @@ export default function RedirectPage() {
                 console.log('🔍 Redirect - Rol encontrado:', userRole)
 
                 // Redirigir según el rol del usuario
-                const redirectPath = getDefaultRoute(userRole)
+                let redirectPath = getDefaultRoute(userRole)
+                
+                // Para suscriptores, necesitamos obtener el slug del studio
+                if (userRole === 'suscriptor') {
+                    // Obtener el slug del studio desde user_metadata
+                    const studioSlug = user.user_metadata?.studio_slug
+                    if (studioSlug) {
+                        redirectPath = getDefaultRoute(userRole, studioSlug)
+                    } else {
+                        console.log('🔍 Redirect - No se encontró studio_slug para suscriptor')
+                        router.push('/unauthorized')
+                        return
+                    }
+                }
+                
                 console.log('🔍 Redirect - Redirigiendo a:', redirectPath)
                 
                 // Pequeño delay para mostrar el loading
