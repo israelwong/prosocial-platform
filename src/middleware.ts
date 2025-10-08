@@ -45,21 +45,52 @@ export async function middleware(request: NextRequest) {
       error: authError,
     } = await supabase.auth.getUser();
 
+    console.log('🔍 Middleware - Pathname:', pathname);
+    console.log('🔍 Middleware - User:', user ? 'authenticated' : 'not authenticated');
+    console.log('🔍 Middleware - Auth Error:', authError);
+
     if (authError || !user) {
+      console.log('🔍 Middleware - Redirecting to login (no auth)');
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
     // Obtener el rol del usuario desde user_metadata
     const userRole = user.user_metadata?.role;
+    const studioSlug = user.user_metadata?.studio_slug;
+
+    console.log('🔍 Middleware - User Role:', userRole);
+    console.log('🔍 Middleware - Studio Slug:', studioSlug);
 
     if (!userRole) {
+      console.log('🔍 Middleware - Redirecting to login (no role)');
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
     // Verificar permisos según el rol
     const hasAccess = checkRouteAccess(userRole, pathname);
+    console.log('🔍 Middleware - Has Access:', hasAccess);
+
+    // Verificación adicional para rutas de studio
+    if (isStudioProtected && userRole === 'suscriptor') {
+      const studioSlugFromPath = pathname.match(/^\/([a-zA-Z0-9-]+)\/studio/)?.[1];
+      console.log('🔍 Middleware - Studio Slug from Path:', studioSlugFromPath);
+      console.log('🔍 Middleware - User Studio Slug:', studioSlug);
+
+      // Si el usuario no tiene studio_slug, redirigir a login
+      if (!studioSlug) {
+        console.log('🔍 Middleware - No studio_slug, redirecting to login');
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
+
+      // Verificar que el usuario tenga acceso a este studio específico
+      if (studioSlugFromPath && studioSlug && studioSlugFromPath !== studioSlug) {
+        console.log('🔍 Middleware - Studio mismatch, redirecting to unauthorized');
+        return NextResponse.redirect(new URL("/unauthorized", request.url));
+      }
+    }
 
     if (!hasAccess) {
+      console.log('🔍 Middleware - Redirecting to unauthorized (no access)');
       return NextResponse.redirect(new URL("/unauthorized", request.url));
     }
 
@@ -101,6 +132,23 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+
+  // Manejar rutas de studio sin slug - redirigir al slug del usuario
+  if (pathname.startsWith('/studio') && !pathname.match(/^\/([a-zA-Z0-9-]+)\/studio/)) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user && user.user_metadata?.studio_slug) {
+      const studioSlug = user.user_metadata.studio_slug;
+      const subPath = pathname.replace('/studio', '');
+      const redirectUrl = new URL(`/${studioSlug}/studio${subPath}`, request.url);
+      console.log(`🔄 [ZEN.PRO] Redirecting ${pathname} to ${redirectUrl.pathname}`);
+      return NextResponse.redirect(redirectUrl);
+    } else {
+      // Si no hay usuario o slug, redirigir a login
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
 
   // Solo reescribir si es una ruta que no existe y no es reservada
   // NO reescribir /[slug] (página pública) ni /[slug]/studio (ya existe)

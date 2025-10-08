@@ -99,7 +99,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
     };
 
     const isActive = (href: string) => {
-        return pathname.endsWith(href);
+        return pathname === `/${studioData.slug}/studio/configuracion${href}`;
     };
 
     return (
@@ -163,7 +163,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
                                                                             {subgroup.items.map((subItem: NavItem) => (
                                                                                 <ZenSidebarMenuItem key={subItem.id}>
                                                                                     <ZenSidebarMenuButton asChild isActive={isActive(subItem.href)}>
-                                                                                        <Link href={subItem.href}>
+                                                                                        <Link href={`/${studioData.slug}/studio/configuracion${subItem.href}`}>
                                                                                             <span className="truncate">{subItem.name}</span>
                                                                                         </Link>
                                                                                     </ZenSidebarMenuButton>
@@ -181,7 +181,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
                                                             <div key={directItem.id} className="pl-2 ml-2 border-l border-zinc-800">
                                                                 <ZenSidebarMenuItem>
                                                                     <ZenSidebarMenuButton asChild isActive={isActive(directItem.href)}>
-                                                                        <Link href={directItem.href}>
+                                                                        <Link href={`/${studioData.slug}/studio/configuracion${directItem.href}`}>
                                                                             <span className="truncate">{directItem.name}</span>
                                                                         </Link>
                                                                     </ZenSidebarMenuButton>
@@ -199,7 +199,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
                                                         {group.items.map((item) => (
                                                             <ZenSidebarMenuItem key={item.id}>
                                                                 <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                    <Link href={item.href}>
+                                                                    <Link href={`/${studioData.slug}/studio/configuracion${item.href}`}>
                                                                         <span className="truncate">{item.name}</span>
                                                                     </Link>
                                                                 </ZenSidebarMenuButton>
@@ -224,7 +224,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
                                                                             {subgroup.items.map((item) => (
                                                                                 <ZenSidebarMenuItem key={item.id}>
                                                                                     <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                                        <Link href={item.href}>
+                                                                                        <Link href={`/${studioData.slug}/studio/configuracion${item.href}`}>
                                                                                             <span className="truncate">{item.name}</span>
                                                                                         </Link>
                                                                                     </ZenSidebarMenuButton>

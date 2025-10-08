@@ -56,7 +56,7 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                 { id: 'identidad', name: 'Identidad', href: '/studio/identidad', icon: 'Star' },
                 { id: 'contacto', name: 'Contacto', href: '/studio/contacto', icon: 'Phone' },
                 { id: 'horarios', name: 'Horarios', href: '/studio/horarios', icon: 'Clock' },
-                { id: 'redes-sociales', name: 'Redes Sociales', href: '/studio/redes-sociales', icon: 'Zap' },
+                { id: 'redes-sociales', name: 'Redes Sociales', href: '/studio/redes', icon: 'Zap' },
             ],
         },
         {
@@ -67,7 +67,7 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             items: [
                 { id: 'personal', name: 'Personal', href: '/operacion/personal', icon: 'Users2' },
                 { id: 'pipeline', name: 'Pipeline', href: '/operacion/pipeline', icon: 'Workflow' },
-                { id: 'tipos-evento', name: 'Tipos de Evento', href: '/operacion/tipos-evento', icon: 'Calendar' },
+                { id: 'tipos-evento', name: 'Tipos de Evento', href: '/operacion/tipos', icon: 'Calendar' },
             ],
         },
         {
@@ -87,9 +87,9 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             moduleSlug: 'ventas',
             items: [
                 { id: 'crm', name: 'Etapas del CRM', href: '/ventas/crm', icon: 'Users' },
-                { id: 'condiciones-comerciales', name: 'Condiciones Comerciales', href: '/ventas/condiciones-comerciales', icon: 'FileText' },
-                { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/ventas/reglas-agendamiento', icon: 'Clock' },
-                { id: 'inteligencia-financiera', name: 'Inteligencia Financiera', href: '/ventas/inteligencia-financiera', icon: 'Coins' },
+                { id: 'condiciones-comerciales', name: 'Condiciones Comerciales', href: '/ventas/condiciones', icon: 'FileText' },
+                { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/ventas/reglas', icon: 'Clock' },
+                { id: 'inteligencia-financiera', name: 'Inteligencia Financiera', href: '/ventas/inteligencia', icon: 'Coins' },
             ],
         },
         {
@@ -214,14 +214,14 @@ export async function ConfiguracionSidebarZenV2({ studioSlug }: ConfiguracionSid
     // Obtener módulos activos
     const activeModules = await getActiveModules(studio.id);
     const activeModuleSlugs = activeModules.map(m => m.slug);
-    
+
     console.log('🔍 ConfiguracionSidebarZenV2 - módulos activos:', activeModuleSlugs);
     console.log('🔍 ConfiguracionSidebarZenV2 - todos los módulos disponibles:', NAVIGATION_CONFIG.modules.map(m => m.moduleSlug));
 
     // TEMPORAL: Mostrar todos los módulos durante desarrollo
     // TODO: Activar filtrado cuando los módulos estén configurados en BD
     const filteredModuleNav = NAVIGATION_CONFIG.modules; // Mostrar todos los módulos
-    
+
     // Filtrar módulos activos (comentado temporalmente)
     // const filteredModuleNav = NAVIGATION_CONFIG.modules.filter(group =>
     //     activeModuleSlugs.includes(group.moduleSlug || '')
