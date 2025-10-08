@@ -13,8 +13,12 @@ export async function middleware(request: NextRequest) {
   // Verificar si es una ruta de studio dinámica [slug]/studio
   const isStudioRoute = pathname.match(/^\/([a-zA-Z0-9-]+)\/studio(\/.*)?$/);
   const isStudioProtected = isStudioRoute && !isReservedPath(pathname);
+  
+  // Verificar si es una ruta de cliente dinámica [slug]/cliente
+  const isClienteRoute = pathname.match(/^\/([a-zA-Z0-9-]+)\/cliente(\/.*)?$/);
+  const isClienteProtected = isClienteRoute && !isReservedPath(pathname);
 
-  if (isProtectedRoute || isStudioProtected) {
+  if (isProtectedRoute || isStudioProtected || isClienteProtected) {
     const supabase = await createClient();
 
     // Verificar autenticación
@@ -39,6 +43,16 @@ export async function middleware(request: NextRequest) {
 
     if (!hasAccess) {
       return NextResponse.redirect(new URL("/unauthorized", request.url));
+    }
+    
+    // Para rutas de cliente, verificar autenticación específica
+    if (isClienteProtected) {
+      const hasClienteAccess = await checkClienteAccess(user, pathname, request);
+      if (!hasClienteAccess) {
+        // Redirigir a página de login de cliente
+        const loginUrl = new URL(`/login-cliente?redirect=${encodeURIComponent(pathname)}`, request.url);
+        return NextResponse.redirect(loginUrl);
+      }
     }
   }
 
@@ -148,6 +162,41 @@ function checkRouteAccess(userRole: string, pathname: string): boolean {
 
     default:
       return false;
+  }
+}
+
+async function checkClienteAccess(user: any, pathname: string, request: NextRequest): Promise<boolean> {
+  try {
+    // Extraer el slug del studio de la ruta
+    const slugMatch = pathname.match(/^\/([a-zA-Z0-9-]+)\/cliente(\/.*)?$/);
+    if (!slugMatch) return false;
+    
+    const studioSlug = slugMatch[1];
+    
+    // Verificar si el usuario tiene acceso a este studio específico
+    // Esto se puede hacer verificando:
+    // 1. Si el usuario es el propietario del studio (suscriptor)
+    // 2. Si el usuario es un cliente con código de acceso válido
+    // 3. Si el usuario tiene un token de acceso específico
+    
+    // Por ahora, implementar lógica básica
+    // TODO: Implementar verificación real de acceso de cliente
+    
+    // Verificar si el usuario tiene metadata de cliente para este studio
+    const clienteData = user.user_metadata?.cliente_access;
+    if (clienteData && clienteData.studio_slug === studioSlug) {
+      return true;
+    }
+    
+    // Verificar si es el propietario del studio
+    if (user.user_metadata?.role === 'suscriptor' && user.user_metadata?.studio_slug === studioSlug) {
+      return true;
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking cliente access:', error);
+    return false;
   }
 }
 
