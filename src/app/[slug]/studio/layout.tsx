@@ -1,5 +1,5 @@
 import React from 'react';
-import { ZenMagicChatProvider, ZenMagicChatWrapper } from '../components/ZenMagic';
+import { ZenMagicChatProvider, ZenMagicChatWrapper } from './components/ZenMagic';
 
 export default async function AppLayout({
     children,

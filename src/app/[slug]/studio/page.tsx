@@ -1,7 +1,7 @@
 import React from 'react';
 import { redirect } from 'next/navigation';
 
-export default function AppPage() {
+export default function StudioPage() {
     // Redirigir al dashboard cuando el suscriptor ingrese a su estudio
-    redirect('/dashboard');
+    redirect('/studio/dashboard');
 }
