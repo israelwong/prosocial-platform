@@ -1,8 +1,12 @@
-export default function ConfiguracionMain({ params }: { params: { slug: string } }) {
-    return (
-        <div>
-            <h1>Configuración - {params.slug}</h1>
-            <p>Panel de configuración del estudio</p>
-        </div>
-    );
+import React from 'react';
+
+export default function ConfiguracionPage() {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-white mb-4">configuracion</h1>
+      <p className="text-zinc-400">
+        Esta página está en desarrollo. Próximamente estará disponible.
+      </p>
+    </div>
+  );
 }
