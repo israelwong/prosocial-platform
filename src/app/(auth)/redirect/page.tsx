@@ -34,10 +34,10 @@ export default function RedirectPage() {
                 // Si no hay rol, intentar detectar por email (fallback para super admin)
                 if (!userRole) {
                     console.log('🔍 Redirect - No se encontró rol en metadata, verificando por email...')
-                    
+
                     // Lista de emails de super admin (fallback)
                     const superAdminEmails = ['admin@prosocial.mx']
-                    
+
                     if (superAdminEmails.includes(user.email || '')) {
                         console.log('🔍 Redirect - Detectado super admin por email:', user.email)
                         userRole = 'super_admin'
@@ -52,7 +52,7 @@ export default function RedirectPage() {
 
                 // Redirigir según el rol del usuario
                 let redirectPath = getDefaultRoute(userRole)
-                
+
                 // Para suscriptores, necesitamos obtener el slug del studio
                 if (userRole === 'suscriptor') {
                     // Obtener el slug del studio desde user_metadata
@@ -65,9 +65,9 @@ export default function RedirectPage() {
                         return
                     }
                 }
-                
+
                 console.log('🔍 Redirect - Redirigiendo a:', redirectPath)
-                
+
                 // Pequeño delay para mostrar el loading
                 setTimeout(() => {
                     router.push(redirectPath)
@@ -89,7 +89,7 @@ export default function RedirectPage() {
                 <div className="text-center">
                     <h2 className="text-xl font-semibold text-white mb-2">Error</h2>
                     <p className="text-zinc-400 mb-4">{error}</p>
-                    <button 
+                    <button
                         onClick={() => router.push('/login')}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
