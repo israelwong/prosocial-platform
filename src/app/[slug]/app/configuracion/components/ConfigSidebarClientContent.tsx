@@ -8,7 +8,7 @@ import {
     ZenSidebarGroup, ZenSidebarGroupLabel, ZenSidebarGroupContent, ZenSidebarMenu,
     ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuButton
 } from '@/components/ui/zen';
-import { StudioHeaderModal } from '../../../components/StudioHeaderModal';
+import { StudioHeaderModal } from '../../components/StudioHeaderModal';
 import {
     Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
     ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2, LogOut,

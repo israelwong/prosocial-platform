@@ -9,8 +9,8 @@ import {
     ZenSidebar, ZenSidebarContent, ZenSidebarHeader, ZenSidebarFooter, ZenSidebarMenu,
     ZenSidebarMenuItem, ZenSidebarMenuButton
 } from '@/components/ui/zen';
-import { StudioHeaderModal } from '../../../components/StudioHeaderModal';
-import { ActiveLink } from '../../../components/ActiveLink'; // Componente cliente para manejar el estado activo
+import { StudioHeaderModal } from '../../components/StudioHeaderModal';
+import { ActiveLink } from '../../components/ActiveLink'; // Componente cliente para manejar el estado activo
 
 // Definición de la apariencia de cada módulo
 const moduleConfig = {

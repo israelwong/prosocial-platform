@@ -1,7 +1,7 @@
 import React from 'react';
 import { ZenSidebarProvider } from '@/components/ui/zen/layout/ZenSidebar';
 import { DashboardSidebarZen } from './components/DashboardSidebarZen';
-import { AppHeader } from '../../components/AppHeader';
+import { AppHeader } from '../components/AppHeader';
 
 export default async function DashboardLayout({
     children,

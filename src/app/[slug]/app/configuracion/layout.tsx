@@ -1,6 +1,6 @@
 import React from 'react';
 import { ConfiguracionSidebarZenV2 } from './components/ConfiguracionSidebarZenV2';
-import { AppHeader } from '../../components/AppHeader';
+import { AppHeader } from '../components/AppHeader';
 import { ZenSidebarProvider } from '@/components/ui/zen';
 
 export default async function ConfiguracionLayout({
