@@ -10,8 +10,8 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith(route)
   );
 
-  // Verificar si es una ruta de studio dinámica [slug]
-  const isStudioRoute = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
+  // Verificar si es una ruta de studio dinámica [slug]/studio
+  const isStudioRoute = pathname.match(/^\/([a-zA-Z0-9-]+)\/studio(\/.*)?$/);
   const isStudioProtected = isStudioRoute && !isReservedPath(pathname);
 
   if (isProtectedRoute || isStudioProtected) {
@@ -118,12 +118,12 @@ export async function middleware(request: NextRequest) {
   const slugMatch = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
   if (slugMatch && pathname !== "/" && !pathname.startsWith("/studio/") && !isReservedPath(pathname)) {
     const [, slug, subPath = ""] = slugMatch;
-    
+
     // No reescribir si ya es una ruta específica del studio (cliente, etc.)
     if (subPath && (subPath.startsWith('/cliente') || subPath.startsWith('/studio'))) {
       return NextResponse.next();
     }
-    
+
     const studioPath = `/${slug}/studio${subPath}`;
     console.log(`🔄 [ZEN.PRO] Rewriting ${pathname} to ${studioPath}`);
     return NextResponse.rewrite(new URL(studioPath, request.url));
@@ -143,12 +143,8 @@ function checkRouteAccess(userRole: string, pathname: string): boolean {
       return pathname.startsWith("/agente");
 
     case "suscriptor":
-      // Suscriptor puede acceder a rutas de studio dinámicas [slug]
-      // Verificar si es una ruta de studio (no reservada)
-      const isStudioRoute = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
-      const reservedPaths = ["/admin", "/agente", "/api", "/login", "/sign-up", "/signin", "/signup", "/forgot-password", "/update-password", "/error", "/redirect", "/sign-up-success", "/complete-profile", "/confirm", "/unauthorized", "/protected", "/about", "/pricing", "/contact", "/features", "/blog", "/help", "/docs", "/demo", "/terms", "/privacy", "/_next", "/favicon.ico", "/robots.txt", "/sitemap.xml"];
-      const isReserved = reservedPaths.some(path => pathname.startsWith(path));
-      return isStudioRoute && !isReserved;
+      // Suscriptor puede acceder a rutas de studio dinámicas [slug]/studio
+      return pathname.match(/^\/([a-zA-Z0-9-]+)\/studio(\/.*)?$/) !== null;
 
     default:
       return false;
