@@ -1,6 +1,8 @@
-import { redirect } from 'next/navigation';
-
-export default function AnalyticsPage() {
-    // Redirigir a la sección de marketing por defecto
-    redirect('/admin/analytics/marketing');
+export default function AdminAnalytics() {
+    return (
+        <div>
+            <h1>Analytics</h1>
+            <p>Estadísticas y métricas del sistema</p>
+        </div>
+    );
 }
