@@ -17,9 +17,14 @@ import { useStudioData } from '@/hooks/useStudioData';
 
 interface StudioHeaderModalProps {
     className?: string;
+    studioData?: {
+        id: string;
+        studio_name: string;
+        slug: string;
+    };
 }
 
-export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
+export function StudioHeaderModal({ className, studioData }: StudioHeaderModalProps) {
     // className is available for future styling if needed
     void className; // Suppress unused parameter warning
     const params = useParams();
@@ -27,20 +32,24 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
     const slug = params.slug as string;
 
     // Detectar si estamos en dashboard o configuración
-    const isDashboard = pathname.includes('/app/dashboard');
-    const isConfiguracion = pathname.includes('/app/configuracion');
+    const isDashboard = pathname.includes('/studio/dashboard');
+    const isConfiguracion = pathname.includes('/studio/configuracion');
 
-    // Usar hook para datos del studio
+    // Usar datos del studio pasados como prop o hook como fallback
     const {
         identidadData,
         loading,
         error
     } = useStudioData({
-        studioSlug: slug,
+        studioSlug: studioData?.slug || slug,
         onUpdate: (data) => {
             console.log('🎯 [STUDIO_HEADER] Updated with new studio data:', data);
         }
     });
+
+    // Usar datos del studio pasados como prop si están disponibles
+    const studioName = studioData?.studio_name || identidadData?.name || 'Studio';
+    const studioSlug = studioData?.slug || slug;
 
 
     // Función para renderizar el logo/isotipo
@@ -135,7 +144,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
         return (
             <div className="text-left">
                 <div className="text-sm font-semibold text-white">
-                    {identidadData?.name || 'Studio'}
+                    {studioName}
                 </div>
                 <div className="flex items-center gap-2">
                     <span className="text-xs text-zinc-400">Personal</span>
@@ -177,7 +186,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href={`/${slug}/app/configuracion/cuenta/perfil`}
+                        href="./configuracion/cuenta/perfil"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <User className="h-4 w-4" />
@@ -187,7 +196,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href={`/${slug}/app/configuracion/cuenta/suscripcion`}
+                        href="./configuracion/cuenta/suscripcion"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <CreditCard className="h-4 w-4" />
@@ -201,7 +210,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                 {isConfiguracion && (
                     <DropdownMenuItem asChild>
                         <Link
-                            href={`/${slug}/app/dashboard`}
+                            href="./dashboard"
                             className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                         >
                             <LayoutDashboard className="h-4 w-4" />
@@ -213,7 +222,7 @@ export function StudioHeaderModal({ className }: StudioHeaderModalProps) {
                 {isDashboard && (
                     <DropdownMenuItem asChild>
                         <Link
-                            href={`/${slug}/app/configuracion`}
+                            href="./configuracion"
                             className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                         >
                             <Settings className="h-4 w-4" />

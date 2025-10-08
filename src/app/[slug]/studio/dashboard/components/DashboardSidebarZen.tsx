@@ -1,7 +1,6 @@
 import React from 'react';
-import Link from 'next/link';
 import {
-    Kanban, Calendar, Users, Settings, BarChart3, Bot, LayoutTemplate, Sparkles, LogOut
+    Kanban, Settings, BarChart3, Bot, LayoutTemplate, Sparkles, LogOut
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { getActiveModules } from '@/lib/modules';
@@ -27,26 +26,77 @@ interface DashboardSidebarZenProps {
 }
 
 export async function DashboardSidebarZen({ className, studioSlug }: DashboardSidebarZenProps) {
-    const studio = await prisma.studios.findUnique({
-        where: { slug: studioSlug },
-        select: { id: true }
-    });
+    console.log('🔍 DashboardSidebarZen - studioSlug recibido:', studioSlug);
+    console.log('🔍 DashboardSidebarZen - tipo de studioSlug:', typeof studioSlug);
+
+    let studio: { id: string; studio_name: string; slug: string } | null = null;
+    let allStudios: { id: string; studio_name: string; slug: string }[] = [];
+
+    try {
+        // Primero verificar si hay studios en la base de datos
+        allStudios = await prisma.studios.findMany({
+            select: { id: true, studio_name: true, slug: true }
+        });
+        console.log('🔍 DashboardSidebarZen - todos los studios:', allStudios);
+        console.log('🔍 DashboardSidebarZen - cantidad de studios:', allStudios.length);
+
+        // Buscar el studio específico
+        studio = await prisma.studios.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true, studio_name: true, slug: true }
+        });
+
+        console.log('🔍 DashboardSidebarZen - studio encontrado:', studio);
+        console.log('🔍 DashboardSidebarZen - búsqueda por slug:', studioSlug);
+
+        // También intentar buscar por ID si el slug no funciona
+        if (!studio && allStudios.length > 0) {
+            console.log('🔍 DashboardSidebarZen - Intentando buscar por otros criterios...');
+            const firstStudio = allStudios[0];
+            console.log('🔍 DashboardSidebarZen - Primer studio disponible:', firstStudio);
+
+            // TEMPORAL: Usar el primer studio disponible si no se encuentra el slug específico
+            console.log('⚠️ DashboardSidebarZen - USANDO PRIMER STUDIO DISPONIBLE COMO FALLBACK');
+            studio = firstStudio;
+        }
+
+    } catch (error) {
+        console.error('❌ DashboardSidebarZen - Error en consulta a BD:', error);
+        return (
+            <ZenSidebar className={className}>
+                <div className="p-4 text-red-400">
+                    <p>Error de conexión a base de datos</p>
+                    <p className="text-xs text-zinc-500">Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+                </div>
+            </ZenSidebar>
+        );
+    }
 
     if (!studio) {
         // Manejar el caso donde el studio no se encuentra
-        return <ZenSidebar className={className}>Studio no encontrado</ZenSidebar>;
+        console.error('❌ DashboardSidebarZen - Studio no encontrado para slug:', studioSlug);
+        console.error('❌ DashboardSidebarZen - Studios disponibles:', allStudios.map(s => s.slug));
+        return (
+            <ZenSidebar className={className}>
+                <div className="p-4 text-red-400">
+                    <p>Studio no encontrado</p>
+                    <p className="text-xs text-zinc-500">Slug buscado: {studioSlug}</p>
+                    <p className="text-xs text-zinc-500">Studios disponibles: {allStudios.map(s => s.slug).join(', ')}</p>
+                </div>
+            </ZenSidebar>
+        );
     }
 
     const activeModules = await getActiveModules(studio.id);
 
     const mainNavItems = [
-        { href: `/${studioSlug}/app/dashboard`, icon: BarChart3, label: 'Dashboard' },
+        { href: './dashboard', icon: BarChart3, label: 'Dashboard' },
     ];
 
     return (
         <ZenSidebar className={className}>
             <ZenSidebarHeader>
-                <StudioHeaderModal />
+                <StudioHeaderModal studioData={studio} />
             </ZenSidebarHeader>
 
             <ZenSidebarContent className="px-4">
@@ -70,7 +120,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                     {activeModules.map(module => {
                         const config = moduleConfig[module.slug as keyof typeof moduleConfig];
                         if (!config) return null;
-                        const href = `/${studioSlug}${config.href}`;
+                        const href = `.${config.href}`;
 
                         return (
                             <ZenSidebarMenuItem key={module.id}>
@@ -86,7 +136,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                 {/* Navegación Fija */}
                 <ZenSidebarMenu>
                     <ZenSidebarMenuItem>
-                        <ActiveLink href={`/${studioSlug}/app/configuracion`}>
+                        <ActiveLink href="./configuracion">
                             <Settings className="w-4 h-4" />
                             <span>Configuración</span>
                         </ActiveLink>

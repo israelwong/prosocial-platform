@@ -1,6 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+// Función para verificar rutas reservadas
+function isReservedPath(path: string): boolean {
+  const reservedPaths = [
+    "/admin", "/agente", "/api", "/login", "/sign-up", "/signin", "/signup",
+    "/forgot-password", "/update-password", "/error", "/redirect", "/sign-up-success",
+    "/complete-profile", "/confirm", "/unauthorized", "/protected", "/about",
+    "/pricing", "/contact", "/features", "/blog", "/help", "/docs", "/demo",
+    "/terms", "/privacy", "/_next", "/favicon.ico", "/robots.txt", "/sitemap.xml"
+  ];
+
+  return reservedPaths.some((reserved) => {
+    if (reserved === "/demo") {
+      return path === "/demo" || path.startsWith("/demo/");
+    }
+    return path.startsWith(reserved);
+  });
+}
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -83,62 +101,22 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Rutas reservadas para sistema
-  const reservedPaths = [
-    "/admin",
-    "/agente",
-    "/api",
-    "/login",
-    "/sign-up",
-    "/signin",
-    "/signup",
-    "/forgot-password",
-    "/update-password",
-    "/error",
-    "/redirect",
-    "/sign-up-success",
-    "/complete-profile",
-    "/confirm",
-    "/unauthorized",
-    "/protected",
-    "/about",
-    "/pricing",
-    "/contact",
-    "/features",
-    "/blog",
-    "/help",
-    "/docs",
-    "/demo",
-    "/terms",
-    "/privacy",
-    "/_next",
-    "/favicon.ico",
-    "/robots.txt",
-    "/sitemap.xml",
-  ];
 
-  // Función para verificar rutas reservadas
-  const isReservedPath = (path: string) => {
-    return reservedPaths.some((reserved) => {
-      // Para rutas exactas como /demo, solo coincidir si es exacto o si empieza con /demo/
-      if (reserved === "/demo") {
-        return path === "/demo" || path.startsWith("/demo/");
-      }
-      return path.startsWith(reserved);
-    });
-  };
-
-  // Si es /[slug] o /[slug]/[...path] y no es ruta reservada → Rewrite a /[slug]/studio[...path]
-  // IMPORTANTE: Evitar bucle infinito - NO reescribir si ya empieza con /studio/
+  // Solo reescribir si es una ruta que no existe y no es reservada
+  // NO reescribir /[slug] (página pública) ni /[slug]/studio (ya existe)
   const slugMatch = pathname.match(/^\/([a-zA-Z0-9-]+)(\/.*)?$/);
-  if (slugMatch && pathname !== "/" && !pathname.startsWith("/studio/") && !isReservedPath(pathname)) {
+  if (slugMatch && pathname !== "/" && !isReservedPath(pathname)) {
     const [, slug, subPath = ""] = slugMatch;
 
-    // No reescribir si ya es una ruta específica del studio (cliente, etc.)
-    if (subPath && (subPath.startsWith('/cliente') || subPath.startsWith('/studio'))) {
+    // No reescribir rutas que ya existen:
+    // - /[slug] (página pública del studio)
+    // - /[slug]/studio (panel privado del studio)  
+    // - /[slug]/cliente (portal de clientes)
+    if (!subPath || subPath.startsWith('/studio') || subPath.startsWith('/cliente')) {
       return NextResponse.next();
     }
 
+    // Solo reescribir si es una subruta que no existe
     const studioPath = `/${slug}/studio${subPath}`;
     console.log(`🔄 [ZEN.PRO] Rewriting ${pathname} to ${studioPath}`);
     return NextResponse.rewrite(new URL(studioPath, request.url));

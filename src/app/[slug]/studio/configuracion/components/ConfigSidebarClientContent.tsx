@@ -28,10 +28,14 @@ const iconMap: { [key: string]: LucideIcon } = {
 
 interface ConfigSidebarClientContentProps {
     navigationConfig: NavigationConfig;
-    studioSlug: string;
+    studioData: {
+        id: string;
+        studio_name: string;
+        slug: string;
+    };
 }
 
-export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: ConfigSidebarClientContentProps) {
+export function ConfigSidebarClientContent({ navigationConfig, studioData }: ConfigSidebarClientContentProps) {
     const pathname = usePathname();
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
@@ -95,14 +99,14 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
     };
 
     const isActive = (href: string) => {
-        return pathname === `/${studioSlug}/app/configuracion${href}`;
+        return pathname.endsWith(href);
     };
 
     return (
         <ZenSidebar>
             <ZenSidebarHeader>
                 <div className="space-y-4 mb-4">
-                    <StudioHeaderModal />
+                    <StudioHeaderModal studioData={studioData} />
                     <ZenInput
                         placeholder="Buscar configuración..."
                         value={searchTerm}
@@ -159,7 +163,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                                             {subgroup.items.map((subItem: NavItem) => (
                                                                                 <ZenSidebarMenuItem key={subItem.id}>
                                                                                     <ZenSidebarMenuButton asChild isActive={isActive(subItem.href)}>
-                                                                                        <Link href={`/${studioSlug}/app/configuracion${subItem.href}`}>
+                                                                                        <Link href={subItem.href}>
                                                                                             <span className="truncate">{subItem.name}</span>
                                                                                         </Link>
                                                                                     </ZenSidebarMenuButton>
@@ -177,7 +181,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                             <div key={directItem.id} className="pl-2 ml-2 border-l border-zinc-800">
                                                                 <ZenSidebarMenuItem>
                                                                     <ZenSidebarMenuButton asChild isActive={isActive(directItem.href)}>
-                                                                        <Link href={`/${studioSlug}/app/configuracion${directItem.href}`}>
+                                                                        <Link href={directItem.href}>
                                                                             <span className="truncate">{directItem.name}</span>
                                                                         </Link>
                                                                     </ZenSidebarMenuButton>
@@ -195,7 +199,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                         {group.items.map((item) => (
                                                             <ZenSidebarMenuItem key={item.id}>
                                                                 <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                    <Link href={`/${studioSlug}/app/configuracion${item.href}`}>
+                                                                    <Link href={item.href}>
                                                                         <span className="truncate">{item.name}</span>
                                                                     </Link>
                                                                 </ZenSidebarMenuButton>
@@ -220,7 +224,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioSlug }: Con
                                                                             {subgroup.items.map((item) => (
                                                                                 <ZenSidebarMenuItem key={item.id}>
                                                                                     <ZenSidebarMenuButton asChild isActive={isActive(item.href)}>
-                                                                                        <Link href={`/${studioSlug}/app/configuracion${item.href}`}>
+                                                                                        <Link href={item.href}>
                                                                                             <span className="truncate">{item.name}</span>
                                                                                         </Link>
                                                                                     </ZenSidebarMenuButton>

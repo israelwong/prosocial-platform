@@ -171,32 +171,70 @@ interface ConfiguracionSidebarZenV2Props {
 
 // Componente principal (Server Component) - ASEGURAR QUE SEA ASYNC
 export async function ConfiguracionSidebarZenV2({ studioSlug }: ConfiguracionSidebarZenV2Props) {
-    // ---- LÓGICA DE FILTRADO DESACTIVADA TEMPORALMENTE PARA DESARROLLO ----
-    // const studio = await prisma.studios.findUnique({
-    //     where: { slug: studioSlug },
-    //     select: { id: true },
-    // });
+    console.log('🔍 ConfiguracionSidebarZenV2 - studioSlug recibido:', studioSlug);
 
-    // if (!studio) {
-    //     return <div>Studio no encontrado</div>;
-    // }
+    // Importar dependencias necesarias
+    const { prisma } = await import('@/lib/prisma');
+    const { getActiveModules } = await import('@/lib/modules');
 
-    // const activeModules = await getActiveModules(studio.id);
-    // const activeModuleSlugs = activeModules.map(m => m.slug);
+    let studio = null;
+    let allStudios: { id: string; studio_name: string; slug: string }[] = [];
 
+    try {
+        // Primero verificar si hay studios en la base de datos
+        allStudios = await prisma.studios.findMany({
+            select: { id: true, studio_name: true, slug: true }
+        });
+        console.log('🔍 ConfiguracionSidebarZenV2 - todos los studios:', allStudios);
+
+        // Buscar el studio específico
+        studio = await prisma.studios.findUnique({
+            where: { slug: studioSlug },
+            select: { id: true, studio_name: true, slug: true }
+        });
+
+        console.log('🔍 ConfiguracionSidebarZenV2 - studio encontrado:', studio);
+
+        // Fallback si no encuentra el studio específico
+        if (!studio && allStudios.length > 0) {
+            console.log('⚠️ ConfiguracionSidebarZenV2 - USANDO PRIMER STUDIO DISPONIBLE COMO FALLBACK');
+            studio = allStudios[0];
+        }
+
+    } catch (error) {
+        console.error('❌ ConfiguracionSidebarZenV2 - Error en consulta a BD:', error);
+        return <div className="p-4 text-red-400">Error de conexión a base de datos</div>;
+    }
+
+    if (!studio) {
+        console.error('❌ ConfiguracionSidebarZenV2 - Studio no encontrado para slug:', studioSlug);
+        return <div className="p-4 text-red-400">Studio no encontrado</div>;
+    }
+
+    // Obtener módulos activos
+    const activeModules = await getActiveModules(studio.id);
+    const activeModuleSlugs = activeModules.map(m => m.slug);
+    
+    console.log('🔍 ConfiguracionSidebarZenV2 - módulos activos:', activeModuleSlugs);
+    console.log('🔍 ConfiguracionSidebarZenV2 - todos los módulos disponibles:', NAVIGATION_CONFIG.modules.map(m => m.moduleSlug));
+
+    // TEMPORAL: Mostrar todos los módulos durante desarrollo
+    // TODO: Activar filtrado cuando los módulos estén configurados en BD
+    const filteredModuleNav = NAVIGATION_CONFIG.modules; // Mostrar todos los módulos
+    
+    // Filtrar módulos activos (comentado temporalmente)
     // const filteredModuleNav = NAVIGATION_CONFIG.modules.filter(group =>
     //     activeModuleSlugs.includes(group.moduleSlug || '')
     // );
-    // --------------------------------------------------------------------
 
-    // Construir la navegación final (usando TODOS los módulos)
+    // Construir la navegación final
     const finalNav = {
         global: NAVIGATION_CONFIG.global,
-        modules: NAVIGATION_CONFIG.modules, // Se usan todos los módulos
+        modules: filteredModuleNav,
         platform: NAVIGATION_CONFIG.platform,
     };
 
     return (
-        <ConfigSidebarClientContent navigationConfig={finalNav} studioSlug={studioSlug} />
+        <ConfigSidebarClientContent navigationConfig={finalNav} studioData={studio} />
     );
 }

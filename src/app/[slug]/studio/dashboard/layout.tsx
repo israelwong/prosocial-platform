@@ -11,6 +11,8 @@ export default async function DashboardLayout({
     params: { slug: string };
 }) {
     const { slug } = await params;
+    console.log('🔍 DashboardLayout - slug recibido:', slug);
+    console.log('🔍 DashboardLayout - URL completa:', typeof window !== 'undefined' ? window.location.href : 'Server side');
 
     return (
         <ZenSidebarProvider>
