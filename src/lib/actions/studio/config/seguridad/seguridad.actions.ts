@@ -4,7 +4,19 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/prisma';
 import { PasswordChangeSchema, SecuritySettingsSchema } from '@/lib/actions/schemas/seguridad/seguridad-schemas';
 import { revalidatePath } from 'next/cache';
-import type { SecuritySettings, AccessLog, SecurityFormData } from '@/app/studio/[slug]/(studio-app)/configuracion/cuenta/seguridad/types';
+import type { SecuritySettings, AccessLog, SecurityFormData } from '@/app/[slug]/studio/configuracion/cuenta/seguridad/types';
+
+// ========================================
+// TIPOS DE SEGURIDAD
+// ========================================
+
+interface SecurityActionDetails {
+    ip_address?: string;
+    user_agent?: string;
+    settings?: Record<string, unknown>;
+    action?: string;
+    [key: string]: unknown;
+}
 
 // ========================================
 // SERVER ACTIONS - SEGURIDAD
@@ -34,7 +46,7 @@ export async function cambiarContraseña(
 
         // Verificar contraseña actual usando re-autenticación
         console.log('🔍 Verificando contraseña actual para:', user.email);
-        
+
         // Crear una nueva instancia de Supabase para la verificación
         const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
         const verifySupabase = createSupabaseClient(
@@ -105,7 +117,7 @@ export async function cambiarContraseña(
 /**
  * Obtener o crear usuario en la base de datos
  */
-async function getOrCreateUser(supabaseUser: any) {
+async function getOrCreateUser(supabaseUser: { id: string; email?: string; user_metadata?: Record<string, unknown>; email_confirmed_at?: string }) {
     // Buscar el usuario en nuestra tabla usando supabase_id
     let dbUser = await prisma.users.findUnique({
         where: { supabase_id: supabaseUser.id }
@@ -114,7 +126,7 @@ async function getOrCreateUser(supabaseUser: any) {
     // Si no existe, buscar por email para ver si ya existe con otro supabase_id
     if (!dbUser) {
         const existingUser = await prisma.users.findUnique({
-            where: { email: supabaseUser.email! }
+            where: { email: supabaseUser.email || 'no-email@example.com' }
         });
 
         if (existingUser) {
@@ -124,7 +136,7 @@ async function getOrCreateUser(supabaseUser: any) {
                 where: { id: existingUser.id },
                 data: {
                     supabase_id: supabaseUser.id,
-                    full_name: supabaseUser.user_metadata?.full_name || existingUser.full_name,
+                    full_name: (typeof supabaseUser.user_metadata?.full_name === 'string' ? supabaseUser.user_metadata.full_name : null) || existingUser.full_name,
                     email_verified: supabaseUser.email_confirmed_at ? true : existingUser.email_verified
                 }
             });
@@ -135,8 +147,8 @@ async function getOrCreateUser(supabaseUser: any) {
             dbUser = await prisma.users.create({
                 data: {
                     supabase_id: supabaseUser.id,
-                    email: supabaseUser.email!,
-                    full_name: supabaseUser.user_metadata?.full_name || supabaseUser.email?.split('@')[0] || 'Usuario',
+                    email: supabaseUser.email || 'no-email@example.com',
+                    full_name: (typeof supabaseUser.user_metadata?.full_name === 'string' ? supabaseUser.user_metadata.full_name : null) || supabaseUser.email?.split('@')[0] || 'Usuario',
                     is_active: true,
                     email_verified: supabaseUser.email_confirmed_at ? true : false
                 }
@@ -157,7 +169,7 @@ export async function obtenerConfiguracionesSeguridad(
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return null;
         }
@@ -200,11 +212,11 @@ export async function actualizarConfiguracionesSeguridad(
     try {
         // Validar datos
         const validatedData = SecuritySettingsSchema.parse(data);
-        
+
         // Obtener usuario actual
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -265,7 +277,7 @@ export async function obtenerHistorialAccesos(
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -318,7 +330,7 @@ export async function cerrarTodasLasSesiones(
     try {
         const supabase = await createClient();
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError || !user) {
             return {
                 success: false,
@@ -366,7 +378,7 @@ async function logSecurityAction(
     userId: string,
     action: string,
     success: boolean,
-    details?: any
+    details?: SecurityActionDetails
 ) {
     try {
         await prisma.user_access_logs.create({
@@ -374,7 +386,7 @@ async function logSecurityAction(
                 user_id: userId,
                 action,
                 success,
-                details,
+                details: details ? JSON.parse(JSON.stringify(details)) : null,
                 ip_address: details?.ip_address || 'N/A',
                 user_agent: details?.user_agent || 'N/A'
             }

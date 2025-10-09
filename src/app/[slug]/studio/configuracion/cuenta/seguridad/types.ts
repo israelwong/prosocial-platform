@@ -16,10 +16,10 @@ export interface AccessLog {
     id: string;
     user_id: string;
     action: string;
-    ip_address?: string;
-    user_agent?: string;
+    ip_address: string | null;
+    user_agent: string | null;
     success: boolean;
-    details?: any;
+    details: any;
     created_at: Date;
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Button } from '@/components/ui/shadcn/button';
 import { Badge } from '@/components/ui/shadcn/badge';
@@ -28,7 +28,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    const loadSessions = async () => {
+    const loadSessions = useCallback(async () => {
         try {
             const result = await obtenerHistorialAccesos(studioSlug);
             if (result.success && result.data) {
@@ -42,7 +42,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [studioSlug]);
 
     const handleRefresh = async () => {
         setRefreshing(true);
@@ -53,7 +53,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
 
     useEffect(() => {
         loadSessions();
-    }, []);
+    }, [loadSessions]);
 
     const getDeviceIcon = (userAgent: string) => {
         if (!userAgent) return <Monitor className="h-4 w-4" />;
