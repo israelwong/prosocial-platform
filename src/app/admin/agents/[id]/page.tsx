@@ -56,7 +56,7 @@ async function getAgent(id: string): Promise<AgentDetail | null> {
                         createdAt: true
                     },
                     orderBy: {
-                        createdAt: 'desc'
+                        created_at: 'desc'
                     },
                     take: 10 // Últimos 10 leads
                 },
