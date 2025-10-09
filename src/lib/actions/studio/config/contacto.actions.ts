@@ -22,8 +22,10 @@ import {
 
 // Obtener datos de contacto del studio
 export async function obtenerContactoStudio(studioSlug: string) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Obtener studio con teléfonos
+    try {
+        console.log('🔍 [obtenerContactoStudio] Buscando studio con slug:', studioSlug);
+
+        // 1. Obtener studio
         const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: {
@@ -32,37 +34,49 @@ export async function obtenerContactoStudio(studioSlug: string) {
                 slug: true,
                 address: true,
                 website: true,
-                telefonos: {
-                    select: {
-                        id: true,
-                        studio_id: true,
-                        numero: true,
-                        tipo: true,
-                        activo: true,
-                        order: true,
-                        createdAt: true,
-                        updatedAt: true,
-                    },
-                    orderBy: { order: "asc" },
-                },
             },
         });
+
+        console.log('🏢 [obtenerContactoStudio] Studio encontrado:', studio);
 
         if (!studio) {
             throw new Error("Studio no encontrado");
         }
 
-        // 2. Transformar datos
+        // 2. Obtener teléfonos del studio
+        const telefonos = await prisma.studio_telefonos.findMany({
+            where: { studio_id: studio.id },
+            select: {
+                id: true,
+                studio_id: true,
+                numero: true,
+                tipo: true,
+                activo: true,
+                order: true,
+                created_at: true,
+                updated_at: true,
+            },
+            orderBy: { order: "asc" },
+        });
+
+        console.log('📞 [obtenerContactoStudio] Telefonos encontrados:', telefonos);
+
+        // 3. Transformar datos
         const contactoData = {
             direccion: studio.address || "",
             website: studio.website || "",
         };
 
+        console.log('📍 [obtenerContactoStudio] Contacto data:', contactoData);
+
         return {
             contactoData,
-            telefonos: studio.telefonos,
+            telefonos,
         };
-    });
+    } catch (error) {
+        console.error('❌ [obtenerContactoStudio] Error:', error);
+        throw error;
+    }
 }
 
 // Obtener teléfonos del studio con filtros
@@ -158,7 +172,7 @@ export async function crearTelefono(
         });
 
         // 5. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${studioSlug}/configuracion/studio/contacto`);
 
         return nuevoTelefono;
     });
@@ -196,7 +210,7 @@ export async function actualizarTelefono(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/studio/contacto`);
 
         return telefonoActualizado;
     });
@@ -236,7 +250,7 @@ export async function actualizarTelefonosBulk(
         );
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${studioSlug}/configuracion/studio/contacto`);
 
         return resultados;
     });
@@ -270,7 +284,7 @@ export async function toggleTelefonoEstado(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/studio/contacto`);
 
         return telefonoActualizado;
     });
@@ -297,7 +311,7 @@ export async function eliminarTelefono(telefonoId: string) {
         });
 
         // 3. Revalidar cache
-        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${existingTelefono.studio.slug}/configuracion/studio/contacto`);
 
         return { success: true };
     });
@@ -330,7 +344,7 @@ export async function actualizarContactoData(
         });
 
         // 4. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${studioSlug}/configuracion/studio/contacto`);
 
         return {
             direccion: studio.address || "",
@@ -364,7 +378,7 @@ export async function actualizarContactoDataBulk(
         });
 
         // 3. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/contacto`);
+        revalidatePath(`/studio/${studioSlug}/configuracion/studio/contacto`);
 
         return {
             direccion: studio.address || "",

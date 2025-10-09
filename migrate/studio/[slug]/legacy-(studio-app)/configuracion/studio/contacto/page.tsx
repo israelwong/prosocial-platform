@@ -71,10 +71,11 @@ export default function ContactoPageZen() {
                 id: telefono.id,
                 studio_id: telefono.studio_id,
                 numero: telefono.numero,
-                tipo: telefono.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina',
+                tipo: telefono.tipo, // Mantener como string genérico
                 activo: telefono.activo,
-                createdAt: telefono.createdAt,
-                updatedAt: telefono.updatedAt
+                order: telefono.order,
+                created_at: telefono.created_at,
+                updated_at: telefono.updated_at
             }));
 
             setTelefonos(telefonosConTipos);
@@ -123,7 +124,7 @@ export default function ContactoPageZen() {
                 setTelefonos(prev => prev.map(t =>
                     t.id === editingTelefono.id ? {
                         ...telefonoActualizado,
-                        tipo: telefonoActualizado.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina'
+                        tipo: telefonoActualizado.tipo // Mantener como string genérico
                     } : t
                 ));
 
@@ -135,7 +136,7 @@ export default function ContactoPageZen() {
                 });
                 setTelefonos(prev => [...prev, {
                     ...nuevoTelefono,
-                    tipo: nuevoTelefono.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina'
+                    tipo: nuevoTelefono.tipo // Mantener como string genérico
                 }]);
                 toast.success('Teléfono agregado exitosamente');
             }
@@ -171,7 +172,7 @@ export default function ContactoPageZen() {
             setTelefonos(prev => prev.map(t =>
                 t.id === id ? {
                     ...telefonoActualizado,
-                    tipo: telefonoActualizado.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina'
+                    tipo: telefonoActualizado.tipo // Mantener como string genérico
                 } : t
             ));
 

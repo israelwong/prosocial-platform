@@ -31,7 +31,7 @@ export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: C
         if (editingTelefono) {
             setFormData({
                 numero: editingTelefono.numero,
-                tipo: editingTelefono.tipo,
+                tipo: editingTelefono.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina',
                 activo: editingTelefono.activo
             });
         } else {

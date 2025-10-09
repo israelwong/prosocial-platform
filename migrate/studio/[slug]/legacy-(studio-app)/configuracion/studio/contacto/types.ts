@@ -2,10 +2,11 @@ export interface Telefono {
     id: string;
     studio_id: string;
     numero: string;
-    tipo: 'principal' | 'whatsapp' | 'emergencia' | 'oficina';
+    tipo: string; // Prisma retorna string genérico
     activo: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    order: number;
+    created_at: Date;
+    updated_at: Date;
 }
 
 export interface TelefonoCreate {

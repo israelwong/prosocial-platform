@@ -1115,7 +1115,7 @@ model studio_telefonos {
   id        String   @id @default(cuid())
   studio_id String
   numero    String
-  tipo      String // "principal", "whatsapp", "oficina"
+  tipo      String // "principal", "whatsapp", "emergencia", "oficina"
   activo    Boolean  @default(true)
   order     Int      @default(0)
   created_at DateTime @default(now())

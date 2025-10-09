@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ZenButton } from '@/components/ui/zen';
 import { ZenBadge } from '@/components/ui/zen';
 import { Trash2, Edit, Phone, CheckCircle, XCircle } from 'lucide-react';
-import { ConfirmModal } from '@/components/ui/zen/overlays/ZenConfirmModal';
+import { ZenConfirmModal } from '@/components/ui/zen/overlays/ZenConfirmModal';
 import { Telefono, TIPOS_TELEFONO } from '../types';
 import { toast } from 'sonner';
 
