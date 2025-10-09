@@ -1,9 +1,9 @@
 import React, { Suspense } from 'react';
 import { Shield } from 'lucide-react';
 import {
-  // PasswordChangeForm,
-  // SecuritySettings,
-  // SessionsHistory,
+  PasswordChangeForm,
+  SecuritySettings,
+  SessionsHistory,
   SecuritySkeleton
 } from './components';
 
@@ -33,18 +33,18 @@ export default async function SeguridadPage({ params }: SeguridadPageProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Password Change Form */}
         <Suspense fallback={<SecuritySkeleton />}>
-          {/* <PasswordChangeForm studioSlug={studioSlug} /> */}
+          <PasswordChangeForm studioSlug={studioSlug} />
         </Suspense>
 
         {/* Security Settings */}
         <Suspense fallback={<SecuritySkeleton />}>
-          {/* <SecuritySettings studioSlug={studioSlug} /> */}
+          <SecuritySettings studioSlug={studioSlug} />
         </Suspense>
       </div>
 
       {/* Sessions History - Full Width */}
       <Suspense fallback={<SecuritySkeleton />}>
-        {/* <SessionsHistory studioSlug={studioSlug} /> */}
+        <SessionsHistory studioSlug={studioSlug} />
       </Suspense>
     </div>
   );
