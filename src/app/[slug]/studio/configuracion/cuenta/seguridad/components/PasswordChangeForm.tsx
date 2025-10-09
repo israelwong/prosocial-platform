@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn
 import { ZenButton } from '@/components/ui/zen';
 import { ZenInput } from '@/components/ui/zen';
 import { PasswordChangeSchema, type PasswordChangeForm as PasswordChangeFormType } from '@/lib/actions/schemas/seguridad/seguridad-schemas';
-import { cambiarContraseña } from '@/lib/actions/studio/config/seguridad/seguridad.actions';
+import { cambiarPassword } from '@/lib/actions/studio/config/seguridad/seguridad.actions';
 import { toast } from 'sonner';
 import { Key, Eye, EyeOff, Shield } from 'lucide-react';
 
@@ -35,7 +35,7 @@ export function PasswordChangeForm({ studioSlug }: PasswordChangeFormProps) {
         const loadingToast = toast.loading('Cambiando contraseña...');
 
         try {
-            const result = await cambiarContraseña(studioSlug, data);
+            const result = await cambiarPassword(studioSlug, data);
 
             if (result.success) {
                 toast.dismiss(loadingToast);
@@ -54,15 +54,15 @@ export function PasswordChangeForm({ studioSlug }: PasswordChangeFormProps) {
         }
     };
 
-  return (
-    <Card className="bg-zinc-900/50 border-zinc-800 h-full flex flex-col">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center gap-2">
-          <Key className="h-5 w-5" />
-          Cambiar Contraseña
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col">
+    return (
+        <Card className="bg-zinc-900/50 border-zinc-800 h-full flex flex-col">
+            <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                    <Key className="h-5 w-5" />
+                    Cambiar Contraseña
+                </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 flex-1 flex flex-col">
                     {/* Contraseña actual */}
                     <div className="relative">

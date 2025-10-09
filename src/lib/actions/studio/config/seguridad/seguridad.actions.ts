@@ -25,7 +25,7 @@ interface SecurityActionDetails {
 /**
  * Cambiar contraseña del usuario
  */
-export async function cambiarContraseña(
+export async function cambiarPassword(
     studioSlug: string,
     data: unknown
 ) {
