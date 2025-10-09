@@ -19,9 +19,9 @@ import { revalidatePath } from 'next/cache';
 // =====================================================
 
 /**
- * Obtener studioId desde el slug
+ * Obtener studio_id desde el slug
  */
-async function getStudioIdFromSlug(slug: string): Promise<string | null> {
+async function getstudio_idFromSlug(slug: string): Promise<string | null> {
     const studio = await prisma.studios.findUnique({
         where: { slug },
         select: { id: true },
@@ -47,8 +47,8 @@ export async function obtenerCatalogo(
     studioSlug: string
 ): Promise<ActionResponse<SeccionData[]>> {
     try {
-        const studioId = await getStudioIdFromSlug(studioSlug);
-        if (!studioId) {
+        const studio_id = await getstudio_idFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
@@ -60,7 +60,7 @@ export async function obtenerCatalogo(
                             include: {
                                 servicios: {
                                     where: {
-                                        studioId,
+                                        studio_id,
                                         status: 'active',
                                     },
                                     include: {
@@ -82,27 +82,27 @@ export async function obtenerCatalogo(
             nombre: seccion.nombre,
             descripcion: seccion.descripcion,
             orden: seccion.orden,
-            createdAt: seccion.createdAt,
-            updatedAt: seccion.updatedAt,
+            createdAt: seccion.created_at,
+            updatedAt: seccion.updated_at,
             categorias: seccion.seccion_categorias.map((sc) => ({
                 id: sc.servicio_categorias.id,
                 nombre: sc.servicio_categorias.nombre,
                 orden: sc.servicio_categorias.orden,
-                createdAt: sc.servicio_categorias.createdAt,
-                updatedAt: sc.servicio_categorias.updatedAt,
+                createdAt: sc.servicio_categorias.created_at,
+                updatedAt: sc.servicio_categorias.updated_at,
                 seccionId: seccion.id,
                 servicios: sc.servicio_categorias.servicios.map((s) => ({
                     id: s.id,
-                    studioId: s.studioId,
-                    servicioCategoriaId: s.servicioCategoriaId,
+                    studioId: s.studio_id,
+                    servicioCategoriaId: s.servicio_categoria_id,
                     nombre: s.nombre,
                     costo: s.costo,
                     gasto: s.gasto,
                     tipo_utilidad: s.tipo_utilidad,
                     orden: s.orden,
                     status: s.status,
-                    createdAt: s.createdAt,
-                    updatedAt: s.updatedAt,
+                    createdAt: s.created_at,
+                    updatedAt: s.updated_at,
                     gastos: s.servicio_gastos.map((g) => ({
                         id: g.id,
                         nombre: g.nombre,
@@ -136,8 +136,8 @@ export async function obtenerSecciones(): Promise<ActionResponse<SeccionData[]>>
             nombre: s.nombre,
             descripcion: s.descripcion,
             orden: s.orden,
-            createdAt: s.createdAt,
-            updatedAt: s.updatedAt,
+            createdAt: s.created_at,
+            updatedAt: s.updated_at,
             categorias: [],
         }));
 
@@ -188,8 +188,8 @@ export async function crearSeccion(
                 nombre: seccion.nombre,
                 descripcion: seccion.descripcion,
                 orden: seccion.orden,
-                createdAt: seccion.createdAt,
-                updatedAt: seccion.updatedAt,
+                createdAt: seccion.created_at,
+                updatedAt: seccion.updated_at,
                 categorias: [],
             },
         };
@@ -210,7 +210,7 @@ export async function crearSeccion(
  */
 export async function actualizarSeccion(
     studioSlug: string,
-    seccionId: string,
+    seccion_id: string,
     data: unknown
 ): Promise<ActionResponse<SeccionData>> {
     try {
@@ -218,7 +218,7 @@ export async function actualizarSeccion(
         const validatedData = SeccionSchema.partial().parse(data);
 
         const seccion = await prisma.studio_servicio_secciones.update({
-            where: { id: seccionId },
+            where: { id: seccion_id },
             data: validatedData,
         });
 
@@ -231,8 +231,8 @@ export async function actualizarSeccion(
                 nombre: seccion.nombre,
                 descripcion: seccion.descripcion,
                 orden: seccion.orden,
-                createdAt: seccion.createdAt,
-                updatedAt: seccion.updatedAt,
+                createdAt: seccion.created_at,
+                updatedAt: seccion.updated_at,
                 categorias: [],
             },
         };
@@ -253,12 +253,12 @@ export async function actualizarSeccion(
  */
 export async function eliminarSeccion(
     studioSlug: string,
-    seccionId: string
+    seccion_id: string
 ): Promise<ActionResponse<boolean>> {
     try {
         // Verificar si tiene categorías
         const seccion = await prisma.studio_servicio_secciones.findUnique({
-            where: { id: seccionId },
+            where: { id: seccion_id },
             include: {
                 seccion_categorias: true,
             },
@@ -276,7 +276,7 @@ export async function eliminarSeccion(
         }
 
         await prisma.studio_servicio_secciones.delete({
-            where: { id: seccionId },
+            where: { id: seccion_id },
         });
 
         revalidateCatalogo(studioSlug);
@@ -336,7 +336,7 @@ export async function obtenerCategorias(): Promise<ActionResponse<CategoriaData[
             include: {
                 seccion_categorias: {
                     select: {
-                        seccionId: true,
+                        seccion_id: true,
                     },
                 },
             },
@@ -347,9 +347,9 @@ export async function obtenerCategorias(): Promise<ActionResponse<CategoriaData[
             id: c.id,
             nombre: c.nombre,
             orden: c.orden,
-            createdAt: c.createdAt,
-            updatedAt: c.updatedAt,
-            seccionId: c.seccion_categorias?.seccionId,
+            createdAt: c.created_at,
+            updatedAt: c.updated_at,
+            seccion_id: c.seccion_categorias?.seccion_id,
             servicios: [],
         }));
 
@@ -369,7 +369,7 @@ export async function obtenerCategorias(): Promise<ActionResponse<CategoriaData[
 export async function crearCategoria(
     studioSlug: string,
     data: unknown,
-    seccionId: string
+    seccion_id: string
 ): Promise<ActionResponse<CategoriaData>> {
     try {
         const validatedData = CategoriaSchema.parse(data);
@@ -390,7 +390,7 @@ export async function crearCategoria(
                 orden: nuevoOrden,
                 seccion_categorias: {
                     create: {
-                        seccionId,
+                        seccion_id,
                     },
                 },
             },
@@ -404,9 +404,9 @@ export async function crearCategoria(
                 id: categoria.id,
                 nombre: categoria.nombre,
                 orden: categoria.orden,
-                createdAt: categoria.createdAt,
-                updatedAt: categoria.updatedAt,
-                seccionId,
+                createdAt: categoria.created_at,
+                updatedAt: categoria.updated_at,
+                seccionId: seccion_id,
                 servicios: [],
             },
         };
@@ -439,7 +439,7 @@ export async function actualizarCategoria(
             include: {
                 seccion_categorias: {
                     select: {
-                        seccionId: true,
+                        seccion_id: true,
                     },
                 },
             },
@@ -453,9 +453,9 @@ export async function actualizarCategoria(
                 id: categoria.id,
                 nombre: categoria.nombre,
                 orden: categoria.orden,
-                createdAt: categoria.createdAt,
-                updatedAt: categoria.updatedAt,
-                seccionId: categoria.seccion_categorias?.seccionId,
+                createdAt: categoria.created_at,
+                updatedAt: categoria.updated_at,
+                seccionId: categoria.seccion_categorias?.seccion_id,
                 servicios: [],
             },
         };
@@ -554,19 +554,19 @@ export async function obtenerServicios(
     studioSlug: string
 ): Promise<ActionResponse<ServicioData[]>> {
     try {
-        const studioId = await getStudioIdFromSlug(studioSlug);
-        if (!studioId) {
+        const studio_id = await getstudio_idFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
         const servicios = await prisma.studio_servicios.findMany({
-            where: { studioId },
+            where: { studio_id },
             include: {
                 servicio_categorias: {
                     include: {
                         seccion_categorias: {
                             select: {
-                                seccionId: true,
+                                seccion_id: true,
                             },
                         },
                     },
@@ -578,16 +578,16 @@ export async function obtenerServicios(
 
         const serviciosData: ServicioData[] = servicios.map((s) => ({
             id: s.id,
-            studioId: s.studioId,
-            servicioCategoriaId: s.servicioCategoriaId,
+            studioId: s.studio_id,
+            servicioCategoriaId: s.servicio_categoria_id,
             nombre: s.nombre,
             costo: s.costo,
             gasto: s.gasto,
             tipo_utilidad: s.tipo_utilidad,
             orden: s.orden,
             status: s.status,
-            createdAt: s.createdAt,
-            updatedAt: s.updatedAt,
+            createdAt: s.created_at,
+            updatedAt: s.updated_at,
             gastos: s.servicio_gastos.map((g) => ({
                 id: g.id,
                 nombre: g.nombre,
@@ -597,9 +597,9 @@ export async function obtenerServicios(
                 id: s.servicio_categorias.id,
                 nombre: s.servicio_categorias.nombre,
                 orden: s.servicio_categorias.orden,
-                createdAt: s.servicio_categorias.createdAt,
-                updatedAt: s.servicio_categorias.updatedAt,
-                seccionId: s.servicio_categorias.seccion_categorias?.seccionId,
+                createdAt: s.servicio_categorias.created_at,
+                updatedAt: s.servicio_categorias.updated_at,
+                seccionId: s.servicio_categorias.seccion_categorias?.seccion_id,
                 servicios: [],
             },
         }));
@@ -622,8 +622,8 @@ export async function crearServicio(
     data: unknown
 ): Promise<ActionResponse<ServicioData>> {
     try {
-        const studioId = await getStudioIdFromSlug(studioSlug);
-        if (!studioId) {
+        const studio_id = await getstudio_idFromSlug(studioSlug);
+        if (!studio_id) {
             return { success: false, error: 'Estudio no encontrado' };
         }
 
@@ -632,8 +632,8 @@ export async function crearServicio(
         // Obtener el siguiente número de orden para esta categoría
         const ultimoServicio = await prisma.studio_servicios.findFirst({
             where: {
-                studioId,
-                servicioCategoriaId: validatedData.servicioCategoriaId,
+                studio_id,
+                servicio_categoria_id: validatedData.servicioCategoriaId,
             },
             orderBy: { orden: 'desc' },
             select: { orden: true },
@@ -643,8 +643,8 @@ export async function crearServicio(
 
         const servicio = await prisma.studio_servicios.create({
             data: {
-                studioId,
-                servicioCategoriaId: validatedData.servicioCategoriaId,
+                studio_id,
+                servicio_categoria_id: validatedData.servicioCategoriaId,
                 nombre: validatedData.nombre,
                 costo: validatedData.costo,
                 gasto: validatedData.gasto,
@@ -672,16 +672,16 @@ export async function crearServicio(
             success: true,
             data: {
                 id: servicio.id,
-                studioId: servicio.studioId,
-                servicioCategoriaId: servicio.servicioCategoriaId,
+                studioId: servicio.studio_id,
+                servicioCategoriaId: servicio.servicio_categoria_id,
                 nombre: servicio.nombre,
                 costo: servicio.costo,
                 gasto: servicio.gasto,
                 tipo_utilidad: servicio.tipo_utilidad,
                 orden: servicio.orden,
                 status: servicio.status,
-                createdAt: servicio.createdAt,
-                updatedAt: servicio.updatedAt,
+                createdAt: servicio.created_at,
+                updatedAt: servicio.updated_at,
                 gastos: servicio.servicio_gastos.map((g) => ({
                     id: g.id,
                     nombre: g.nombre,
@@ -739,16 +739,16 @@ export async function actualizarServicio(
             success: true,
             data: {
                 id: servicio.id,
-                studioId: servicio.studioId,
-                servicioCategoriaId: servicio.servicioCategoriaId,
+                studioId: servicio.studio_id,
+                servicioCategoriaId: servicio.servicio_categoria_id,
                 nombre: servicio.nombre,
                 costo: servicio.costo,
                 gasto: servicio.gasto,
                 tipo_utilidad: servicio.tipo_utilidad,
                 orden: servicio.orden,
                 status: servicio.status,
-                createdAt: servicio.createdAt,
-                updatedAt: servicio.updatedAt,
+                createdAt: servicio.created_at,
+                updatedAt: servicio.updated_at,
                 gastos: servicio.servicio_gastos.map((g) => ({
                     id: g.id,
                     nombre: g.nombre,
@@ -811,8 +811,8 @@ export async function duplicarServicio(
         // Obtener el siguiente orden
         const ultimoServicio = await prisma.studio_servicios.findFirst({
             where: {
-                studioId: servicioOriginal.studioId,
-                servicioCategoriaId: servicioOriginal.servicioCategoriaId,
+                studio_id: servicioOriginal.studio_id,
+                servicio_categoria_id: servicioOriginal.servicio_categoria_id,
             },
             orderBy: { orden: 'desc' },
             select: { orden: true },
@@ -822,8 +822,8 @@ export async function duplicarServicio(
 
         const servicioNuevo = await prisma.studio_servicios.create({
             data: {
-                studioId: servicioOriginal.studioId,
-                servicioCategoriaId: servicioOriginal.servicioCategoriaId,
+                studio_id: servicioOriginal.studio_id,
+                servicio_categoria_id: servicioOriginal.servicio_categoria_id,
                 nombre: `${servicioOriginal.nombre} (Copia)`,
                 costo: servicioOriginal.costo,
                 gasto: servicioOriginal.gasto,
@@ -850,8 +850,8 @@ export async function duplicarServicio(
             success: true,
             data: {
                 id: servicioNuevo.id,
-                studioId: servicioNuevo.studioId,
-                servicioCategoriaId: servicioNuevo.servicioCategoriaId,
+                studioId: servicioNuevo.studio_id,
+                servicioCategoriaId: servicioNuevo.servicio_categoria_id,
                 nombre: servicioNuevo.nombre,
                 costo: servicioNuevo.costo,
                 gasto: servicioNuevo.gasto,
@@ -860,8 +860,8 @@ export async function duplicarServicio(
                 tipo_utilidad: servicioNuevo.tipo_utilidad,
                 orden: servicioNuevo.orden,
                 status: servicioNuevo.status,
-                createdAt: servicioNuevo.createdAt,
-                updatedAt: servicioNuevo.updatedAt,
+                createdAt: servicioNuevo.created_at,
+                updatedAt: servicioNuevo.updated_at,
                 gastos: servicioNuevo.servicio_gastos.map((g) => ({
                     id: g.id,
                     nombre: g.nombre,
@@ -893,7 +893,7 @@ export async function actualizarPosicionCatalogo(
     parentId?: string | null
 ): Promise<ActionResponse<boolean>> {
     try {
-        await getStudioIdFromSlug(studioSlug);
+        await getstudio_idFromSlug(studioSlug);
 
         if (itemType === 'seccion') {
             // Actualizar orden de sección
@@ -914,8 +914,8 @@ export async function actualizarPosicionCatalogo(
 
                     // Actualizar relación de sección
                     await tx.studio_seccion_categorias.update({
-                        where: { categoriaId: itemId },
-                        data: { seccionId: parentId },
+                        where: { categoria_id: itemId },
+                        data: { seccion_id: parentId },
                     });
                 });
             } else {
@@ -931,7 +931,7 @@ export async function actualizarPosicionCatalogo(
                     where: { id: itemId },
                     data: {
                         orden: newIndex,
-                        servicioCategoriaId: parentId,
+                        servicio_categoria_id: parentId,
                     },
                 });
             } else {

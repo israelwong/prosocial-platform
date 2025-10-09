@@ -38,13 +38,13 @@ export default async function SeguridadPage({ params }: SeguridadPageProps) {
 
         {/* Security Settings */}
         <Suspense fallback={<SecuritySkeleton />}>
-          <SecuritySettings studioSlug={studioSlug} />
+          {/* <SecuritySettings studioSlug={studioSlug} /> */}
         </Suspense>
       </div>
 
       {/* Sessions History - Full Width */}
       <Suspense fallback={<SecuritySkeleton />}>
-        <SessionsHistory studioSlug={studioSlug} />
+        {/* <SessionsHistory studioSlug={studioSlug} /> */}
       </Suspense>
     </div>
   );
