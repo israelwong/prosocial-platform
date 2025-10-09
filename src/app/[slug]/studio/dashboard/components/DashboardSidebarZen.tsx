@@ -1,15 +1,16 @@
 import React from 'react';
 import {
-    Kanban, Settings, BarChart3, Bot, LayoutTemplate, Sparkles, LogOut
+    Kanban, Settings, BarChart3, Bot, LayoutTemplate, Sparkles
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { getActiveModules } from '@/lib/modules';
 import {
     ZenSidebar, ZenSidebarContent, ZenSidebarHeader, ZenSidebarFooter, ZenSidebarMenu,
-    ZenSidebarMenuItem, ZenSidebarMenuButton
+    ZenSidebarMenuItem
 } from '@/components/ui/zen';
 import { StudioHeaderModal } from '../../components/StudioHeaderModal';
 import { ActiveLink } from '../../components/ActiveLink'; // Componente cliente para manejar el estado activo
+import { LogoutButton } from '@/components/auth/logout-button';
 
 // Definición de la apariencia de cada módulo
 const moduleConfig = {
@@ -147,10 +148,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
             <ZenSidebarFooter>
                 <ZenSidebarMenu>
                     <ZenSidebarMenuItem>
-                        <ZenSidebarMenuButton className="text-zinc-400 hover:text-white hover:bg-zinc-800">
-                            <LogOut className="w-4 h-4" />
-                            <span>Cerrar Sesión</span>
-                        </ZenSidebarMenuButton>
+                        <LogoutButton />
                     </ZenSidebarMenuItem>
                 </ZenSidebarMenu>
             </ZenSidebarFooter>

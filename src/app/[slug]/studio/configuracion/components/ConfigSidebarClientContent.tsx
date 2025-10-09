@@ -11,10 +11,11 @@ import {
 import { StudioHeaderModal } from '../../components/StudioHeaderModal';
 import {
     Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
-    ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2, LogOut,
+    ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2,
     UserCircle, ShoppingCart, Briefcase, Camera, Cog, Server, Shield, Database, FileText, Webhook, FormInput, LayoutDashboard,
     TrendingUp, Code, Link as LinkIcon, Image, Search, Edit, Gift, HelpCircle, Phone, Users2, Settings
 } from 'lucide-react';
+import { LogoutButton } from '@/components/auth/logout-button';
 import type { LucideIcon } from 'lucide-react';
 import type { NavigationConfig, NavItem, NavItemGroup } from './ConfiguracionSidebarZenV2';
 
@@ -249,10 +250,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
             <ZenSidebarFooter>
                 <ZenSidebarMenu>
                     <ZenSidebarMenuItem>
-                        <ZenSidebarMenuButton className="text-zinc-400 hover:text-white hover:bg-zinc-800">
-                            <LogOut className="w-4 h-4" />
-                            <span>Cerrar Sesión</span>
-                        </ZenSidebarMenuButton>
+                        <LogoutButton />
                     </ZenSidebarMenuItem>
                 </ZenSidebarMenu>
             </ZenSidebarFooter>

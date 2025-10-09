@@ -1,4 +1,4 @@
-// src/lib/middleware/setup-sync.middleware.ts
+// src/lib/services/setup-sync.service.ts
 
 import { SetupValidationService } from '@/lib/services/setup-validation.service';
 import { revalidatePath } from 'next/cache';

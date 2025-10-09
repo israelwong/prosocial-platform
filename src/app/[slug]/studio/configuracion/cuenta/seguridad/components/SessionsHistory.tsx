@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/shadcn/card';
 import { Button } from '@/components/ui/shadcn/button';
 import { Badge } from '@/components/ui/shadcn/badge';
-import { 
-    Monitor, 
-    Smartphone, 
-    Tablet, 
-    MapPin, 
-    Clock, 
-    CheckCircle, 
+import {
+    Monitor,
+    Smartphone,
+    Tablet,
+    MapPin,
+    Clock,
+    CheckCircle,
     XCircle,
     RefreshCw,
     AlertTriangle
@@ -57,28 +57,28 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
 
     const getDeviceIcon = (userAgent: string) => {
         if (!userAgent) return <Monitor className="h-4 w-4" />;
-        
+
         const ua = userAgent.toLowerCase();
-        
+
         // Detectar móviles
         if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
             return <Smartphone className="h-4 w-4" />;
         }
-        
+
         // Detectar tablets
         if (ua.includes('tablet') || ua.includes('ipad')) {
             return <Tablet className="h-4 w-4" />;
         }
-        
+
         // Por defecto, desktop
         return <Monitor className="h-4 w-4" />;
     };
 
     const getDeviceName = (userAgent: string) => {
         if (!userAgent || userAgent.trim() === '') return 'Dispositivo desconocido';
-        
+
         const ua = userAgent.toLowerCase();
-        
+
         // Detectar sistema operativo
         let os = 'Sistema desconocido';
         if (ua.includes('windows')) os = 'Windows';
@@ -86,7 +86,7 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         else if (ua.includes('linux')) os = 'Linux';
         else if (ua.includes('android')) os = 'Android';
         else if (ua.includes('iphone') || ua.includes('ipad')) os = 'iOS';
-        
+
         // Detectar navegador
         let browser = 'Navegador desconocido';
         if (ua.includes('chrome') && !ua.includes('edg')) browser = 'Chrome';
@@ -94,12 +94,12 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
         else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
         else if (ua.includes('edg')) browser = 'Edge';
         else if (ua.includes('opera')) browser = 'Opera';
-        
+
         // Si no se puede detectar nada, mostrar información básica
         if (os === 'Sistema desconocido' && browser === 'Navegador desconocido') {
             return 'Dispositivo desconocido';
         }
-        
+
         return `${browser} en ${os}`;
     };
 
@@ -146,12 +146,17 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
     }
 
     return (
-        <Card className="bg-zinc-900/50 border-zinc-800 h-full flex flex-col">
+        <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-white flex items-center gap-2">
                         <Clock className="h-5 w-5 text-blue-400" />
                         Historial de Sesiones
+                        {sessions.length > 0 && (
+                            <span className="text-sm text-zinc-400 font-normal">
+                                ({sessions.length} registros)
+                            </span>
+                        )}
                     </CardTitle>
                     <Button
                         variant="outline"
@@ -164,10 +169,10 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
                     </Button>
                 </div>
             </CardHeader>
-            
-            <CardContent className="flex-1 flex flex-col">
+
+            <CardContent>
                 {sessions.length === 0 ? (
-                    <div className="flex-1 flex items-center justify-center text-center">
+                    <div className="flex items-center justify-center py-8 text-center">
                         <div className="space-y-2">
                             <AlertTriangle className="h-8 w-8 text-zinc-500 mx-auto" />
                             <p className="text-zinc-400">No hay historial de sesiones</p>
@@ -175,49 +180,46 @@ export function SessionsHistory({ studioSlug }: SessionsHistoryProps) {
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-3 flex-1 overflow-y-auto">
+                    <div className="max-h-96 overflow-y-auto space-y-2 pr-2">
                         {sessions.map((session) => (
                             <div
                                 key={session.id}
-                                className="p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:bg-zinc-800/70 transition-colors"
+                                className="flex items-center justify-between p-3 bg-zinc-800/50 rounded-lg hover:bg-zinc-800/70 transition-colors"
                             >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-start gap-3">
-                                        <div className="flex-shrink-0 mt-1">
-                                            {getDeviceIcon(session.user_agent || '')}
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div className="flex-shrink-0">
+                                        {getDeviceIcon(session.user_agent || '')}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-white font-medium text-sm truncate">
+                                                {getActionLabel(session.action)}
+                                            </span>
+                                            <Badge
+                                                variant={session.success ? "default" : "destructive"}
+                                                className="text-xs px-2 py-0.5"
+                                            >
+                                                {session.success ? (
+                                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                                ) : (
+                                                    <XCircle className="h-3 w-3 mr-1" />
+                                                )}
+                                                {session.success ? 'OK' : 'Error'}
+                                            </Badge>
                                         </div>
-                                        <div className="space-y-1 flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-white font-medium">
-                                                    {getActionLabel(session.action)}
-                                                </span>
-                                                <Badge 
-                                                    variant={session.success ? "default" : "destructive"}
-                                                    className="text-xs"
-                                                >
-                                                    {session.success ? (
-                                                        <CheckCircle className="h-3 w-3 mr-1" />
-                                                    ) : (
-                                                        <XCircle className="h-3 w-3 mr-1" />
-                                                    )}
-                                                    {session.success ? 'Exitoso' : 'Fallido'}
-                                                </Badge>
+                                        <div className="text-xs text-zinc-400 space-y-1">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <span className="truncate">{getDeviceName(session.user_agent || '')}</span>
+                                                {session.ip_address && (
+                                                    <span className="flex items-center gap-1 text-zinc-500 flex-shrink-0">
+                                                        <MapPin className="h-3 w-3" />
+                                                        {session.ip_address}
+                                                    </span>
+                                                )}
                                             </div>
-                                            
-                                            <div className="text-sm text-zinc-400 space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span>{getDeviceName(session.user_agent || '')}</span>
-                                                    {session.ip_address && (
-                                                        <span className="flex items-center gap-1">
-                                                            <MapPin className="h-3 w-3" />
-                                                            {session.ip_address}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    <Clock className="h-3 w-3" />
-                                                    {formatDate(session.created_at)}
-                                                </div>
+                                            <div className="flex items-center gap-1">
+                                                <Clock className="h-3 w-3" />
+                                                {formatDate(session.created_at)}
                                             </div>
                                         </div>
                                     </div>

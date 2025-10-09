@@ -5,6 +5,7 @@ import { Bell, Sparkles, ExternalLink } from 'lucide-react';
 import { BreadcrumbHeader } from './BreadcrumbHeader';
 import { ZenButton } from '@/components/ui/zen';
 import { useZenMagicChat } from './ZenMagic';
+import { UserAvatar } from '@/components/auth/user-avatar';
 
 interface AppHeaderProps {
     studioSlug: string;
@@ -43,6 +44,9 @@ export function AppHeader({ studioSlug }: AppHeaderProps) {
                     <Sparkles className="h-5 w-5" />
                     <span className="sr-only">ZEN Magic</span>
                 </ZenButton>
+
+                {/* Avatar del usuario con modal de logout */}
+                <UserAvatar studioSlug={studioSlug} />
             </div>
         </header>
     );

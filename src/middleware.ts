@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/middleware";
 
 // Función para verificar rutas reservadas
 function isReservedPath(path: string): boolean {
@@ -22,6 +22,14 @@ function isReservedPath(path: string): boolean {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Redirección para cualquier [slug]/login a /login
+  const slugLoginMatch = pathname.match(/^\/([a-zA-Z0-9-]+)\/login$/);
+  if (slugLoginMatch) {
+    const slug = slugLoginMatch[1];
+    console.log(`🔄 [ZEN.PRO] Redirecting /${slug}/login to /login`);
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   // Rutas que requieren autenticación
   const protectedRoutes = ["/admin", "/agente"];
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -37,7 +45,7 @@ export async function middleware(request: NextRequest) {
   const isClienteProtected = isClienteRoute && !isReservedPath(pathname);
 
   if (isProtectedRoute || isStudioProtected || isClienteProtected) {
-    const supabase = await createClient();
+    const { supabase } = createClient(request, NextResponse.next());
 
     // Verificar autenticación
     const {
@@ -56,7 +64,16 @@ export async function middleware(request: NextRequest) {
 
     // Obtener el rol del usuario desde user_metadata
     const userRole = user.user_metadata?.role;
-    const studioSlug = user.user_metadata?.studio_slug;
+    let studioSlug = user.user_metadata?.studio_slug;
+
+    // Si no hay studio_slug en metadata, intentar obtenerlo de la URL
+    if (!studioSlug && isStudioProtected) {
+      const studioSlugFromPath = pathname.match(/^\/([a-zA-Z0-9-]+)\/studio/)?.[1];
+      if (studioSlugFromPath) {
+        studioSlug = studioSlugFromPath;
+        console.log('🔍 Middleware - Using studio_slug from URL:', studioSlug);
+      }
+    }
 
     console.log('🔍 Middleware - User Role:', userRole);
     console.log('🔍 Middleware - Studio Slug:', studioSlug);
@@ -71,7 +88,7 @@ export async function middleware(request: NextRequest) {
     console.log('🔍 Middleware - Has Access:', hasAccess);
 
     // Verificación adicional para rutas de studio
-    if (isStudioProtected && userRole === 'suscriptor') {
+    if (isStudioProtected && (userRole === 'suscriptor' || userRole === 'studio_owner')) {
       const studioSlugFromPath = pathname.match(/^\/([a-zA-Z0-9-]+)\/studio/)?.[1];
       console.log('🔍 Middleware - Studio Slug from Path:', studioSlugFromPath);
       console.log('🔍 Middleware - User Studio Slug:', studioSlug);
@@ -135,7 +152,7 @@ export async function middleware(request: NextRequest) {
 
   // Manejar rutas de studio sin slug - redirigir al slug del usuario
   if (pathname.startsWith('/studio') && !pathname.match(/^\/([a-zA-Z0-9-]+)\/studio/)) {
-    const supabase = await createClient();
+    const { supabase } = createClient(request, NextResponse.next());
     const { data: { user } } = await supabase.auth.getUser();
 
     if (user && user.user_metadata?.studio_slug) {
@@ -184,7 +201,8 @@ function checkRouteAccess(userRole: string, pathname: string): boolean {
       return pathname.startsWith("/agente");
 
     case "suscriptor":
-      // Suscriptor puede acceder a rutas de studio dinámicas [slug]/studio
+    case "studio_owner":
+      // Suscriptor y studio_owner pueden acceder a rutas de studio dinámicas [slug]/studio
       return pathname.match(/^\/([a-zA-Z0-9-]+)\/studio(\/.*)?$/) !== null;
 
     default:

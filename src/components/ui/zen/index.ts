@@ -47,6 +47,28 @@ export {
 export { ZenHeader } from './layout/ZenHeader';
 
 // =============================================================================
+// OVERLAYS COMPONENTS (DISPONIBLES)
+// =============================================================================
+export { ZenConfirmModal } from './overlays/ZenConfirmModal';
+export {
+  ZenDropdownMenu,
+  ZenDropdownMenuTrigger,
+  ZenDropdownMenuContent,
+  ZenDropdownMenuItem,
+  ZenDropdownMenuCheckboxItem,
+  ZenDropdownMenuRadioItem,
+  ZenDropdownMenuLabel,
+  ZenDropdownMenuSeparator,
+  ZenDropdownMenuShortcut,
+  ZenDropdownMenuGroup,
+  ZenDropdownMenuPortal,
+  ZenDropdownMenuSub,
+  ZenDropdownMenuSubContent,
+  ZenDropdownMenuSubTrigger,
+  ZenDropdownMenuRadioGroup,
+} from './overlays/ZenDropdownMenu';
+
+// =============================================================================
 // DESIGN TOKENS
 // =============================================================================
 export { ZEN_COLORS } from './tokens/colors';
