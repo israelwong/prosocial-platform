@@ -19,7 +19,7 @@ export interface AccessLog {
     ip_address: string | null;
     user_agent: string | null;
     success: boolean;
-    details: any;
+    details: unknown;
     created_at: Date;
 }
 
