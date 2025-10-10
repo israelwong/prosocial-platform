@@ -18,8 +18,9 @@ export function AppHeader({ studioSlug }: AppHeaderProps) {
             <div className="flex items-center">
                 <BreadcrumbHeader studioSlug={studioSlug} />
             </div>
-            <div className="flex items-center gap-4">
-                <ZenButton variant="ghost" size="icon" className="rounded-full">
+            <div className="flex items-center gap-2 lg:gap-4">
+                {/* Botones ocultos en mobile */}
+                <ZenButton variant="ghost" size="icon" className="rounded-full hidden lg:flex">
                     <Bell className="h-5 w-5" />
                     <span className="sr-only">Notificaciones</span>
                 </ZenButton>
@@ -27,7 +28,7 @@ export function AppHeader({ studioSlug }: AppHeaderProps) {
                 <ZenButton
                     variant="ghost"
                     size="icon"
-                    className="rounded-full text-zinc-400 hover:text-zinc-200"
+                    className="rounded-full text-zinc-400 hover:text-zinc-200 hidden lg:flex"
                     onClick={() => window.open(`/${studioSlug}`, '_blank')}
                     title="Ver página pública"
                 >
@@ -38,14 +39,14 @@ export function AppHeader({ studioSlug }: AppHeaderProps) {
                 <ZenButton
                     variant="ghost"
                     size="icon"
-                    className={`rounded-full ${isOpen ? 'bg-zinc-800 text-zinc-200' : 'text-zinc-400 hover:text-zinc-200'}`}
+                    className={`rounded-full ${isOpen ? 'bg-zinc-800 text-zinc-200' : 'text-zinc-400 hover:text-zinc-200'} hidden lg:flex`}
                     onClick={toggleChat}
                 >
                     <Sparkles className="h-5 w-5" />
                     <span className="sr-only">ZEN Magic</span>
                 </ZenButton>
 
-                {/* Avatar del usuario con modal de logout */}
+                {/* Avatar del usuario - siempre visible */}
                 <UserAvatar studioSlug={studioSlug} />
             </div>
         </header>

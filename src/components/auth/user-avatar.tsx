@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, LogOut, Settings, CreditCard, UserCircle } from "lucide-react";
+import { LogOut, Settings, CreditCard, UserCircle, Rocket, LayoutDashboard } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { logout } from "@/lib/actions/auth/logout.action";
 import { getCurrentUserClient } from "@/lib/auth/user-utils-client";
@@ -23,8 +24,14 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ className, studioSlug }: UserAvatarProps) {
-    const [user, setUser] = useState<any>(null);
-    const [userProfile, setUserProfile] = useState<any>(null);
+    const [user, setUser] = useState<{
+        email?: string;
+        user_metadata?: { full_name?: string };
+    } | null>(null);
+    const [userProfile, setUserProfile] = useState<{
+        fullName?: string | null;
+        avatarUrl?: string | null;
+    } | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const pathname = usePathname();
@@ -40,7 +47,10 @@ export function UserAvatar({ className, studioSlug }: UserAvatarProps) {
                     // Obtener perfil completo del usuario desde la base de datos
                     const authUser = await getCurrentUserClient();
                     if (authUser) {
-                        setUserProfile(authUser.profile);
+                        setUserProfile({
+                            fullName: authUser.profile.fullName,
+                            avatarUrl: authUser.profile.avatarUrl
+                        });
                     }
                 }
             } catch (error) {
@@ -79,8 +89,8 @@ export function UserAvatar({ className, studioSlug }: UserAvatarProps) {
     }
 
     // Obtener información del usuario con fallbacks
-    const userName = userProfile?.fullName || user.user_metadata?.full_name || user.email || "Usuario";
-    const userEmail = user.email;
+    const userName = userProfile?.fullName || user?.user_metadata?.full_name || user?.email || "Usuario";
+    const userEmail = user?.email;
     const avatarUrl = userProfile?.avatarUrl;
 
     // Generar iniciales para el fallback
@@ -99,6 +109,7 @@ export function UserAvatar({ className, studioSlug }: UserAvatarProps) {
     const menuRoutes = {
         perfil: `${basePath}/configuracion/cuenta/perfil`,
         suscripcion: `${basePath}/configuracion/cuenta/suscripcion`,
+        builder: `${basePath}/builder`,
         configuracion: isInConfiguracion ? `${basePath}/dashboard` : `${basePath}/configuracion`
     };
 
@@ -112,9 +123,11 @@ export function UserAvatar({ className, studioSlug }: UserAvatarProps) {
                 >
                     {avatarUrl ? (
                         <div className="w-8 h-8 rounded-full overflow-hidden">
-                            <img
+                            <Image
                                 src={avatarUrl}
                                 alt={userName}
+                                width={32}
+                                height={32}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                     // Si la imagen falla al cargar, mostrar fallback
@@ -158,10 +171,31 @@ export function UserAvatar({ className, studioSlug }: UserAvatarProps) {
                     </Link>
                 </ZenDropdownMenuItem>
 
+                <ZenDropdownMenuSeparator />
+
+                {/* Espacio de Trabajo */}
+                <div className="px-2 py-1.5">
+                    <div className="text-xs font-medium text-zinc-400">Espacio de Trabajo</div>
+                </div>
+
+                <ZenDropdownMenuItem className="cursor-pointer" asChild>
+                    <Link href={`/${studioSlug}/studio/dashboard`}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                    </Link>
+                </ZenDropdownMenuItem>
+
+                <ZenDropdownMenuItem className="cursor-pointer" asChild>
+                    <Link href={menuRoutes.builder}>
+                        <Rocket className="mr-2 h-4 w-4" />
+                        <span>Studio Builder</span>
+                    </Link>
+                </ZenDropdownMenuItem>
+
                 <ZenDropdownMenuItem className="cursor-pointer" asChild>
                     <Link href={menuRoutes.configuracion}>
                         <Settings className="mr-2 h-4 w-4" />
-                        <span>{isInConfiguracion ? 'Dashboard' : 'Configuración'}</span>
+                        <span>Configuración</span>
                     </Link>
                 </ZenDropdownMenuItem>
 

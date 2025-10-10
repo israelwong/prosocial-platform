@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-    Kanban, Settings, BarChart3, Bot, LayoutTemplate, Sparkles
+    Kanban, Settings, BarChart3, Bot, LayoutTemplate, Rocket, Sparkles
 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { getActiveModules } from '@/lib/modules';
@@ -91,7 +91,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
     const activeModules = await getActiveModules(studio.id);
 
     const mainNavItems = [
-        { href: './dashboard', icon: BarChart3, label: 'Dashboard' },
+        { href: `/${studioSlug}/studio/dashboard`, icon: BarChart3, label: 'Dashboard' },
     ];
 
     return (
@@ -121,7 +121,7 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                     {activeModules.map(module => {
                         const config = moduleConfig[module.slug as keyof typeof moduleConfig];
                         if (!config) return null;
-                        const href = `.${config.href}`;
+                        const href = `/${studioSlug}/studio${config.href}`;
 
                         return (
                             <ZenSidebarMenuItem key={module.id}>
@@ -137,7 +137,13 @@ export async function DashboardSidebarZen({ className, studioSlug }: DashboardSi
                 {/* Navegación Fija */}
                 <ZenSidebarMenu>
                     <ZenSidebarMenuItem>
-                        <ActiveLink href="./configuracion">
+                        <ActiveLink href={`/${studioSlug}/studio/builder`}>
+                            <Rocket className="w-4 h-4" />
+                            <span>Studio Builder</span>
+                        </ActiveLink>
+                    </ZenSidebarMenuItem>
+                    <ZenSidebarMenuItem>
+                        <ActiveLink href={`/${studioSlug}/studio/configuracion`}>
                             <Settings className="w-4 h-4" />
                             <span>Configuración</span>
                         </ActiveLink>

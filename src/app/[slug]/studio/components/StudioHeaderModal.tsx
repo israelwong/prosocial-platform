@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, usePathname } from 'next/navigation';
-import { ChevronDown, LayoutDashboard, Settings, User, CreditCard, Plus, Calendar, BarChart3, Users, Zap } from 'lucide-react';
+import { ChevronDown, User, CreditCard, Plus, Calendar, BarChart3, Users, Zap } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,12 +28,13 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
     // className is available for future styling if needed
     void className; // Suppress unused parameter warning
     const params = useParams();
-    const pathname = usePathname();
+    // const pathname = usePathname(); // Comentado ya que no se usa actualmente
     const slug = params.slug as string;
 
-    // Detectar si estamos en dashboard o configuración
-    const isDashboard = pathname.includes('/studio/dashboard');
-    const isConfiguracion = pathname.includes('/studio/configuracion');
+    // Variables de detección de ruta (mantenidas para futuras funcionalidades)
+    // const isDashboard = pathname.includes('/studio/dashboard');
+    // const isConfiguracion = pathname.includes('/studio/configuracion');
+    // const isBuilder = pathname.includes('/studio/builder');
 
     // Usar datos del studio pasados como prop o hook como fallback
     const {
@@ -190,7 +191,7 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href="./configuracion/cuenta/perfil"
+                        href="../configuracion/cuenta/perfil"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <User className="h-4 w-4" />
@@ -200,40 +201,13 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href="./configuracion/cuenta/suscripcion"
+                        href="../configuracion/cuenta/suscripcion"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <CreditCard className="h-4 w-4" />
                         Suscripción
                     </Link>
                 </DropdownMenuItem>
-
-                <DropdownMenuSeparator className="bg-zinc-700" />
-
-                {/* Navegación según ruta actual */}
-                {isConfiguracion && (
-                    <DropdownMenuItem asChild>
-                        <Link
-                            href="./dashboard"
-                            className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
-                        >
-                            <LayoutDashboard className="h-4 w-4" />
-                            Dashboard
-                        </Link>
-                    </DropdownMenuItem>
-                )}
-
-                {isDashboard && (
-                    <DropdownMenuItem asChild>
-                        <Link
-                            href="./configuracion"
-                            className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
-                        >
-                            <Settings className="h-4 w-4" />
-                            Configuración
-                        </Link>
-                    </DropdownMenuItem>
-                )}
 
                 <DropdownMenuSeparator className="bg-zinc-700" />
 
@@ -245,7 +219,7 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href="./dashboard/kanban"
+                        href="../dashboard/kanban"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <Plus className="h-4 w-4" />
@@ -255,7 +229,7 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href="./dashboard/agenda"
+                        href="../dashboard/agenda"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <Calendar className="h-4 w-4" />
@@ -265,7 +239,7 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href="./dashboard/contactos"
+                        href="../dashboard/contactos"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <Users className="h-4 w-4" />
@@ -275,7 +249,7 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href="./dashboard/finanzas"
+                        href="../dashboard/finanzas"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <BarChart3 className="h-4 w-4" />
@@ -285,7 +259,7 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
 
                 <DropdownMenuItem asChild>
                     <Link
-                        href="./configuracion/studio/identidad"
+                        href="./builder/identidad"
                         className="flex items-center gap-3 px-2 py-1.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700"
                     >
                         <Zap className="h-4 w-4" />
