@@ -1,13 +1,83 @@
 import React from 'react';
+import { notFound } from 'next/navigation';
+import { getStudioProfileBySlug } from '@/lib/actions/public/profile.actions';
+import { ProfilePageClient } from './perfil/ProfilePageClient';
+import { Metadata } from 'next';
 
-export default function AppPage() {
-    return (
-        <div>
-            <h1 className="text-2xl font-semibold text-white">Pagina principal</h1>
-            <p className="mt-2 text-zinc-400">
-                Pagina principal del estudio
-            </p>
-            {/* Aquí irá el contenido del dashboard */}
-        </div>
-    );
+interface PublicProfilePageProps {
+    params: Promise<{ slug: string }>;
+}
+
+/**
+ * Public Studio Profile Page
+ * Server component that fetches profile data and renders client component
+ * No authentication required - completely public
+ */
+export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
+    const { slug } = await params;
+
+    try {
+        // Fetch complete profile data
+        const result = await getStudioProfileBySlug({ slug });
+
+        if (!result.success || !result.data) {
+            console.error('❌ [PublicProfilePage] Failed to fetch profile:', result.error);
+            notFound();
+        }
+
+        const profileData = result.data;
+
+        return (
+            <ProfilePageClient profileData={profileData} />
+        );
+    } catch (error) {
+        console.error('❌ [PublicProfilePage] Error:', error);
+        notFound();
+    }
+}
+
+/**
+ * Generate metadata for SEO
+ */
+export async function generateMetadata({ params }: PublicProfilePageProps): Promise<Metadata> {
+    const { slug } = await params;
+
+    try {
+        const result = await getStudioProfileBySlug({ slug });
+
+        if (!result.success || !result.data) {
+            return {
+                title: 'Studio no encontrado',
+                description: 'El estudio solicitado no está disponible',
+            };
+        }
+
+        const { studio } = result.data;
+        const title = `${studio.studio_name}${studio.slogan ? ` - ${studio.slogan}` : ''}`;
+        const description = studio.description || `Perfil profesional de ${studio.studio_name}`;
+
+        return {
+            title,
+            description,
+            keywords: studio.keywords || undefined,
+            openGraph: {
+                title,
+                description,
+                images: studio.logo_url ? [studio.logo_url] : undefined,
+                type: 'profile',
+            },
+            twitter: {
+                card: 'summary_large_image',
+                title,
+                description,
+                images: studio.logo_url ? [studio.logo_url] : undefined,
+            },
+        };
+    } catch (error) {
+        console.error('❌ [generateMetadata] Error:', error);
+        return {
+            title: 'Studio no encontrado',
+            description: 'El estudio solicitado no está disponible',
+        };
+    }
 }

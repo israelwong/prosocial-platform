@@ -15,6 +15,7 @@ export { SeparadorZen } from './SeparadorZen';
 // FORM COMPONENTS (DISPONIBLES)
 // =============================================================================
 export { ZenTextarea } from './forms/ZenTextarea';
+export { ZenSelect } from './forms/ZenSelect';
 
 // =============================================================================
 // MEDIA COMPONENTS (DISPONIBLES)
@@ -84,6 +85,7 @@ export type { ZenCardProps, ZenCardHeaderProps, ZenCardContentProps, ZenCardTitl
 export type { ZenBadgeProps } from './base/ZenBadge';
 export type { ZenLabelProps } from './base/ZenLabel';
 export type { ZenTextareaProps } from './forms/ZenTextarea';
+export type { ZenSelectProps, ZenSelectOption } from './forms/ZenSelect';
 export type { SeparadorZenProps } from './SeparadorZen';
 
 // =============================================================================

@@ -1,24 +1,24 @@
 export interface Telefono {
     id: string;
     studio_id: string;
-    numero: string;
-    tipo: string; // Prisma retorna string genérico
-    activo: boolean;
+    number: string; // Actualizado: numero → number
+    type: string; // Actualizado: tipo → type
+    is_active: boolean; // Actualizado: activo → is_active
     order: number;
     created_at: Date;
     updated_at: Date;
 }
 
 export interface TelefonoCreate {
-    numero: string;
-    tipo: 'principal' | 'whatsapp' | 'emergencia' | 'oficina';
-    activo?: boolean;
+    number: string; // Actualizado: numero → number
+    type: 'principal' | 'whatsapp' | 'emergencia' | 'oficina'; // Actualizado: tipo → type
+    is_active?: boolean; // Actualizado: activo → is_active
 }
 
 export interface TelefonoUpdate {
-    numero?: string;
-    tipo?: 'principal' | 'whatsapp' | 'emergencia' | 'oficina';
-    activo?: boolean;
+    number?: string; // Actualizado: numero → number
+    type?: 'principal' | 'whatsapp' | 'emergencia' | 'oficina'; // Actualizado: tipo → type
+    is_active?: boolean; // Actualizado: activo → is_active
 }
 
 export interface ContactoData {

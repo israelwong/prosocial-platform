@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Phone, CheckCircle } from 'lucide-react';
 import { Telefono, TelefonoCreate, TIPOS_TELEFONO } from '../types';
 
-type TipoTelefono = TelefonoCreate['tipo'];
+type TipoTelefono = TelefonoCreate['type']; // Actualizado: tipo → type
 
 interface ContactoModalZenProps {
     isOpen: boolean;
@@ -21,24 +21,24 @@ interface ContactoModalZenProps {
 
 export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: ContactoModalZenProps) {
     const [formData, setFormData] = useState<TelefonoCreate>({
-        numero: '',
-        tipo: 'principal',
-        activo: true
+        number: '', // Actualizado: numero → number
+        type: 'principal', // Actualizado: tipo → type
+        is_active: true // Actualizado: activo → is_active
     });
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         if (editingTelefono) {
             setFormData({
-                numero: editingTelefono.numero,
-                tipo: editingTelefono.tipo as 'principal' | 'whatsapp' | 'emergencia' | 'oficina',
-                activo: editingTelefono.activo
+                number: editingTelefono.number, // Actualizado: numero → number
+                type: editingTelefono.type as 'principal' | 'whatsapp' | 'emergencia' | 'oficina', // Actualizado: tipo → type
+                is_active: editingTelefono.is_active // Actualizado: activo → is_active
             });
         } else {
             setFormData({
-                numero: '',
-                tipo: 'principal',
-                activo: true
+                number: '', // Actualizado: numero → number
+                type: 'principal', // Actualizado: tipo → type
+                is_active: true // Actualizado: activo → is_active
             });
         }
     }, [editingTelefono, isOpen]);
@@ -46,7 +46,7 @@ export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: C
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!formData.numero.trim()) {
+        if (!formData.number.trim()) { // Actualizado: numero → number
             return;
         }
 
@@ -67,7 +67,7 @@ export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: C
     };
 
     const isEditing = !!editingTelefono;
-    const tipoInfo = TIPOS_TELEFONO.find(t => t.value === formData.tipo);
+    const tipoInfo = TIPOS_TELEFONO.find(t => t.value === formData.type); // Actualizado: tipo → type
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -95,10 +95,10 @@ export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: C
                                 Número de Teléfono
                             </ZenLabel>
                             <ZenInput
-                                id="numero"
+                                id="number" // Actualizado: numero → number
                                 label=""
-                                value={formData.numero}
-                                onChange={(e) => setFormData(prev => ({ ...prev, numero: e.target.value }))}
+                                value={formData.number} // Actualizado: numero → number
+                                onChange={(e) => setFormData(prev => ({ ...prev, number: e.target.value }))} // Actualizado: numero → number
                                 placeholder="+52 55 1234 5678"
                                 disabled={saving}
                                 className="w-full"
@@ -111,8 +111,8 @@ export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: C
                                 Tipo de Teléfono
                             </ZenLabel>
                             <Select
-                                value={formData.tipo}
-                                onValueChange={(value: TipoTelefono) => setFormData(prev => ({ ...prev, tipo: value }))}
+                                value={formData.type} // Actualizado: tipo → type
+                                onValueChange={(value: TipoTelefono) => setFormData(prev => ({ ...prev, type: value }))} // Actualizado: tipo → type
                                 disabled={saving}
                             >
                                 <SelectTrigger className="w-full bg-zinc-800 border-zinc-700 text-white">
@@ -155,9 +155,9 @@ export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: C
                                     </p>
                                 </div>
                                 <Switch
-                                    id="activo"
-                                    checked={formData.activo}
-                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, activo: checked }))}
+                                    id="is_active" // Actualizado: activo → is_active
+                                    checked={formData.is_active} // Actualizado: activo → is_active
+                                    onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_active: checked }))} // Actualizado: activo → is_active
                                     disabled={saving}
                                     className="data-[state=checked]:bg-blue-600"
                                 />
@@ -179,7 +179,7 @@ export function ContactoModalZen({ isOpen, onClose, onSave, editingTelefono }: C
                             type="submit"
                             variant="primary"
                             loading={saving}
-                            disabled={!formData.numero.trim() || saving}
+                            disabled={!formData.number.trim() || saving} // Actualizado: numero → number
                             className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
                             {!saving && (

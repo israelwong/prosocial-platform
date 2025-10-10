@@ -54,10 +54,10 @@ export async function obtenerRedesSocialesStudio(
     }
 
     // 3. Obtener redes sociales
-    const redesSociales = await prisma.studio_redes_sociales.findMany({
+    const redesSociales = await prisma.studio_social_networks.findMany({
       where: whereClause,
       include: {
-        plataforma: true,
+        platform: true,
       },
       orderBy: { order: "asc" },
     });
@@ -95,11 +95,11 @@ export async function crearRedSocial(
       throw new Error("Plataforma de red social no encontrada");
     }
 
-    const existingRed = await prisma.studio_redes_sociales.findFirst({
+    const existingRed = await prisma.studio_social_networks.findFirst({
       where: {
         studio_id: studio.id,
-        plataformaId: validatedData.plataformaId,
-        activo: true,
+        platform_id: validatedData.plataformaId,
+        is_active: true,
       },
     });
 
@@ -108,15 +108,15 @@ export async function crearRedSocial(
     }
 
     // 4. Crear red social
-    const nuevaRedSocial = await prisma.studio_redes_sociales.create({
+    const nuevaRedSocial = await prisma.studio_social_networks.create({
       data: {
         studio_id: studio.id,
-        plataformaId: validatedData.plataformaId,
+        platform_id: validatedData.plataformaId,
         url: validatedData.url,
-        activo: validatedData.activo,
+        is_active: validatedData.activo,
       },
       include: {
-        plataforma: true,
+        platform: true,
       },
     });
 
@@ -137,11 +137,11 @@ export async function actualizarRedSocial(
     const validatedData = RedSocialUpdateSchema.parse(data);
 
     // 2. Obtener red social existente
-    const existingRedSocial = await prisma.studio_redes_sociales.findUnique({
+    const existingRedSocial = await prisma.studio_social_networks.findUnique({
       where: { id: redSocialId },
       include: {
         studio: { select: { slug: true } },
-        plataforma: true
+        platform: true
       },
     });
 
@@ -150,14 +150,14 @@ export async function actualizarRedSocial(
     }
 
     // 3. Actualizar red social
-    const redSocialActualizada = await prisma.studio_redes_sociales.update({
+    const redSocialActualizada = await prisma.studio_social_networks.update({
       where: { id: redSocialId },
       data: {
         ...(validatedData.url && { url: validatedData.url }),
         ...(validatedData.activo !== undefined && { activo: validatedData.activo }),
       },
       include: {
-        plataforma: true,
+        platform: true,
       },
     });
 
@@ -201,14 +201,14 @@ export async function actualizarRedesSocialesBulk(
     // 4. Actualizar todas las redes sociales en una transacción
     const resultados = await prisma.$transaction(
       validatedData.redesSociales.map((red) =>
-        prisma.studio_redes_sociales.update({
+        prisma.studio_social_networks.update({
           where: { id: red.id },
           data: {
             ...(red.url && { url: red.url }),
             ...(red.activo !== undefined && { activo: red.activo }),
           },
           include: {
-            plataforma: true,
+            platform: true,
           },
         })
       )
@@ -225,11 +225,11 @@ export async function actualizarRedesSocialesBulk(
 export async function eliminarRedSocial(redSocialId: string) {
   return await retryDatabaseOperation(async () => {
     // 1. Obtener red social existente
-    const existingRedSocial = await prisma.studio_redes_sociales.findUnique({
+    const existingRedSocial = await prisma.studio_social_networks.findUnique({
       where: { id: redSocialId },
       include: {
         studio: { select: { slug: true } },
-        plataforma: true
+        platform: true
       },
     });
 
@@ -238,7 +238,7 @@ export async function eliminarRedSocial(redSocialId: string) {
     }
 
     // 2. Eliminar red social
-    await prisma.studio_redes_sociales.delete({
+    await prisma.studio_social_networks.delete({
       where: { id: redSocialId },
     });
 
@@ -259,11 +259,11 @@ export async function toggleRedSocialEstado(
     const validatedData = RedSocialToggleSchema.parse(data);
 
     // 2. Obtener red social existente
-    const existingRedSocial = await prisma.studio_redes_sociales.findUnique({
+    const existingRedSocial = await prisma.studio_social_networks.findUnique({
       where: { id: redSocialId },
       include: {
         studio: { select: { slug: true } },
-        plataforma: true
+        platform: true
       },
     });
 
@@ -272,11 +272,11 @@ export async function toggleRedSocialEstado(
     }
 
     // 3. Actualizar estado
-    const redSocialActualizada = await prisma.studio_redes_sociales.update({
+    const redSocialActualizada = await prisma.studio_social_networks.update({
       where: { id: redSocialId },
-      data: { activo: validatedData.activo },
+      data: { is_active: validatedData.activo },
       include: {
-        plataforma: true,
+        platform: true,
       },
     });
 
@@ -302,14 +302,14 @@ export async function obtenerEstadisticasRedesSociales(studioSlug: string) {
 
     // 2. Obtener estadísticas
     const [total, activas, inactivas] = await Promise.all([
-      prisma.studio_redes_sociales.count({
+      prisma.studio_social_networks.count({
         where: { studio_id: studio.id },
       }),
-      prisma.studio_redes_sociales.count({
-        where: { studio_id: studio.id, activo: true },
+      prisma.studio_social_networks.count({
+        where: { studio_id: studio.id, is_active: true },
       }),
-      prisma.studio_redes_sociales.count({
-        where: { studio_id: studio.id, activo: false },
+      prisma.studio_social_networks.count({
+        where: { studio_id: studio.id, is_active: false },
       }),
     ]);
 
@@ -337,7 +337,7 @@ export async function reordenarRedesSociales(studioSlug: string, redes: Array<{ 
 
     // 2. Actualizar el orden de cada red social
     const updatePromises = redes.map(({ id, order }) =>
-      prisma.studio_redes_sociales.update({
+      prisma.studio_social_networks.update({
         where: {
           id,
           studio_id: studio.id // Asegurar que pertenece al studio

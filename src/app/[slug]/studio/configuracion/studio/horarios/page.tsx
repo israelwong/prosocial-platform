@@ -9,8 +9,18 @@ import { toast } from 'sonner';
 import { HorariosStatsZen } from './components/HorariosStatsZen';
 import { HorariosListZen } from './components/HorariosListZen';
 import { HorariosSkeletonZen } from './components/HorariosSkeletonZen';
-import { Horario } from '@/lib/actions/schemas/horarios-schemas';
-import { DiaSemana } from '@/lib/actions/schemas/horarios-schemas';
+
+// Tipo local para evitar problemas de cache de TypeScript
+type Horario = {
+  id: string;
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+  order: number;
+  created_at: Date;
+  updated_at: Date;
+};
 import {
   obtenerHorariosStudio,
   toggleHorarioEstado,
@@ -59,9 +69,9 @@ export default function HorariosPage() {
       if (horariosData.length === 0) {
         await inicializarHorariosPorDefecto(slug);
         const horariosInicializados = await obtenerHorariosStudio(slug);
-        setHorarios(horariosInicializados);
+        setHorarios(horariosInicializados as Horario[]);
       } else {
-        setHorarios(horariosData);
+        setHorarios(horariosData as Horario[]);
       }
     } catch (err) {
       console.error('❌ Error loading horarios data:', err);
@@ -112,13 +122,23 @@ export default function HorariosPage() {
 
   const handleUpdateHorario = async (id: string, data: { day_of_week: string; start_time: string; end_time: string }) => {
     try {
+      // Obtener el horario actual para mantener is_active y order
+      const horarioActual = horarios.find(h => h.id === id);
+      if (!horarioActual) return;
+
       // Actualizar optimísticamente
       setHorarios(prev => prev.map(h =>
-        h.id === id ? { ...h, ...data } : h
+        h.id === id ? { ...h, ...data } as Horario : h
       ));
 
-      // Llamar Server Action
-      await actualizarHorario(id, { id, studio_slug: slug, ...data });
+      // Llamar Server Action con todos los campos requeridos
+      await actualizarHorario(id, {
+        id,
+        studio_slug: slug,
+        ...data,
+        is_active: horarioActual.is_active,
+        order: horarioActual.order
+      } as Parameters<typeof actualizarHorario>[1]);
 
       toast.success('Horario actualizado exitosamente');
     } catch (err) {
@@ -133,9 +153,12 @@ export default function HorariosPage() {
 
   const handleAddHorario = async (data: { day_of_week: string; start_time: string; end_time: string; is_active: boolean }) => {
     try {
-      // Crear nuevo horario
-      const nuevoHorario = await crearHorario(slug, data);
-      setHorarios(prev => [...prev, nuevoHorario]);
+      // Crear nuevo horario con order por defecto
+      const nuevoHorario = await crearHorario(slug, {
+        ...data,
+        order: horarios.length // Usar la longitud actual como order
+      } as Parameters<typeof crearHorario>[1]);
+      setHorarios(prev => [...prev, nuevoHorario as Horario]);
       toast.success('Horario agregado exitosamente');
     } catch (err) {
       console.error('Error creating horario:', err);

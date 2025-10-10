@@ -70,9 +70,9 @@ export default function ContactoPageZen() {
       const telefonosConTipos = (data.telefonos || []).map(telefono => ({
         id: telefono.id,
         studio_id: telefono.studio_id,
-        numero: telefono.numero,
-        tipo: telefono.tipo, // Mantener como string genérico
-        activo: telefono.activo,
+        number: telefono.number, // Actualizado: numero → number
+        type: telefono.type, // Actualizado: tipo → type
+        is_active: telefono.is_active, // Actualizado: activo → is_active
         order: telefono.order,
         created_at: telefono.created_at,
         updated_at: telefono.updated_at
@@ -124,7 +124,7 @@ export default function ContactoPageZen() {
         setTelefonos(prev => prev.map(t =>
           t.id === editingTelefono.id ? {
             ...telefonoActualizado,
-            tipo: telefonoActualizado.tipo // Mantener como string genérico
+            type: telefonoActualizado.type // Actualizado: tipo → type
           } : t
         ));
 
@@ -132,11 +132,11 @@ export default function ContactoPageZen() {
       } else {
         const nuevoTelefono = await crearTelefono(slug, {
           ...data,
-          activo: data.activo ?? true,
+          is_active: data.is_active ?? true, // Actualizado: activo → is_active
         });
         setTelefonos(prev => [...prev, {
           ...nuevoTelefono,
-          tipo: nuevoTelefono.tipo // Mantener como string genérico
+          type: nuevoTelefono.type // Actualizado: tipo → type
         }]);
         toast.success('Teléfono agregado exitosamente');
       }
@@ -161,29 +161,29 @@ export default function ContactoPageZen() {
     }
   };
 
-  const handleToggleActive = async (id: string, activo: boolean) => {
+  const handleToggleActive = async (id: string, is_active: boolean) => {
     try {
       setTelefonos(prev => prev.map(t =>
-        t.id === id ? { ...t, activo } : t
+        t.id === id ? { ...t, is_active } : t
       ));
 
-      const telefonoActualizado = await toggleTelefonoEstado(id, { id, activo });
+      const telefonoActualizado = await toggleTelefonoEstado(id, { id, is_active }); // Actualizado: activo → is_active
 
       setTelefonos(prev => prev.map(t =>
         t.id === id ? {
           ...telefonoActualizado,
-          tipo: telefonoActualizado.tipo // Mantener como string genérico
+          type: telefonoActualizado.type // Actualizado: tipo → type
         } : t
       ));
 
-      toast.success(`Teléfono ${activo ? 'activado' : 'desactivado'} exitosamente`);
+      toast.success(`Teléfono ${is_active ? 'activado' : 'desactivado'} exitosamente`);
     } catch (err) {
       console.error('Error toggling telefono:', err);
       const errorMessage = err instanceof Error ? err.message : 'Error al cambiar estado del teléfono';
       toast.error(errorMessage);
 
       setTelefonos(prev => prev.map(t =>
-        t.id === id ? { ...t, activo: !activo } : t
+        t.id === id ? { ...t, is_active: !is_active } : t
       ));
     }
   };

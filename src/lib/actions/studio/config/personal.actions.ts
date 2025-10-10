@@ -457,13 +457,13 @@ export async function obtenerCategoriasPersonal(studioSlug: string): Promise<Cat
             tipo: categoria.tipo,
             color: categoria.color,
             icono: categoria.icono,
-            esDefault: categoria.es_default,
+            esDefault: categoria.is_default,
             orden: categoria.order,
-            isActive: categoria.isActive,
+            isActive: categoria.is_active,
             createdAt: categoria.created_at,
             updatedAt: categoria.updated_at,
             personalCount: categoria._count?.personal || 0,
-            _count: categoria._count
+            _count: categoria._count || { personal: 0 }
         }));
 
         return { success: true, data: categoriasMapeadas };
@@ -515,7 +515,7 @@ export async function crearCategoriaPersonal(
                 color: validatedData.color || null,
                 icono: validatedData.icono || null,
                 tipo: validatedData.tipo,
-                es_default: validatedData.esDefault,
+                is_default: validatedData.esDefault,
                 order: validatedData.orden,
                 is_active: validatedData.isActive
             },
@@ -537,12 +537,13 @@ export async function crearCategoriaPersonal(
             tipo: categoria.tipo,
             color: categoria.color,
             icono: categoria.icono,
-            esDefault: categoria.es_default,
+            esDefault: categoria.is_default,
             orden: categoria.order,
-            isActive: categoria.isActive,
+            isActive: categoria.is_active,
             createdAt: categoria.created_at,
             updatedAt: categoria.updated_at,
-            personalCount: categoria._count?.personal || 0
+            personalCount: categoria._count?.personal || 0,
+            _count: categoria._count || { personal: 0 }
         };
 
         return { success: true, data: categoriaMapeada };
@@ -590,7 +591,7 @@ export async function actualizarCategoriaPersonal(
         }
 
         // Si se está cambiando el nombre, verificar que no existe otra con el mismo nombre
-        if (validatedData.nombre && validatedData.nombre !== existingCategoria.nombre) {
+        if (validatedData.nombre && validatedData.nombre !== existingCategoria.name) {
             const duplicateCategoria = await prisma.studio_categorias_personal.findFirst({
                 where: {
                     studio_id: studio.id,
@@ -622,7 +623,25 @@ export async function actualizarCategoriaPersonal(
             }
         });
 
-        return { success: true, data: categoria };
+        // Mapear los datos para que coincidan con la interfaz
+        const categoriaMapeada = {
+            id: categoria.id,
+            projectId: categoria.studio_id,
+            nombre: categoria.name,
+            descripcion: categoria.description,
+            tipo: categoria.tipo,
+            color: categoria.color,
+            icono: categoria.icono,
+            esDefault: categoria.is_default,
+            orden: categoria.order,
+            isActive: categoria.is_active,
+            createdAt: categoria.created_at,
+            updatedAt: categoria.updated_at,
+            personalCount: categoria._count?.personal || 0,
+            _count: categoria._count || { personal: 0 }
+        };
+
+        return { success: true, data: categoriaMapeada };
     } catch (error) {
         console.error('Error al actualizar categoría de personal:', error);
         if (error instanceof Error && error.name === 'ZodError') {
@@ -675,7 +694,7 @@ export async function eliminarCategoriaPersonal(
         }
 
         // No permitir eliminar categorías del sistema
-        if (existingCategoria.esDefault) {
+        if (existingCategoria.is_default) {
             return { success: false, error: 'No se puede eliminar una categoría del sistema' };
         }
 

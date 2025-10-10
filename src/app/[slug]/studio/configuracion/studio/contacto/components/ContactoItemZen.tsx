@@ -12,7 +12,7 @@ interface ContactoItemZenProps {
     telefono: Telefono;
     onDelete: (id: string) => void;
     onEdit: (telefono: Telefono) => void;
-    onToggleActive: (id: string, activo: boolean) => void;
+    onToggleActive: (id: string, is_active: boolean) => void; // Actualizado: activo → is_active
 }
 
 export function ContactoItemZen({ telefono, onDelete, onEdit, onToggleActive }: ContactoItemZenProps) {
@@ -25,9 +25,9 @@ export function ContactoItemZen({ telefono, onDelete, onEdit, onToggleActive }: 
 
     const handleToggleTelefono = async () => {
         try {
-            await onToggleActive(telefono.id, !telefono.activo);
-            toast.success(`Teléfono ${!telefono.activo ? 'activado' : 'desactivado'} exitosamente`);
-        } catch (error) {
+            await onToggleActive(telefono.id, !telefono.is_active); // Actualizado: activo → is_active
+            toast.success(`Teléfono ${!telefono.is_active ? 'activado' : 'desactivado'} exitosamente`); // Actualizado: activo → is_active
+        } catch {
             toast.error('Error al cambiar estado del teléfono');
         }
     };
@@ -42,7 +42,7 @@ export function ContactoItemZen({ telefono, onDelete, onEdit, onToggleActive }: 
             await onDelete(telefono.id);
             setShowDeleteModal(false);
             toast.success('Teléfono eliminado exitosamente');
-        } catch (error) {
+        } catch {
             toast.error('Error al eliminar teléfono');
         } finally {
             setDeleting(false);
@@ -53,24 +53,24 @@ export function ContactoItemZen({ telefono, onDelete, onEdit, onToggleActive }: 
         setShowDeleteModal(false);
     };
 
-    const tipoInfo = getTipoInfo(telefono.tipo);
+    const tipoInfo = getTipoInfo(telefono.type); // Actualizado: tipo → type
 
     return (
         <>
-            <div className={`p-4 bg-zinc-900/30 rounded-lg border transition-all duration-200 hover:bg-zinc-900/50 ${telefono.activo
+            <div className={`p-4 bg-zinc-900/30 rounded-lg border transition-all duration-200 hover:bg-zinc-900/50 ${telefono.is_active // Actualizado: activo → is_active
                 ? 'border-zinc-700 hover:border-zinc-600'
                 : 'border-zinc-800 opacity-60 hover:opacity-80'
                 }`}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-3">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${telefono.activo ? 'bg-green-900/20' : 'bg-zinc-800'
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${telefono.is_active ? 'bg-green-900/20' : 'bg-zinc-800' // Actualizado: activo → is_active
                                 }`}>
-                                <Phone className={`h-5 w-5 ${telefono.activo ? 'text-green-400' : 'text-zinc-500'
+                                <Phone className={`h-5 w-5 ${telefono.is_active ? 'text-green-400' : 'text-zinc-500' // Actualizado: activo → is_active
                                     }`} />
                             </div>
                             <div>
-                                <p className="text-white font-medium text-lg">{telefono.numero}</p>
+                                <p className="text-white font-medium text-lg">{telefono.number}</p> {/* Actualizado: numero → number */}
                                 <div className="flex items-center gap-2 mt-1">
                                     <ZenBadge
                                         variant="secondary"
@@ -80,14 +80,14 @@ export function ContactoItemZen({ telefono, onDelete, onEdit, onToggleActive }: 
                                         {tipoInfo.label}
                                     </ZenBadge>
                                     <div className="flex items-center gap-1">
-                                        {telefono.activo ? (
+                                        {telefono.is_active ? ( // Actualizado: activo → is_active
                                             <CheckCircle className="h-3 w-3 text-green-400" />
                                         ) : (
                                             <XCircle className="h-3 w-3 text-red-400" />
                                         )}
-                                        <span className={`text-xs ${telefono.activo ? 'text-green-400' : 'text-red-400'
+                                        <span className={`text-xs ${telefono.is_active ? 'text-green-400' : 'text-red-400' // Actualizado: activo → is_active
                                             }`}>
-                                            {telefono.activo ? 'Activo' : 'Inactivo'}
+                                            {telefono.is_active ? 'Activo' : 'Inactivo'} {/* Actualizado: activo → is_active */}
                                         </span>
                                     </div>
                                 </div>
@@ -100,12 +100,12 @@ export function ContactoItemZen({ telefono, onDelete, onEdit, onToggleActive }: 
                             variant="outline"
                             size="sm"
                             onClick={handleToggleTelefono}
-                            className={`h-9 px-4 text-xs transition-colors ${telefono.activo
+                            className={`h-9 px-4 text-xs transition-colors ${telefono.is_active // Actualizado: activo → is_active
                                 ? 'border-green-600 text-green-400 hover:bg-green-900/20 hover:border-green-500'
                                 : 'border-zinc-600 text-zinc-400 hover:bg-zinc-700 hover:border-zinc-500'
                                 }`}
                         >
-                            {telefono.activo ? 'Desactivar' : 'Activar'}
+                            {telefono.is_active ? 'Desactivar' : 'Activar'} {/* Actualizado: activo → is_active */}
                         </ZenButton>
 
                         <ZenButton
@@ -137,7 +137,7 @@ export function ContactoItemZen({ telefono, onDelete, onEdit, onToggleActive }: 
                 onClose={handleDeleteCancel}
                 onConfirm={handleDeleteConfirm}
                 title="Eliminar teléfono"
-                description={`¿Estás seguro de que quieres eliminar el teléfono ${telefono.numero}? Esta acción no se puede deshacer.`}
+                description={`¿Estás seguro de que quieres eliminar el teléfono ${telefono.number}? Esta acción no se puede deshacer.`}
                 confirmText="Eliminar"
                 cancelText="Cancelar"
                 variant="destructive"

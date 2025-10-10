@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ZenCard, ZenCardContent } from '@/components/ui/zen';
 import { ZenButton } from '@/components/ui/zen';
-import { Clock, Edit, Trash2, Check, X } from 'lucide-react';
+import { Clock, Edit, Check, X } from 'lucide-react';
 import { Horario, DIAS_SEMANA_MAP } from '@/lib/actions/schemas/horarios-schemas';
 import { HorarioFormZen } from './HorarioFormZen';
 
@@ -46,7 +46,7 @@ export function HorarioItemZen({ horario, onToggle, onUpdate }: HorarioItemZenPr
 
     if (isEditing) {
         return (
-            <ZenCard variant="outline" padding="md">
+            <ZenCard variant="outlined" padding="md">
                 <ZenCardContent>
                     <HorarioFormZen
                         initialData={{
@@ -67,11 +67,11 @@ export function HorarioItemZen({ horario, onToggle, onUpdate }: HorarioItemZenPr
 
     return (
         <ZenCard
-            variant={horario.is_active ? "default" : "outline"}
+            variant={horario.is_active ? "default" : "outlined"}
             padding="md"
             className={`transition-all duration-200 ${horario.is_active
-                    ? 'border-zinc-600 hover:border-zinc-500'
-                    : 'border-zinc-700 bg-zinc-800/30'
+                ? 'border-zinc-600 hover:border-zinc-500'
+                : 'border-zinc-700 bg-zinc-800/30'
                 }`}
         >
             <ZenCardContent>
@@ -81,7 +81,7 @@ export function HorarioItemZen({ horario, onToggle, onUpdate }: HorarioItemZenPr
                         <div className="flex items-center gap-2">
                             <Clock className={`h-4 w-4 ${horario.is_active ? 'text-blue-400' : 'text-zinc-500'}`} />
                             <span className={`font-medium ${horario.is_active ? 'text-white' : 'text-zinc-400'}`}>
-                                {DIAS_SEMANA_MAP[horario.day_of_week]}
+                                {DIAS_SEMANA_MAP[horario.day_of_week as keyof typeof DIAS_SEMANA_MAP]}
                             </span>
                         </div>
 
@@ -94,8 +94,8 @@ export function HorarioItemZen({ horario, onToggle, onUpdate }: HorarioItemZenPr
 
                         {/* Estado */}
                         <div className={`px-2 py-1 rounded-full text-xs font-medium ${horario.is_active
-                                ? 'bg-green-500/20 text-green-400'
-                                : 'bg-zinc-500/20 text-zinc-400'
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-zinc-500/20 text-zinc-400'
                             }`}>
                             {horario.is_active ? 'Activo' : 'Inactivo'}
                         </div>
@@ -114,7 +114,7 @@ export function HorarioItemZen({ horario, onToggle, onUpdate }: HorarioItemZenPr
 
                         <ZenButton
                             onClick={handleToggle}
-                            variant={horario.is_active ? "outline" : "primary"}
+                            variant={horario.is_active ? "secondary" : "primary"}
                             size="sm"
                             loading={isLoading}
                             disabled={isLoading}

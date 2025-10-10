@@ -12,8 +12,8 @@ interface ContactoStatsZenProps {
 }
 
 export function ContactoStatsZen({ telefonos, contactoData, loading }: ContactoStatsZenProps) {
-    const telefonosActivos = telefonos.filter(t => t.activo).length;
-    const telefonosInactivos = telefonos.filter(t => !t.activo).length;
+    const telefonosActivos = telefonos.filter(t => t.is_active).length; // Actualizado: activo → is_active
+    const telefonosInactivos = telefonos.filter(t => !t.is_active).length; // Actualizado: activo → is_active
     const totalTelefonos = telefonos.length;
 
     if (loading) {

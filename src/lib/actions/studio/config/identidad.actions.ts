@@ -76,7 +76,7 @@ export async function actualizarIdentidadBasica(
         studio_name: validatedData.nombre,
         slogan: validatedData.slogan,
         description: validatedData.descripcion,
-        logo_url: validatedData.logoUrl,      // ✅ Cambiar a logo_url
+        logo_url: validatedData.logo_url,      // Corregido: logoUrl → logo_url
         isotipo_url: validatedData.isotipo_url, // ✅ Ya correcto
       },
       select: {
@@ -192,7 +192,7 @@ export async function actualizarIdentidadCompleta(
       studio_name: validatedData.nombre,
       slogan: validatedData.slogan ?? null,
       descripcion: validatedData.descripcion ?? null,
-      logo_url: validatedData.logoUrl ?? null,
+      logo_url: validatedData.logo_url ?? null, // Corregido: logoUrl → logo_url
       isotipo_url: validatedData.isotipo_url ?? null,
     };
 

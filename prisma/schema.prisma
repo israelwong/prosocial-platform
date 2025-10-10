@@ -1420,7 +1420,7 @@ model studio_categorias_personal {
   tipo        PersonalType
   color       String?
   icono       String?
-  es_default  Boolean           @default(false)
+  is_default  Boolean           @default(false)
   order       Int               @default(0)
   is_active    Boolean           @default(true)
   created_at  DateTime          @default(now())
@@ -1431,7 +1431,7 @@ model studio_categorias_personal {
   @@unique([studio_id, name])
   @@index([studio_id, tipo])
   @@index([studio_id, is_active])
-  @@index([es_default])
+  @@index([is_default])
   @@index([order])
 }
 

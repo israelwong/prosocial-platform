@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ZenButton } from '@/components/ui/zen';
 import { ZenInput } from '@/components/ui/zen';
-import { ZenSelect } from '@/components/ui/zen';
+import { ZenSelect } from '@/components/ui/zen/forms/ZenSelect';
 import { DIAS_SEMANA_OPTIONS } from '@/lib/actions/schemas/horarios-schemas';
 
 interface HorarioFormZenProps {
@@ -89,8 +89,8 @@ export function HorarioFormZen({
                     </label>
                     <ZenSelect
                         value={formData.day_of_week}
-                        onValueChange={(value) => handleInputChange('day_of_week', value)}
-                        options={DIAS_SEMANA_OPTIONS}
+                        onValueChange={(value: string) => handleInputChange('day_of_week', value)}
+                        options={[...DIAS_SEMANA_OPTIONS]}
                         placeholder="Selecciona un día"
                         error={errors.day_of_week}
                     />
@@ -103,7 +103,7 @@ export function HorarioFormZen({
                     </label>
                     <ZenSelect
                         value={formData.is_active ? 'active' : 'inactive'}
-                        onValueChange={(value) => handleInputChange('is_active', value === 'active')}
+                        onValueChange={(value: string) => handleInputChange('is_active', value === 'active')}
                         options={[
                             { value: 'active', label: 'Activo' },
                             { value: 'inactive', label: 'Inactivo' },

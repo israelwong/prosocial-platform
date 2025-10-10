@@ -73,7 +73,7 @@ export type HorariosBulkUpdateForm = z.infer<typeof HorariosBulkUpdateSchema>;
 // Tipo para el horario completo
 export interface Horario {
   id: string;
-  day_of_week: DiaSemana;
+  day_of_week: string; // Cambiado de DiaSemana a string para mayor flexibilidad
   start_time: string;
   end_time: string;
   is_active: boolean;

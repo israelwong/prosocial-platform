@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Palette, Zap } from 'lucide-react';
+import { Palette } from 'lucide-react';
 import { IdentidadFormZen, LogoManagerZen, IdentidadSkeletonZen } from './components';
 import { useParams } from 'next/navigation';
-import { obtenerIdentidadStudio } from '@/lib/actions/studio/config/identidad.actions';
+import { obtenerIdentidadStudio, actualizarLogo } from '@/lib/actions/studio/config/identidad.actions';
 import { IdentidadData } from './types';
 
 export default function IdentidadPage() {
@@ -18,7 +18,7 @@ export default function IdentidadPage() {
       try {
         const result = await obtenerIdentidadStudio(studioSlug);
         if (result.success !== false) {
-          setIdentidadData(result as IdentidadData);
+          setIdentidadData(result as unknown as IdentidadData);
         }
       } catch (error) {
         console.error('Error loading identidad data:', error);
@@ -54,12 +54,15 @@ export default function IdentidadPage() {
               tipo="logo"
               url={identidadData?.logo_url}
               onUpdate={async (url: string) => {
-                // TODO: Implement logo update
-                console.log('Logo updated:', url);
+                try {
+                  await actualizarLogo(studioSlug, { tipo: 'logo', url });
+                  setIdentidadData(prev => prev ? { ...prev, logo_url: url } : null);
+                } catch (error) {
+                  console.error('Error updating logo:', error);
+                }
               }}
               onLocalUpdate={(url: string | null) => {
-                // TODO: Implement local update
-                console.log('Local logo update:', url);
+                setIdentidadData(prev => prev ? { ...prev, logo_url: url } : null);
               }}
               studioSlug={studioSlug}
             />
@@ -72,12 +75,15 @@ export default function IdentidadPage() {
               tipo="isotipo"
               url={identidadData?.isotipo_url}
               onUpdate={async (url: string) => {
-                // TODO: Implement isotipo update
-                console.log('Isotipo updated:', url);
+                try {
+                  await actualizarLogo(studioSlug, { tipo: 'isotipo', url });
+                  setIdentidadData(prev => prev ? { ...prev, isotipo_url: url } : null);
+                } catch (error) {
+                  console.error('Error updating isotipo:', error);
+                }
               }}
               onLocalUpdate={(url: string | null) => {
-                // TODO: Implement local update
-                console.log('Local isotipo update:', url);
+                setIdentidadData(prev => prev ? { ...prev, isotipo_url: url } : null);
               }}
               studioSlug={studioSlug}
             />
@@ -113,42 +119,7 @@ export default function IdentidadPage() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Zap className="h-5 w-5 text-yellow-400" />
-          <h3 className="text-lg font-semibold text-white">Acciones Rápidas</h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-zinc-800/50 rounded-lg">
-            <h4 className="font-medium text-white mb-2">Generar Palabras Clave</h4>
-            <p className="text-sm text-zinc-400 mb-3">
-              Usa IA para generar palabras clave relevantes para tu estudio.
-            </p>
-            <button className="text-purple-400 hover:text-purple-300 text-sm font-medium">
-              Generar con IA →
-            </button>
-          </div>
-          <div className="p-4 bg-zinc-800/50 rounded-lg">
-            <h4 className="font-medium text-white mb-2">Plantillas de Slogan</h4>
-            <p className="text-sm text-zinc-400 mb-3">
-              Explora plantillas profesionales para tu slogan.
-            </p>
-            <button className="text-purple-400 hover:text-purple-300 text-sm font-medium">
-              Ver Plantillas →
-            </button>
-          </div>
-          <div className="p-4 bg-zinc-800/50 rounded-lg">
-            <h4 className="font-medium text-white mb-2">Vista Previa</h4>
-            <p className="text-sm text-zinc-400 mb-3">
-              Ve cómo se ve tu identidad en diferentes contextos.
-            </p>
-            <button className="text-purple-400 hover:text-purple-300 text-sm font-medium">
-              Vista Previa →
-            </button>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 }

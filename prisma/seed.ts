@@ -41,8 +41,7 @@ async function main() {
     // 3. Demo Studio
     await seedDemoStudio();
 
-    // 4. Usuarios Multi-Contexto
-    await seedUsers();
+    // 4. Usuarios Multi-Contexto (removido - usar seed-demo-users.ts)
 
     // 5. Pipelines V2.0
     await seedPipelines();
@@ -61,15 +60,14 @@ async function main() {
     console.log('  ✅ Módulos de plataforma');
     console.log('  ✅ Planes con límites');
     console.log('  ✅ Demo Studio configurado');
-    console.log('  ✅ Usuarios multi-contexto');
+    console.log('  ✅ Usuarios (usar seed-demo-users.ts)');
     console.log('  ✅ Pipelines Marketing + Manager');
     console.log('  ✅ Catálogo de servicios');
     console.log('  ✅ Tipos de evento');
     console.log('  ✅ Demo Lead asociado\n');
     console.log('🔗 Acceso:');
-    console.log('  Super Admin: admin@prosocial.mx');
-    console.log('  Studio Owner: owner@demo-studio.com');
-    console.log('  Studio URL: /demo-studio\n');
+    console.log('  Studio URL: /demo-studio');
+    console.log('  Usuarios: Ejecutar seed-demo-users.ts\n');
 }
 
 // ============================================
@@ -407,129 +405,9 @@ async function seedDemoStudio() {
     console.log(`  ✅ Studio configurado con acceso completo`);
 }
 
-// ============================================
-// 6. USERS (Multi-Contexto)
-// ============================================
-
-async function seedUsers() {
-    console.log('👥 Seeding users...');
-
-    // 1. Super Admin
-    const superAdmin = await prisma.users.upsert({
-        where: { email: 'admin@prosocial.mx' },
-        update: {},
-        create: {
-            supabase_id: 'superadmin-supabase-uuid',
-            email: 'admin@prosocial.mx',
-            full_name: 'Super Administrador',
-            is_active: true,
-        },
-    });
-
-    await prisma.user_platform_roles.upsert({
-        where: {
-            user_id_role: {
-                user_id: superAdmin.id,
-                role: 'SUPER_ADMIN',
-            },
-        },
-        update: {},
-        create: {
-            user_id: superAdmin.id,
-            role: 'SUPER_ADMIN',
-            is_active: true,
-            granted_at: new Date(),
-        },
-    });
-    console.log(`  ✅ Super Admin: ${superAdmin.email}`);
-
-    // 2. Studio Owner
-    const owner = await prisma.users.upsert({
-        where: { email: 'owner@demo-studio.com' },
-        update: {},
-        create: {
-            supabase_id: 'owner-supabase-uuid',
-            email: 'owner@demo-studio.com',
-            full_name: 'Carlos Méndez',
-            phone: '+52 33 1234 5678',
-            is_active: true,
-        },
-    });
-
-    // Rol de plataforma: SUSCRIPTOR
-    await prisma.user_platform_roles.upsert({
-        where: {
-            user_id_role: {
-                user_id: owner.id,
-                role: 'SUSCRIPTOR',
-            },
-        },
-        update: {},
-        create: {
-            user_id: owner.id,
-            role: 'SUSCRIPTOR',
-            is_active: true,
-            granted_at: new Date(),
-        },
-    });
-
-    // Rol en studio: OWNER
-    await prisma.user_studio_roles.upsert({
-        where: {
-            user_id_studio_id_role: {
-                user_id: owner.id,
-                studio_id: DEMO_STUDIO_ID,
-                role: 'OWNER',
-            },
-        },
-        update: {},
-        create: {
-            user_id: owner.id,
-            studio_id: DEMO_STUDIO_ID,
-            role: 'OWNER',
-            is_active: true,
-            invited_at: new Date(),
-            accepted_at: new Date(),
-        },
-    });
-    console.log(`  ✅ Studio Owner: ${owner.email}`);
-
-    // 3. Fotógrafo (personal operativo)
-    const photographer = await prisma.users.upsert({
-        where: { email: 'fotografo@demo-studio.com' },
-        update: {},
-        create: {
-            supabase_id: 'photographer-supabase-uuid',
-            email: 'fotografo@demo-studio.com',
-            full_name: 'Juan Pérez',
-            phone: '+52 33 8765 4321',
-            is_active: true,
-        },
-    });
-
-    await prisma.user_studio_roles.upsert({
-        where: {
-            user_id_studio_id_role: {
-                user_id: photographer.id,
-                studio_id: DEMO_STUDIO_ID,
-                role: 'PHOTOGRAPHER',
-            },
-        },
-        update: {},
-        create: {
-            user_id: photographer.id,
-            studio_id: DEMO_STUDIO_ID,
-            role: 'PHOTOGRAPHER',
-            is_active: true,
-            invited_at: new Date(),
-            accepted_at: new Date(),
-        },
-    });
-    console.log(`  ✅ Photographer: ${photographer.email}`);
-}
 
 // ============================================
-// 7. PIPELINES V2.0
+// 6. PIPELINES V2.0
 // ============================================
 
 async function seedPipelines() {
@@ -601,7 +479,7 @@ async function seedPipelines() {
 }
 
 // ============================================
-// 8. CATÁLOGO (sample)
+// 7. CATÁLOGO (sample)
 // ============================================
 
 async function seedCatalogo() {
@@ -661,7 +539,7 @@ async function seedCatalogo() {
 }
 
 // ============================================
-// 9. TIPOS DE EVENTO
+// 8. TIPOS DE EVENTO
 // ============================================
 
 async function seedTiposEvento() {
@@ -690,7 +568,7 @@ async function seedTiposEvento() {
 }
 
 // ============================================
-// 10. DEMO LEAD
+// 9. DEMO LEAD
 // ============================================
 
 async function seedDemoLead() {

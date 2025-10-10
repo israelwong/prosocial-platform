@@ -5,7 +5,7 @@ export const IdentidadUpdateSchema = z.object({
   slogan: z.string().max(200, "El slogan es muy largo").optional(),
   descripcion: z.string().max(1000, "La descripción es muy larga").optional(),
   palabras_clave: z.string().optional(),
-  logoUrl: z.string().url("URL de logo inválida").optional().or(z.literal("")),
+  logo_url: z.string().url("URL de logo inválida").optional().or(z.literal("")), // Corregido: logoUrl → logo_url
   isotipo_url: z.string().url("URL de isotipo inválida").optional().or(z.literal("")),
 });
 

@@ -98,8 +98,8 @@ export async function obtenerTelefonosStudio(
         // 2. Construir filtros
         const whereClause: {
             studio_id: string;
-            activo?: boolean;
-            tipo?: string;
+            is_active?: boolean; // Actualizado: activo → is_active
+            type?: string; // Actualizado: tipo → type
         } = {
             studio_id: studio.id,
         };
@@ -107,12 +107,12 @@ export async function obtenerTelefonosStudio(
         if (filters) {
             const validatedFilters = TelefonosFiltersSchema.parse(filters);
 
-            if (validatedFilters.activo !== undefined) {
-                whereClause.activo = validatedFilters.activo;
+            if (validatedFilters.is_active !== undefined) { // Actualizado: activo → is_active
+                whereClause.is_active = validatedFilters.is_active; // Actualizado: activo → is_active
             }
 
-            if (validatedFilters.tipo) {
-                whereClause.tipo = validatedFilters.tipo;
+            if (validatedFilters.type) { // Actualizado: tipo → type
+                whereClause.type = validatedFilters.type; // Actualizado: tipo → type
             }
         }
 
@@ -147,7 +147,7 @@ export async function crearTelefono(
 
         // 3. Verificar si ya existe un teléfono del mismo tipo activo
         // Solo para tipo "principal" limitamos a uno activo
-        if (validatedData.tipo === "principal") {
+        if (validatedData.type === "principal") { // Actualizado: tipo → type
             const existingTelefono = await prisma.studio_phones.findFirst({
                 where: {
                     studio_id: studio.id,
@@ -156,7 +156,7 @@ export async function crearTelefono(
                 },
             });
 
-            if (existingTelefono && validatedData.activo) {
+            if (existingTelefono && validatedData.is_active) { // Actualizado: activo → is_active
                 throw new Error("Ya tienes un teléfono principal activo. Desactiva el existente o elige otro tipo.");
             }
         }
@@ -165,9 +165,9 @@ export async function crearTelefono(
         const nuevoTelefono = await prisma.studio_phones.create({
             data: {
                 studio_id: studio.id,
-                number: validatedData.numero,
-                type: validatedData.tipo,
-                is_active: validatedData.activo,
+                number: validatedData.number, // Actualizado: numero → number
+                type: validatedData.type, // Actualizado: tipo → type
+                is_active: validatedData.is_active, // Actualizado: activo → is_active
             },
         });
 
@@ -203,9 +203,9 @@ export async function actualizarTelefono(
         const telefonoActualizado = await prisma.studio_phones.update({
             where: { id: telefonoId },
             data: {
-                ...(validatedData.numero && { number: validatedData.numero }),
-                ...(validatedData.tipo && { type: validatedData.tipo }),
-                ...(validatedData.activo !== undefined && { is_active: validatedData.activo }),
+                ...(validatedData.number && { number: validatedData.number }), // Actualizado: numero → number
+                ...(validatedData.type && { type: validatedData.type }), // Actualizado: tipo → type
+                ...(validatedData.is_active !== undefined && { is_active: validatedData.is_active }), // Actualizado: activo → is_active
             },
         });
 
@@ -241,9 +241,9 @@ export async function actualizarTelefonosBulk(
                 prisma.studio_phones.update({
                     where: { id: telefono.id },
                     data: {
-                        ...(telefono.numero && { number: telefono.numero }),
-                        ...(telefono.tipo && { type: telefono.tipo }),
-                        ...(telefono.activo !== undefined && { is_active: telefono.activo }),
+                        ...(telefono.number && { number: telefono.number }), // Actualizado: numero → number
+                        ...(telefono.type && { type: telefono.type }), // Actualizado: tipo → type
+                        ...(telefono.is_active !== undefined && { is_active: telefono.is_active }), // Actualizado: activo → is_active
                     },
                 })
             )
@@ -280,7 +280,7 @@ export async function toggleTelefonoEstado(
         // 3. Actualizar estado
         const telefonoActualizado = await prisma.studio_phones.update({
             where: { id: telefonoId },
-            data: { is_active: validatedData.activo },
+            data: { is_active: validatedData.is_active }, // Actualizado: activo → is_active
         });
 
         // 4. Revalidar cache
