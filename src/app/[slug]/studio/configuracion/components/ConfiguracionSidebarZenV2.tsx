@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ConfigSidebarClientContent } from './ConfigSidebarClientContent';
+import { getEventosPorEtapaConCotizaciones } from '@/app/admin/_lib/actions/evento/consultas.actions';
 
 // Interfaces de tipos (icon es ahora string)
 export interface NavItem {
@@ -57,6 +58,9 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                 { id: 'contacto', name: 'Contacto', href: '/studio/contacto', icon: 'Phone' },
                 { id: 'horarios', name: 'Horarios', href: '/studio/horarios', icon: 'Clock' },
                 { id: 'redes-sociales', name: 'Redes Sociales', href: '/studio/redes', icon: 'Zap' },
+                { id: 'faq', name: 'Preguntas frecuentes', href: '/pagina/faq', icon: 'HelpCircle' },
+                { id: 'ventajas', name: 'Ventajas competitivas', href: '/studio/ventajas-competitivas', icon: 'ShoppingCart' },
+                { id: 'metadata', name: 'Metadata', href: '/pagina/metadata', icon: 'Search' },
             ],
         },
         {
@@ -86,10 +90,13 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             icon: 'ShoppingCart',
             moduleSlug: 'ventas',
             items: [
-                { id: 'crm', name: 'Etapas del CRM', href: '/ventas/crm', icon: 'Users' },
+                { id: 'inteligencia-financiera', name: 'Inteligencia Financiera', href: '/ventas/inteligencia', icon: 'Coins' },
                 { id: 'condiciones-comerciales', name: 'Condiciones Comerciales', href: '/ventas/condiciones', icon: 'FileText' },
                 { id: 'reglas-agendamiento', name: 'Reglas de Agendamiento', href: '/ventas/reglas', icon: 'Clock' },
-                { id: 'inteligencia-financiera', name: 'Inteligencia Financiera', href: '/ventas/inteligencia', icon: 'Coins' },
+                { id: 'crm', name: 'Ciclo de venta', href: '/ventas/crm', icon: 'Users' },
+                { id: 'gantt', name: 'Modelo Gantt', href: '/ventas/gantt', icon: 'FileText' },
+                { id: 'garantias', name: 'Garantías de venta', href: '/ventas/garantias', icon: 'Shield' },
+                { id: 'contrato', name: 'Modelo de Contrato', href: '/ventas/contrato', icon: 'FileText' },
             ],
         },
         {
@@ -101,20 +108,6 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                 { id: 'metodos', name: 'Métodos de Pago', href: '/pagos/metodos', icon: 'CreditCard' },
                 { id: 'cuentas-bancarias', name: 'Cuentas Bancarias', href: '/pagos/cuentas-bancarias', icon: 'Building' },
                 { id: 'stripe', name: 'Stripe', href: '/pagos/stripe', icon: 'CreditCard' },
-            ],
-        },
-        {
-            id: 'pagina',
-            title: 'Página Web',
-            icon: 'Globe',
-            moduleSlug: 'pagina',
-            items: [
-                { id: 'portafolio', name: 'Portafolio', href: '/pagina/portafolio', icon: 'Image' },
-                { id: 'seo', name: 'SEO', href: '/pagina/seo', icon: 'Search' },
-                { id: 'editor', name: 'Editor', href: '/pagina/editor', icon: 'Edit' },
-                { id: 'lead-forms', name: 'Lead Forms', href: '/pagina/lead-forms', icon: 'FormInput' },
-                { id: 'faq', name: 'FAQ', href: '/pagina/faq', icon: 'HelpCircle' },
-                { id: 'promociones', name: 'Promociones', href: '/pagina/promociones', icon: 'Gift' },
             ],
         },
         {
@@ -150,6 +143,16 @@ const NAVIGATION_CONFIG: NavigationConfig = {
                 { id: 'logs', name: 'Logs', href: '/sistema/logs', icon: 'FileText' },
             ],
         },
+        {
+            id: 'ingresos',
+            title: 'Ingresos',
+            icon: 'Coins',
+            moduleSlug: 'ingresos',
+            items: [
+                { id: 'invitaciones', name: 'Invitaciones digitales', href: '/ingresos/invitaciones', icon: 'Coins' },
+                { id: 'cloud', name: 'Almacenamiento en la nube', href: '/ingresos/cloud', icon: 'Coins' },
+            ],
+        }
     ],
     platform: [
         {

@@ -10,6 +10,30 @@ import {
     type ServiciosExistentes
 } from '@/lib/actions/schemas/configuracion-precios-schemas';
 
+// Tipos específicos para los servicios
+type ServicioItem = {
+    id: string;
+    utility_type: string;
+};
+
+type ServicioConGastos = {
+    id: string;
+    updated_at: Date;
+    item_expenses?: Array<{
+        id: string;
+        name: string;
+        cost: number;
+    }>;
+};
+
+type ServicioEstadistica = {
+    id: string;
+    name: string;
+    utility_type: string;
+    cost: number;
+    expense: number;
+};
+
 // Obtener configuración de precios del studio
 export async function obtenerConfiguracionPrecios(studioSlug: string) {
     return await retryDatabaseOperation(async () => {
@@ -39,11 +63,11 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
             configuracion = await prisma.studio_configuraciones.create({
                 data: {
                     studio: { connect: { id: studio.id } },
-                    nombre: 'Configuración de Precios',
-                    utilidad_servicio: 0.30, // 30%
-                    utilidad_producto: 0.40, // 40%
-                    comision_venta: 0.10, // 10%
-                    sobreprecio: 0.05, // 5%
+                    name: 'Configuración de Precios',
+                    service_margin: 0.30, // 30%
+                    product_margin: 0.40, // 40%
+                    sales_commission: 0.10, // 10%
+                    markup: 0.05, // 5%
                     status: 'active',
                     updated_at: new Date(),
                 },
@@ -52,12 +76,12 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
 
         return {
             id: studio.id,
-            nombre: studio.name,
+            nombre: studio.studio_name,
             slug: studio.slug,
-            utilidad_servicio: String((configuracion.utilidad_servicio ?? 0.30) * 100), // Convertir a porcentaje
-            utilidad_producto: String((configuracion.utilidad_producto ?? 0.40) * 100),
-            comision_venta: String((configuracion.comision_venta ?? 0.10) * 100),
-            sobreprecio: String((configuracion.sobreprecio ?? 0.05) * 100),
+            utilidad_servicio: String((configuracion.service_margin ?? 0.30) * 100), // Convertir a porcentaje
+            utilidad_producto: String((configuracion.product_margin ?? 0.40) * 100),
+            comision_venta: String((configuracion.sales_commission ?? 0.10) * 100),
+            sobreprecio: String((configuracion.markup ?? 0.05) * 100),
         };
     });
 }
@@ -74,10 +98,10 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
                     orderBy: { updated_at: 'desc' },
                     take: 1,
                     select: {
-                        utilidad_servicio: true,
-                        utilidad_producto: true,
-                        comision_venta: true,
-                        sobreprecio: true,
+                        service_margin: true,
+                        product_margin: true,
+                        sales_commission: true,
+                        markup: true,
                     }
                 }
             },
@@ -88,29 +112,29 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
         }
 
         // Contar servicios existentes
-        const servicios = await prisma.studio_servicios.findMany({
-            where: { studio: { id: studio.id } },
+        const servicios = await prisma.studio_items.findMany({
+            where: { studio_id: studio.id },
             select: {
                 id: true,
-                tipo_utilidad: true,
+                utility_type: true,
             },
         });
 
         const total_servicios = servicios.length;
         const servicios_por_tipo = {
-            servicios: servicios.filter(s => s.tipo_utilidad === 'servicio').length,
-            productos: servicios.filter(s => s.tipo_utilidad === 'producto').length,
-            paquetes: servicios.filter(s => s.tipo_utilidad === 'paquete').length,
+            servicios: servicios.filter((s: ServicioItem) => s.utility_type === 'service').length,
+            productos: servicios.filter((s: ServicioItem) => s.utility_type === 'product').length,
+            paquetes: servicios.filter((s: ServicioItem) => s.utility_type === 'package').length,
         };
 
         // Verificar si hay cambios en los porcentajes
         const configuracionActual = studio.configuraciones[0];
         const requiere_actualizacion_masiva = total_servicios > 0 && (
             !configuracionActual || // Si no hay configuración, se necesita actualizar
-            configuracionActual.utilidad_servicio !== 0.30 || // Si los valores son diferentes a los por defecto
-            configuracionActual.utilidad_producto !== 0.40 ||
-            configuracionActual.comision_venta !== 0.10 ||
-            configuracionActual.sobreprecio !== 0.05
+            configuracionActual.service_margin !== 0.30 || // Si los valores son diferentes a los por defecto
+            configuracionActual.product_margin !== 0.40 ||
+            configuracionActual.sales_commission !== 0.10 ||
+            configuracionActual.markup !== 0.05
         );
 
         return {
@@ -141,10 +165,10 @@ export async function actualizarConfiguracionPrecios(
 
         // Convertir porcentajes a decimales para almacenamiento
         const dataToSave = {
-            utilidad_servicio: parseFloat((parseFloat(validatedData.utilidad_servicio) / 100).toFixed(4)),
-            utilidad_producto: parseFloat((parseFloat(validatedData.utilidad_producto) / 100).toFixed(4)),
-            comision_venta: parseFloat((parseFloat(validatedData.comision_venta) / 100).toFixed(4)),
-            sobreprecio: parseFloat((parseFloat(validatedData.sobreprecio) / 100).toFixed(4)),
+            service_margin: parseFloat((parseFloat(validatedData.utilidad_servicio) / 100).toFixed(4)),
+            product_margin: parseFloat((parseFloat(validatedData.utilidad_producto) / 100).toFixed(4)),
+            sales_commission: parseFloat((parseFloat(validatedData.comision_venta) / 100).toFixed(4)),
+            markup: parseFloat((parseFloat(validatedData.sobreprecio) / 100).toFixed(4)),
         };
 
         // Obtener el studio
@@ -172,10 +196,10 @@ export async function actualizarConfiguracionPrecios(
                     id: configuracionExistente.id,
                 },
                 data: {
-                    utilidad_servicio: dataToSave.utilidad_servicio,
-                    utilidad_producto: dataToSave.utilidad_producto,
-                    comision_venta: dataToSave.comision_venta,
-                    sobreprecio: dataToSave.sobreprecio,
+                    service_margin: dataToSave.service_margin,
+                    product_margin: dataToSave.product_margin,
+                    sales_commission: dataToSave.sales_commission,
+                    markup: dataToSave.markup,
                     status: 'active',
                     updated_at: new Date(),
                 },
@@ -184,11 +208,11 @@ export async function actualizarConfiguracionPrecios(
             await prisma.studio_configuraciones.create({
                 data: {
                     studio: { connect: { id: studio.id } },
-                    nombre: 'Configuración de Precios',
-                    utilidad_servicio: dataToSave.utilidad_servicio,
-                    utilidad_producto: dataToSave.utilidad_producto,
-                    comision_venta: dataToSave.comision_venta,
-                    sobreprecio: dataToSave.sobreprecio,
+                    name: 'Configuración de Precios',
+                    service_margin: dataToSave.service_margin,
+                    product_margin: dataToSave.product_margin,
+                    sales_commission: dataToSave.sales_commission,
+                    markup: dataToSave.markup,
                     status: 'active',
                     updated_at: new Date(),
                 },
@@ -200,11 +224,11 @@ export async function actualizarConfiguracionPrecios(
 
         if (serviciosExistentes.requiere_actualizacion_masiva) {
             // 4. Obtener todos los servicios existentes para el recálculo masivo
-            const todosLosServicios = await prisma.studio_servicios.findMany({
-                where: { studio: { id: studio.id } },
+            const todosLosServicios = await prisma.studio_items.findMany({
+                where: { studio_id: studio.id },
                 include: {
                     // Incluir gastos si existen
-                    servicio_gastos: true,
+                    item_expenses: true,
                 },
             });
 
@@ -213,8 +237,8 @@ export async function actualizarConfiguracionPrecios(
             // usando studio_configuraciones. Solo actualizamos updatedAt para
             // indicar que hubo un cambio en la configuración.
 
-            const updatePromises = todosLosServicios.map(servicio => {
-                return prisma.studio_servicios.update({
+            const updatePromises = todosLosServicios.map((servicio: ServicioConGastos) => {
+                return prisma.studio_items.update({
                     where: { id: servicio.id },
                     data: {
                         updated_at: new Date(),
@@ -252,14 +276,14 @@ export async function obtenerEstadisticasServicios(studioSlug: string) {
             throw new Error("Studio no encontrado");
         }
 
-        const servicios = await prisma.studio_servicios.findMany({
-            where: { studio: { id: studio.id } },
+        const servicios = await prisma.studio_items.findMany({
+            where: { studio_id: studio.id },
             select: {
                 id: true,
-                nombre: true,
-                tipo_utilidad: true,
-                costo: true,
-                gasto: true,
+                name: true,
+                utility_type: true,
+                cost: true,
+                expense: true,
             },
         });
 
@@ -267,15 +291,15 @@ export async function obtenerEstadisticasServicios(studioSlug: string) {
         const estadisticas = {
             total_servicios: servicios.length,
             servicios_por_tipo: {
-                servicios: servicios.filter(s => s.tipo_utilidad === 'servicio').length,
-                productos: servicios.filter(s => s.tipo_utilidad === 'producto').length,
-                paquetes: servicios.filter(s => s.tipo_utilidad === 'paquete').length,
+                servicios: servicios.filter((s: ServicioEstadistica) => s.utility_type === 'service').length,
+                productos: servicios.filter((s: ServicioEstadistica) => s.utility_type === 'product').length,
+                paquetes: servicios.filter((s: ServicioEstadistica) => s.utility_type === 'package').length,
             },
             costo_promedio: servicios.length > 0
-                ? servicios.reduce((acc, s) => acc + (s.costo || 0), 0) / servicios.length
+                ? servicios.reduce((acc: number, s: ServicioEstadistica) => acc + (s.cost || 0), 0) / servicios.length
                 : 0,
             gasto_promedio: servicios.length > 0
-                ? servicios.reduce((acc, s) => acc + (s.gasto || 0), 0) / servicios.length
+                ? servicios.reduce((acc: number, s: ServicioEstadistica) => acc + (s.expense || 0), 0) / servicios.length
                 : 0,
         };
 

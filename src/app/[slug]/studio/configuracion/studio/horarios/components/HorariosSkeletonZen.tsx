@@ -1,88 +1,84 @@
 'use client';
 
 import React from 'react';
-import { ZenCard } from '@/components/ui/zen';
+import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
 
-/**
- * HorariosSkeletonZen - Skeleton loading state para la página de horarios
- * 
- * Características:
- * - ✅ Usa ZenCard para consistencia visual
- * - ✅ Animación pulse suave
- * - ✅ Layout responsive que coincide con el contenido real
- * - ✅ Colores zinc coherentes con el tema
- * - ✅ Espaciado consistente con design tokens
- * - ✅ Simula estadísticas, lista de horarios e información de uso
- */
 export function HorariosSkeletonZen() {
     return (
         <div className="p-6 space-y-6 max-w-screen-lg mx-auto mb-16">
-            {/* Header Navigation Skeleton */}
-            <ZenCard variant="default" padding="lg">
-                <div className="animate-pulse">
-                    <div className="h-8 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                    <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                </div>
-            </ZenCard>
-
-            {/* Estadísticas Skeleton */}
-            <div className="grid gap-4 md:grid-cols-3">
-                {[1, 2, 3].map((i) => (
-                    <ZenCard key={i} variant="default" padding="md">
-                        <div className="animate-pulse">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="h-4 w-24 bg-zinc-700 rounded" />
-                                <div className="h-4 w-4 bg-zinc-700 rounded" />
-                            </div>
-                            <div className="h-8 w-16 bg-zinc-700 rounded mb-2" />
-                            <div className="h-3 w-20 bg-zinc-700 rounded" />
-                        </div>
-                    </ZenCard>
-                ))}
+            {/* Header skeleton */}
+            <div className="space-y-2">
+                <div className="h-8 bg-zinc-700 rounded w-1/3 animate-pulse"></div>
+                <div className="h-4 bg-zinc-700 rounded w-1/2 animate-pulse"></div>
             </div>
 
-            {/* Lista de Horarios Skeleton */}
+            {/* Stats skeleton */}
             <ZenCard variant="default" padding="lg">
-                <div className="animate-pulse">
-                    <div className="flex items-center justify-between mb-4">
-                        <div>
-                            <div className="h-6 bg-zinc-700 rounded w-1/3 mb-2"></div>
-                            <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
-                        </div>
-                        <div className="h-10 bg-zinc-700 rounded w-32"></div>
+                <ZenCardHeader>
+                    <ZenCardTitle className="flex items-center gap-2">
+                        <div className="h-5 w-5 bg-zinc-700 rounded animate-pulse"></div>
+                        <div className="h-5 bg-zinc-700 rounded w-48 animate-pulse"></div>
+                    </ZenCardTitle>
+                </ZenCardHeader>
+                <ZenCardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="space-y-2">
+                                <div className="h-4 bg-zinc-700 rounded w-3/4 animate-pulse"></div>
+                                <div className="h-8 bg-zinc-700 rounded w-1/2 animate-pulse"></div>
+                            </div>
+                        ))}
                     </div>
-
-                    <div className="space-y-3">
-                        <div className="h-16 bg-zinc-700 rounded"></div>
-                        <div className="h-16 bg-zinc-700 rounded"></div>
-                        <div className="h-16 bg-zinc-700 rounded"></div>
-                    </div>
-                </div>
+                </ZenCardContent>
             </ZenCard>
 
-            {/* Información de uso Skeleton */}
+            {/* List skeleton */}
             <ZenCard variant="default" padding="lg">
-                <div className="animate-pulse">
-                    <div className="h-6 bg-zinc-700 rounded w-1/3 mb-4"></div>
+                <ZenCardHeader>
+                    <div className="flex items-center justify-between">
+                        <div className="h-6 bg-zinc-700 rounded w-48 animate-pulse"></div>
+                        <div className="flex items-center gap-2">
+                            <div className="h-8 bg-zinc-700 rounded w-20 animate-pulse"></div>
+                            <div className="h-8 bg-zinc-700 rounded w-32 animate-pulse"></div>
+                        </div>
+                    </div>
+                </ZenCardHeader>
+                <ZenCardContent>
+                    <div className="space-y-3">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="animate-pulse">
+                                <div className="h-16 bg-zinc-700 rounded-lg"></div>
+                            </div>
+                        ))}
+                    </div>
+                </ZenCardContent>
+            </ZenCard>
+
+            {/* Info skeleton */}
+            <ZenCard variant="default" padding="lg">
+                <ZenCardHeader>
+                    <div className="h-6 bg-zinc-700 rounded w-64 animate-pulse"></div>
+                </ZenCardHeader>
+                <ZenCardContent>
                     <div className="grid gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                            <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                            <div className="h-4 bg-zinc-700 rounded w-32 animate-pulse"></div>
                             <div className="space-y-1">
-                                <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
-                                <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                                <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="h-3 bg-zinc-700 rounded w-full animate-pulse"></div>
+                                ))}
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <div className="h-5 bg-zinc-700 rounded w-1/4"></div>
+                            <div className="h-4 bg-zinc-700 rounded w-40 animate-pulse"></div>
                             <div className="space-y-1">
-                                <div className="h-4 bg-zinc-700 rounded w-3/4"></div>
-                                <div className="h-4 bg-zinc-700 rounded w-2/3"></div>
-                                <div className="h-4 bg-zinc-700 rounded w-1/2"></div>
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="h-3 bg-zinc-700 rounded w-full animate-pulse"></div>
+                                ))}
                             </div>
                         </div>
                     </div>
-                </div>
+                </ZenCardContent>
             </ZenCard>
         </div>
     );

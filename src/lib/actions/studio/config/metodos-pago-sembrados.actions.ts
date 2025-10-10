@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 // Métodos de pago básicos que se siembran automáticamente
 const METODOS_PAGO_BASICOS = [
     {
-        metodo_pago: "Efectivo",
+        payment_method_name: "Efectivo",
         payment_method: "cash",
         comision_porcentaje_base: 0,
         comision_fija_monto: 0,
@@ -17,7 +17,7 @@ const METODOS_PAGO_BASICOS = [
         orden: 1,
     },
     {
-        metodo_pago: "SPEI Directo",
+        payment_method_name: "SPEI Directo",
         payment_method: "spei_directo",
         comision_porcentaje_base: 0,
         comision_fija_monto: 0,
@@ -27,7 +27,7 @@ const METODOS_PAGO_BASICOS = [
         orden: 2,
     },
     {
-        metodo_pago: "Transferencia Bancaria",
+        payment_method_name: "Transferencia Bancaria",
         payment_method: "transferencia",
         comision_porcentaje_base: 0,
         comision_fija_monto: 0,
@@ -37,7 +37,7 @@ const METODOS_PAGO_BASICOS = [
         orden: 3,
     },
     {
-        metodo_pago: "Depósito Bancario",
+        payment_method_name: "Depósito Bancario",
         payment_method: "deposito",
         comision_porcentaje_base: 0,
         comision_fija_monto: 0,
@@ -113,7 +113,7 @@ export async function obtenerMetodosPagoActivos(studio_id: string) {
                 studio_id,
                 status: "active",
             },
-            orderBy: { orden: 'asc' },
+            orderBy: { order: 'asc' },
         });
 
         return {

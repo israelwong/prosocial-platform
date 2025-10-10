@@ -3,110 +3,101 @@
 import React from 'react';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
 import { Clock, Calendar, CheckCircle, XCircle } from 'lucide-react';
-import { Horario } from '../types';
+import { Horario } from '@/lib/actions/schemas/horarios-schemas';
 
 interface HorariosStatsZenProps {
     horarios: Horario[];
     loading?: boolean;
 }
 
-export function HorariosStatsZen({ horarios, loading }: HorariosStatsZenProps) {
+export function HorariosStatsZen({ horarios, loading = false }: HorariosStatsZenProps) {
     if (loading) {
         return (
-            <div className="grid gap-4 md:grid-cols-3">
-                {[...Array(3)].map((_, i) => (
-                    <ZenCard key={i} variant="default" padding="md">
-                        <div className="animate-pulse">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="h-4 w-24 bg-zinc-700 rounded" />
-                                <div className="h-4 w-4 bg-zinc-700 rounded" />
+            <ZenCard variant="default" padding="lg">
+                <ZenCardHeader>
+                    <ZenCardTitle className="flex items-center gap-2">
+                        <Clock className="h-5 w-5" />
+                        Estadísticas de Horarios
+                    </ZenCardTitle>
+                </ZenCardHeader>
+                <ZenCardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="animate-pulse">
+                                <div className="h-4 bg-zinc-700 rounded w-3/4 mb-2"></div>
+                                <div className="h-8 bg-zinc-700 rounded w-1/2"></div>
                             </div>
-                            <div className="h-8 w-16 bg-zinc-700 rounded mb-2" />
-                            <div className="h-3 w-20 bg-zinc-700 rounded" />
-                        </div>
-                    </ZenCard>
-                ))}
-            </div>
+                        ))}
+                    </div>
+                </ZenCardContent>
+            </ZenCard>
         );
     }
 
-    const horariosActivos = horarios.filter(h => h.activo).length;
-    const horariosInactivos = horarios.filter(h => !h.activo).length;
     const totalHorarios = horarios.length;
-    const porcentajeActivos = totalHorarios > 0 ? Math.round((horariosActivos / totalHorarios) * 100) : 0;
+    const horariosActivos = horarios.filter(h => h.is_active).length;
+    const horariosInactivos = totalHorarios - horariosActivos;
+    const diasConHorarios = new Set(horarios.filter(h => h.is_active).map(h => h.day_of_week)).size;
 
     return (
-        <div className="grid gap-4 md:grid-cols-3">
-            {/* Días Activos */}
-            <ZenCard variant="default" padding="md" className="hover:bg-zinc-800/30 transition-colors duration-200">
-                <ZenCardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <ZenCardTitle className="text-sm font-medium text-zinc-300">
-                        Días Activos
-                    </ZenCardTitle>
-                    <div className="p-2 bg-green-900/20 rounded-full">
-                        <CheckCircle className="h-4 w-4 text-green-400" />
-                    </div>
-                </ZenCardHeader>
-                <ZenCardContent>
-                    <div className="flex items-center gap-3">
-                        <div className="text-2xl font-bold text-green-400">{horariosActivos}</div>
-                        <div className="text-sm text-zinc-500">
-                            {porcentajeActivos}% del total
+        <ZenCard variant="default" padding="lg">
+            <ZenCardHeader>
+                <ZenCardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Estadísticas de Horarios
+                </ZenCardTitle>
+            </ZenCardHeader>
+            <ZenCardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Total de horarios */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-zinc-400">
+                            <Calendar className="h-4 w-4" />
+                            <span className="text-sm">Total de horarios</span>
+                        </div>
+                        <div className="text-2xl font-bold text-white">
+                            {totalHorarios}
                         </div>
                     </div>
-                    <div className="mt-2 text-xs text-zinc-500">
-                        Horarios de atención activos
-                    </div>
-                </ZenCardContent>
-            </ZenCard>
 
-            {/* Días Inactivos */}
-            <ZenCard variant="default" padding="md" className="hover:bg-zinc-800/30 transition-colors duration-200">
-                <ZenCardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <ZenCardTitle className="text-sm font-medium text-zinc-300">
-                        Días Inactivos
-                    </ZenCardTitle>
-                    <div className="p-2 bg-red-900/20 rounded-full">
-                        <XCircle className="h-4 w-4 text-red-400" />
-                    </div>
-                </ZenCardHeader>
-                <ZenCardContent>
-                    <div className="flex items-center gap-3">
-                        <div className="text-2xl font-bold text-red-400">{horariosInactivos}</div>
-                        <div className="text-sm text-zinc-500">
-                            {100 - porcentajeActivos}% del total
+                    {/* Horarios activos */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-zinc-400">
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <span className="text-sm">Horarios activos</span>
+                        </div>
+                        <div className="text-2xl font-bold text-green-500">
+                            {horariosActivos}
                         </div>
                     </div>
-                    {horariosInactivos > 0 && (
-                        <div className="mt-2 text-xs text-zinc-500">
-                            No aparecen en tu perfil público
-                        </div>
-                    )}
-                </ZenCardContent>
-            </ZenCard>
 
-            {/* Total Días */}
-            <ZenCard variant="default" padding="md" className="hover:bg-zinc-800/30 transition-colors duration-200">
-                <ZenCardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <ZenCardTitle className="text-sm font-medium text-zinc-300">
-                        Total Días
-                    </ZenCardTitle>
-                    <div className="p-2 bg-blue-900/20 rounded-full">
-                        <Calendar className="h-4 w-4 text-blue-400" />
-                    </div>
-                </ZenCardHeader>
-                <ZenCardContent>
-                    <div className="flex items-center gap-3">
-                        <div className="text-2xl font-bold text-white">{totalHorarios}</div>
-                        <div className="text-sm text-zinc-500">
-                            de 7 días
+                    {/* Días con horarios */}
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-zinc-400">
+                            <Clock className="h-4 w-4 text-blue-500" />
+                            <span className="text-sm">Días con horarios</span>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-500">
+                            {diasConHorarios}
                         </div>
                     </div>
-                    <div className="mt-2 text-xs text-zinc-500">
-                        Horarios configurados
+                </div>
+
+                {/* Información adicional */}
+                {horariosInactivos > 0 && (
+                    <div className="mt-4 p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
+                        <div className="flex items-center gap-2 text-amber-400">
+                            <XCircle className="h-4 w-4" />
+                            <span className="text-sm font-medium">
+                                {horariosInactivos} horario{horariosInactivos !== 1 ? 's' : ''} inactivo{horariosInactivos !== 1 ? 's' : ''}
+                            </span>
+                        </div>
+                        <p className="text-xs text-zinc-400 mt-1">
+                            Los horarios inactivos no se mostrarán en tu página pública
+                        </p>
                     </div>
-                </ZenCardContent>
-            </ZenCard>
-        </div>
+                )}
+            </ZenCardContent>
+        </ZenCard>
     );
 }

@@ -20,8 +20,8 @@ export async function obtenerIdentidadStudio(studioSlug: string) {
         studio_name: true,
         slug: true,
         slogan: true,
-        descripcion: true,
-        palabras_clave: true,
+        description: true,
+        keywords: true,
         logo_url: true,
         isotipo_url: true,
       },
@@ -37,12 +37,12 @@ export async function obtenerIdentidadStudio(studioSlug: string) {
 
     // Parsear palabras clave si existen
     let palabrasClave: string[] = [];
-    if (studio.palabras_clave) {
+    if (studio.keywords) {
       try {
-        palabrasClave = JSON.parse(studio.palabras_clave);
+        palabrasClave = JSON.parse(studio.keywords);
       } catch {
         // Si no se puede parsear, usar como string simple
-        palabrasClave = studio.palabras_clave.split(',').map(p => p.trim()).filter(p => p);
+        palabrasClave = studio.keywords.split(',').map(p => p.trim()).filter(p => p);
       }
     }
 
@@ -75,14 +75,14 @@ export async function actualizarIdentidadBasica(
       data: {
         studio_name: validatedData.nombre,
         slogan: validatedData.slogan,
-        descripcion: validatedData.descripcion,
+        description: validatedData.descripcion,
         logo_url: validatedData.logoUrl,      // ✅ Cambiar a logo_url
         isotipo_url: validatedData.isotipo_url, // ✅ Ya correcto
       },
       select: {
         studio_name: true,
         slogan: true,
-        descripcion: true,
+        description: true,
         logo_url: true,      // ✅ Cambiar a logo_url
         isotipo_url: true,
       },
@@ -114,16 +114,16 @@ export async function actualizarPalabrasClave(
     await prisma.studios.update({
       where: { id: studio.id },
       data: {
-        palabras_clave: palabrasClaveString,
+        keywords: palabrasClaveString,
       },
       select: {
-        palabras_clave: true,
+        keywords: true,
       },
     });
 
     revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/identidad`);
     return {
-      palabras_clave: palabrasClave,
+      keywords: palabrasClave,
     };
   });
 }
@@ -207,8 +207,8 @@ export async function actualizarIdentidadCompleta(
       select: {
         studio_name: true,
         slogan: true,
-        descripcion: true,
-        palabras_clave: true,
+        description: true,
+        keywords: true,
         logo_url: true,
         isotipo_url: true,
       },
@@ -216,11 +216,11 @@ export async function actualizarIdentidadCompleta(
 
     // Parsear palabras clave para la respuesta
     let palabrasClave: string[] = [];
-    if (studioActualizado.palabras_clave) {
+    if (studioActualizado.keywords) {
       try {
-        palabrasClave = JSON.parse(studioActualizado.palabras_clave);
+        palabrasClave = JSON.parse(studioActualizado.keywords);
       } catch {
-        palabrasClave = studioActualizado.palabras_clave.split(',').map(p => p.trim()).filter(p => p);
+        palabrasClave = studioActualizado.keywords.split(',').map(p => p.trim()).filter(p => p);
       }
     }
 

@@ -44,14 +44,14 @@ export async function obtenerContactoStudio(studioSlug: string) {
         }
 
         // 2. Obtener teléfonos del studio
-        const telefonos = await prisma.studio_telefonos.findMany({
+        const telefonos = await prisma.studio_phones.findMany({
             where: { studio_id: studio.id },
             select: {
                 id: true,
                 studio_id: true,
-                numero: true,
-                tipo: true,
-                activo: true,
+                number: true,
+                type: true,
+                is_active: true,
                 order: true,
                 created_at: true,
                 updated_at: true,
@@ -117,7 +117,7 @@ export async function obtenerTelefonosStudio(
         }
 
         // 3. Obtener teléfonos
-        const telefonos = await prisma.studio_telefonos.findMany({
+        const telefonos = await prisma.studio_phones.findMany({
             where: whereClause,
             orderBy: { created_at: "asc" },
         });
@@ -148,11 +148,11 @@ export async function crearTelefono(
         // 3. Verificar si ya existe un teléfono del mismo tipo activo
         // Solo para tipo "principal" limitamos a uno activo
         if (validatedData.tipo === "principal") {
-            const existingTelefono = await prisma.studio_telefonos.findFirst({
+            const existingTelefono = await prisma.studio_phones.findFirst({
                 where: {
                     studio_id: studio.id,
-                    tipo: "principal",
-                    activo: true,
+                    type: "principal",
+                    is_active: true,
                 },
             });
 
@@ -162,12 +162,12 @@ export async function crearTelefono(
         }
 
         // 4. Crear teléfono
-        const nuevoTelefono = await prisma.studio_telefonos.create({
+        const nuevoTelefono = await prisma.studio_phones.create({
             data: {
                 studio_id: studio.id,
-                numero: validatedData.numero,
-                tipo: validatedData.tipo,
-                activo: validatedData.activo,
+                number: validatedData.numero,
+                type: validatedData.tipo,
+                is_active: validatedData.activo,
             },
         });
 
@@ -188,7 +188,7 @@ export async function actualizarTelefono(
         const validatedData = TelefonoUpdateSchema.parse(data);
 
         // 2. Obtener teléfono existente
-        const existingTelefono = await prisma.studio_telefonos.findUnique({
+        const existingTelefono = await prisma.studio_phones.findUnique({
             where: { id: telefonoId },
             include: {
                 studio: { select: { slug: true } },
@@ -200,12 +200,12 @@ export async function actualizarTelefono(
         }
 
         // 3. Actualizar teléfono
-        const telefonoActualizado = await prisma.studio_telefonos.update({
+        const telefonoActualizado = await prisma.studio_phones.update({
             where: { id: telefonoId },
             data: {
-                ...(validatedData.numero && { numero: validatedData.numero }),
-                ...(validatedData.tipo && { tipo: validatedData.tipo }),
-                ...(validatedData.activo !== undefined && { activo: validatedData.activo }),
+                ...(validatedData.numero && { number: validatedData.numero }),
+                ...(validatedData.tipo && { type: validatedData.tipo }),
+                ...(validatedData.activo !== undefined && { is_active: validatedData.activo }),
             },
         });
 
@@ -238,12 +238,12 @@ export async function actualizarTelefonosBulk(
         // 3. Actualizar todos los teléfonos en una transacción
         const resultados = await prisma.$transaction(
             validatedData.telefonos.map((telefono) =>
-                prisma.studio_telefonos.update({
+                prisma.studio_phones.update({
                     where: { id: telefono.id },
                     data: {
-                        ...(telefono.numero && { numero: telefono.numero }),
-                        ...(telefono.tipo && { tipo: telefono.tipo }),
-                        ...(telefono.activo !== undefined && { activo: telefono.activo }),
+                        ...(telefono.numero && { number: telefono.numero }),
+                        ...(telefono.tipo && { type: telefono.tipo }),
+                        ...(telefono.activo !== undefined && { is_active: telefono.activo }),
                     },
                 })
             )
@@ -266,7 +266,7 @@ export async function toggleTelefonoEstado(
         const validatedData = TelefonoToggleSchema.parse(data);
 
         // 2. Obtener teléfono existente
-        const existingTelefono = await prisma.studio_telefonos.findUnique({
+        const existingTelefono = await prisma.studio_phones.findUnique({
             where: { id: telefonoId },
             include: {
                 studio: { select: { slug: true } },
@@ -278,9 +278,9 @@ export async function toggleTelefonoEstado(
         }
 
         // 3. Actualizar estado
-        const telefonoActualizado = await prisma.studio_telefonos.update({
+        const telefonoActualizado = await prisma.studio_phones.update({
             where: { id: telefonoId },
-            data: { activo: validatedData.activo },
+            data: { is_active: validatedData.activo },
         });
 
         // 4. Revalidar cache
@@ -294,7 +294,7 @@ export async function toggleTelefonoEstado(
 export async function eliminarTelefono(telefonoId: string) {
     return await retryDatabaseOperation(async () => {
         // 1. Obtener teléfono existente
-        const existingTelefono = await prisma.studio_telefonos.findUnique({
+        const existingTelefono = await prisma.studio_phones.findUnique({
             where: { id: telefonoId },
             include: {
                 studio: { select: { slug: true } },
@@ -306,7 +306,7 @@ export async function eliminarTelefono(telefonoId: string) {
         }
 
         // 2. Eliminar teléfono
-        await prisma.studio_telefonos.delete({
+        await prisma.studio_phones.delete({
             where: { id: telefonoId },
         });
 
@@ -402,25 +402,25 @@ export async function obtenerEstadisticasContacto(studioSlug: string) {
 
         // 2. Obtener estadísticas
         const [totalTelefonos, telefonosActivos, telefonosInactivos] = await Promise.all([
-            prisma.studio_telefonos.count({
+            prisma.studio_phones.count({
                 where: { studio_id: studio.id },
             }),
-            prisma.studio_telefonos.count({
-                where: { studio_id: studio.id, activo: true },
+            prisma.studio_phones.count({
+                where: { studio_id: studio.id, is_active: true },
             }),
-            prisma.studio_telefonos.count({
-                where: { studio_id: studio.id, activo: false },
+            prisma.studio_phones.count({
+                where: { studio_id: studio.id, is_active: false },
             }),
         ]);
 
         // 3. Obtener teléfonos por tipo
-        const telefonosPorTipo = await prisma.studio_telefonos.findMany({
+        const telefonosPorTipo = await prisma.studio_phones.findMany({
             where: { studio_id: studio.id },
-            select: { tipo: true, activo: true },
+            select: { type: true, is_active: true },
         });
 
-        const tiposCount = telefonosPorTipo.reduce((acc, telefono) => {
-            acc[telefono.tipo] = (acc[telefono.tipo] || 0) + 1;
+        const tiposCount = telefonosPorTipo.reduce((acc: Record<string, number>, telefono: { type: string; is_active: boolean }) => {
+            acc[telefono.type] = (acc[telefono.type] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
 
@@ -468,7 +468,7 @@ export async function reordenarTelefonos(studioSlug: string, telefonos: Array<{ 
 
         // 2. Actualizar el orden de cada teléfono
         const updatePromises = telefonos.map(({ id, order }) =>
-            prisma.studio_telefonos.update({
+            prisma.studio_phones.update({
                 where: {
                     id,
                     studio_id: studio.id // Asegurar que pertenece al studio

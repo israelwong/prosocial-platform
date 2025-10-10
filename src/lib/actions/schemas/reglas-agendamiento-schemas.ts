@@ -10,10 +10,10 @@ import { z } from 'zod';
 export const createReglaAgendamientoSchema = z.object({
     nombre: z.string().min(1, 'El nombre es requerido'),
     descripcion: z.string().optional(),
-    recurrencia: z.enum(['por_dia', 'por_hora'], {
-        required_error: 'La recurrencia es requerida',
-        invalid_type_error: 'La recurrencia debe ser "por_dia" o "por_hora"'
-    }),
+    recurrencia: z.enum(['por_dia', 'por_hora']).refine(
+        (val) => ['por_dia', 'por_hora'].includes(val),
+        { message: 'La recurrencia debe ser "por_dia" o "por_hora"' }
+    ),
     capacidadOperativa: z.number().min(1, 'La capacidad operativa debe ser al menos 1'),
     status: z.enum(['active', 'inactive']).default('active'),
     orden: z.number().min(0).default(0)
@@ -48,7 +48,18 @@ export type UpdateOrdenReglas = z.infer<typeof updateOrdenReglasSchema>;
 
 export interface ReglaAgendamientoResponse {
     success: boolean;
-    data?: any;
+    data?: {
+        id: string;
+        projectId: string;
+        nombre: string;
+        descripcion?: string | null;
+        recurrencia: 'por_dia' | 'por_hora';
+        capacidadOperativa: number;
+        status: 'active' | 'inactive';
+        orden: number;
+        createdAt: Date;
+        updatedAt: Date;
+    };
     error?: string;
 }
 

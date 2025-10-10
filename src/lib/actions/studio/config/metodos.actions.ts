@@ -20,7 +20,7 @@ export async function obtenerMetodosPago(studioSlug: string) {
 
         const metodos = await prisma.studio_metodos_pago.findMany({
             where: { studio_id: studio.id },
-            orderBy: { orden: 'asc' },
+            orderBy: { order: 'asc' },
         });
 
         return {
@@ -95,14 +95,12 @@ export async function crearMetodoPago(studioSlug: string, data: MetodoPagoForm) 
 
         const dataToSave = {
             studio_id: studio.id,
-            metodo_pago: validationResult.data.metodo_pago,
-            comision_porcentaje_base: validationResult.data.comision_porcentaje_base ? parseFloat(validationResult.data.comision_porcentaje_base) : null,
-            comision_fija_monto: validationResult.data.comision_fija_monto ? parseFloat(validationResult.data.comision_fija_monto) : null,
+            payment_method_name: validationResult.data.metodo_pago,
+            base_commission_percentage: validationResult.data.comision_porcentaje_base ? parseFloat(validationResult.data.comision_porcentaje_base) : null,
+            fixed_commission_amount: validationResult.data.comision_fija_monto ? parseFloat(validationResult.data.comision_fija_monto) : null,
             payment_method: validationResult.data.payment_method,
-            tipo: validationResult.data.tipo,
-            requiere_stripe: validationResult.data.requiere_stripe,
             status: validationResult.data.status,
-            orden: validationResult.data.orden || 0,
+            order: validationResult.data.orden || 0,
             updated_at: new Date(),
         };
 
@@ -147,14 +145,12 @@ export async function actualizarMetodoPago(studioSlug: string, metodoId: string,
         }
 
         const dataToSave = {
-            metodo_pago: validationResult.data.metodo_pago,
-            comision_porcentaje_base: validationResult.data.comision_porcentaje_base ? parseFloat(validationResult.data.comision_porcentaje_base) : null,
-            comision_fija_monto: validationResult.data.comision_fija_monto ? parseFloat(validationResult.data.comision_fija_monto) : null,
+            payment_method_name: validationResult.data.metodo_pago,
+            base_commission_percentage: validationResult.data.comision_porcentaje_base ? parseFloat(validationResult.data.comision_porcentaje_base) : null,
+            fixed_commission_amount: validationResult.data.comision_fija_monto ? parseFloat(validationResult.data.comision_fija_monto) : null,
             payment_method: validationResult.data.payment_method,
-            tipo: validationResult.data.tipo,
-            requiere_stripe: validationResult.data.requiere_stripe,
             status: validationResult.data.status,
-            orden: validationResult.data.orden || 0,
+            order: validationResult.data.orden || 0,
             updated_at: new Date(),
         };
 
@@ -225,7 +221,7 @@ export async function actualizarOrdenMetodosPago(studioSlug: string, metodos: { 
             metodos.map(metodo =>
                 prisma.studio_metodos_pago.update({
                     where: { id: metodo.id },
-                    data: { orden: metodo.orden, updated_at: new Date() },
+                    data: { order: metodo.orden, updated_at: new Date() },
                 })
             )
         );

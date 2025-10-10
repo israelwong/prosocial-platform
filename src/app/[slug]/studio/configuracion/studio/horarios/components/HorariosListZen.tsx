@@ -1,19 +1,18 @@
 'use client';
 
-import React from 'react';
-import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
+import React, { useState } from 'react';
+import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
 import { ZenButton } from '@/components/ui/zen';
-import { Clock, Plus } from 'lucide-react';
-import { HorariosItemZen } from './HorariosItemZen';
-import { Horario } from '../types';
-import { DIAS_SEMANA } from '../types';
-import { DiaSemana } from '@/lib/actions/schemas/horarios-schemas';
+import { Plus, Filter } from 'lucide-react';
+import { Horario } from '@/lib/actions/schemas/horarios-schemas';
+import { HorarioItemZen } from './HorarioItemZen';
+import { HorarioFormZen } from './HorarioFormZen';
 
 interface HorariosListZenProps {
     horarios: Horario[];
-    onToggleHorario: (id: string, activo: boolean) => void;
-    onUpdateHorario: (id: string, data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string }) => void;
-    onAddHorario: (data: { dia_semana: DiaSemana; hora_inicio: string; hora_fin: string; activo: boolean }) => void;
+    onToggleHorario: (id: string, is_active: boolean) => Promise<void>;
+    onUpdateHorario: (id: string, data: { day_of_week: string; start_time: string; end_time: string }) => Promise<void>;
+    onAddHorario: (data: { day_of_week: string; start_time: string; end_time: string; is_active: boolean }) => Promise<void>;
     loading?: boolean;
 }
 
@@ -22,102 +21,146 @@ export function HorariosListZen({
     onToggleHorario,
     onUpdateHorario,
     onAddHorario,
-    loading
+    loading = false
 }: HorariosListZenProps) {
-    // Crear un mapa de horarios por día para acceso rápido
-    const horariosPorDia = new Map(
-        horarios.map(horario => [horario.dia_semana, horario])
-    );
+    const [showForm, setShowForm] = useState(false);
+    const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
-    // Crear horarios para todos los días de la semana
-    const todosLosDias = DIAS_SEMANA.map(dia => {
-        const horarioExistente = horariosPorDia.get(dia.value);
-        return horarioExistente || {
-            id: `temp-${dia.value}`,
-            studio_id: '',
-            dia_semana: dia.value,
-            hora_inicio: '09:00',
-            hora_fin: '18:00',
-            activo: false,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        };
+    const filteredHorarios = horarios.filter(horario => {
+        if (filter === 'active') return horario.is_active;
+        if (filter === 'inactive') return !horario.is_active;
+        return true;
     });
 
-    const diasConHorarios = todosLosDias.filter(h => h.id.startsWith('temp-') === false);
-    const diasSinHorarios = todosLosDias.filter(h => h.id.startsWith('temp-'));
+    const handleAddHorario = async (data: { day_of_week: string; start_time: string; end_time: string; is_active: boolean }) => {
+        await onAddHorario(data);
+        setShowForm(false);
+    };
 
-    return (
-        <ZenCard variant="default" padding="none">
-            <ZenCardHeader>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <ZenCardTitle>Horarios por Día de la Semana</ZenCardTitle>
-                        <ZenCardDescription>
-                            Configura los horarios de atención para cada día
-                        </ZenCardDescription>
-                    </div>
-                    {diasSinHorarios.length > 0 && (
-                        <ZenButton
-                            onClick={() => {
-                                // Agregar el primer día sin horario
-                                const primerDiaSinHorario = diasSinHorarios[0];
-                                onAddHorario({
-                                    dia_semana: primerDiaSinHorario.dia_semana as DiaSemana,
-                                    hora_inicio: primerDiaSinHorario.hora_inicio,
-                                    hora_fin: primerDiaSinHorario.hora_fin,
-                                    activo: true
-                                });
-                            }}
-                            variant="outline"
-                            size="sm"
-                            className="bg-blue-600/10 border-blue-600 text-blue-400 hover:bg-blue-600/20"
-                        >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Agregar Horario
-                        </ZenButton>
-                    )}
-                </div>
-            </ZenCardHeader>
-            <ZenCardContent className="space-y-4">
-                {loading ? (
-                    <div className="space-y-3">
-                        {[...Array(7)].map((_, i) => (
+    if (loading) {
+        return (
+            <ZenCard variant="default" padding="lg">
+                <ZenCardHeader>
+                    <ZenCardTitle>Horarios de Atención</ZenCardTitle>
+                </ZenCardHeader>
+                <ZenCardContent>
+                    <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
                             <div key={i} className="animate-pulse">
                                 <div className="h-16 bg-zinc-700 rounded-lg"></div>
                             </div>
                         ))}
                     </div>
+                </ZenCardContent>
+            </ZenCard>
+        );
+    }
+
+    return (
+        <ZenCard variant="default" padding="lg">
+            <ZenCardHeader>
+                <div className="flex items-center justify-between">
+                    <ZenCardTitle>Horarios de Atención</ZenCardTitle>
+                    <div className="flex items-center gap-2">
+                        {/* Filtros */}
+                        <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1">
+                            <button
+                                onClick={() => setFilter('all')}
+                                className={`px-3 py-1 text-xs rounded-md transition-colors ${filter === 'all'
+                                        ? 'bg-zinc-700 text-white'
+                                        : 'text-zinc-400 hover:text-white'
+                                    }`}
+                            >
+                                Todos
+                            </button>
+                            <button
+                                onClick={() => setFilter('active')}
+                                className={`px-3 py-1 text-xs rounded-md transition-colors ${filter === 'active'
+                                        ? 'bg-zinc-700 text-white'
+                                        : 'text-zinc-400 hover:text-white'
+                                    }`}
+                            >
+                                Activos
+                            </button>
+                            <button
+                                onClick={() => setFilter('inactive')}
+                                className={`px-3 py-1 text-xs rounded-md transition-colors ${filter === 'inactive'
+                                        ? 'bg-zinc-700 text-white'
+                                        : 'text-zinc-400 hover:text-white'
+                                    }`}
+                            >
+                                Inactivos
+                            </button>
+                        </div>
+
+                        {/* Botón agregar */}
+                        <ZenButton
+                            onClick={() => setShowForm(!showForm)}
+                            variant="primary"
+                            size="sm"
+                        >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Agregar Horario
+                        </ZenButton>
+                    </div>
+                </div>
+            </ZenCardHeader>
+            <ZenCardContent>
+                {/* Formulario de nuevo horario */}
+                {showForm && (
+                    <div className="mb-6">
+                        <HorarioFormZen
+                            onSubmit={handleAddHorario}
+                            onCancel={() => setShowForm(false)}
+                            submitLabel="Agregar Horario"
+                        />
+                    </div>
+                )}
+
+                {/* Lista de horarios */}
+                {filteredHorarios.length === 0 ? (
+                    <div className="text-center py-8">
+                        <div className="text-zinc-400 mb-2">
+                            {filter === 'all' && 'No hay horarios configurados'}
+                            {filter === 'active' && 'No hay horarios activos'}
+                            {filter === 'inactive' && 'No hay horarios inactivos'}
+                        </div>
+                        <p className="text-sm text-zinc-500">
+                            {filter === 'all' && 'Agrega tu primer horario de atención'}
+                            {filter === 'active' && 'Todos los horarios están inactivos'}
+                            {filter === 'inactive' && 'Todos los horarios están activos'}
+                        </p>
+                    </div>
                 ) : (
                     <div className="space-y-3">
-                        {todosLosDias.map((horario) => (
-                            <HorariosItemZen
-                                key={horario.dia_semana}
+                        {filteredHorarios.map((horario) => (
+                            <HorarioItemZen
+                                key={horario.id}
                                 horario={horario}
-                                onToggleActive={onToggleHorario}
-                                onUpdateHorario={onUpdateHorario}
-                                onAddHorario={onAddHorario}
+                                onToggle={onToggleHorario}
+                                onUpdate={onUpdateHorario}
                             />
                         ))}
                     </div>
                 )}
 
-                {/* Información adicional */}
-                <div className="mt-6 p-4 bg-zinc-800/50 rounded-lg border border-zinc-700/50">
-                    <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-blue-900/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Clock className="h-4 w-4 text-blue-400" />
-                        </div>
-                        <div className="space-y-2">
-                            <h4 className="text-white font-medium text-sm">Información sobre horarios</h4>
-                            <div className="text-xs text-zinc-400 space-y-1">
-                                <p>• Los horarios activos aparecerán en tu perfil público</p>
-                                <p>• Puedes configurar diferentes horarios para cada día</p>
-                                <p>• Los horarios inactivos no se mostrarán a los clientes</p>
+                {/* Información de ayuda */}
+                {horarios.length > 0 && (
+                    <div className="mt-6 p-4 bg-zinc-800/30 rounded-lg border border-zinc-700">
+                        <div className="flex items-start gap-3">
+                            <Filter className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-medium text-white">Consejos para configurar horarios</h4>
+                                <ul className="text-xs text-zinc-400 space-y-1">
+                                    <li>• Los horarios activos se mostrarán en tu página pública</li>
+                                    <li>• Puedes tener múltiples horarios para el mismo día</li>
+                                    <li>• Los horarios se ordenan automáticamente por día y hora</li>
+                                    <li>• Usa horarios inactivos para temporadas especiales</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
             </ZenCardContent>
         </ZenCard>
     );

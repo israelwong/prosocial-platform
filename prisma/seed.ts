@@ -77,98 +77,9 @@ async function main() {
 // ============================================
 
 async function seedPlatformModules() {
-    console.log('🧩 Seeding platform modules...');
-
-    const modules = [
-        // CORE MODULES (incluidos en planes)
-        {
-            slug: 'manager',
-            name: 'ZEN Manager',
-            description: 'Sistema de gestión operacional - Kanban, Gantt, equipo',
-            category: 'CORE' as const,
-            base_price: null,
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-        {
-            slug: 'magic',
-            name: 'ZEN Magic',
-            description: 'Asistente inteligente con IA - Claude integration',
-            category: 'CORE' as const,
-            base_price: null,
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-        {
-            slug: 'marketing',
-            name: 'ZEN Marketing',
-            description: 'CRM y pipeline de ventas - Leads, cotizaciones',
-            category: 'CORE' as const,
-            base_price: null,
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-        {
-            slug: 'pages',
-            name: 'ZEN Pages',
-            description: 'Landing page pública - Portfolios, lead forms',
-            category: 'CORE' as const,
-            base_price: null,
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-
-        // ADDON MODULES (pago adicional)
-        {
-            slug: 'payment',
-            name: 'ZEN Payment',
-            description: 'Procesamiento de pagos - Stripe Connect',
-            category: 'ADDON' as const,
-            base_price: 199, // MXN/mes
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-        {
-            slug: 'cloud',
-            name: 'ZEN Cloud',
-            description: 'Almacenamiento extra - CDN, galerías',
-            category: 'ADDON' as const,
-            base_price: 299, // MXN/mes
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-        {
-            slug: 'conversations',
-            name: 'ZEN Conversations',
-            description: 'Chat en tiempo real - WhatsApp, SMS',
-            category: 'ADDON' as const,
-            base_price: 249, // MXN/mes
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-        {
-            slug: 'invitation',
-            name: 'ZEN Invitation',
-            description: 'Invitaciones digitales - RSVP, QR codes',
-            category: 'ADDON' as const,
-            base_price: 149, // MXN/mes
-            billing_type: 'MONTHLY',
-            is_active: true,
-        },
-    ];
-
-    for (const moduleData of modules) {
-        await prisma.platform_modules.upsert({
-            where: { slug: moduleData.slug },
-            update: { updated_at: new Date() },
-            create: {
-                ...moduleData,
-                created_at: new Date(),
-                updated_at: new Date(),
-            },
-        });
-        console.log(`  ✅ ${moduleData.name} (${moduleData.category})`);
-    }
+    console.log('🧩 Plataforma configurada...');
+    console.log(`  ✅ Acceso completo a todas las funcionalidades`);
+    // Los módulos ya no se usan en el nuevo modelo de monetización
 }
 
 // ============================================
@@ -308,7 +219,7 @@ async function seedPlans() {
             },
             popular: false,
             active: true,
-            orden: 1,
+            order: 1,
         },
     });
 
@@ -343,7 +254,7 @@ async function seedPlans() {
             },
             popular: true,
             active: true,
-            orden: 2,
+            order: 2,
         },
     });
 
@@ -379,7 +290,7 @@ async function seedPlans() {
             },
             popular: false,
             active: true,
-            orden: 3,
+            order: 3,
         },
     });
 
@@ -411,11 +322,19 @@ async function seedDemoStudio() {
             studio_name: 'Demo Studio',
             slug: DEMO_STUDIO_SLUG,
             email: 'contacto@demo-studio.com',
-            phone: '+52 33 1234 5678',
             address: 'Av. Revolución 1234, Guadalajara, JAL',
+            maps_url: 'https://maps.app.goo.gl/demo123',
+            latitude: 20.6597,
+            longitude: -103.3496,
+            place_id: 'ChIJ_demo_place_id',
+            website: 'https://demo-studio.com',
+            bank_name: 'BBVA',
+            account_number: '1234567890',
+            account_holder: 'Demo Studio S.A. de C.V.',
+            clabe_number: '012345678901234567',
             slogan: 'Capturamos tus momentos inolvidables',
-            descripcion: 'Estudio fotográfico profesional especializado en bodas, XV años y eventos sociales',
-            palabras_clave: 'fotografía, bodas, eventos, Guadalajara',
+            description: 'Estudio fotográfico profesional especializado en bodas, XV años y eventos sociales',
+            keywords: 'fotografía, bodas, eventos, Guadalajara',
             subscription_status: 'TRIAL',
             is_active: true,
             created_at: new Date(),
@@ -428,45 +347,64 @@ async function seedDemoStudio() {
     await prisma.studio_configuraciones.create({
         data: {
             studio_id: demoStudio.id,
-            nombre: 'Configuración Principal',
-            utilidad_servicio: 35, // 35% de utilidad en servicios
-            utilidad_producto: 40, // 40% de utilidad en productos
-            comision_venta: 5, // 5% de comisión por venta
-            sobreprecio: 0,
+            name: 'Configuración Principal',
+            service_margin: 35, // 35% de utilidad en servicios
+            product_margin: 40, // 40% de utilidad en productos
+            sales_commission: 5, // 5% de comisión por venta
+            markup: 0,
             status: 'active',
         },
     });
     console.log(`  ✅ Configuración creada`);
 
-    // Activar módulos CORE
-    const modulesToActivate = ['manager', 'marketing', 'magic', 'pages'];
+    // Teléfonos del studio
+    await prisma.studio_phones.createMany({
+        data: [
+            {
+                studio_id: demoStudio.id,
+                number: '+52 33 1234 5678',
+                type: 'principal',
+                is_active: true,
+                order: 0,
+            },
+            {
+                studio_id: demoStudio.id,
+                number: '+52 33 1234 5679',
+                type: 'whatsapp',
+                is_active: true,
+                order: 1,
+            },
+        ],
+    });
+    console.log(`  ✅ Teléfonos creados`);
 
-    for (const moduleSlug of modulesToActivate) {
-        const moduleData = await prisma.platform_modules.findUnique({
-            where: { slug: moduleSlug },
-        });
+    // Horarios de atención
+    const diasSemana = [
+        { day: 'monday', name: 'Lunes' },
+        { day: 'tuesday', name: 'Martes' },
+        { day: 'wednesday', name: 'Miércoles' },
+        { day: 'thursday', name: 'Jueves' },
+        { day: 'friday', name: 'Viernes' },
+        { day: 'saturday', name: 'Sábado' },
+        { day: 'sunday', name: 'Domingo' },
+    ];
 
-        if (moduleData) {
-            await prisma.studio_modules.upsert({
-                where: {
-                    studio_id_module_id: {
-                        studio_id: demoStudio.id,
-                        module_id: moduleData.id,
-                    },
-                },
-                update: { is_active: true, updated_at: new Date() },
-                create: {
-                    studio_id: demoStudio.id,
-                    module_id: moduleData.id,
-                    is_active: true,
-                    activated_at: new Date(),
-                    created_at: new Date(),
-                    updated_at: new Date(),
-                },
-            });
-            console.log(`  ✅ Módulo activado: ${moduleData.name}`);
-        }
-    }
+    await prisma.studio_business_hours.createMany({
+        data: diasSemana.map((dia, index) => ({
+            studio_id: demoStudio.id,
+            day_of_week: dia.day,
+            start_time: '09:00',
+            end_time: '18:00',
+            is_active: index < 5, // Lunes a Viernes activos por defecto
+            order: index,
+        })),
+        skipDuplicates: true,
+    });
+    console.log(`  ✅ Horarios de atención creados`);
+
+    // El nuevo modelo de monetización no requiere activación de módulos
+    // Los estudios tienen acceso completo a todas las funcionalidades
+    console.log(`  ✅ Studio configurado con acceso completo`);
 }
 
 // ============================================
@@ -670,51 +608,51 @@ async function seedCatalogo() {
     console.log('📁 Seeding catálogo...');
 
     // Secciones
-    const seccion = await prisma.studio_servicio_secciones.upsert({
-        where: { nombre: 'Cobertura del Evento' },
+    const seccion = await prisma.studio_service_sections.upsert({
+        where: { name: 'Cobertura del Evento' },
         update: {},
         create: {
-            nombre: 'Cobertura del Evento',
-            descripcion: 'Servicios de fotografía y video el día del evento',
-            orden: 0,
+            name: 'Cobertura del Evento',
+            description: 'Servicios de fotografía y video el día del evento',
+            order: 0,
         },
     });
 
     // Categoría
-    const categoria = await prisma.studio_servicio_categorias.upsert({
-        where: { nombre: 'Fotografía de evento' },
+    const categoria = await prisma.studio_service_categories.upsert({
+        where: { name: 'Fotografía de evento' },
         update: {},
         create: {
-            nombre: 'Fotografía de evento',
-            orden: 0,
+            name: 'Fotografía de evento',
+            order: 0,
         },
     });
 
     // Relación sección-categoría
-    await prisma.studio_seccion_categorias.createMany({
+    await prisma.studio_section_categories.createMany({
         data: {
-            seccion_id: seccion.id,
-            categoria_id: categoria.id,
+            section_id: seccion.id,
+            category_id: categoria.id,
         },
         skipDuplicates: true,
     });
 
     // Servicios (solo costo y gasto - utilidad se calcula al vuelo)
     const servicios = [
-        { nombre: 'Fotógrafo principal por hora', costo: 500, orden: 0 },
-        { nombre: 'Asistente de iluminación por hora', costo: 200, orden: 1 },
-        { nombre: 'Revelado digital de fotos', costo: 1500, orden: 2 },
+        { name: 'Fotógrafo principal por hora', cost: 500, order: 0 },
+        { name: 'Asistente de iluminación por hora', cost: 200, order: 1 },
+        { name: 'Revelado digital de fotos', cost: 1500, order: 2 },
     ];
 
-    await prisma.studio_servicios.createMany({
+    await prisma.studio_items.createMany({
         data: servicios.map(servicio => ({
             studio_id: DEMO_STUDIO_ID,
-            servicio_categoria_id: categoria.id,
-            nombre: servicio.nombre,
-            costo: servicio.costo,
-            gasto: 0,
-            tipo_utilidad: 'servicio',
-            orden: servicio.orden,
+            service_category_id: categoria.id,
+            name: servicio.name,
+            cost: servicio.cost,
+            expense: 0,
+            utility_type: 'service',
+            order: servicio.order,
             status: 'active',
         })),
         skipDuplicates: true,
@@ -730,19 +668,19 @@ async function seedTiposEvento() {
     console.log('🎉 Seeding tipos de evento...');
 
     const tipos = [
-        { nombre: 'Boda', orden: 0 },
-        { nombre: 'XV Años', orden: 1 },
-        { nombre: 'Sesión Familiar', orden: 2 },
-        { nombre: 'Sesión Embarazo', orden: 3 },
-        { nombre: 'Evento Corporativo', orden: 4 },
+        { name: 'Boda', order: 0 },
+        { name: 'XV Años', order: 1 },
+        { name: 'Sesión Familiar', order: 2 },
+        { name: 'Sesión Embarazo', order: 3 },
+        { name: 'Evento Corporativo', order: 4 },
     ];
 
-    await prisma.studio_evento_tipos.createMany({
+    await prisma.studio_event_types.createMany({
         data: tipos.map(tipo => ({
             studio_id: DEMO_STUDIO_ID,
-            nombre: tipo.nombre,
+            name: tipo.name,
             status: 'active',
-            orden: tipo.orden,
+            order: tipo.order,
             created_at: new Date(),
             updated_at: new Date(),
         })),
@@ -758,8 +696,10 @@ async function seedTiposEvento() {
 async function seedDemoLead() {
     console.log('👤 Seeding demo lead...');
 
-    const demoLead = await prisma.platform_leads.create({
-        data: {
+    const demoLead = await prisma.platform_leads.upsert({
+        where: { email: 'owner@demo-studio.com' },
+        update: { updated_at: new Date() },
+        create: {
             studio_id: DEMO_STUDIO_ID,
             name: 'Carlos Méndez',
             email: 'owner@demo-studio.com',

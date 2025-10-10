@@ -6,73 +6,70 @@ import { revalidatePath } from "next/cache";
 import {
     HorarioCreateSchema,
     HorarioUpdateSchema,
-    HorariosBulkUpdateSchema,
     HorarioToggleSchema,
-    HorariosFiltersSchema,
     type HorarioCreateForm,
     type HorarioUpdateForm,
-    type HorariosBulkUpdateForm,
     type HorarioToggleForm,
-    type HorariosFiltersForm,
 } from "@/lib/actions/schemas/horarios-schemas";
 
 // Obtener horarios del studio
-export async function obtenerHorariosStudio(
-    studioSlug: string,
-    filters?: HorariosFiltersForm
-) {
-    return await retryDatabaseOperation(async () => {
+export async function obtenerHorariosStudio(studioSlug: string) {
+    try {
+        console.log('🔍 [obtenerHorariosStudio] Buscando studio con slug:', studioSlug);
+
         // 1. Obtener studio
         const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
-            select: { id: true, studio_name: true },
+            select: {
+                id: true,
+                studio_name: true,
+                slug: true,
+            },
         });
+
+        console.log('🏢 [obtenerHorariosStudio] Studio encontrado:', studio);
 
         if (!studio) {
             throw new Error("Studio no encontrado");
         }
 
-        // 2. Construir filtros
-        const whereClause: {
-            studio_id: string;
-            activo?: boolean;
-            dia_semana?: string;
-        } = {
-            studio_id: studio.id,
-        };
-
-        if (filters) {
-            const validatedFilters = HorariosFiltersSchema.parse(filters);
-
-            if (validatedFilters.activo !== undefined) {
-                whereClause.activo = validatedFilters.activo;
-            }
-
-            if (validatedFilters.dia_semana) {
-                whereClause.dia_semana = validatedFilters.dia_semana;
-            }
-        }
-
-        // 3. Obtener horarios
-        const horarios = await prisma.studio_horarios_atencion.findMany({
-            where: whereClause,
+        // 2. Obtener horarios del studio usando el nuevo schema
+        const horarios = await prisma.studio_business_hours.findMany({
+            where: { studio_id: studio.id },
+            select: {
+                id: true,
+                day_of_week: true,
+                start_time: true,
+                end_time: true,
+                is_active: true,
+                order: true,
+                created_at: true,
+                updated_at: true,
+            },
             orderBy: [
-                { dia_semana: "asc" },
-                { hora_inicio: "asc" }
+                { order: 'asc' },
+                { day_of_week: 'asc' }
             ],
         });
 
+        console.log('⏰ [obtenerHorariosStudio] Horarios encontrados:', horarios.length);
+
         return horarios;
-    });
+    } catch (error) {
+        console.error('❌ [obtenerHorariosStudio] Error:', error);
+        throw new Error("Error al obtener los horarios del studio");
+    }
 }
 
-// Crear horario
-export async function crearHorario(
-    studioSlug: string,
-    data: HorarioCreateForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Obtener studio
+// Crear nuevo horario
+export async function crearHorario(studioSlug: string, data: HorarioCreateForm) {
+    try {
+        console.log('➕ [crearHorario] Creando horario para studio:', studioSlug, 'con datos:', data);
+
+        // Validar datos
+        const validatedData = HorarioCreateSchema.parse(data);
+
+        // Obtener studio
         const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
@@ -82,233 +79,132 @@ export async function crearHorario(
             throw new Error("Studio no encontrado");
         }
 
-        // 2. Validar datos
-        const validatedData = HorarioCreateSchema.parse(data);
-
-        // 3. Verificar si ya existe un horario para ese día
-        const existingHorario = await prisma.studio_horarios_atencion.findUnique({
-            where: {
-                studio_id_dia_semana: {
+        // Crear horario usando el nuevo schema
+        const horario = await retryDatabaseOperation(async () => {
+            return await prisma.studio_business_hours.create({
+                data: {
                     studio_id: studio.id,
-                    dia_semana: validatedData.dia_semana,
+                    day_of_week: validatedData.day_of_week,
+                    start_time: validatedData.start_time,
+                    end_time: validatedData.end_time,
+                    is_active: validatedData.is_active,
+                    order: validatedData.order || 0,
                 },
-            },
+                select: {
+                    id: true,
+                    day_of_week: true,
+                    start_time: true,
+                    end_time: true,
+                    is_active: true,
+                    order: true,
+                    created_at: true,
+                    updated_at: true,
+                },
+            });
         });
 
-        if (existingHorario) {
-            throw new Error(`Ya existe un horario configurado para ${validatedData.dia_semana}`);
-        }
+        console.log('✅ [crearHorario] Horario creado:', horario);
 
-        // 4. Crear horario
-        const nuevoHorario = await prisma.studio_horarios_atencion.create({
-            data: {
-                studio_id: studio.id,
-                dia_semana: validatedData.dia_semana,
-                hora_inicio: validatedData.hora_inicio,
-                hora_fin: validatedData.hora_fin,
-                activo: validatedData.activo,
-            },
-        });
+        // Revalidar cache
+        revalidatePath(`/studio/${studioSlug}/configuracion/studio/horarios`);
 
-        // 5. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/horarios`);
-
-        return nuevoHorario;
-    });
+        return horario;
+    } catch (error) {
+        console.error('❌ [crearHorario] Error:', error);
+        throw new Error("Error al crear el horario");
+    }
 }
 
 // Actualizar horario
-export async function actualizarHorario(
-    horarioId: string,
-    data: HorarioUpdateForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Validar datos
+export async function actualizarHorario(id: string, data: HorarioUpdateForm) {
+    try {
+        console.log('✏️ [actualizarHorario] Actualizando horario:', id, 'con datos:', data);
+
+        // Validar datos
         const validatedData = HorarioUpdateSchema.parse(data);
 
-        // 2. Obtener horario existente
-        const existingHorario = await prisma.studio_horarios_atencion.findUnique({
-            where: { id: horarioId },
-            include: {
-                studio: { select: { slug: true } }
-            },
+        // Actualizar horario usando el nuevo schema
+        const horario = await retryDatabaseOperation(async () => {
+            return await prisma.studio_business_hours.update({
+                where: { id },
+                data: {
+                    day_of_week: validatedData.day_of_week,
+                    start_time: validatedData.start_time,
+                    end_time: validatedData.end_time,
+                    is_active: validatedData.is_active,
+                    order: validatedData.order,
+                },
+                select: {
+                    id: true,
+                    day_of_week: true,
+                    start_time: true,
+                    end_time: true,
+                    is_active: true,
+                    order: true,
+                    created_at: true,
+                    updated_at: true,
+                },
+            });
         });
 
-        if (!existingHorario) {
-            throw new Error("Horario no encontrado");
-        }
+        console.log('✅ [actualizarHorario] Horario actualizado:', horario);
 
-        // 3. Actualizar horario
-        const horarioActualizado = await prisma.studio_horarios_atencion.update({
-            where: { id: horarioId },
-            data: {
-                ...(validatedData.dia_semana && { dia_semana: validatedData.dia_semana }),
-                ...(validatedData.hora_inicio && { hora_inicio: validatedData.hora_inicio }),
-                ...(validatedData.hora_fin && { hora_fin: validatedData.hora_fin }),
-                ...(validatedData.activo !== undefined && { activo: validatedData.activo }),
-            },
-        });
+        // Revalidar cache
+        revalidatePath(`/studio/${data.studio_slug}/configuracion/studio/horarios`);
 
-        // 4. Revalidar cache
-        revalidatePath(`/studio/${existingHorario.studio.slug}/configuracion/cuenta/horarios`);
-
-        return horarioActualizado;
-    });
+        return horario;
+    } catch (error) {
+        console.error('❌ [actualizarHorario] Error:', error);
+        throw new Error("Error al actualizar el horario");
+    }
 }
 
-// Actualizar múltiples horarios
-export async function actualizarHorariosBulk(
-    studioSlug: string,
-    data: HorariosBulkUpdateForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Obtener studio
-        const studio = await prisma.studios.findUnique({
-            where: { slug: studioSlug },
-            select: { id: true },
-        });
+// Toggle estado del horario
+export async function toggleHorarioEstado(id: string, data: HorarioToggleForm) {
+    try {
+        console.log('🔄 [toggleHorarioEstado] Toggle horario:', id, 'activo:', data.is_active);
 
-        if (!studio) {
-            throw new Error("Studio no encontrado");
-        }
-
-        // 2. Validar datos
-        const validatedData = HorariosBulkUpdateSchema.parse(data);
-
-        // 3. Actualizar todos los horarios en una transacción
-        const resultados = await prisma.$transaction(
-            validatedData.horarios.map((horario) =>
-                prisma.studio_horarios_atencion.update({
-                    where: { id: horario.id },
-                    data: {
-                        ...(horario.dia_semana && { dia_semana: horario.dia_semana }),
-                        ...(horario.hora_inicio && { hora_inicio: horario.hora_inicio }),
-                        ...(horario.hora_fin && { hora_fin: horario.hora_fin }),
-                        ...(horario.activo !== undefined && { activo: horario.activo }),
-                    },
-                })
-            )
-        );
-
-        // 4. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/horarios`);
-
-        return resultados;
-    });
-}
-
-// Toggle estado de horario
-export async function toggleHorarioEstado(
-    horarioId: string,
-    data: HorarioToggleForm
-) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Validar datos
+        // Validar datos
         const validatedData = HorarioToggleSchema.parse(data);
 
-        // 2. Obtener horario existente
-        const existingHorario = await prisma.studio_horarios_atencion.findUnique({
-            where: { id: horarioId },
-            include: {
-                studio: { select: { slug: true } }
-            },
+        // Actualizar estado usando el nuevo schema
+        const horario = await retryDatabaseOperation(async () => {
+            return await prisma.studio_business_hours.update({
+                where: { id },
+                data: {
+                    is_active: validatedData.is_active,
+                },
+                select: {
+                    id: true,
+                    day_of_week: true,
+                    start_time: true,
+                    end_time: true,
+                    is_active: true,
+                    order: true,
+                    created_at: true,
+                    updated_at: true,
+                },
+            });
         });
 
-        if (!existingHorario) {
-            throw new Error("Horario no encontrado");
-        }
+        console.log('✅ [toggleHorarioEstado] Estado actualizado:', horario);
 
-        // 3. Actualizar estado
-        const horarioActualizado = await prisma.studio_horarios_atencion.update({
-            where: { id: horarioId },
-            data: { activo: validatedData.activo },
-        });
+        // Revalidar cache
+        revalidatePath(`/studio/${data.studio_slug}/configuracion/studio/horarios`);
 
-        // 4. Revalidar cache
-        revalidatePath(`/studio/${existingHorario.studio.slug}/configuracion/cuenta/horarios`);
-
-        return horarioActualizado;
-    });
-}
-
-// Eliminar horario
-export async function eliminarHorario(horarioId: string) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Obtener horario existente
-        const existingHorario = await prisma.studio_horarios_atencion.findUnique({
-            where: { id: horarioId },
-            include: {
-                studio: { select: { slug: true } }
-            },
-        });
-
-        if (!existingHorario) {
-            throw new Error("Horario no encontrado");
-        }
-
-        // 2. Eliminar horario
-        await prisma.studio_horarios_atencion.delete({
-            where: { id: horarioId },
-        });
-
-        // 3. Revalidar cache
-        revalidatePath(`/studio/${existingHorario.studio.slug}/configuracion/cuenta/horarios`);
-
-        return { success: true };
-    });
-}
-
-// Obtener estadísticas de horarios
-export async function obtenerEstadisticasHorarios(studioSlug: string) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Obtener studio
-        const studio = await prisma.studios.findUnique({
-            where: { slug: studioSlug },
-            select: { id: true },
-        });
-
-        if (!studio) {
-            throw new Error("Studio no encontrado");
-        }
-
-        // 2. Obtener estadísticas
-        const [total, activos, inactivos] = await Promise.all([
-            prisma.studio_horarios_atencion.count({
-                where: { studio_id: studio.id },
-            }),
-            prisma.studio_horarios_atencion.count({
-                where: { studio_id: studio.id, activo: true },
-            }),
-            prisma.studio_horarios_atencion.count({
-                where: { studio_id: studio.id, activo: false },
-            }),
-        ]);
-
-        // 3. Obtener horarios por día
-        const horariosPorDia = await prisma.studio_horarios_atencion.findMany({
-            where: { studio_id: studio.id },
-            select: { dia_semana: true, activo: true },
-        });
-
-        const diasConfigurados = horariosPorDia.length;
-        const diasActivos = horariosPorDia.filter(h => h.activo).length;
-
-        return {
-            total,
-            activos,
-            inactivos,
-            diasConfigurados,
-            diasActivos,
-            porcentajeActivos: total > 0 ? Math.round((activos / total) * 100) : 0,
-            porcentajeDiasActivos: diasConfigurados > 0 ? Math.round((diasActivos / diasConfigurados) * 100) : 0,
-        };
-    });
+        return horario;
+    } catch (error) {
+        console.error('❌ [toggleHorarioEstado] Error:', error);
+        throw new Error("Error al cambiar el estado del horario");
+    }
 }
 
 // Inicializar horarios por defecto
 export async function inicializarHorariosPorDefecto(studioSlug: string) {
-    return await retryDatabaseOperation(async () => {
-        // 1. Obtener studio
+    try {
+        console.log('🚀 [inicializarHorariosPorDefecto] Inicializando horarios para studio:', studioSlug);
+
+        // Obtener studio
         const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true },
@@ -318,52 +214,50 @@ export async function inicializarHorariosPorDefecto(studioSlug: string) {
             throw new Error("Studio no encontrado");
         }
 
-        // 2. Verificar si ya tiene horarios configurados
-        const existingHorarios = await prisma.studio_horarios_atencion.count({
+        // Verificar si ya existen horarios
+        const existingHorarios = await prisma.studio_business_hours.count({
             where: { studio_id: studio.id },
         });
 
         if (existingHorarios > 0) {
-            // Si ya tiene horarios, retornar éxito sin crear nuevos
-            return {
-                success: true,
-                message: "El studio ya tiene horarios configurados",
-                data: { horariosExistentes: existingHorarios }
-            };
+            console.log('ℹ️ [inicializarHorariosPorDefecto] Ya existen horarios, saltando inicialización');
+            return;
         }
 
-        // 3. Crear horarios por defecto
-        const horariosPorDefecto = [
-            { dia_semana: "lunes", hora_inicio: "09:00", hora_fin: "18:00", activo: true },
-            { dia_semana: "martes", hora_inicio: "09:00", hora_fin: "18:00", activo: true },
-            { dia_semana: "miercoles", hora_inicio: "09:00", hora_fin: "18:00", activo: true },
-            { dia_semana: "jueves", hora_inicio: "09:00", hora_fin: "18:00", activo: true },
-            { dia_semana: "viernes", hora_inicio: "09:00", hora_fin: "18:00", activo: true },
-            { dia_semana: "sabado", hora_inicio: "10:00", hora_fin: "16:00", activo: true },
-            { dia_semana: "domingo", hora_inicio: "10:00", hora_fin: "14:00", activo: false },
+        // Crear horarios por defecto
+        const diasSemana = [
+            { day: 'monday', name: 'Lunes' },
+            { day: 'tuesday', name: 'Martes' },
+            { day: 'wednesday', name: 'Miércoles' },
+            { day: 'thursday', name: 'Jueves' },
+            { day: 'friday', name: 'Viernes' },
+            { day: 'saturday', name: 'Sábado' },
+            { day: 'sunday', name: 'Domingo' },
         ];
 
-        const horariosCreados = await prisma.$transaction(
-            horariosPorDefecto.map((horario) =>
-                prisma.studio_horarios_atencion.create({
-                    data: {
-                        studio_id: studio.id,
-                        ...horario,
-                    },
-                })
-            )
-        );
+        const horariosPorDefecto = diasSemana.map((dia, index) => ({
+            studio_id: studio.id,
+            day_of_week: dia.day,
+            start_time: '09:00',
+            end_time: '18:00',
+            is_active: index < 5, // Lunes a Viernes activos por defecto
+            order: index,
+        }));
 
-        // 4. Revalidar cache
-        revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/horarios`);
+        await retryDatabaseOperation(async () => {
+            await prisma.studio_business_hours.createMany({
+                data: horariosPorDefecto,
+            });
+        });
 
-        return {
-            success: true,
-            message: "Horarios inicializados exitosamente",
-            data: horariosCreados
-        };
-    });
+        console.log('✅ [inicializarHorariosPorDefecto] Horarios inicializados:', horariosPorDefecto.length);
+
+        // Revalidar cache
+        revalidatePath(`/studio/${studioSlug}/configuracion/studio/horarios`);
+
+        return horariosPorDefecto;
+    } catch (error) {
+        console.error('❌ [inicializarHorariosPorDefecto] Error:', error);
+        throw new Error("Error al inicializar los horarios por defecto");
+    }
 }
-
-// Nota: La zona horaria se maneja a nivel de plataforma, no por proyecto individual
-// Si necesitas esta funcionalidad, deberías actualizar platform_config en lugar de projects

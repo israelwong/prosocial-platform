@@ -38,10 +38,10 @@ export async function obtenerPersonal(studioSlug: string): Promise<PersonalListR
         const personal = await prisma.studio_personal.findMany({
             where: { studio_id: studio.id },
             include: {
-                categoria: {
+                category: {
                     select: {
                         id: true,
-                        nombre: true,
+                        name: true,
                         tipo: true,
                         color: true,
                         icono: true
@@ -50,20 +50,48 @@ export async function obtenerPersonal(studioSlug: string): Promise<PersonalListR
                 platformUser: {
                     select: {
                         id: true,
-                        fullName: true,
+                        full_name: true,
                         email: true,
-                        avatarUrl: true
+                        avatar_url: true
                     }
                 }
             },
             orderBy: [
-                { categoria: { orden: 'asc' } },
-                { orden: 'asc' },
-                { nombre: 'asc' }
+                { category: { order: 'asc' } },
+                { order: 'asc' },
+                { name: 'asc' }
             ]
         });
 
-        return { success: true, data: personal };
+        // Mapear los datos para que coincidan con la interfaz
+        const personalMapeado = personal.map(persona => ({
+            id: persona.id,
+            projectId: persona.studio_id,
+            nombre: persona.name,
+            categoriaId: persona.category_id,
+            tipo: persona.tipo,
+            status: persona.status,
+            email: persona.email,
+            phone: persona.phone,
+            emergency_phone: persona.emergency_phone,
+            cuenta_clabe: persona.clabe_account,
+            platformUserId: persona.platform_user_id,
+            honorarios_fijos: persona.fixed_salary,
+            honorarios_variables: persona.variable_salary,
+            orden: persona.order,
+            createdAt: persona.created_at,
+            updatedAt: persona.updated_at,
+            categoria: {
+                id: persona.category.id,
+                nombre: persona.category.name,
+                tipo: persona.category.tipo,
+                color: persona.category.color,
+                icono: persona.category.icono
+            },
+            platformUser: persona.platformUser
+        }));
+
+        return { success: true, data: personalMapeado };
     } catch (error) {
         console.error('Error al obtener personal:', error);
         return { success: false, error: 'Error interno del servidor' };
@@ -110,27 +138,27 @@ export async function crearPersonal(
         const personal = await prisma.studio_personal.create({
             data: {
                 // Campos requeridos
-                nombre: personalDataWithoutProfiles.nombre,
+                name: personalDataWithoutProfiles.nombre,
                 studio_id: studio.id,
-                categoriaId: personalDataWithoutProfiles.categoriaId,
+                category_id: personalDataWithoutProfiles.categoriaId,
                 tipo: personalDataWithoutProfiles.tipo || categoria.tipo,
                 status: personalDataWithoutProfiles.status || 'activo',
 
                 // Campos opcionales - solo incluir si tienen valor
                 ...(personalDataWithoutProfiles.email && personalDataWithoutProfiles.email !== '' && { email: personalDataWithoutProfiles.email }),
-                ...(personalDataWithoutProfiles.telefono && personalDataWithoutProfiles.telefono !== '' && { telefono: personalDataWithoutProfiles.telefono }),
-                ...(personalDataWithoutProfiles.telefono_emergencia && personalDataWithoutProfiles.telefono_emergencia !== '' && { telefono_emergencia: personalDataWithoutProfiles.telefono_emergencia }),
-                ...(personalDataWithoutProfiles.cuenta_clabe && personalDataWithoutProfiles.cuenta_clabe !== '' && { cuenta_clabe: personalDataWithoutProfiles.cuenta_clabe }),
-                ...(personalDataWithoutProfiles.platformUserId && { platformUserId: personalDataWithoutProfiles.platformUserId }),
-                ...(personalDataWithoutProfiles.honorarios_fijos !== undefined && { honorarios_fijos: personalDataWithoutProfiles.honorarios_fijos }),
-                ...(personalDataWithoutProfiles.honorarios_variables !== undefined && { honorarios_variables: personalDataWithoutProfiles.honorarios_variables }),
-                ...(personalDataWithoutProfiles.orden !== undefined && { orden: personalDataWithoutProfiles.orden })
+                ...(personalDataWithoutProfiles.telefono && personalDataWithoutProfiles.telefono !== '' && { phone: personalDataWithoutProfiles.telefono }),
+                ...(personalDataWithoutProfiles.telefono_emergencia && personalDataWithoutProfiles.telefono_emergencia !== '' && { emergency_phone: personalDataWithoutProfiles.telefono_emergencia }),
+                ...(personalDataWithoutProfiles.cuenta_clabe && personalDataWithoutProfiles.cuenta_clabe !== '' && { clabe_account: personalDataWithoutProfiles.cuenta_clabe }),
+                ...(personalDataWithoutProfiles.platformUserId && { platform_user_id: personalDataWithoutProfiles.platformUserId }),
+                ...(personalDataWithoutProfiles.honorarios_fijos !== undefined && { fixed_salary: personalDataWithoutProfiles.honorarios_fijos }),
+                ...(personalDataWithoutProfiles.honorarios_variables !== undefined && { variable_salary: personalDataWithoutProfiles.honorarios_variables }),
+                ...(personalDataWithoutProfiles.orden !== undefined && { order: personalDataWithoutProfiles.orden })
             },
             include: {
-                categoria: {
+                category: {
                     select: {
                         id: true,
-                        nombre: true,
+                        name: true,
                         tipo: true,
                         color: true,
                         icono: true
@@ -139,9 +167,9 @@ export async function crearPersonal(
                 platformUser: {
                     select: {
                         id: true,
-                        fullName: true,
+                        full_name: true,
                         email: true,
-                        avatarUrl: true
+                        avatar_url: true
                     }
                 }
             }
@@ -151,13 +179,41 @@ export async function crearPersonal(
         if (perfilesIds && perfilesIds.length > 0) {
             await prisma.studio_personal_profile_assignments.createMany({
                 data: perfilesIds.map(perfilId => ({
-                    personalId: personal.id,
-                    perfilId: perfilId
+                    personal_id: personal.id,
+                    profile_id: perfilId
                 }))
             });
         }
 
-        return { success: true, data: personal };
+        // Mapear los datos para que coincidan con la interfaz
+        const personalMapeado = {
+            id: personal.id,
+            projectId: personal.studio_id,
+            nombre: personal.name,
+            categoriaId: personal.category_id,
+            tipo: personal.tipo,
+            status: personal.status,
+            email: personal.email,
+            phone: personal.phone,
+            emergency_phone: personal.emergency_phone,
+            cuenta_clabe: personal.clabe_account,
+            platformUserId: personal.platform_user_id,
+            honorarios_fijos: personal.fixed_salary,
+            honorarios_variables: personal.variable_salary,
+            orden: personal.order,
+            createdAt: personal.created_at,
+            updatedAt: personal.updated_at,
+            categoria: {
+                id: personal.category.id,
+                nombre: personal.category.name,
+                tipo: personal.category.tipo,
+                color: personal.category.color,
+                icono: personal.category.icono
+            },
+            platformUser: personal.platformUser
+        };
+
+        return { success: true, data: personalMapeado };
     } catch (error) {
         console.error('Error al crear personal:', error);
         if (error instanceof Error && error.name === 'ZodError') {
@@ -222,27 +278,27 @@ export async function actualizarPersonal(
         const updateData: Record<string, unknown> = {};
 
         // Solo incluir campos que tienen valores definidos
-        if (personalDataWithoutProfiles.nombre !== undefined) updateData.nombre = personalDataWithoutProfiles.nombre;
-        if (personalDataWithoutProfiles.categoriaId !== undefined) updateData.categoriaId = personalDataWithoutProfiles.categoriaId;
+        if (personalDataWithoutProfiles.nombre !== undefined) updateData.name = personalDataWithoutProfiles.nombre;
+        if (personalDataWithoutProfiles.categoriaId !== undefined) updateData.category_id = personalDataWithoutProfiles.categoriaId;
         if (personalDataWithoutProfiles.tipo !== undefined) updateData.tipo = personalDataWithoutProfiles.tipo;
         if (personalDataWithoutProfiles.status !== undefined) updateData.status = personalDataWithoutProfiles.status;
         if (personalDataWithoutProfiles.email !== undefined) updateData.email = personalDataWithoutProfiles.email || null;
-        if (personalDataWithoutProfiles.telefono !== undefined) updateData.telefono = personalDataWithoutProfiles.telefono || null;
-        if (personalDataWithoutProfiles.telefono_emergencia !== undefined) updateData.telefono_emergencia = personalDataWithoutProfiles.telefono_emergencia || null;
-        if (personalDataWithoutProfiles.cuenta_clabe !== undefined) updateData.cuenta_clabe = personalDataWithoutProfiles.cuenta_clabe || null;
-        if (personalDataWithoutProfiles.platformUserId !== undefined) updateData.platformUserId = personalDataWithoutProfiles.platformUserId || null;
-        if (personalDataWithoutProfiles.honorarios_fijos !== undefined) updateData.honorarios_fijos = personalDataWithoutProfiles.honorarios_fijos;
-        if (personalDataWithoutProfiles.honorarios_variables !== undefined) updateData.honorarios_variables = personalDataWithoutProfiles.honorarios_variables;
-        if (personalDataWithoutProfiles.orden !== undefined) updateData.orden = personalDataWithoutProfiles.orden;
+        if (personalDataWithoutProfiles.telefono !== undefined) updateData.phone = personalDataWithoutProfiles.telefono || null;
+        if (personalDataWithoutProfiles.telefono_emergencia !== undefined) updateData.emergency_phone = personalDataWithoutProfiles.telefono_emergencia || null;
+        if (personalDataWithoutProfiles.cuenta_clabe !== undefined) updateData.clabe_account = personalDataWithoutProfiles.cuenta_clabe || null;
+        if (personalDataWithoutProfiles.platformUserId !== undefined) updateData.platform_user_id = personalDataWithoutProfiles.platformUserId || null;
+        if (personalDataWithoutProfiles.honorarios_fijos !== undefined) updateData.fixed_salary = personalDataWithoutProfiles.honorarios_fijos;
+        if (personalDataWithoutProfiles.honorarios_variables !== undefined) updateData.variable_salary = personalDataWithoutProfiles.honorarios_variables;
+        if (personalDataWithoutProfiles.orden !== undefined) updateData.order = personalDataWithoutProfiles.orden;
 
         const personal = await prisma.studio_personal.update({
             where: { id: personalId },
             data: updateData,
             include: {
-                categoria: {
+                category: {
                     select: {
                         id: true,
-                        nombre: true,
+                        name: true,
                         tipo: true,
                         color: true,
                         icono: true
@@ -251,9 +307,9 @@ export async function actualizarPersonal(
                 platformUser: {
                     select: {
                         id: true,
-                        fullName: true,
+                        full_name: true,
                         email: true,
-                        avatarUrl: true
+                        avatar_url: true
                     }
                 }
             }
@@ -263,21 +319,49 @@ export async function actualizarPersonal(
         if (perfilesIds !== undefined) {
             // Eliminar perfiles existentes
             await prisma.studio_personal_profile_assignments.deleteMany({
-                where: { personalId: personalId }
+                where: { personal_id: personalId }
             });
 
             // Crear nuevos perfiles si hay alguno
             if (perfilesIds.length > 0) {
                 await prisma.studio_personal_profile_assignments.createMany({
                     data: perfilesIds.map(perfilId => ({
-                        personalId: personalId,
-                        perfilId: perfilId
+                        personal_id: personalId,
+                        profile_id: perfilId
                     }))
                 });
             }
         }
 
-        return { success: true, data: personal };
+        // Mapear los datos para que coincidan con la interfaz
+        const personalMapeado = {
+            id: personal.id,
+            projectId: personal.studio_id,
+            nombre: personal.name,
+            categoriaId: personal.category_id,
+            tipo: personal.tipo,
+            status: personal.status,
+            email: personal.email,
+            phone: personal.phone,
+            emergency_phone: personal.emergency_phone,
+            cuenta_clabe: personal.clabe_account,
+            platformUserId: personal.platform_user_id,
+            honorarios_fijos: personal.fixed_salary,
+            honorarios_variables: personal.variable_salary,
+            orden: personal.order,
+            createdAt: personal.created_at,
+            updatedAt: personal.updated_at,
+            categoria: {
+                id: personal.category.id,
+                nombre: personal.category.name,
+                tipo: personal.category.tipo,
+                color: personal.category.color,
+                icono: personal.category.icono
+            },
+            platformUser: personal.platformUser
+        };
+
+        return { success: true, data: personalMapeado };
     } catch (error) {
         console.error('Error al actualizar personal:', error);
         if (error instanceof Error && error.name === 'ZodError') {
@@ -359,12 +443,30 @@ export async function obtenerCategoriasPersonal(studioSlug: string): Promise<Cat
             },
             orderBy: [
                 { tipo: 'asc' },
-                { orden: 'asc' },
-                { nombre: 'asc' }
+                { order: 'asc' },
+                { name: 'asc' }
             ]
         });
 
-        return { success: true, data: categorias };
+        // Mapear los datos para que coincidan con la interfaz
+        const categoriasMapeadas = categorias.map(categoria => ({
+            id: categoria.id,
+            projectId: categoria.studio_id,
+            nombre: categoria.name,
+            descripcion: categoria.description,
+            tipo: categoria.tipo,
+            color: categoria.color,
+            icono: categoria.icono,
+            esDefault: categoria.es_default,
+            orden: categoria.order,
+            isActive: categoria.isActive,
+            createdAt: categoria.created_at,
+            updatedAt: categoria.updated_at,
+            personalCount: categoria._count?.personal || 0,
+            _count: categoria._count
+        }));
+
+        return { success: true, data: categoriasMapeadas };
     } catch (error) {
         console.error('Error al obtener categorías de personal:', error);
         return { success: false, error: 'Error interno del servidor' };
@@ -396,7 +498,7 @@ export async function crearCategoriaPersonal(
         const existingCategoria = await prisma.studio_categorias_personal.findFirst({
             where: {
                 studio_id: studio.id,
-                nombre: validatedData.nombre
+                name: validatedData.nombre
             }
         });
 
@@ -407,11 +509,15 @@ export async function crearCategoriaPersonal(
         // Crear categoría
         const categoria = await prisma.studio_categorias_personal.create({
             data: {
-                ...validatedData,
                 studio_id: studio.id,
-                descripcion: validatedData.descripcion || null,
+                name: validatedData.nombre,
+                description: validatedData.descripcion || null,
                 color: validatedData.color || null,
-                icono: validatedData.icono || null
+                icono: validatedData.icono || null,
+                tipo: validatedData.tipo,
+                es_default: validatedData.esDefault,
+                order: validatedData.orden,
+                is_active: validatedData.isActive
             },
             include: {
                 _count: {
@@ -422,7 +528,24 @@ export async function crearCategoriaPersonal(
             }
         });
 
-        return { success: true, data: categoria };
+        // Mapear los datos para que coincidan con la interfaz
+        const categoriaMapeada = {
+            id: categoria.id,
+            projectId: categoria.studio_id,
+            nombre: categoria.name,
+            descripcion: categoria.description,
+            tipo: categoria.tipo,
+            color: categoria.color,
+            icono: categoria.icono,
+            esDefault: categoria.es_default,
+            orden: categoria.order,
+            isActive: categoria.isActive,
+            createdAt: categoria.created_at,
+            updatedAt: categoria.updated_at,
+            personalCount: categoria._count?.personal || 0
+        };
+
+        return { success: true, data: categoriaMapeada };
     } catch (error) {
         console.error('Error al crear categoría de personal:', error);
         if (error instanceof Error && error.name === 'ZodError') {
@@ -471,7 +594,7 @@ export async function actualizarCategoriaPersonal(
             const duplicateCategoria = await prisma.studio_categorias_personal.findFirst({
                 where: {
                     studio_id: studio.id,
-                    nombre: validatedData.nombre,
+                    name: validatedData.nombre,
                     id: { not: categoriaId }
                 }
             });
@@ -486,7 +609,7 @@ export async function actualizarCategoriaPersonal(
             where: { id: categoriaId },
             data: {
                 ...validatedData,
-                descripcion: validatedData.descripcion || null,
+                description: validatedData.descripcion || null,
                 color: validatedData.color || null,
                 icono: validatedData.icono || null
             },
@@ -598,7 +721,7 @@ export async function actualizarOrdenCategoriasPersonal(
                         studio_id: studio.id
                     },
                     data: {
-                        orden: categoria.orden
+                        order: categoria.orden
                     }
                 })
             )
@@ -635,7 +758,7 @@ export async function obtenerPerfilesPersonal(studioSlug: string) {
 
         const perfiles = await prisma.studio_personal_profiles.findMany({
             where: { studio_id: studio.id },
-            orderBy: { orden: 'asc' },
+            orderBy: { order: 'asc' },
             include: {
                 _count: {
                     select: {
@@ -672,8 +795,11 @@ export async function crearPerfilPersonal(studioSlug: string, data: Record<strin
 
         const perfil = await prisma.studio_personal_profiles.create({
             data: {
-                ...validatedData,
-                studio_id: studio.id
+                studio_id: studio.id,
+                name: validatedData.nombre,
+                description: validatedData.descripcion,
+                order: validatedData.orden,
+                is_active: validatedData.isActive
             }
         });
 
@@ -749,7 +875,7 @@ export async function actualizarOrdenPersonal(
                         id: personalId,
                         studio_id: studio.id // Verificar que pertenece al proyecto
                     },
-                    data: { orden: index }
+                    data: { order: index }
                 })
             )
         );
@@ -782,11 +908,11 @@ export async function actualizarPosicionPersonal(
 
         // Actualizar el personal con nueva posición y categoría
         const updateData: Record<string, unknown> = {
-            orden: newPosition - 1 // Convertir de basado en 1 a basado en 0
+            order: newPosition - 1 // Convertir de basado en 1 a basado en 0
         };
 
         if (newCategoryId !== undefined) {
-            updateData.categoriaId = newCategoryId;
+            updateData.category_id = newCategoryId;
         }
 
         await prisma.studio_personal.update({
@@ -859,7 +985,7 @@ export async function actualizarOrdenPerfilesPersonal(studioSlug: string, data: 
                         id: perfil.id,
                         studio_id: studio.id
                     },
-                    data: { orden: perfil.orden }
+                    data: { order: perfil.orden }
                 })
             )
         );
