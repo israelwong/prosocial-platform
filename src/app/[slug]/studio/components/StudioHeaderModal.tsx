@@ -177,6 +177,10 @@ export function StudioHeaderModal({ className, studioData }: StudioHeaderModalPr
                 className="w-56 bg-zinc-800 border-zinc-700"
                 align="start"
                 side="right"
+                sideOffset={5}
+                alignOffset={-10}
+                avoidCollisions={true}
+                collisionPadding={16}
             >
                 {/* Gestionar */}
                 <div className="px-2 py-1.5">

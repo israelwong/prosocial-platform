@@ -1,11 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import Image from 'next/image';
-import { ZenButton } from '@/components/ui/zen/base/ZenButton';
-import { ZenInput } from '@/components/ui/zen/base/ZenInput';
-import { ZenLabel } from '@/components/ui/zen/base/ZenLabel';
-import { Upload, ExternalLink } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { useFileUpload } from '@/hooks/useFileUpload';
 import { ALLOWED_MIME_TYPES } from '@/lib/actions/schemas/media-schemas';
@@ -28,8 +25,6 @@ export function LogoManagerZen({
   studioSlug,
   loading = false
 }: LogoManagerZenProps) {
-  const [nuevaUrl, setNuevaUrl] = useState('');
-  const [showUrlInput, setShowUrlInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Hook para upload de archivos
@@ -81,28 +76,6 @@ export function LogoManagerZen({
     }
   };
 
-  const handleUpdateUrl = async () => {
-    if (!nuevaUrl.trim()) return;
-
-    const urlTrimmed = nuevaUrl.trim();
-
-    // Actualización optimista - actualizar UI inmediatamente
-    onLocalUpdate(urlTrimmed);
-    setNuevaUrl('');
-    setShowUrlInput(false);
-
-    try {
-      await onUpdate(urlTrimmed);
-      toast.success(`${tipo === 'logo' ? 'Logo' : 'Isotipo'} actualizado`);
-    } catch {
-      // Revertir cambios en caso de error
-      onLocalUpdate(url || null);
-      setNuevaUrl(urlTrimmed);
-      setShowUrlInput(true);
-      toast.error(`Error al actualizar ${tipo === 'logo' ? 'logo' : 'isotipo'}`);
-    }
-  };
-
   const handleRemoveUrl = async () => {
     // Guardar la URL original para rollback
     const originalUrl = url ?? null;
@@ -121,13 +94,6 @@ export function LogoManagerZen({
       onLocalUpdate(originalUrl);
       toast.error(`Error al eliminar ${tipo === 'logo' ? 'logo' : 'isotipo'}`);
       console.error('Error al eliminar archivo:', error);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleUpdateUrl();
     }
   };
 
@@ -161,15 +127,6 @@ export function LogoManagerZen({
               </button>
 
               <button
-                onClick={() => window.open(url, '_blank')}
-                disabled={uploading || loading}
-                className="flex items-center gap-2 px-3 py-2 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ExternalLink className="h-3 w-3" />
-                Ver
-              </button>
-
-              <button
                 onClick={handleRemoveUrl}
                 disabled={uploading || loading}
                 className="flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/20 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -195,7 +152,7 @@ export function LogoManagerZen({
               maxSize={5}
               maxFiles={1}
               disabled={uploading || loading}
-              className="h-72 border border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900/20 transition-all duration-300 rounded-lg group cursor-pointer relative overflow-hidden"
+              className="h-40 border border-dashed border-zinc-700 hover:border-zinc-500 hover:bg-zinc-900/20 transition-all duration-300 rounded-lg group cursor-pointer relative overflow-hidden"
             >
               <div className="flex flex-col items-center justify-center h-full p-6 text-center">
                 {/* Icono principal */}
@@ -278,63 +235,6 @@ export function LogoManagerZen({
       )}
 
       {/* Input de URL con ZEN components */}
-      {showUrlInput && (
-        <div className="space-y-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800">
-          <ZenLabel htmlFor={`url-${tipo}`}>
-            URL del {titulo}
-          </ZenLabel>
-          <div className="flex space-x-2">
-            <ZenInput
-              id={`url-${tipo}`}
-              label=""
-              value={nuevaUrl}
-              onChange={(e) => setNuevaUrl(e.target.value)}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              onKeyPress={handleKeyPress}
-              disabled={uploading || loading}
-              className="flex-1"
-            />
-            <ZenButton
-              onClick={handleUpdateUrl}
-              size="sm"
-              loading={uploading}
-              disabled={!nuevaUrl.trim() || uploading || loading}
-            >
-              Guardar
-            </ZenButton>
-            <ZenButton
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setShowUrlInput(false);
-                setNuevaUrl('');
-              }}
-              disabled={uploading || loading}
-            >
-              Cancelar
-            </ZenButton>
-          </div>
-        </div>
-      )}
-
-      {/* Botón para agregar URL si no hay archivo */}
-      {!url && !showUrlInput && (
-        <div className="mt-4">
-          <ZenButton
-            variant="outline"
-            size="sm"
-            onClick={() => setShowUrlInput(true)}
-            disabled={uploading || loading}
-            className="w-full hover:bg-zinc-800/50 transition-colors duration-200"
-          >
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Agregar URL
-          </ZenButton>
-          <p className="text-xs text-zinc-500 text-center mt-2">
-            O proporciona una URL directa a tu imagen
-          </p>
-        </div>
-      )}
     </div>
   );
 }

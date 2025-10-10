@@ -6,14 +6,14 @@ import { usePathname } from 'next/navigation';
 import {
     ZenInput, ZenSidebar, ZenSidebarContent, ZenSidebarHeader, ZenSidebarFooter,
     ZenSidebarGroup, ZenSidebarGroupLabel, ZenSidebarGroupContent, ZenSidebarMenu,
-    ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuButton
+    ZenSidebarMenuItem, ZenSidebarMenuSub, ZenSidebarMenuButton, ZenButton, useZenSidebar
 } from '@/components/ui/zen';
 import { StudioHeaderModal } from '../../components/StudioHeaderModal';
 import {
     Building2, User, Zap, Clock, CreditCard, Bell, Lock, Package, Calendar, Layers, SlidersHorizontal, Plug, Star,
     ChevronDown, ChevronRight, BarChart3, LayoutTemplate, Sparkles, Bot, Globe, Palette, Puzzle, Workflow, Mail, Coins, Wand2,
     UserCircle, ShoppingCart, Briefcase, Camera, Cog, Server, Shield, Database, FileText, Webhook, FormInput, LayoutDashboard,
-    TrendingUp, Code, Link as LinkIcon, Image, Search, Edit, Gift, HelpCircle, Phone, Users2, Settings
+    TrendingUp, Code, Link as LinkIcon, Image, Search, Edit, Gift, HelpCircle, Phone, Users2, Settings, X, Menu
 } from 'lucide-react';
 import { LogoutButton } from '@/components/auth/logout-button';
 import type { LucideIcon } from 'lucide-react';
@@ -41,6 +41,7 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
     const [expandedSubgroups, setExpandedSubgroups] = useState<string[]>([]);
+    const { isOpen, toggleSidebar } = useZenSidebar();
 
     const allNavGroups = useMemo(() => [
         ...navigationConfig.global,
@@ -104,10 +105,20 @@ export function ConfigSidebarClientContent({ navigationConfig, studioData }: Con
     };
 
     return (
-        <ZenSidebar>
+        <ZenSidebar className={isOpen ? '' : 'hidden lg:block'}>
             <ZenSidebarHeader>
                 <div className="space-y-4 mb-4">
-                    <StudioHeaderModal studioData={studioData} />
+                    <div className="flex items-center justify-between">
+                        <StudioHeaderModal studioData={studioData} />
+                        <ZenButton
+                            variant="ghost"
+                            size="sm"
+                            onClick={toggleSidebar}
+                            className="lg:hidden p-2 text-zinc-400 hover:text-zinc-200"
+                        >
+                            <X className="h-4 w-4" />
+                        </ZenButton>
+                    </div>
                     <ZenInput
                         placeholder="Buscar configuración..."
                         value={searchTerm}
