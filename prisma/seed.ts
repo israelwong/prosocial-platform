@@ -91,6 +91,7 @@ async function seedSocialNetworks() {
         {
             name: 'Facebook',
             slug: 'facebook',
+            description: 'Red social principal para conectar con clientes',
             color: '#1877F2',
             icon: 'facebook',
             base_url: 'https://facebook.com/',
@@ -99,6 +100,7 @@ async function seedSocialNetworks() {
         {
             name: 'Instagram',
             slug: 'instagram',
+            description: 'Plataforma visual perfecta para fotógrafos',
             color: '#E4405F',
             icon: 'instagram',
             base_url: 'https://instagram.com/',
@@ -107,6 +109,7 @@ async function seedSocialNetworks() {
         {
             name: 'TikTok',
             slug: 'tiktok',
+            description: 'Red social de videos cortos y creativos',
             color: '#000000',
             icon: 'tiktok',
             base_url: 'https://tiktok.com/@',
@@ -115,10 +118,29 @@ async function seedSocialNetworks() {
         {
             name: 'YouTube',
             slug: 'youtube',
+            description: 'Plataforma de videos largos y tutoriales',
             color: '#FF0000',
             icon: 'youtube',
             base_url: 'https://youtube.com/@',
             order: 4,
+        },
+        {
+            name: 'Threads',
+            slug: 'threads',
+            description: 'Red social de Meta para conversaciones',
+            color: '#000000',
+            icon: 'threads',
+            base_url: 'https://threads.net/@',
+            order: 5,
+        },
+        {
+            name: 'LinkedIn',
+            slug: 'linkedin',
+            description: 'Red profesional para networking B2B',
+            color: '#0077B5',
+            icon: 'linkedin',
+            base_url: 'https://linkedin.com/in/',
+            order: 6,
         },
     ];
 

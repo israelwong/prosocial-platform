@@ -36,6 +36,7 @@ export function FooterPreview({ data, loading = false }: FooterPreviewProps) {
     // Debug: Log data to see what's being passed
     console.log('🔍 FooterPreview - Data received:', data);
     console.log('🔍 FooterPreview - FooterData keys:', Object.keys(footerData));
+    console.log('🔍 FooterPreview - redes_sociales:', footerData.redes_sociales);
 
 
     // Helper function to safely get array values
@@ -55,7 +56,11 @@ export function FooterPreview({ data, loading = false }: FooterPreviewProps) {
     const telefonoActivo = telefonos.find(t => t.is_active !== false);
 
     // Función para obtener icono de red social
-    const getSocialIcon = (plataforma: string) => {
+    const getSocialIcon = (plataforma: string | undefined | null) => {
+        if (!plataforma || typeof plataforma !== 'string') {
+            return <Globe className="w-4 h-4" />;
+        }
+
         const platform = plataforma.toLowerCase();
         switch (platform) {
             case 'instagram':
@@ -105,23 +110,21 @@ export function FooterPreview({ data, loading = false }: FooterPreviewProps) {
 
                     {/* Redes Sociales */}
                     {redesSociales.length > 0 && (
-                        <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 text-zinc-400 flex-shrink-0">
-                                {getSocialIcon(redesSociales[0].plataforma)}
-                            </div>
-                            <div className="flex gap-1">
-                                {redesSociales.map((red, index) => (
-                                    <a
-                                        key={index}
-                                        href={red.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-zinc-400 hover:text-zinc-300 transition-colors"
-                                    >
-                                        {getSocialIcon(red.plataforma)}
-                                    </a>
-                                ))}
-                            </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            {redesSociales.map((red, index) => (
+                                <a
+                                    key={index}
+                                    href={red.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1.5 text-zinc-300 hover:text-zinc-200 transition-colors text-xs"
+                                >
+                                    {getSocialIcon(red.plataforma)}
+                                    <span className="capitalize">
+                                        {red.plataforma || 'Red Social'}
+                                    </span>
+                                </a>
+                            ))}
                         </div>
                     )}
 

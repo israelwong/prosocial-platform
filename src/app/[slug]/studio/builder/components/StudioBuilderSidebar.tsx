@@ -9,9 +9,8 @@ import { StudioHeaderModal } from '../../components/StudioHeaderModal';
 import { ActiveLink } from '../../components/ActiveLink';
 import { LogoutButton } from '@/components/auth/logout-button';
 import {
-    Star, Phone, Clock, Zap, HelpCircle, ShoppingCart, Search, Camera, X
+    Star, Phone, Clock, Zap, HelpCircle, ShoppingCart, Search, Camera, X, Home, CreditCard, File, User, Rows2, ShoppingBag,
 } from 'lucide-react';
-
 
 interface StudioBuilderSidebarProps {
     className?: string;
@@ -37,14 +36,18 @@ export function StudioBuilderSidebar({ className, studioSlug }: StudioBuilderSid
             icon: Camera,
             items: [
                 { id: 'identidad', name: 'Identidad', href: `/identidad`, icon: Star },
+                { id: 'principal', name: 'Principal', href: `/principal`, icon: Home },
+                //promociones hero
+                // { id: 'faq', name: 'Preguntas frecuentes', href: `/faq`, icon: HelpCircle },
+                // { id: 'ventajas', name: 'Ventajas competitivas', href: `/ventajas-competitivas`, icon: ShoppingCart },
+                { id: 'promociones', name: 'Promociones', href: `/promociones`, icon: Zap },
+                { id: 'portafolio', name: 'Portafolio', href: `/portafolio`, icon: Rows2 },
+                { id: 'catalogo', name: 'Catálogo', href: `/catalogo`, icon: ShoppingBag },
                 { id: 'contacto', name: 'Contacto', href: `/contacto`, icon: Phone },
-                { id: 'faq', name: 'Preguntas frecuentes', href: `/faq`, icon: HelpCircle },
-                { id: 'ventajas', name: 'Ventajas competitivas', href: `/ventajas-competitivas`, icon: ShoppingCart },
-                // promociones 
-                // portafolio
-                // Zona de pago
-                // cotizaciones
-                // Portal cliente
+
+                { id: 'zona-pago', name: 'Zona de pago', href: `/zona-pago`, icon: CreditCard },
+                { id: 'cotizaciones', name: 'Cotizaciones', href: `/cotizaciones`, icon: File },
+                { id: 'portal-cliente', name: 'Portal cliente', href: `/portal-cliente`, icon: User },
 
             ],
         },

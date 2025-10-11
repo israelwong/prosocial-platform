@@ -1,359 +1,222 @@
-"use server";
+'use server';
 
-import { prisma } from "@/lib/prisma";
-import { retryDatabaseOperation } from "@/lib/actions/utils/database-retry";
-import { revalidatePath } from "next/cache";
-import {
-  RedSocialCreateSchema,
-  RedSocialUpdateSchema,
-  RedSocialBulkUpdateSchema,
-  RedSocialToggleSchema,
-  RedSocialFiltersSchema,
-  type RedSocialCreateForm,
-  type RedSocialUpdateForm,
-  type RedSocialBulkUpdateForm,
-  type RedSocialToggleForm,
-  type RedSocialFiltersForm,
-} from "@/lib/actions/schemas/redes-sociales-schemas";
+import { prisma } from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
+import { toast } from 'sonner';
 
 // Obtener redes sociales del studio
-export async function obtenerRedesSocialesStudio(
-  studioSlug: string,
-  filters?: RedSocialFiltersForm
-) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Obtener studio
+export async function obtenerRedesSocialesStudio(studioSlug: string) {
+  try {
     const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
-      select: { id: true, studio_name: true },
+      select: { id: true }
     });
 
     if (!studio) {
-      throw new Error("Studio no encontrado");
+      return { success: false, error: 'Studio no encontrado' };
     }
 
-    // 2. Construir filtros
-    const whereClause: {
-      studio_id: string;
-      activo?: boolean;
-      plataformaId?: string;
-    } = {
-      studio_id: studio.id,
-    };
-
-    if (filters) {
-      const validatedFilters = RedSocialFiltersSchema.parse(filters);
-
-      if (validatedFilters.activo !== undefined) {
-        whereClause.activo = validatedFilters.activo;
-      }
-
-      if (validatedFilters.plataformaId) {
-        whereClause.plataformaId = validatedFilters.plataformaId;
-      }
-    }
-
-    // 3. Obtener redes sociales
     const redesSociales = await prisma.studio_social_networks.findMany({
-      where: whereClause,
+      where: { studio_id: studio.id },
       include: {
-        platform: true,
+        platform: true
       },
-      orderBy: { order: "asc" },
+      orderBy: { order: 'asc' }
     });
 
     return redesSociales;
-  });
+  } catch (error) {
+    console.error('Error obteniendo redes sociales:', error);
+    return { success: false, error: 'Error interno del servidor' };
+  }
 }
 
-// Crear red social
-export async function crearRedSocial(
-  studioSlug: string,
-  data: RedSocialCreateForm
-) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Obtener studio
+// Obtener plataformas disponibles
+export async function obtenerPlataformasDisponibles() {
+  try {
+    const plataformas = await prisma.platform_social_networks.findMany({
+      where: { is_active: true },
+      orderBy: { order: 'asc' }
+    });
+
+    return plataformas;
+  } catch (error) {
+    console.error('Error obteniendo plataformas:', error);
+    return { success: false, error: 'Error interno del servidor' };
+  }
+}
+
+// Crear nueva red social
+export async function crearRedSocial(studioSlug: string, data: {
+  platform_id: string;
+  url: string;
+}) {
+  try {
     const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
-      select: { id: true },
+      select: { id: true }
     });
 
     if (!studio) {
-      throw new Error("Studio no encontrado");
+      return { success: false, error: 'Studio no encontrado' };
     }
 
-    // 2. Validar datos
-    const validatedData = RedSocialCreateSchema.parse(data);
-
-    // 3. Obtener información de la plataforma y verificar duplicados
-    const plataforma = await prisma.platform_social_networks.findUnique({
-      where: { id: validatedData.plataformaId },
-      select: { id: true, name: true }
+    // Obtener el siguiente orden
+    const ultimoOrden = await prisma.studio_social_networks.findFirst({
+      where: { studio_id: studio.id },
+      orderBy: { order: 'desc' },
+      select: { order: true }
     });
 
-    if (!plataforma) {
-      throw new Error("Plataforma de red social no encontrada");
-    }
+    const nuevoOrden = (ultimoOrden?.order || 0) + 1;
 
-    const existingRed = await prisma.studio_social_networks.findFirst({
-      where: {
-        studio_id: studio.id,
-        platform_id: validatedData.plataformaId,
-        is_active: true,
-      },
-    });
-
-    if (existingRed) {
-      throw new Error(`Ya tienes una cuenta activa de ${plataforma.name}. Puedes editarla o desactivarla para crear una nueva.`);
-    }
-
-    // 4. Crear red social
-    const nuevaRedSocial = await prisma.studio_social_networks.create({
+    const redSocial = await prisma.studio_social_networks.create({
       data: {
         studio_id: studio.id,
-        platform_id: validatedData.plataformaId,
-        url: validatedData.url,
-        is_active: validatedData.activo,
+        platform_id: data.platform_id,
+        url: data.url,
+        order: nuevoOrden,
+        is_active: true
       },
       include: {
-        platform: true,
-      },
+        platform: true
+      }
     });
 
-    // 5. Revalidar cache
-    revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/redes-sociales`);
-
-    return nuevaRedSocial;
-  });
+    revalidatePath(`/studio/${studioSlug}/builder/identidad`);
+    return { success: true, data: redSocial };
+  } catch (error) {
+    console.error('Error creando red social:', error);
+    return { success: false, error: 'Error interno del servidor' };
+  }
 }
 
 // Actualizar red social
-export async function actualizarRedSocial(
-  redSocialId: string,
-  data: RedSocialUpdateForm
-) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Validar datos
-    const validatedData = RedSocialUpdateSchema.parse(data);
-
-    // 2. Obtener red social existente
-    const existingRedSocial = await prisma.studio_social_networks.findUnique({
-      where: { id: redSocialId },
-      include: {
-        studio: { select: { slug: true } },
-        platform: true
-      },
-    });
-
-    if (!existingRedSocial) {
-      throw new Error("La red social que intentas actualizar no existe o no tienes permisos para modificarla");
-    }
-
-    // 3. Actualizar red social
-    const redSocialActualizada = await prisma.studio_social_networks.update({
-      where: { id: redSocialId },
-      data: {
-        ...(validatedData.url && { url: validatedData.url }),
-        ...(validatedData.activo !== undefined && { activo: validatedData.activo }),
-      },
-      include: {
-        platform: true,
-      },
-    });
-
-    // 4. Revalidar cache
-    revalidatePath(`/studio/${existingRedSocial.studio.slug}/configuracion/cuenta/redes-sociales`);
-
-    return redSocialActualizada;
-  });
-}
-
-// Actualizar múltiples redes sociales
-export async function actualizarRedesSocialesBulk(
-  studioSlug: string,
-  data: RedSocialBulkUpdateForm
-) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Obtener studio
+export async function actualizarRedSocial(studioSlug: string, redSocialId: string, data: {
+  platform_id?: string;
+  url?: string;
+  is_active?: boolean;
+}) {
+  try {
     const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
-      select: { id: true },
+      select: { id: true }
     });
 
     if (!studio) {
-      throw new Error("Studio no encontrado");
+      return { success: false, error: 'Studio no encontrado' };
     }
 
-    // 2. Validar datos
-    const validatedData = RedSocialBulkUpdateSchema.parse(data);
-
-    // 3. Validar todas las URLs
-    for (const red of validatedData.redesSociales) {
-      if (red.url) {
-        try {
-          new URL(red.url);
-        } catch {
-          throw new Error(`La URL de tu red social no es válida. Por favor verifica que esté completa y correcta.`);
-        }
+    const redSocial = await prisma.studio_social_networks.update({
+      where: {
+        id: redSocialId,
+        studio_id: studio.id
+      },
+      data: {
+        ...(data.platform_id && { platform_id: data.platform_id }),
+        ...(data.url && { url: data.url }),
+        ...(data.is_active !== undefined && { is_active: data.is_active })
+      },
+      include: {
+        platform: true
       }
+    });
+
+    revalidatePath(`/studio/${studioSlug}/builder/identidad`);
+    return { success: true, data: redSocial };
+  } catch (error) {
+    console.error('Error actualizando red social:', error);
+    return { success: false, error: 'Error interno del servidor' };
+  }
+}
+
+// Eliminar red social
+export async function eliminarRedSocial(studioSlug: string, redSocialId: string) {
+  try {
+    const studio = await prisma.studios.findUnique({
+      where: { slug: studioSlug },
+      select: { id: true }
+    });
+
+    if (!studio) {
+      return { success: false, error: 'Studio no encontrado' };
     }
 
-    // 4. Actualizar todas las redes sociales en una transacción
-    const resultados = await prisma.$transaction(
-      validatedData.redesSociales.map((red) =>
+    await prisma.studio_social_networks.delete({
+      where: {
+        id: redSocialId,
+        studio_id: studio.id
+      }
+    });
+
+    revalidatePath(`/studio/${studioSlug}/builder/identidad`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error eliminando red social:', error);
+    return { success: false, error: 'Error interno del servidor' };
+  }
+}
+
+// Reordenar redes sociales
+export async function reordenarRedesSociales(studioSlug: string, redesSociales: Array<{
+  id: string;
+  order: number;
+}>) {
+  try {
+    const studio = await prisma.studios.findUnique({
+      where: { slug: studioSlug },
+      select: { id: true }
+    });
+
+    if (!studio) {
+      return { success: false, error: 'Studio no encontrado' };
+    }
+
+    // Actualizar el orden de cada red social
+    await Promise.all(
+      redesSociales.map(red =>
         prisma.studio_social_networks.update({
-          where: { id: red.id },
-          data: {
-            ...(red.url && { url: red.url }),
-            ...(red.activo !== undefined && { activo: red.activo }),
+          where: {
+            id: red.id,
+            studio_id: studio.id
           },
-          include: {
-            platform: true,
-          },
+          data: { order: red.order }
         })
       )
     );
 
-    // 5. Revalidar cache
-    revalidatePath(`/studio/${studioSlug}/configuracion/cuenta/redes-sociales`);
-
-    return resultados;
-  });
-}
-
-// Eliminar red social
-export async function eliminarRedSocial(redSocialId: string) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Obtener red social existente
-    const existingRedSocial = await prisma.studio_social_networks.findUnique({
-      where: { id: redSocialId },
-      include: {
-        studio: { select: { slug: true } },
-        platform: true
-      },
-    });
-
-    if (!existingRedSocial) {
-      throw new Error("La red social que intentas eliminar no existe o no tienes permisos para eliminarla");
-    }
-
-    // 2. Eliminar red social
-    await prisma.studio_social_networks.delete({
-      where: { id: redSocialId },
-    });
-
-    // 3. Revalidar cache
-    revalidatePath(`/studio/${existingRedSocial.studio.slug}/configuracion/cuenta/redes-sociales`);
-
+    revalidatePath(`/studio/${studioSlug}/builder/identidad`);
     return { success: true };
-  });
+  } catch (error) {
+    console.error('Error reordenando redes sociales:', error);
+    return { success: false, error: 'Error interno del servidor' };
+  }
 }
 
 // Toggle estado de red social
-export async function toggleRedSocialEstado(
-  redSocialId: string,
-  data: RedSocialToggleForm
-) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Validar datos
-    const validatedData = RedSocialToggleSchema.parse(data);
-
-    // 2. Obtener red social existente
-    const existingRedSocial = await prisma.studio_social_networks.findUnique({
-      where: { id: redSocialId },
-      include: {
-        studio: { select: { slug: true } },
-        platform: true
-      },
-    });
-
-    if (!existingRedSocial) {
-      throw new Error("Red social no encontrada");
-    }
-
-    // 3. Actualizar estado
-    const redSocialActualizada = await prisma.studio_social_networks.update({
-      where: { id: redSocialId },
-      data: { is_active: validatedData.activo },
-      include: {
-        platform: true,
-      },
-    });
-
-    // 4. Revalidar cache
-    revalidatePath(`/studio/${existingRedSocial.studio.slug}/configuracion/cuenta/redes-sociales`);
-
-    return redSocialActualizada;
-  });
-}
-
-// Obtener estadísticas de redes sociales
-export async function obtenerEstadisticasRedesSociales(studioSlug: string) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Obtener studio
+export async function toggleRedSocialEstado(studioSlug: string, redSocialId: string, isActive: boolean) {
+  try {
     const studio = await prisma.studios.findUnique({
       where: { slug: studioSlug },
-      select: { id: true },
+      select: { id: true }
     });
 
     if (!studio) {
-      throw new Error("Studio no encontrado");
+      return { success: false, error: 'Studio no encontrado' };
     }
 
-    // 2. Obtener estadísticas
-    const [total, activas, inactivas] = await Promise.all([
-      prisma.studio_social_networks.count({
-        where: { studio_id: studio.id },
-      }),
-      prisma.studio_social_networks.count({
-        where: { studio_id: studio.id, is_active: true },
-      }),
-      prisma.studio_social_networks.count({
-        where: { studio_id: studio.id, is_active: false },
-      }),
-    ]);
-
-    return {
-      total,
-      activas,
-      inactivas,
-      porcentajeActivas: total > 0 ? Math.round((activas / total) * 100) : 0,
-    };
-  });
-}
-
-// Reordenar redes sociales
-export async function reordenarRedesSociales(studioSlug: string, redes: Array<{ id: string; order: number }>) {
-  return await retryDatabaseOperation(async () => {
-    // 1. Verificar que el studio existe
-    const studio = await prisma.studios.findUnique({
-      where: { slug: studioSlug },
-      select: { id: true },
+    await prisma.studio_social_networks.update({
+      where: {
+        id: redSocialId,
+        studio_id: studio.id
+      },
+      data: { is_active: isActive }
     });
 
-    if (!studio) {
-      throw new Error("Studio no encontrado");
-    }
-
-    // 2. Actualizar el orden de cada red social
-    const updatePromises = redes.map(({ id, order }) =>
-      prisma.studio_social_networks.update({
-        where: {
-          id,
-          studio_id: studio.id // Asegurar que pertenece al studio
-        },
-        data: { order },
-      })
-    );
-
-    await Promise.all(updatePromises);
-
-    // 3. Revalidar la página
-    revalidatePath(`/studio/${studioSlug}/configuracion/estudio/redes-sociales`);
-
-    return {
-      success: true,
-      message: "Orden de redes sociales actualizado exitosamente",
-    };
-  });
+    revalidatePath(`/studio/${studioSlug}/builder/identidad`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error cambiando estado de red social:', error);
+    return { success: false, error: 'Error interno del servidor' };
+  }
 }

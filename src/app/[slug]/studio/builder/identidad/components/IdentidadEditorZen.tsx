@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import { ZenButton, ZenInput, ZenTextarea } from '@/components/ui/zen';
 import { ZenCard, ZenCardContent } from '@/components/ui/zen';
-import { Plus, X, Save, Check, Info, Globe } from 'lucide-react';
+import { Plus, X, Save, Check, Info, Globe, Share2 } from 'lucide-react';
 import { IdentidadData } from '../types';
 import { LogoManagerZen } from './LogoManagerZen';
+import { RedesSocialesSection } from './RedesSocialesSection';
 import { actualizarIdentidadCompleta } from '@/lib/actions/studio/config/identidad.actions';
 import { toast } from 'sonner';
 
@@ -84,7 +85,8 @@ export function IdentidadEditorZen({
 
     const tabs = [
         { id: 'encabezado', label: 'Encabezado', icon: Info },
-        { id: 'footer', label: 'Pie de Página', icon: Globe }
+        { id: 'footer', label: 'Pie de Página', icon: Globe },
+        { id: 'redes', label: 'Redes Sociales', icon: Share2 }
     ];
 
     return (
@@ -200,16 +202,15 @@ export function IdentidadEditorZen({
                                 hint="Tu sitio web principal"
                             />
 
-                            {/* Redes Sociales - Placeholder */}
+                            {/* Redes Sociales */}
                             <div className="space-y-3">
                                 <label className="text-sm font-medium text-white">
                                     Redes Sociales
                                 </label>
-                                <div className="text-center py-8 text-zinc-500">
-                                    <Globe className="h-12 w-12 mx-auto mb-4 text-zinc-600" />
-                                    <p>Redes Sociales</p>
-                                    <p className="text-sm">Próximamente: gestión de redes sociales</p>
-                                </div>
+                                <RedesSocialesSection
+                                    studioSlug={studioSlug}
+                                    onLocalUpdate={onLocalUpdate}
+                                />
                             </div>
 
                             {/* Palabras Clave SEO */}
@@ -311,6 +312,17 @@ export function IdentidadEditorZen({
                                     </ZenButton>
                                 </div>
                             </div>
+                        </ZenCardContent>
+                    </ZenCard>
+                )}
+
+                {activeTab === 'redes' && (
+                    <ZenCard variant="default" padding="none">
+                        <ZenCardContent className="p-6">
+                            <RedesSocialesSection
+                                studioSlug={studioSlug}
+                                onLocalUpdate={onLocalUpdate}
+                            />
                         </ZenCardContent>
                     </ZenCard>
                 )}
