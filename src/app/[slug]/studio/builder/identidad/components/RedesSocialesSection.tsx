@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ZenButton } from '@/components/ui/zen';
 import { Plus, Share2, GripVertical } from 'lucide-react';
 import { RedSocialItem } from './RedSocialItem';
@@ -47,76 +47,76 @@ export function RedesSocialesSection({ studioSlug, onLocalUpdate }: RedesSociale
     const [saving, setSaving] = useState(false);
 
     // Cargar datos iniciales
-    const loadData = useCallback(async () => {
-        try {
-            setLoading(true);
-
-            // Cargar redes sociales del studio
-            const redesResult = await obtenerRedesSocialesStudio(studioSlug);
-            if (Array.isArray(redesResult)) {
-                const redesFormateadas = redesResult.map((red) => ({
-                    id: red.id,
-                    studio_id: red.studio_id,
-                    plataformaId: red.platform_id,
-                    url: red.url,
-                    activo: red.is_active,
-                    createdAt: red.created_at,
-                    updatedAt: red.updated_at,
-                    plataforma: red.platform ? {
-                        id: red.platform.id,
-                        name: red.platform.name,
-                        slug: red.platform.slug,
-                        description: red.platform.description,
-                        color: red.platform.color,
-                        icon: red.platform.icon,
-                        baseUrl: red.platform.base_url,
-                        order: red.platform.order,
-                        isActive: red.platform.is_active,
-                        createdAt: red.platform.created_at,
-                        updatedAt: red.platform.updated_at
-                    } : null
-                }));
-                setRedes(redesFormateadas);
-                
-                // Enviar datos iniciales al FooterPreview (solo redes activas)
-                const redesActivas = redesFormateadas
-                    .filter(red => red.activo)
-                    .map(red => ({
-                        plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
-                        url: red.url
-                    }));
-                onLocalUpdate({ redes_sociales: redesActivas } as Partial<IdentidadData>);
-            }
-
-            // Cargar plataformas disponibles
-            const plataformasResult = await obtenerPlataformasDisponibles();
-            if (Array.isArray(plataformasResult)) {
-                const plataformasFormateadas = plataformasResult.map((plataforma) => ({
-                    id: plataforma.id,
-                    name: plataforma.name,
-                    slug: plataforma.slug,
-                    description: plataforma.description,
-                    color: plataforma.color,
-                    icon: plataforma.icon,
-                    baseUrl: plataforma.base_url,
-                    order: plataforma.order,
-                    isActive: plataforma.is_active,
-                    createdAt: plataforma.created_at,
-                    updatedAt: plataforma.updated_at
-                }));
-                setPlataformas(plataformasFormateadas);
-            }
-        } catch (error) {
-            console.error('Error loading redes sociales:', error);
-            toast.error('Error al cargar las redes sociales');
-        } finally {
-            setLoading(false);
-        }
-    }, [studioSlug, onLocalUpdate]);
-
     useEffect(() => {
+        const loadData = async () => {
+            try {
+                setLoading(true);
+
+                // Cargar redes sociales del studio
+                const redesResult = await obtenerRedesSocialesStudio(studioSlug);
+                if (Array.isArray(redesResult)) {
+                    const redesFormateadas = redesResult.map((red) => ({
+                        id: red.id,
+                        studio_id: red.studio_id,
+                        plataformaId: red.platform_id,
+                        url: red.url,
+                        activo: red.is_active,
+                        createdAt: red.created_at,
+                        updatedAt: red.updated_at,
+                        plataforma: red.platform ? {
+                            id: red.platform.id,
+                            name: red.platform.name,
+                            slug: red.platform.slug,
+                            description: red.platform.description,
+                            color: red.platform.color,
+                            icon: red.platform.icon,
+                            baseUrl: red.platform.base_url,
+                            order: red.platform.order,
+                            isActive: red.platform.is_active,
+                            createdAt: red.platform.created_at,
+                            updatedAt: red.platform.updated_at
+                        } : null
+                    }));
+                    setRedes(redesFormateadas);
+
+                    // Enviar datos iniciales al FooterPreview (solo redes activas)
+                    const redesActivas = redesFormateadas
+                        .filter(red => red.activo)
+                        .map(red => ({
+                            plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
+                            url: red.url
+                        }));
+                    onLocalUpdate({ redes_sociales: redesActivas } as Partial<IdentidadData>);
+                }
+
+                // Cargar plataformas disponibles
+                const plataformasResult = await obtenerPlataformasDisponibles();
+                if (Array.isArray(plataformasResult)) {
+                    const plataformasFormateadas = plataformasResult.map((plataforma) => ({
+                        id: plataforma.id,
+                        name: plataforma.name,
+                        slug: plataforma.slug,
+                        description: plataforma.description,
+                        color: plataforma.color,
+                        icon: plataforma.icon,
+                        baseUrl: plataforma.base_url,
+                        order: plataforma.order,
+                        isActive: plataforma.is_active,
+                        createdAt: plataforma.created_at,
+                        updatedAt: plataforma.updated_at
+                    }));
+                    setPlataformas(plataformasFormateadas);
+                }
+            } catch (error) {
+                console.error('Error loading redes sociales:', error);
+                toast.error('Error al cargar las redes sociales');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         loadData();
-    }, [loadData]);
+    }, [studioSlug, onLocalUpdate]);
 
 
     const sensors = useSensors(
