@@ -166,7 +166,7 @@ export async function actualizarLogo(
 // Actualizar múltiples campos de identidad
 export async function actualizarIdentidadCompleta(
   studioSlug: string,
-  data: IdentidadUpdateForm & { palabras_clave?: string[] }
+  data: IdentidadUpdateForm
 ) {
   return await retryDatabaseOperation(async () => {
     const studio = await prisma.studios.findUnique({
@@ -198,7 +198,7 @@ export async function actualizarIdentidadCompleta(
 
     // Agregar palabras clave si se proporcionan
     if (data.palabras_clave) {
-      updateData.palabras_clave = JSON.stringify(data.palabras_clave);
+      updateData.palabras_clave = data.palabras_clave;
     }
 
     const studioActualizado = await prisma.studios.update({

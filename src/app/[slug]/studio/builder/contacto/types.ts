@@ -8,7 +8,7 @@ export interface Telefono {
 
 export interface Horario {
     id?: string;
-    dia: string;
+    dia: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
     apertura: string;
     cierre: string;
     cerrado: boolean;

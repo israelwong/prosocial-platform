@@ -2,71 +2,75 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ZenBadge } from '@/components/ui/zen';
+import { Star } from 'lucide-react';
 
 interface HeaderPreviewProps {
     data?: {
         studio_name?: string;
         slogan?: string | null;
-        palabras_clave?: string[];
         logo_url?: string | null;
     };
+    loading?: boolean;
 }
 
-export function HeaderPreview({ data }: HeaderPreviewProps) {
+export function HeaderPreview({ data, loading = false }: HeaderPreviewProps) {
     const studioData = data || {
         studio_name: 'Mi Estudio',
         slogan: null,
-        palabras_clave: [],
         logo_url: null,
     };
 
     return (
-        <div className="text-center space-y-4">
-            {/* Logo */}
-            {studioData.logo_url ? (
-                <div className="w-20 h-20 mx-auto bg-zinc-800 rounded-xl flex items-center justify-center overflow-hidden">
-                    <Image
-                        src={studioData.logo_url}
-                        alt="Logo"
-                        width={80}
-                        height={80}
-                        className="max-w-full max-h-full object-contain"
-                    />
-                </div>
-            ) : (
-                <div className="w-20 h-20 mx-auto bg-zinc-800 rounded-xl flex items-center justify-center">
-                    <div className="w-8 h-8 bg-zinc-600 rounded-lg"></div>
-                </div>
-            )}
+        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full px-4 pt-2 pb-4">
+            <div className="flex items-center">
+                {/* Columna 1: Logo, nombre y slogan */}
+                <div className="flex items-center space-x-3 flex-1">
+                    {/* Logo/Avatar */}
+                    <div className="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {loading ? (
+                            <div className="w-6 h-6 bg-zinc-600 rounded-lg animate-pulse"></div>
+                        ) : studioData.logo_url ? (
+                            <Image
+                                src={studioData.logo_url}
+                                alt="Logo"
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-6 h-6 bg-zinc-500 rounded-lg"></div>
+                        )}
+                    </div>
 
-            {/* Nombre del estudio */}
-            <div>
-                <h1 className="text-xl font-bold text-white mb-2">
-                    {studioData.studio_name || 'Mi Estudio'}
-                </h1>
-                {studioData.slogan && (
-                    <p className="text-zinc-400 text-sm">
-                        {studioData.slogan}
-                    </p>
-                )}
+                    {/* Información del estudio */}
+                    <div className="flex-1">
+                        {loading ? (
+                            <>
+                                <div className="h-4 bg-zinc-700 rounded animate-pulse mb-2 w-32"></div>
+                                <div className="h-3 bg-zinc-700 rounded animate-pulse w-24"></div>
+                            </>
+                        ) : (
+                            <>
+                                <h1 className="text-white font-semibold text-base">
+                                    {studioData.studio_name || 'Mi Estudio'}
+                                </h1>
+                                {studioData.slogan && (
+                                    <p className="text-zinc-400 text-xs">
+                                        {studioData.slogan}
+                                    </p>
+                                )}
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Columna 2: Icono de promoción (más delgada) */}
+                <div className="flex justify-end w-12">
+                    <div className="w-6 h-6 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                        <Star className="h-3 w-3 text-yellow-400" />
+                    </div>
+                </div>
             </div>
-
-            {/* Palabras clave */}
-            {studioData.palabras_clave && studioData.palabras_clave.length > 0 && (
-                <div className="flex flex-wrap gap-2 justify-center">
-                    {studioData.palabras_clave.slice(0, 3).map((palabra: string, index: number) => (
-                        <ZenBadge key={index} variant="secondary" size="sm">
-                            {palabra}
-                        </ZenBadge>
-                    ))}
-                    {studioData.palabras_clave.length > 3 && (
-                        <ZenBadge variant="outline" size="sm">
-                            +{studioData.palabras_clave.length - 3}
-                        </ZenBadge>
-                    )}
-                </div>
-            )}
         </div>
     );
 }

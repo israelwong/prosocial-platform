@@ -49,6 +49,7 @@ export function SectionLayout({ children, section, studioSlug, data, loading = f
                                     section={section}
                                     studioSlug={studioSlug}
                                     data={data}
+                                    loading={loading}
                                 />
                             )}
                         </ZenCardContent>
