@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { ConfigSidebarClientContent } from './ConfigSidebarClientContent';
-import { getEventosPorEtapaConCotizaciones } from '@/app/admin/_lib/actions/evento/consultas.actions';
 
 // Interfaces de tipos (icon es ahora string)
 export interface NavItem {
@@ -48,21 +47,6 @@ const NAVIGATION_CONFIG: NavigationConfig = {
         },
     ],
     modules: [
-        {
-            id: 'studio',
-            title: 'Studio',
-            icon: 'Camera',
-            moduleSlug: 'studio',
-            items: [
-                { id: 'identidad', name: 'Identidad', href: '/studio/identidad', icon: 'Star' },
-                { id: 'contacto', name: 'Contacto', href: '/studio/contacto', icon: 'Phone' },
-                { id: 'horarios', name: 'Horarios', href: '/studio/horarios', icon: 'Clock' },
-                { id: 'redes-sociales', name: 'Redes Sociales', href: '/studio/redes', icon: 'Zap' },
-                { id: 'faq', name: 'Preguntas frecuentes', href: '/pagina/faq', icon: 'HelpCircle' },
-                { id: 'ventajas', name: 'Ventajas competitivas', href: '/studio/ventajas-competitivas', icon: 'ShoppingCart' },
-                { id: 'metadata', name: 'Metadata', href: '/pagina/metadata', icon: 'Search' },
-            ],
-        },
         {
             id: 'operacion',
             title: 'Operación',
