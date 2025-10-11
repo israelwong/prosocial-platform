@@ -187,6 +187,7 @@ export async function actualizarIdentidadCompleta(
       descripcion: string | null;
       logo_url: string | null;
       isotipo_url: string | null;
+      website: string | null;
       palabras_clave?: string;
     } = {
       studio_name: validatedData.nombre,
@@ -194,6 +195,7 @@ export async function actualizarIdentidadCompleta(
       descripcion: validatedData.descripcion ?? null,
       logo_url: validatedData.logo_url ?? null, // Corregido: logoUrl → logo_url
       isotipo_url: validatedData.isotipo_url ?? null,
+      website: validatedData.pagina_web ?? null,
     };
 
     // Agregar palabras clave si se proporcionan
@@ -211,6 +213,7 @@ export async function actualizarIdentidadCompleta(
         keywords: true,
         logo_url: true,
         isotipo_url: true,
+        website: true,
       },
     });
 

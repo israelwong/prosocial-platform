@@ -192,17 +192,6 @@ export function IdentidadEditorZen({
                 {activeTab === 'footer' && (
                     <ZenCard variant="default" padding="none">
                         <ZenCardContent className="p-6 space-y-4">
-                            {/* Página Web */}
-                            <ZenInput
-                                label="Página Web (Opcional)"
-                                value={data.pagina_web || ''}
-                                onChange={(e) => handleInputChange('pagina_web', e.target.value)}
-                                placeholder="https://tuestudio.com"
-                                disabled={loading}
-                                hint="Tu sitio web principal"
-                            />
-
-
                             {/* Palabras Clave SEO */}
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
@@ -276,6 +265,16 @@ export function IdentidadEditorZen({
                                     </div>
                                 )}
                             </div>
+
+                            {/* Página Web */}
+                            <ZenInput
+                                label="Página Web (Opcional)"
+                                value={data.pagina_web || ''}
+                                onChange={(e) => handleInputChange('pagina_web', e.target.value)}
+                                placeholder="https://tuestudio.com"
+                                disabled={loading}
+                                hint="Tu sitio web principal"
+                            />
 
                             {/* Botón de Guardar */}
                             <div className="pt-4">
