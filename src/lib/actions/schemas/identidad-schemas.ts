@@ -7,7 +7,11 @@ export const IdentidadUpdateSchema = z.object({
   palabras_clave: z.string().optional(),
   logo_url: z.string().url("URL de logo inválida").optional().or(z.literal("")), // Corregido: logoUrl → logo_url
   isotipo_url: z.string().url("URL de isotipo inválida").optional().or(z.literal("")),
-  pagina_web: z.string().url("URL de página web inválida").optional().or(z.literal("")),
+  pagina_web: z.union([
+    z.string().url("URL de página web inválida"),
+    z.literal(""),
+    z.undefined()
+  ]).optional(),
 });
 
 export type IdentidadUpdateForm = z.infer<typeof IdentidadUpdateSchema>;
