@@ -85,8 +85,8 @@ export function IdentidadEditorZen({
 
     const tabs = [
         { id: 'encabezado', label: 'Encabezado', icon: Info },
-        { id: 'footer', label: 'Pie de Página', icon: Globe },
-        { id: 'redes', label: 'Redes Sociales', icon: Share2 }
+        { id: 'redes', label: 'Redes Sociales', icon: Share2 },
+        { id: 'footer', label: 'Pie de Página', icon: Globe }
     ];
 
     return (
@@ -202,16 +202,6 @@ export function IdentidadEditorZen({
                                 hint="Tu sitio web principal"
                             />
 
-                            {/* Redes Sociales */}
-                            <div className="space-y-3">
-                                <label className="text-sm font-medium text-white">
-                                    Redes Sociales
-                                </label>
-                                <RedesSocialesSection
-                                    studioSlug={studioSlug}
-                                    onLocalUpdate={onLocalUpdate}
-                                />
-                            </div>
 
                             {/* Palabras Clave SEO */}
                             <div className="space-y-3">
