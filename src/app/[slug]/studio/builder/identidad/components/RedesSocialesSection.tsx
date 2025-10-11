@@ -77,6 +77,15 @@ export function RedesSocialesSection({ studioSlug, onLocalUpdate }: RedesSociale
                     } : null
                 }));
                 setRedes(redesFormateadas);
+                
+                // Enviar datos iniciales al FooterPreview (solo redes activas)
+                const redesActivas = redesFormateadas
+                    .filter(red => red.activo)
+                    .map(red => ({
+                        plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
+                        url: red.url
+                    }));
+                onLocalUpdate({ redes_sociales: redesActivas } as Partial<IdentidadData>);
             }
 
             // Cargar plataformas disponibles
@@ -103,7 +112,7 @@ export function RedesSocialesSection({ studioSlug, onLocalUpdate }: RedesSociale
         } finally {
             setLoading(false);
         }
-    }, [studioSlug]);
+    }, [studioSlug, onLocalUpdate]);
 
     useEffect(() => {
         loadData();
