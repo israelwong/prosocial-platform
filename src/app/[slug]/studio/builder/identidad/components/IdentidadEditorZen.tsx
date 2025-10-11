@@ -190,119 +190,125 @@ export function IdentidadEditorZen({
                 )}
 
                 {activeTab === 'footer' && (
-                    <ZenCard variant="default" padding="none">
-                        <ZenCardContent className="p-6 space-y-4">
-                            {/* Palabras Clave SEO */}
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <label className="text-sm font-medium text-white">
-                                        Palabras Clave SEO
-                                    </label>
-                                    <ZenButton
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => setShowPalabrasModal(true)}
-                                        disabled={loading}
-                                        className="text-xs px-2 py-1"
-                                    >
-                                        <Plus className="h-3 w-3 mr-1" />
-                                        Agregar
-                                    </ZenButton>
-                                </div>
-
-                                {/* Lista de palabras clave */}
-                                {data.palabras_clave && data.palabras_clave.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                        {data.palabras_clave.map((palabra, index) => (
-                                            <div key={index} className="inline-flex items-center gap-1 bg-zinc-800 text-zinc-300 px-3 py-1 rounded-full text-sm">
-                                                <span>{palabra}</span>
-                                                <button
-                                                    onClick={() => handleRemovePalabra(palabra)}
-                                                    className="text-zinc-400 hover:text-red-400 transition-colors ml-1"
-                                                    disabled={loading}
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            </div>
-                                        ))}
+                    <div className="space-y-6">
+                        {/* Ficha 1: Palabras Clave SEO */}
+                        <ZenCard variant="default" padding="none">
+                            <ZenCardContent className="p-6">
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-medium text-white">
+                                            Palabras Clave SEO
+                                        </label>
+                                        <ZenButton
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => setShowPalabrasModal(true)}
+                                            disabled={loading}
+                                            className="text-xs px-2 py-1"
+                                        >
+                                            <Plus className="h-3 w-3 mr-1" />
+                                            Agregar
+                                        </ZenButton>
                                     </div>
-                                )}
 
-                                {/* Modal para agregar palabra */}
-                                {showPalabrasModal && (
-                                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                                        <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md mx-4">
-                                            <h3 className="text-lg font-semibold text-white mb-4">
-                                                Agregar Palabra Clave
-                                            </h3>
-                                            <ZenInput
-                                                label="Palabra Clave"
-                                                value={nuevaPalabra}
-                                                onChange={(e) => setNuevaPalabra(e.target.value)}
-                                                placeholder="Ej: fotografía, eventos, retratos"
-                                                onKeyPress={(e) => e.key === 'Enter' && handleAddPalabra()}
-                                            />
-                                            <div className="flex gap-3 mt-4">
-                                                <ZenButton
-                                                    onClick={handleAddPalabra}
-                                                    disabled={!nuevaPalabra.trim()}
-                                                    size="sm"
-                                                >
-                                                    Agregar
-                                                </ZenButton>
-                                                <ZenButton
-                                                    variant="outline"
-                                                    onClick={() => {
-                                                        setShowPalabrasModal(false);
-                                                        setNuevaPalabra('');
-                                                    }}
-                                                    size="sm"
-                                                >
-                                                    Cancelar
-                                                </ZenButton>
+                                    {/* Lista de palabras clave */}
+                                    {data.palabras_clave && data.palabras_clave.length > 0 && (
+                                        <div className="flex flex-wrap gap-2">
+                                            {data.palabras_clave.map((palabra, index) => (
+                                                <div key={index} className="inline-flex items-center gap-1 bg-zinc-800 text-zinc-300 px-3 py-1 rounded-full text-sm">
+                                                    <span>{palabra}</span>
+                                                    <button
+                                                        onClick={() => handleRemovePalabra(palabra)}
+                                                        className="text-zinc-400 hover:text-red-400 transition-colors ml-1"
+                                                        disabled={loading}
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {/* Modal para agregar palabra */}
+                                    {showPalabrasModal && (
+                                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                                            <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-6 w-full max-w-md mx-4">
+                                                <h3 className="text-lg font-semibold text-white mb-4">
+                                                    Agregar Palabra Clave
+                                                </h3>
+                                                <ZenInput
+                                                    label="Palabra Clave"
+                                                    value={nuevaPalabra}
+                                                    onChange={(e) => setNuevaPalabra(e.target.value)}
+                                                    placeholder="Ej: fotografía, eventos, retratos"
+                                                    onKeyPress={(e) => e.key === 'Enter' && handleAddPalabra()}
+                                                />
+                                                <div className="flex gap-3 mt-4">
+                                                    <ZenButton
+                                                        onClick={handleAddPalabra}
+                                                        disabled={!nuevaPalabra.trim()}
+                                                        size="sm"
+                                                    >
+                                                        Agregar
+                                                    </ZenButton>
+                                                    <ZenButton
+                                                        variant="outline"
+                                                        onClick={() => {
+                                                            setShowPalabrasModal(false);
+                                                            setNuevaPalabra('');
+                                                        }}
+                                                        size="sm"
+                                                    >
+                                                        Cancelar
+                                                    </ZenButton>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Página Web */}
-                            <ZenInput
-                                label="Página Web (Opcional)"
-                                value={data.pagina_web || ''}
-                                onChange={(e) => handleInputChange('pagina_web', e.target.value)}
-                                placeholder="https://tuestudio.com"
-                                disabled={loading}
-                                hint="Tu sitio web principal"
-                            />
-
-                            {/* Botón de Guardar */}
-                            <div className="pt-4">
-                                <div className="flex justify-end">
-                                    <ZenButton
-                                        onClick={handleSave}
-                                        disabled={loading || isSaving}
-                                        loading={isSaving}
-                                        loadingText="Guardando..."
-                                        variant="primary"
-                                        size="sm"
-                                    >
-                                        {saveSuccess ? (
-                                            <>
-                                                <Check className="h-4 w-4 mr-2" />
-                                                Guardado
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Save className="h-4 w-4 mr-2" />
-                                                Guardar Cambios
-                                            </>
-                                        )}
-                                    </ZenButton>
+                                    )}
                                 </div>
-                            </div>
-                        </ZenCardContent>
-                    </ZenCard>
+                            </ZenCardContent>
+                        </ZenCard>
+
+                        {/* Ficha 2: Página Web y Botón de Guardar */}
+                        <ZenCard variant="default" padding="none">
+                            <ZenCardContent className="p-6 space-y-4">
+                                <ZenInput
+                                    label="Página Web (Opcional)"
+                                    value={data.pagina_web || ''}
+                                    onChange={(e) => handleInputChange('pagina_web', e.target.value)}
+                                    placeholder="https://tuestudio.com"
+                                    disabled={loading}
+                                    hint="Tu sitio web principal"
+                                />
+
+                                {/* Botón de Guardar */}
+                                <div className="pt-4">
+                                    <div className="flex justify-end">
+                                        <ZenButton
+                                            onClick={handleSave}
+                                            disabled={loading || isSaving}
+                                            loading={isSaving}
+                                            loadingText="Guardando..."
+                                            variant="primary"
+                                            size="sm"
+                                        >
+                                            {saveSuccess ? (
+                                                <>
+                                                    <Check className="h-4 w-4 mr-2" />
+                                                    Guardado
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Save className="h-4 w-4 mr-2" />
+                                                    Guardar Cambios
+                                                </>
+                                            )}
+                                        </ZenButton>
+                                    </div>
+                                </div>
+                            </ZenCardContent>
+                        </ZenCard>
+                    </div>
                 )}
 
                 {activeTab === 'redes' && (
