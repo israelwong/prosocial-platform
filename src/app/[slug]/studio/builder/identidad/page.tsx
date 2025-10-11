@@ -1,12 +1,27 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { IdentidadEditorZen } from './components/';
 import { SectionLayout } from '../components';
 import { useParams } from 'next/navigation';
 import { obtenerIdentidadStudio, actualizarLogo } from '@/lib/actions/studio/config/identidad.actions';
 import { obtenerContactoStudio } from '@/lib/actions/studio/config/contacto.actions';
 import { IdentidadData } from './types';
+
+// Función wrapper para manejar el tipo de obtenerContactoStudio
+async function getContactoData(studioSlug: string): Promise<Record<string, unknown> | null> {
+    try {
+        const result = await obtenerContactoStudio(studioSlug);
+        if (result && typeof result === 'object') {
+            // Asumir que es datos válidos
+            return result as Record<string, unknown>;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error loading contacto:', error);
+        return null;
+    }
+}
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
 import { Image as ImageIcon } from 'lucide-react';
 
@@ -14,7 +29,7 @@ export default function IdentidadPage() {
     const params = useParams();
     const studioSlug = params.slug as string;
     const [identidadData, setIdentidadData] = useState<IdentidadData | null>(null);
-    const [contactoData, setContactoData] = useState<any>(null);
+    const [contactoData, setContactoData] = useState<Record<string, unknown> | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -27,8 +42,8 @@ export default function IdentidadPage() {
                 }
 
                 // Cargar datos de contacto para el footer
-                const contactoResult = await obtenerContactoStudio(studioSlug);
-                if (contactoResult.success !== false) {
+                const contactoResult = await getContactoData(studioSlug);
+                if (contactoResult) {
                     setContactoData(contactoResult);
                 }
             } catch (error) {
@@ -40,6 +55,22 @@ export default function IdentidadPage() {
 
         loadData();
     }, [studioSlug]);
+
+    // Memoizar funciones para evitar re-renders
+    const handleLocalUpdate = useCallback((data: unknown) => {
+        setIdentidadData(prev => {
+            if (!prev) return null;
+            const updateData = data as Partial<IdentidadData>;
+            return Object.assign({}, prev, updateData);
+        });
+    }, []);
+
+    const handleLogoLocalUpdate = useCallback((url: string | null) => {
+        setIdentidadData(prev => {
+            if (!prev) return null;
+            return { ...prev, logo_url: url };
+        });
+    }, []);
 
     // Combinar datos de identidad y contacto para el preview
     const combinedData = {
@@ -82,13 +113,7 @@ export default function IdentidadPage() {
                                 logo_url: null,
                                 isotipo_url: null,
                             }}
-                            onLocalUpdate={(data: unknown) => {
-                                setIdentidadData(prev => {
-                                    if (!prev) return null;
-                                    const updateData = data as Partial<IdentidadData>;
-                                    return Object.assign({}, prev, updateData);
-                                });
-                            }}
+                            onLocalUpdate={handleLocalUpdate}
                             onLogoUpdate={async (url: string) => {
                                 try {
                                     await actualizarLogo(studioSlug, { tipo: 'logo', url });
@@ -96,12 +121,7 @@ export default function IdentidadPage() {
                                     console.error('Error updating logo:', error);
                                 }
                             }}
-                            onLogoLocalUpdate={(url: string | null) => {
-                                setIdentidadData(prev => {
-                                    if (!prev) return null;
-                                    return { ...prev, logo_url: url };
-                                });
-                            }}
+                            onLogoLocalUpdate={handleLogoLocalUpdate}
                             studioSlug={studioSlug}
                         />
                     )}
