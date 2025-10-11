@@ -7,6 +7,9 @@ import InstagramIcon from '@/components/ui/shadcn/icons/InstagramIcon';
 import FacebookIcon from '@/components/ui/shadcn/icons/FacebookIcon';
 import TikTokIcon from '@/components/ui/shadcn/icons/TikTokIcon';
 import YouTubeIcon from '@/components/ui/shadcn/icons/YouTubeIcon';
+import LinkedInIcon from '@/components/ui/shadcn/icons/LinkedInIcon';
+import ThreadsIcon from '@/components/ui/shadcn/icons/ThreadsIcon';
+import SpotifyIcon from '@/components/ui/shadcn/icons/SpotifyIcon';
 
 interface FooterPreviewProps {
     data?: {
@@ -71,6 +74,12 @@ export function FooterPreview({ data, loading = false }: FooterPreviewProps) {
                 return <TikTokIcon className="w-4 h-4" />;
             case 'youtube':
                 return <YouTubeIcon className="w-4 h-4" />;
+            case 'linkedin':
+                return <LinkedInIcon className="w-4 h-4" />;
+            case 'threads':
+                return <ThreadsIcon className="w-4 h-4" />;
+            case 'spotify':
+                return <SpotifyIcon className="w-4 h-4" />;
             default:
                 return <Globe className="w-4 h-4" />;
         }

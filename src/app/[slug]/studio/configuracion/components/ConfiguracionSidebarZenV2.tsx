@@ -95,41 +95,8 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             ],
         },
         {
-            id: 'integraciones',
-            title: 'Integraciones',
-            icon: 'Plug',
-            moduleSlug: 'integraciones',
-            items: [
-                { id: 'apis', name: 'APIs', href: '/integraciones/apis', icon: 'Code' },
-                { id: 'webhooks', name: 'Webhooks', href: '/integraciones/webhooks', icon: 'Webhook' },
-                { id: 'conectores', name: 'Conectores', href: '/integraciones/conectores', icon: 'LinkIcon' },
-            ],
-        },
-        {
-            id: 'analytics',
-            title: 'Analytics',
-            icon: 'BarChart3',
-            moduleSlug: 'analytics',
-            items: [
-                { id: 'metricas', name: 'Métricas', href: '/analytics/metricas', icon: 'TrendingUp' },
-                { id: 'reportes', name: 'Reportes', href: '/analytics/reportes', icon: 'FileText' },
-                { id: 'dashboard', name: 'Dashboard', href: '/analytics/dashboard', icon: 'LayoutDashboard' },
-            ],
-        },
-        {
-            id: 'sistema',
-            title: 'Sistema',
-            icon: 'Server',
-            moduleSlug: 'sistema',
-            items: [
-                { id: 'permisos', name: 'Permisos', href: '/sistema/permisos', icon: 'Shield' },
-                { id: 'backups', name: 'Backups', href: '/sistema/backups', icon: 'Database' },
-                { id: 'logs', name: 'Logs', href: '/sistema/logs', icon: 'FileText' },
-            ],
-        },
-        {
             id: 'ingresos',
-            title: 'Ingresos',
+            title: 'Ingresos compartidos',
             icon: 'Coins',
             moduleSlug: 'ingresos',
             items: [
@@ -138,18 +105,7 @@ const NAVIGATION_CONFIG: NavigationConfig = {
             ],
         }
     ],
-    platform: [
-        {
-            id: 'platform',
-            title: 'Plataforma',
-            icon: 'SlidersHorizontal',
-            items: [
-                { id: 'modulos', name: 'Módulos Activos', href: '/platform/modulos', icon: 'Layers' },
-                { id: 'integraciones', name: 'Integraciones', href: '/platform/integraciones', icon: 'Plug' },
-                { id: 'notificaciones', name: 'Notificaciones', href: '/platform/notificaciones', icon: 'Bell' },
-            ],
-        },
-    ],
+    platform: [],
 };
 
 interface ConfiguracionSidebarZenV2Props {
