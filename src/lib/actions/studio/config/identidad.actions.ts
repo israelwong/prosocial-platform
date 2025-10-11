@@ -184,15 +184,15 @@ export async function actualizarIdentidadCompleta(
     const updateData: {
       studio_name: string;
       slogan: string | null;
-      descripcion: string | null;
+      description: string | null;
       logo_url: string | null;
       isotipo_url: string | null;
       website: string | null;
-      palabras_clave?: string;
+      keywords?: string;
     } = {
       studio_name: validatedData.nombre,
       slogan: validatedData.slogan ?? null,
-      descripcion: validatedData.descripcion ?? null,
+      description: validatedData.descripcion ?? null,
       logo_url: validatedData.logo_url ?? null, // Corregido: logoUrl → logo_url
       isotipo_url: validatedData.isotipo_url ?? null,
       website: validatedData.pagina_web ?? null,
@@ -200,7 +200,7 @@ export async function actualizarIdentidadCompleta(
 
     // Agregar palabras clave si se proporcionan
     if (data.palabras_clave) {
-      updateData.palabras_clave = data.palabras_clave;
+      updateData.keywords = data.palabras_clave;
     }
 
     const studioActualizado = await prisma.studios.update({
