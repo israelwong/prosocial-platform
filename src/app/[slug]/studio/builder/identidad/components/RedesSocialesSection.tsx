@@ -138,10 +138,12 @@ export function RedesSocialesSection({ studioSlug, onLocalUpdate }: RedesSociale
                 if (result.success) {
                     toast.success("Orden de redes sociales actualizado");
                     // Convertir a formato esperado por FooterPreview
-                    const redesFormateadas = newOrder.map(red => ({
-                        plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
-                        url: red.url
-                    }));
+                    const redesFormateadas = newOrder
+                        .filter(red => red.activo)
+                        .map(red => ({
+                            plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
+                            url: red.url
+                        }));
                     onLocalUpdate({ redes_sociales: redesFormateadas } as Partial<IdentidadData>);
                 } else {
                     throw new Error(result.error);
@@ -232,10 +234,12 @@ export function RedesSocialesSection({ studioSlug, onLocalUpdate }: RedesSociale
                     setRedes(updatedRedes);
                     toast.success("Red social actualizada");
                     // Convertir a formato esperado por FooterPreview
-                    const redesFormateadas = updatedRedes.map(red => ({
-                        plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
-                        url: red.url
-                    }));
+                    const redesFormateadas = updatedRedes
+                        .filter(red => red.activo)
+                        .map(red => ({
+                            plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
+                            url: red.url
+                        }));
                     onLocalUpdate({ redes_sociales: redesFormateadas } as Partial<IdentidadData>);
                 } else {
                     throw new Error(result.error);
@@ -274,10 +278,12 @@ export function RedesSocialesSection({ studioSlug, onLocalUpdate }: RedesSociale
                     setRedes(updatedRedes);
                     toast.success("Red social agregada");
                     // Convertir a formato esperado por FooterPreview
-                    const redesFormateadas = updatedRedes.map(red => ({
-                        plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
-                        url: red.url
-                    }));
+                    const redesFormateadas = updatedRedes
+                        .filter(red => red.activo)
+                        .map(red => ({
+                            plataforma: red.plataforma?.slug || red.plataformaId || 'unknown',
+                            url: red.url
+                        }));
                     onLocalUpdate({ redes_sociales: redesFormateadas } as Partial<IdentidadData>);
                 } else {
                     throw new Error(result.error || 'Error desconocido');
