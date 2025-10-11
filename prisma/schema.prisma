@@ -1073,6 +1073,9 @@ model studios {
   lead_forms           studio_lead_forms[]
   client_portal_access studio_client_portal_access[]
 
+  // Relaciones - Zonas de Trabajo (V2.1)
+  zonas_trabajo        studio_zonas_trabajo[]
+
   @@index([plan_id])
   @@index([slug])
   @@index([is_active])
@@ -1213,6 +1216,24 @@ model studio_setup_status {
   @@index([studio_id])
   @@index([is_fully_configured])
   @@index([overall_progress])
+}
+
+// ---------------------------------------------
+// 3.5 ZONAS DE TRABAJO (V2.1)
+// ---------------------------------------------
+
+model studio_zonas_trabajo {
+  id         String   @id @default(cuid())
+  studio_id  String
+  nombre     String
+  orden      Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  studio studios @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+
+  @@index([studio_id])
+  @@index([studio_id, orden])
 }
 
 model setup_section_progress {

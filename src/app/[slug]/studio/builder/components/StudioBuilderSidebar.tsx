@@ -38,11 +38,8 @@ export function StudioBuilderSidebar({ className, studioSlug }: StudioBuilderSid
             items: [
                 { id: 'identidad', name: 'Identidad', href: `/identidad`, icon: Star },
                 { id: 'contacto', name: 'Contacto', href: `/contacto`, icon: Phone },
-                { id: 'horarios', name: 'Horarios', href: `/horarios`, icon: Clock },
-                { id: 'redes-sociales', name: 'Redes Sociales', href: `/redes`, icon: Zap },
                 { id: 'faq', name: 'Preguntas frecuentes', href: `/faq`, icon: HelpCircle },
                 { id: 'ventajas', name: 'Ventajas competitivas', href: `/ventajas-competitivas`, icon: ShoppingCart },
-                { id: 'metadata', name: 'Metadata', href: `/metadata`, icon: Search },
             ],
         },
     ];
