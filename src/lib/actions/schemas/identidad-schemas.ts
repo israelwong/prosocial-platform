@@ -7,11 +7,18 @@ export const IdentidadUpdateSchema = z.object({
   palabras_clave: z.string().optional(),
   logo_url: z.string().url("URL de logo inválida").optional().or(z.literal("")), // Corregido: logoUrl → logo_url
   isotipo_url: z.string().url("URL de isotipo inválida").optional().or(z.literal("")),
-  pagina_web: z.union([
-    z.string().url("URL de página web inválida"),
-    z.literal(""),
-    z.undefined()
-  ]).optional(),
+  pagina_web: z.string().optional().transform((val) => {
+    if (!val || val.trim() === "") return undefined;
+    return val;
+  }).refine((val) => {
+    if (!val) return true; // Permitir undefined/null/empty
+    try {
+      new URL(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, "URL de página web inválida"),
 });
 
 export type IdentidadUpdateForm = z.infer<typeof IdentidadUpdateSchema>;
