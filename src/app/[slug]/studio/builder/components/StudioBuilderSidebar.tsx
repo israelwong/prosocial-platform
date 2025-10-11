@@ -40,6 +40,12 @@ export function StudioBuilderSidebar({ className, studioSlug }: StudioBuilderSid
                 { id: 'contacto', name: 'Contacto', href: `/contacto`, icon: Phone },
                 { id: 'faq', name: 'Preguntas frecuentes', href: `/faq`, icon: HelpCircle },
                 { id: 'ventajas', name: 'Ventajas competitivas', href: `/ventajas-competitivas`, icon: ShoppingCart },
+                // promociones 
+                // portafolio
+                // Zona de pago
+                // cotizaciones
+                // Portal cliente
+
             ],
         },
     ];

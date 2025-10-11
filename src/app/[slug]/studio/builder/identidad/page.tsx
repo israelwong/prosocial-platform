@@ -5,6 +5,7 @@ import { IdentidadEditorZen } from './components/';
 import { SectionLayout } from '../components';
 import { useParams } from 'next/navigation';
 import { obtenerIdentidadStudio, actualizarLogo } from '@/lib/actions/studio/config/identidad.actions';
+import { obtenerContactoStudio } from '@/lib/actions/studio/config/contacto.actions';
 import { IdentidadData } from './types';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
 import { Image as ImageIcon } from 'lucide-react';
@@ -13,27 +14,41 @@ export default function IdentidadPage() {
     const params = useParams();
     const studioSlug = params.slug as string;
     const [identidadData, setIdentidadData] = useState<IdentidadData | null>(null);
+    const [contactoData, setContactoData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadIdentidadData = async () => {
+        const loadData = async () => {
             try {
-                const result = await obtenerIdentidadStudio(studioSlug);
-                if (result.success !== false) {
-                    setIdentidadData(result as unknown as IdentidadData);
+                // Cargar datos de identidad
+                const identidadResult = await obtenerIdentidadStudio(studioSlug);
+                if (identidadResult.success !== false) {
+                    setIdentidadData(identidadResult as unknown as IdentidadData);
+                }
+
+                // Cargar datos de contacto para el footer
+                const contactoResult = await obtenerContactoStudio(studioSlug);
+                if (contactoResult.success !== false) {
+                    setContactoData(contactoResult);
                 }
             } catch (error) {
-                console.error('Error loading identidad data:', error);
+                console.error('Error loading data:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadIdentidadData();
+        loadData();
     }, [studioSlug]);
 
+    // Combinar datos de identidad y contacto para el preview
+    const combinedData = {
+        ...identidadData,
+        ...contactoData,
+    };
+
     return (
-        <SectionLayout section="identidad" studioSlug={studioSlug} data={identidadData as unknown as Record<string, unknown>} loading={loading}>
+        <SectionLayout section="identidad" studioSlug={studioSlug} data={combinedData as unknown as Record<string, unknown>} loading={loading}>
             <ZenCard variant="default" padding="none">
                 <ZenCardHeader className="border-b border-zinc-800">
                     <div className="flex items-center gap-3">

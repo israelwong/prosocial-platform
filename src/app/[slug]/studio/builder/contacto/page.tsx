@@ -5,6 +5,7 @@ import { ContactoEditorZen } from './components/ContactoEditorZen';
 import { SectionLayout } from '../components';
 import { useParams } from 'next/navigation';
 import { obtenerContactoStudio } from '@/lib/actions/studio/config/contacto.actions';
+import { obtenerIdentidadStudio } from '@/lib/actions/studio/config/identidad.actions';
 import { ContactoData } from './types';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
 import { Phone } from 'lucide-react';
@@ -13,29 +14,45 @@ export default function ContactoPage() {
     const params = useParams();
     const studioSlug = params.slug as string;
     const [contactoData, setContactoData] = useState<ContactoData | null>(null);
+    const [identidadData, setIdentidadData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadContactoData = async () => {
+        const loadData = async () => {
             try {
-                const result = await obtenerContactoStudio(studioSlug);
-                if ('success' in result && result.success === false) {
-                    console.error('Error loading contacto:', result.error);
+                // Cargar datos de contacto
+                const contactoResult = await obtenerContactoStudio(studioSlug);
+                if ('success' in contactoResult && contactoResult.success === false) {
+                    console.error('Error loading contacto:', contactoResult.error);
                 } else {
-                    setContactoData(result as ContactoData);
+                    setContactoData(contactoResult as ContactoData);
+                }
+
+                // Cargar datos de identidad para el header
+                const identidadResult = await obtenerIdentidadStudio(studioSlug);
+                if ('success' in identidadResult && identidadResult.success === false) {
+                    console.error('Error loading identidad:', identidadResult.error);
+                } else {
+                    setIdentidadData(identidadResult);
                 }
             } catch (error) {
-                console.error('Error loading contacto data:', error);
+                console.error('Error loading data:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadContactoData();
+        loadData();
     }, [studioSlug]);
 
+    // Combinar datos de contacto e identidad para el preview
+    const combinedData = {
+        ...contactoData,
+        ...identidadData,
+    };
+
     return (
-        <SectionLayout section="contacto" studioSlug={studioSlug} data={contactoData as unknown as Record<string, unknown>} loading={loading}>
+        <SectionLayout section="contacto" studioSlug={studioSlug} data={combinedData as unknown as Record<string, unknown>} loading={loading}>
             <ZenCard variant="default" padding="none">
                 <ZenCardHeader className="border-b border-zinc-800">
                     <div className="flex items-center gap-3">

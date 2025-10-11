@@ -14,14 +14,17 @@ interface HeaderPreviewProps {
 }
 
 export function HeaderPreview({ data, loading = false }: HeaderPreviewProps) {
-    const studioData = data || {
-        studio_name: 'Mi Estudio',
-        slogan: null,
-        logo_url: null,
-    };
+    const studioData = data || {};
+
+    // Solo mostrar header si hay datos reales o está cargando
+    const hasData = studioData.studio_name || studioData.logo_url || loading;
+
+    if (!hasData) {
+        return null;
+    }
 
     return (
-        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full px-4 pt-2 pb-4">
+        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full px-4 py-4">
             <div className="flex items-center">
                 {/* Columna 1: Logo, nombre y slogan */}
                 <div className="flex items-center space-x-3 flex-1">
@@ -52,7 +55,7 @@ export function HeaderPreview({ data, loading = false }: HeaderPreviewProps) {
                         ) : (
                             <>
                                 <h1 className="text-white font-semibold text-base">
-                                    {studioData.studio_name || 'Mi Estudio'}
+                                    {studioData.studio_name}
                                 </h1>
                                 {studioData.slogan && (
                                     <p className="text-zinc-400 text-xs">

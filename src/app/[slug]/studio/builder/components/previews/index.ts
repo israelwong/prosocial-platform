@@ -1,6 +1,7 @@
 // Componentes modulares del preview (globales)
 export { MobilePreviewContainer } from './MobilePreviewContainer';
 export { HeaderPreview } from './HeaderPreview';
+export { FooterPreview } from './FooterPreview';
 export { NavbarPreview } from './NavbarPreview';
 export { ContentPreviewSkeleton } from './ContentPreviewSkeleton';
 
