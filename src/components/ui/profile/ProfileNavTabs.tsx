@@ -1,35 +1,41 @@
 'use client';
 
 import React from 'react';
-import { Grid3X3, Store, Info } from 'lucide-react';
-import { ProfileTab } from '@/types/public-profile';
+import { Home, Grid3X3, Store, Phone } from 'lucide-react';
 
 interface ProfileNavTabsProps {
-    activeTab: ProfileTab;
-    onTabChange: (tab: ProfileTab) => void;
+    activeTab: string;
+    onTabChange: (tab: string) => void;
 }
 
 /**
- * ProfileNavTabs - Tab navigation for profile content
- * Client component with state management
- * Uses ZEN styling consistent with design system
+ * ProfileNavTabs - Componente para navegación de tabs del perfil público
+ * Homologado con ProfileNavigation para consistencia
+ * 
+ * Usado en:
+ * - Perfil público (navegación de tabs con iconos)
  */
 export function ProfileNavTabs({ activeTab, onTabChange }: ProfileNavTabsProps) {
     const tabs = [
         {
-            id: ProfileTab.POSTS,
-            label: 'Publicaciones',
+            id: 'inicio',
+            label: 'Inicio',
+            icon: Home,
+        },
+        {
+            id: 'portafolio',
+            label: 'Portafolio',
             icon: Grid3X3,
         },
         {
-            id: ProfileTab.SHOP,
-            label: 'Tienda',
+            id: 'catalogo',
+            label: 'Catálogo',
             icon: Store,
         },
         {
-            id: ProfileTab.INFO,
-            label: 'Información',
-            icon: Info,
+            id: 'contacto',
+            label: 'Contacto',
+            icon: Phone,
         },
     ];
 
@@ -45,7 +51,7 @@ export function ProfileNavTabs({ activeTab, onTabChange }: ProfileNavTabsProps) 
                             key={tab.id}
                             onClick={() => onTabChange(tab.id)}
                             className={`
-                flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium
+                flex-1 flex flex-col items-center justify-center gap-1 px-2 py-3 text-sm font-medium
                 transition-colors duration-200
                 ${isActive
                                     ? 'text-purple-400 border-b-2 border-purple-400 bg-purple-400/5'
@@ -53,8 +59,8 @@ export function ProfileNavTabs({ activeTab, onTabChange }: ProfileNavTabsProps) 
                                 }
               `}
                         >
-                            <Icon className="h-4 w-4" />
-                            <span className="hidden sm:inline">{tab.label}</span>
+                            <Icon className="h-5 w-5" />
+                            <span className="text-xs">{tab.label}</span>
                         </button>
                     );
                 })}

@@ -1,11 +1,10 @@
 import React from 'react';
-import { ProfileTab, PublicProfileData } from '@/types/public-profile';
-import { PostGridView } from './PostGridView';
-import { ShopView } from './ShopView';
-import { InfoView } from './InfoView';
+import { PublicProfileData } from '@/types/public-profile';
+import { ProfileContent } from '@/components/ui/profile';
+// PostGridView, ShopView, and InfoView are now handled by ProfileContent component
 
 interface ProfileContentViewProps {
-    activeTab: ProfileTab;
+    activeTab: string;
     profileData: PublicProfileData;
 }
 
@@ -18,22 +17,48 @@ export function ProfileContentView({ activeTab, profileData }: ProfileContentVie
     const { studio, socialNetworks, contactInfo, items, portfolios } = profileData;
 
     switch (activeTab) {
-        case ProfileTab.POSTS:
-            return <PostGridView portfolios={portfolios} />;
-
-        case ProfileTab.SHOP:
-            return <ShopView items={items} />;
-
-        case ProfileTab.INFO:
+        case 'inicio':
             return (
-                <InfoView
-                    studio={studio}
-                    contactInfo={contactInfo}
-                    socialNetworks={socialNetworks}
+                <ProfileContent
+                    variant="posts"
+                    data={{ portfolios }}
+                />
+            );
+
+        case 'portafolio':
+            return (
+                <ProfileContent
+                    variant="posts"
+                    data={{ portfolios }}
+                />
+            );
+
+        case 'catalogo':
+            return (
+                <ProfileContent
+                    variant="shop"
+                    data={{ items }}
+                />
+            );
+
+        case 'contacto':
+            return (
+                <ProfileContent
+                    variant="info"
+                    data={{
+                        studio,
+                        contactInfo,
+                        socialNetworks
+                    }}
                 />
             );
 
         default:
-            return <PostGridView portfolios={portfolios} />;
+            return (
+                <ProfileContent
+                    variant="posts"
+                    data={{ portfolios }}
+                />
+            );
     }
 }

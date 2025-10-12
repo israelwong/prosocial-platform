@@ -4,16 +4,19 @@ import React, { useState } from 'react';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenButton, ZenInput } from '@/components/ui/zen';
 import { Bot, Send, Crown, Sparkles } from 'lucide-react';
 
-interface ZenAIChatProps {
+interface ProfileAIChatProps {
     isProPlan: boolean;
 }
 
 /**
- * ZenAIChat - AI Chat interface or upsell component
- * Conditional rendering based on plan type
- * Uses ZenCard, ZenInput, ZenButton from ZEN Design System
+ * ProfileAIChat - Componente reutilizable para chat IA del perfil
+ * Migrado desde ZenAIChat del perfil público con mejor naming
+ * 
+ * Usado en:
+ * - Perfil público (chat IA o upgrade)
+ * - Builder preview (preview de chat IA)
  */
-export function ZenAIChat({ isProPlan }: ZenAIChatProps) {
+export function ProfileAIChat({ isProPlan }: ProfileAIChatProps) {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([
         {
@@ -139,8 +142,8 @@ export function ZenAIChat({ isProPlan }: ZenAIChatProps) {
                         >
                             <div
                                 className={`max-w-[80%] p-3 rounded-lg text-sm ${msg.isBot
-                                        ? 'bg-zinc-800 text-zinc-100'
-                                        : 'bg-purple-600 text-white'
+                                    ? 'bg-zinc-800 text-zinc-100'
+                                    : 'bg-purple-600 text-white'
                                     }`}
                             >
                                 {msg.text}

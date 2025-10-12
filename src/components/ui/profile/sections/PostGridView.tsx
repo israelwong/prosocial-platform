@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { Play } from 'lucide-react';
+import { Play, Grid3X3 } from 'lucide-react';
 import { PublicPortfolio } from '@/types/public-profile';
 
 interface PostGridViewProps {
@@ -76,6 +76,3 @@ export function PostGridView({ portfolios }: PostGridViewProps) {
         </div>
     );
 }
-
-// Import Grid3X3 for the empty state
-import { Grid3X3 } from 'lucide-react';

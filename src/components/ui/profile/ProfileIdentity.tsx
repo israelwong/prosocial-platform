@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Star } from 'lucide-react';
 
-interface HeaderPreviewProps {
+interface ProfileIdentityProps {
     data?: {
         studio_name?: string;
         slogan?: string | null;
@@ -13,7 +13,15 @@ interface HeaderPreviewProps {
     loading?: boolean;
 }
 
-export function HeaderPreview({ data, loading = false }: HeaderPreviewProps) {
+/**
+ * ProfileIdentity - Componente reutilizable para identidad del estudio
+ * Migrado desde HeaderPreview del builder con mejor naming
+ * 
+ * Usado en:
+ * - Builder preview (header sticky)
+ * - Perfil público (header completo)
+ */
+export function ProfileIdentity({ data, loading = false }: ProfileIdentityProps) {
     const studioData = data || {};
 
     // Solo mostrar header si hay datos reales o está cargando

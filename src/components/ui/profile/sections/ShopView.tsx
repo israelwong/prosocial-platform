@@ -1,7 +1,7 @@
 import React from 'react';
 import { Store } from 'lucide-react';
 import { PublicCatalogItem } from '@/types/public-profile';
-import { ProductCard } from '@/components/ui/profile/ProductCard';
+import { ProductCard } from './ProductCard';
 
 interface ShopViewProps {
     items: PublicCatalogItem[];

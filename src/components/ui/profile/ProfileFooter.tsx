@@ -11,7 +11,7 @@ import LinkedInIcon from '@/components/ui/shadcn/icons/LinkedInIcon';
 import ThreadsIcon from '@/components/ui/shadcn/icons/ThreadsIcon';
 import SpotifyIcon from '@/components/ui/shadcn/icons/SpotifyIcon';
 
-interface FooterPreviewProps {
+interface ProfileFooterProps {
     data?: {
         // Datos de identidad (pie de página)
         pagina_web?: string | null;
@@ -33,14 +33,16 @@ interface FooterPreviewProps {
     loading?: boolean;
 }
 
-export function FooterPreview({ data, loading = false }: FooterPreviewProps) {
+/**
+ * ProfileFooter - Componente reutilizable para footer del perfil
+ * Migrado desde FooterPreview del builder con mejor naming
+ * 
+ * Usado en:
+ * - Builder preview (footer con datos de contacto)
+ * - Perfil público (footer con información completa)
+ */
+export function ProfileFooter({ data, loading = false }: ProfileFooterProps) {
     const footerData = data || {};
-
-    // Debug: Log data to see what's being passed
-    console.log('🔍 FooterPreview - Data received:', data);
-    console.log('🔍 FooterPreview - FooterData keys:', Object.keys(footerData));
-    console.log('🔍 FooterPreview - redes_sociales:', footerData.redes_sociales);
-
 
     // Helper function to safely get array values
     const getArrayValue = <T,>(value: unknown, defaultValue: T[]): T[] => {
@@ -84,7 +86,6 @@ export function FooterPreview({ data, loading = false }: FooterPreviewProps) {
                 return <Globe className="w-4 h-4" />;
         }
     };
-
 
     return (
         <div className="bg-zinc-900/30 border-t border-zinc-800/50 p-3 mt-6 pb-5">
@@ -210,7 +211,6 @@ export function FooterPreview({ data, loading = false }: FooterPreviewProps) {
                             )}
                         </div>
                     )}
-
                 </div>
             )}
         </div>

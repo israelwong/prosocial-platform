@@ -4,36 +4,27 @@ import React, { useEffect, useState } from 'react';
 import { ContactoEditorZen } from './components/ContactoEditorZen';
 import { SectionLayout } from '../components';
 import { useParams } from 'next/navigation';
-import { obtenerContactoStudio } from '@/lib/actions/studio/config/contacto.actions';
-import { obtenerIdentidadStudio } from '@/lib/actions/studio/config/identidad.actions';
+import { getBuilderProfileData } from '@/lib/actions/studio/builder-profile.actions';
 import { ContactoData } from './types';
+import { BuilderProfileData } from '@/types/builder-profile';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
 import { Phone } from 'lucide-react';
 
 export default function ContactoPage() {
     const params = useParams();
     const studioSlug = params.slug as string;
-    const [contactoData, setContactoData] = useState<ContactoData | null>(null);
-    const [identidadData, setIdentidadData] = useState<any>(null);
+    const [builderData, setBuilderData] = useState<BuilderProfileData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Cargar datos de contacto
-                const contactoResult = await obtenerContactoStudio(studioSlug);
-                if ('success' in contactoResult && contactoResult.success === false) {
-                    console.error('Error loading contacto:', contactoResult.error);
+                // ✅ UNA SOLA CONSULTA - Estrategia homologada con perfil público
+                const result = await getBuilderProfileData(studioSlug);
+                if (result.success && result.data) {
+                    setBuilderData(result.data);
                 } else {
-                    setContactoData(contactoResult as ContactoData);
-                }
-
-                // Cargar datos de identidad para el header
-                const identidadResult = await obtenerIdentidadStudio(studioSlug);
-                if ('success' in identidadResult && identidadResult.success === false) {
-                    console.error('Error loading identidad:', identidadResult.error);
-                } else {
-                    setIdentidadData(identidadResult);
+                    console.error('Error loading builder data:', result.error);
                 }
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -45,14 +36,36 @@ export default function ContactoPage() {
         loadData();
     }, [studioSlug]);
 
-    // Combinar datos de contacto e identidad para el preview
-    const combinedData = {
-        ...contactoData,
-        ...identidadData,
-    };
+    // ✅ Mapear datos para preview - Header, Footer y Contenido de contacto
+    const previewData = builderData ? {
+        // Para ProfileIdentity
+        studio_name: builderData.studio.studio_name,
+        slogan: builderData.studio.slogan,
+        logo_url: builderData.studio.logo_url,
+        // Para ProfileFooter
+        pagina_web: builderData.studio.website,
+        palabras_clave: builderData.studio.keywords,
+        redes_sociales: builderData.socialNetworks.map(network => ({
+            plataforma: network.platform?.name || '',
+            url: network.url
+        })),
+        email: null, // No hay email en BuilderProfileData
+        telefonos: builderData.contactInfo.phones.map(phone => ({
+            numero: phone.number,
+            tipo: phone.type === 'WHATSAPP' ? 'whatsapp' as const :
+                phone.type === 'LLAMADAS' ? 'llamadas' as const : 'ambos' as const,
+            is_active: true
+        })),
+        direccion: builderData.contactInfo.address,
+        google_maps_url: null, // No hay google_maps_url en BuilderProfileData
+        // Para ProfileContent (sección contacto)
+        studio: builderData.studio,
+        contactInfo: builderData.contactInfo,
+        socialNetworks: builderData.socialNetworks
+    } : null;
 
     return (
-        <SectionLayout section="contacto" studioSlug={studioSlug} data={combinedData as unknown as Record<string, unknown>} loading={loading}>
+        <SectionLayout section="contacto" studioSlug={studioSlug} data={previewData as unknown as Record<string, unknown>} loading={loading}>
             <ZenCard variant="default" padding="none">
                 <ZenCardHeader className="border-b border-zinc-800">
                     <div className="flex items-center gap-3">
@@ -76,7 +89,22 @@ export default function ContactoPage() {
                         </div>
                     ) : (
                         <ContactoEditorZen
-                            data={contactoData || {
+                            data={builderData ? {
+                                id: builderData.studio.id,
+                                studio_id: builderData.studio.id,
+                                descripcion: builderData.studio.description || '',
+                                direccion: builderData.contactInfo.address || '',
+                                google_maps_url: '',
+                                horarios: [],
+                                telefonos: builderData.contactInfo.phones.map(phone => ({
+                                    id: phone.id,
+                                    numero: phone.number,
+                                    tipo: (phone.type === 'WHATSAPP' ? 'whatsapp' :
+                                        phone.type === 'LLAMADAS' ? 'llamadas' : 'ambos') as 'llamadas' | 'whatsapp' | 'ambos',
+                                    is_active: true
+                                })),
+                                zonas_trabajo: []
+                            } : {
                                 id: 'temp-id',
                                 studio_id: 'temp-studio-id',
                                 descripcion: '',
@@ -87,10 +115,13 @@ export default function ContactoPage() {
                                 zonas_trabajo: []
                             }}
                             onLocalUpdate={(data: unknown) => {
-                                setContactoData(prev => {
+                                setBuilderData((prev: BuilderProfileData | null) => {
                                     if (!prev) return null;
                                     const updateData = data as Partial<ContactoData>;
-                                    return Object.assign({}, prev, updateData);
+                                    return {
+                                        ...prev,
+                                        contactInfo: { ...prev.contactInfo, ...updateData }
+                                    };
                                 });
                             }}
                             studioSlug={studioSlug}

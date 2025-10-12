@@ -3,7 +3,7 @@
 import React from 'react';
 import { SectionPreview } from './SectionPreview';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
-import { Type } from 'lucide-react';
+import { Smartphone } from 'lucide-react';
 
 interface SectionLayoutProps {
     children: React.ReactNode;
@@ -29,7 +29,7 @@ export function SectionLayout({ children, section, studioSlug, data, loading = f
                         <ZenCardHeader className="border-b border-zinc-800">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-purple-600/20 rounded-lg">
-                                    <Type className="h-5 w-5 text-purple-400" />
+                                    <Smartphone className="h-5 w-5 text-purple-400" />
                                 </div>
                                 <div>
                                     <ZenCardTitle>Vista Previa Mobile</ZenCardTitle>

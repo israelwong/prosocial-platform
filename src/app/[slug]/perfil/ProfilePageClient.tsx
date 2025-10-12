@@ -1,13 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ProfileTab, PublicProfileData } from '@/types/public-profile';
-import { ProfileHeader } from './ProfileHeader';
-import { ProfileNavTabs } from './ProfileNavTabs';
+import { PublicProfileData } from '@/types/public-profile';
+import { ProfileIdentity, ProfileNavTabs, ProfileCTA, ProfileAIChat, ProfileFooter } from '@/components/ui/profile';
 import { ProfileContentView } from './ProfileContentView';
-import { HeroCTA } from './HeroCTA';
-import { ZenAIChat } from './ZenAIChat';
-import { getProfileStats, isProPlan } from '@/lib/utils/profile-utils';
+import { isProPlan } from '@/lib/utils/profile-utils';
 
 interface ProfilePageClientProps {
     profileData: PublicProfileData;
@@ -19,10 +16,9 @@ interface ProfilePageClientProps {
  * Mobile-first design that expands to desktop
  */
 export function ProfilePageClient({ profileData }: ProfilePageClientProps) {
-    const [activeTab, setActiveTab] = useState<ProfileTab>(ProfileTab.POSTS);
+    const [activeTab, setActiveTab] = useState<string>('inicio');
 
-    const { studio, portfolios } = profileData;
-    const stats = getProfileStats(portfolios);
+    const { studio } = profileData;
     const isPro = isProPlan(studio.plan?.slug);
 
     return (
@@ -30,7 +26,13 @@ export function ProfilePageClient({ profileData }: ProfilePageClientProps) {
             {/* Mobile Layout (default) */}
             <div className="lg:hidden">
                 {/* Profile Header */}
-                <ProfileHeader studio={studio} stats={stats} />
+                <ProfileIdentity
+                    data={{
+                        studio_name: studio.studio_name,
+                        slogan: studio.slogan,
+                        logo_url: studio.logo_url
+                    }}
+                />
 
                 {/* Navigation Tabs */}
                 <ProfileNavTabs
@@ -43,6 +45,26 @@ export function ProfilePageClient({ profileData }: ProfilePageClientProps) {
                     activeTab={activeTab}
                     profileData={profileData}
                 />
+
+                {/* Footer */}
+                <ProfileFooter
+                    data={{
+                        pagina_web: studio.website,
+                        palabras_clave: studio.keywords,
+                        redes_sociales: profileData.socialNetworks?.map(network => ({
+                            plataforma: network.platform?.name || '',
+                            url: network.url
+                        })) || [],
+                        email: null, // No hay email en PublicContactInfo
+                        telefonos: profileData.contactInfo?.phones?.map(phone => ({
+                            numero: phone.number,
+                            tipo: phone.type === 'WHATSAPP' ? 'whatsapp' : 'llamadas',
+                            is_active: true
+                        })) || [],
+                        direccion: profileData.contactInfo?.address,
+                        google_maps_url: null // No hay google_maps_url en PublicContactInfo
+                    }}
+                />
             </div>
 
             {/* Desktop Layout (3 columns) */}
@@ -50,7 +72,13 @@ export function ProfilePageClient({ profileData }: ProfilePageClientProps) {
                 {/* Column 1: Profile Content */}
                 <div className="space-y-6">
                     {/* Profile Header */}
-                    <ProfileHeader studio={studio} stats={stats} />
+                    <ProfileIdentity
+                        data={{
+                            studio_name: studio.studio_name,
+                            slogan: studio.slogan,
+                            logo_url: studio.logo_url
+                        }}
+                    />
 
                     {/* Navigation Tabs */}
                     <ProfileNavTabs
@@ -63,16 +91,36 @@ export function ProfilePageClient({ profileData }: ProfilePageClientProps) {
                         activeTab={activeTab}
                         profileData={profileData}
                     />
+
+                    {/* Footer */}
+                    <ProfileFooter
+                        data={{
+                            pagina_web: studio.website,
+                            palabras_clave: studio.keywords,
+                            redes_sociales: profileData.socialNetworks?.map(network => ({
+                                plataforma: network.platform?.name || '',
+                                url: network.url
+                            })) || [],
+                            email: null, // No hay email en PublicContactInfo
+                            telefonos: profileData.contactInfo?.phones?.map(phone => ({
+                                numero: phone.number,
+                                tipo: phone.type === 'WHATSAPP' ? 'whatsapp' : 'llamadas',
+                                is_active: true
+                            })) || [],
+                            direccion: profileData.contactInfo?.address,
+                            google_maps_url: null // No hay google_maps_url en PublicContactInfo
+                        }}
+                    />
                 </div>
 
                 {/* Column 2: Hero CTA (sticky) */}
                 <div className="lg:sticky lg:top-6 lg:h-fit">
-                    <HeroCTA />
+                    <ProfileCTA variant="hero" />
                 </div>
 
                 {/* Column 3: AI Chat (sticky) */}
                 <div className="lg:sticky lg:top-6 lg:h-fit">
-                    <ZenAIChat isProPlan={isPro} />
+                    <ProfileAIChat isProPlan={isPro} variant="chat" />
                 </div>
             </div>
         </div>

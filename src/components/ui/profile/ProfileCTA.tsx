@@ -1,13 +1,18 @@
+'use client';
+
 import React from 'react';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenButton } from '@/components/ui/zen';
 import { Sparkles, ArrowRight } from 'lucide-react';
 
 /**
- * HeroCTA - Promotional banner for center column
- * Static promotional content for now
- * Uses ZenCard and ZenButton from ZEN Design System
+ * ProfileCTA - Componente reutilizable para CTAs del perfil
+ * Migrado desde HeroCTA del perfil público con mejor naming
+ * 
+ * Usado en:
+ * - Perfil público (CTA promocional)
+ * - Builder preview (preview de CTA)
  */
-export function HeroCTA() {
+export function ProfileCTA() {
     const handleCTAClick = () => {
         // TODO: Implement CTA action (redirect to booking, contact, etc.)
         console.log('Hero CTA clicked');
