@@ -2,21 +2,22 @@
  * Profile Sections - Componentes para diferentes secciones del perfil
  * 
  * Secciones principales (visibles en menú):
- * - Inicio/Portafolio: PostGridView
- * - Catálogo: ShopView  
- * - Contacto: InfoView
+ * - Inicio/Portafolio: MainSection
+ * - Catálogo: CatalogSection  
+ * - Contacto: ContactSection
  * 
  * Secciones adicionales (rutas específicas):
- * - Payments: PaymentsView (/[slug]/payment)
- * - Clientes: ClientesView (/[slug]/cliente)
+ * - Payments: PaymentsSection (/[slug]/payment)
+ * - Clientes: ClientsSection (/[slug]/cliente)
  */
 
 // Secciones principales
-export { PostGridView } from './PostGridView';
-export { ShopView } from './ShopView';
-export { InfoView } from './InfoView';
+export { MainSection } from './MainSection';
+export { PortfolioSection } from './PortfolioSection';
+export { CatalogSection } from './CatalogSection';
+export { ContactSection } from './ContactSection';
 export { ProductCard } from './ProductCard';
 
 // Secciones adicionales
-export { PaymentsView } from './PaymentsView';
-export { ClientesView } from './ClientesView';
+export { PaymentsSection } from './PaymentsSection';
+export { ClientsSection } from './ClientsSection';

@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { PostGridView, ShopView, InfoView } from './sections';
+import { MainSection, PortfolioSection, CatalogSection, ContactSection } from './sections';
+import { PublicPortfolio, PublicCatalogItem, PublicStudioProfile, PublicContactInfo, PublicSocialNetwork } from '@/types/public-profile';
 
 interface ProfileContentProps {
-    variant?: 'skeleton' | 'posts' | 'shop' | 'info';
+    variant?: 'skeleton' | 'posts' | 'portfolio' | 'shop' | 'info';
     data?: Record<string, unknown>;
     loading?: boolean;
 }
@@ -58,23 +59,29 @@ export function ProfileContent({
         );
     }
 
-    // Posts/Portfolio content
+    // Posts/Main content
     if (variant === 'posts') {
-        const portfolios = data?.portfolios as any[] || [];
-        return <PostGridView portfolios={portfolios} />;
+        const portfolios = data?.portfolios as PublicPortfolio[] || [];
+        return <MainSection portfolios={portfolios} />;
+    }
+
+    // Portfolio content
+    if (variant === 'portfolio') {
+        const portfolios = data?.portfolios as PublicPortfolio[] || [];
+        return <PortfolioSection portfolios={portfolios} />;
     }
 
     // Shop/Catalog content
     if (variant === 'shop') {
-        const items = data?.items as any[] || [];
-        return <ShopView items={items} />;
+        const items = data?.items as PublicCatalogItem[] || [];
+        return <CatalogSection items={items} />;
     }
 
     // Info/Contact content
     if (variant === 'info') {
-        const studio = data?.studio;
-        const contactInfo = data?.contactInfo;
-        const socialNetworks = data?.socialNetworks as any[] || [];
+        const studio = data?.studio as PublicStudioProfile;
+        const contactInfo = data?.contactInfo as PublicContactInfo;
+        const socialNetworks = data?.socialNetworks as PublicSocialNetwork[] || [];
 
         if (!studio || !contactInfo) {
             return (
@@ -89,7 +96,7 @@ export function ProfileContent({
             );
         }
 
-        return <InfoView studio={studio as any} contactInfo={contactInfo as any} socialNetworks={socialNetworks} />;
+        return <ContactSection studio={studio} contactInfo={contactInfo} socialNetworks={socialNetworks} />;
     }
 
     // Default fallback

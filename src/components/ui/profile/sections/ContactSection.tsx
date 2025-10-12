@@ -14,7 +14,7 @@ interface InfoViewProps {
  * Uses ZenButton and ZenCard from ZEN Design System
  * Shows contact actions, location, and social links
  */
-export function InfoView({ studio, contactInfo, socialNetworks }: InfoViewProps) {
+export function ContactSection({ studio, contactInfo, socialNetworks }: InfoViewProps) {
     const handleCall = (phoneNumber: string) => {
         window.open(`tel:${phoneNumber}`, '_self');
     };

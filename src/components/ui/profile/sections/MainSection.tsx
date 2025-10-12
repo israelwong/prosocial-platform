@@ -12,7 +12,7 @@ interface PostGridViewProps {
  * Shows images and videos from studio portfolios
  * Mobile-first responsive design
  */
-export function PostGridView({ portfolios }: PostGridViewProps) {
+export function MainSection({ portfolios }: PostGridViewProps) {
     // Flatten all portfolio items into a single array
     const allItems = portfolios.flatMap(portfolio =>
         portfolio.items.map(item => ({

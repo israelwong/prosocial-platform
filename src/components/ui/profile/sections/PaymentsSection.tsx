@@ -17,7 +17,7 @@ interface PaymentsViewProps {
  * Shows payment history, billing details, and payment methods
  * Used in /[slug]/payment route
  */
-export function PaymentsView({ payments = [] }: PaymentsViewProps) {
+export function PaymentsSection({ payments = [] }: PaymentsViewProps) {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',

@@ -12,7 +12,7 @@ interface ShopViewProps {
  * Shows studio items in a responsive grid
  * Uses ProductCard components
  */
-export function ShopView({ items }: ShopViewProps) {
+export function CatalogSection({ items }: ShopViewProps) {
     if (items.length === 0) {
         return (
             <div className="p-8 text-center">

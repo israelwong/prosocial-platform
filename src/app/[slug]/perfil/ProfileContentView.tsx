@@ -28,7 +28,7 @@ export function ProfileContentView({ activeTab, profileData }: ProfileContentVie
         case 'portafolio':
             return (
                 <ProfileContent
-                    variant="posts"
+                    variant="portfolio"
                     data={{ portfolios }}
                 />
             );
