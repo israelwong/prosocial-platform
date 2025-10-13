@@ -9,7 +9,7 @@ import { StudioHeaderModal } from '../../components/StudioHeaderModal';
 import { ActiveLink } from '../../components/ActiveLink';
 import { LogoutButton } from '@/components/auth/logout-button';
 import {
-    Star, Phone, Clock, Zap, HelpCircle, ShoppingCart, Search, Camera, X, Home, CreditCard, File, User, Rows2, ShoppingBag,
+    Star, Phone, Zap, Camera, X, Home, CreditCard, File, User, Rows2, ShoppingBag,
 } from 'lucide-react';
 
 interface StudioBuilderSidebarProps {
@@ -28,27 +28,36 @@ export function StudioBuilderSidebar({ className, studioSlug }: StudioBuilderSid
         slug: studioSlug
     };
 
-    // Configuración de navegación específica para Studio Builder
+    // Configuración de navegación específica para Studio Builder con títulos de sección
     const builderNavItems = [
         {
-            id: 'studio',
-            title: 'Studio',
-            icon: Camera,
+            id: 'identidad',
+            title: 'Identidad',
+            icon: Star,
             items: [
                 { id: 'identidad', name: 'Identidad', href: `/identidad`, icon: Star },
                 { id: 'principal', name: 'Principal', href: `/principal`, icon: Home },
-                //promociones hero
-                // { id: 'faq', name: 'Preguntas frecuentes', href: `/faq`, icon: HelpCircle },
-                // { id: 'ventajas', name: 'Ventajas competitivas', href: `/ventajas-competitivas`, icon: ShoppingCart },
                 { id: 'promociones', name: 'Promociones', href: `/promociones`, icon: Zap },
+            ],
+        },
+        {
+            id: 'tabs',
+            title: 'Tabs',
+            icon: Camera,
+            items: [
                 { id: 'portafolio', name: 'Portafolio', href: `/portafolio`, icon: Rows2 },
                 { id: 'catalogo', name: 'Catálogo', href: `/catalogo`, icon: ShoppingBag },
                 { id: 'contacto', name: 'Contacto', href: `/contacto`, icon: Phone },
-
+            ],
+        },
+        {
+            id: 'addons',
+            title: 'Addons',
+            icon: Zap,
+            items: [
                 { id: 'zona-pago', name: 'Zona de pago', href: `/zona-pago`, icon: CreditCard },
                 { id: 'cotizaciones', name: 'Cotizaciones', href: `/cotizaciones`, icon: File },
                 { id: 'portal-cliente', name: 'Portal cliente', href: `/portal-cliente`, icon: User },
-
             ],
         },
     ];
@@ -76,6 +85,11 @@ export function StudioBuilderSidebar({ className, studioSlug }: StudioBuilderSid
 
                     {builderNavItems.map(group => (
                         <div key={group.id}>
+                            {/* Título de sección como separador */}
+                            <div className="px-3 py-2 text-xs font-semibold text-zinc-500 uppercase tracking-wider border-b border-zinc-800 mb-2">
+                                {group.title}
+                            </div>
+                            
                             {group.items.map(item => (
                                 <ZenSidebarMenuItem key={item.id}>
                                     <ActiveLink href={`/${studioSlug}/studio/builder${item.href}`}>
