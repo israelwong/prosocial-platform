@@ -5,7 +5,7 @@ import { ZenButton, ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from 
 import { MapPin, Plus, GripVertical, Edit3, Trash2 } from 'lucide-react';
 import { ZonaTrabajo } from '../types';
 import { ZonaTrabajoModal } from './ZonaTrabajoModal';
-import { obtenerZonasTrabajoStudio, crearZonaTrabajo, actualizarZonaTrabajo, eliminarZonaTrabajo, reordenarZonasTrabajo } from '@/lib/actions/studio/config/zonas-trabajo.actions';
+import { obtenerZonasTrabajoStudio, crearZonaTrabajo, actualizarZonaTrabajo, eliminarZonaTrabajo, reordenarZonasTrabajo } from '@/lib/actions/studio/config/contacto';
 import { toast } from 'sonner';
 import {
     DndContext,

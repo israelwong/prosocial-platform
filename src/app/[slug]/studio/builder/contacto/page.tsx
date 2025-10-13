@@ -19,16 +19,20 @@ export default function ContactoPage() {
     useEffect(() => {
         const loadData = async () => {
             try {
+                console.log('🔄 [ContactoPage] Loading builder data for slug:', studioSlug);
                 // ✅ UNA SOLA CONSULTA - Estrategia homologada con perfil público
                 const result = await getBuilderProfileData(studioSlug);
+                console.log('📊 [ContactoPage] Builder data result:', result);
                 if (result.success && result.data) {
                     setBuilderData(result.data);
+                    console.log('✅ [ContactoPage] Builder data loaded successfully');
                 } else {
-                    console.error('Error loading builder data:', result.error);
+                    console.error('❌ [ContactoPage] Error loading builder data:', result.error);
                 }
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('❌ [ContactoPage] Error loading data:', error);
             } finally {
+                console.log('🏁 [ContactoPage] Setting loading to false');
                 setLoading(false);
             }
         };
@@ -115,16 +119,33 @@ export default function ContactoPage() {
                                 zonas_trabajo: []
                             }}
                             onLocalUpdate={(data: unknown) => {
+                                console.log('🔄 [ContactoPage] onLocalUpdate called with:', data);
                                 setBuilderData((prev: BuilderProfileData | null) => {
                                     if (!prev) return null;
                                     const updateData = data as Partial<ContactoData>;
+                                    console.log('📝 [ContactoPage] Updating builderData with:', updateData);
                                     return {
                                         ...prev,
-                                        contactInfo: { ...prev.contactInfo, ...updateData }
+                                        studio: {
+                                            ...prev.studio,
+                                            description: updateData.descripcion !== undefined ? updateData.descripcion : prev.studio.description,
+                                            address: updateData.direccion !== undefined ? updateData.direccion : prev.studio.address
+                                        },
+                                        contactInfo: {
+                                            ...prev.contactInfo,
+                                            address: updateData.direccion !== undefined ? updateData.direccion : prev.contactInfo.address,
+                                            phones: updateData.telefonos !== undefined ? updateData.telefonos.map(phone => ({
+                                                id: phone.id || '',
+                                                number: phone.numero,
+                                                type: phone.tipo === 'whatsapp' ? 'WHATSAPP' :
+                                                    phone.tipo === 'llamadas' ? 'LLAMADAS' : 'AMBOS'
+                                            })) : prev.contactInfo.phones
+                                        }
                                     };
                                 });
                             }}
                             studioSlug={studioSlug}
+                            loading={loading}
                         />
                     )}
                 </ZenCardContent>

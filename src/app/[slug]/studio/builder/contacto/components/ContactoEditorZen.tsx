@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { ContactoData } from '../types';
 import { ZenButton, ZenInput, ZenTextarea, ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
-import { Info, Plus, Save, Check } from 'lucide-react';
+import { Save, Check } from 'lucide-react';
 import { ZonasTrabajoSection } from './ZonasTrabajoSection';
 import { TelefonosSection } from './TelefonosSection';
 import { HorariosSection } from './HorariosSection';
-import { actualizarContacto } from '@/lib/actions/studio/config/contacto.actions';
+import { actualizarContacto } from '@/lib/actions/studio/config/contacto';
 import { toast } from 'sonner';
 
 interface ContactoEditorZenProps {
@@ -27,10 +27,10 @@ export function ContactoEditorZen({
     const [activeTab, setActiveTab] = useState('info');
 
     const tabs = [
-        { id: 'info', label: 'Información', icon: Info },
-        { id: 'telefonos', label: 'Teléfonos', icon: Plus },
-        { id: 'horarios', label: 'Horarios', icon: Plus },
-        { id: 'zonas', label: 'Zonas de Trabajo', icon: Plus }
+        { id: 'info', label: 'Información' },
+        { id: 'telefonos', label: 'Teléfonos' },
+        { id: 'horarios', label: 'Horarios' },
+        { id: 'zonas', label: 'Zonas de Trabajo' }
     ];
 
     const handleUpdateInfo = async () => {
@@ -58,17 +58,15 @@ export function ContactoEditorZen({
             <div className="border-b border-zinc-800">
                 <div className="flex space-x-8">
                     {tabs.map((tab) => {
-                        const Icon = tab.icon;
                         return (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                                     ? 'border-blue-500 text-blue-400'
                                     : 'border-transparent text-zinc-400 hover:text-zinc-300 hover:border-zinc-600'
                                     }`}
                             >
-                                <Icon className="h-4 w-4" />
                                 {tab.label}
                             </button>
                         );
@@ -81,10 +79,7 @@ export function ContactoEditorZen({
                 {activeTab === 'info' && (
                     <ZenCard variant="default" padding="none">
                         <ZenCardHeader className="border-b border-zinc-800">
-                            <div className="flex items-center gap-3">
-                                <Info className="h-5 w-5 text-blue-400" />
-                                <ZenCardTitle>Información de Contacto</ZenCardTitle>
-                            </div>
+                            <ZenCardTitle>Información de Contacto</ZenCardTitle>
                         </ZenCardHeader>
                         <ZenCardContent className="p-6 space-y-4">
                             <ZenTextarea
@@ -149,6 +144,7 @@ export function ContactoEditorZen({
                     <TelefonosSection
                         telefonos={data.telefonos || []}
                         onLocalUpdate={onLocalUpdate}
+                        studioSlug={studioSlug}
                     />
                 )}
 

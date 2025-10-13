@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
 import { Clock } from 'lucide-react';
 import { Horario } from '../types';
-import { obtenerHorariosStudio, toggleHorarioEstado, actualizarHorario, inicializarHorariosPorDefecto } from '@/lib/actions/studio/config/horarios.actions';
+import { obtenerHorariosStudio, toggleHorarioEstado, actualizarHorario, inicializarHorariosPorDefecto } from '@/lib/actions/studio/config/contacto';
 import { toast } from 'sonner';
 
 interface HorariosSectionProps {

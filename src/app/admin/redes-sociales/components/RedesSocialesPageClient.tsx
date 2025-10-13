@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/shadcn/badge';
 import { Button } from '@/components/ui/shadcn/button';
 import { Eye, EyeOff, Edit, Trash2 } from 'lucide-react';
 import { deletePlataformaRedSocial } from '../actions';
-import { RedSocialIcon } from '@/components/ui/shadcn/icons/RedSocialIcon';
+import { RedSocialIcon } from '@/components/ui/icons/RedSocialIcon';
 
 interface PlataformaRedSocial {
     id: string;

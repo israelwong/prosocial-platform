@@ -140,7 +140,7 @@ const titleClass = ZEN_TYPOGRAPHY.component.pageTitle;
 
 ```typescript
 // Múltiples patrones diferentes
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/shadcn/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 

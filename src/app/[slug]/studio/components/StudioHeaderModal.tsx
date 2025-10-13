@@ -11,7 +11,7 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/shadcn/dropdown-menu';
 import { ZenSidebarMenuButton } from '@/components/ui/zen';
 import { useStudioData } from '@/hooks/useStudioData';
 

@@ -6,6 +6,7 @@ import { Phone, Plus, GripVertical, Edit3, Trash2 } from 'lucide-react';
 import { Telefono } from '../types';
 import { TelefonoModal } from './TelefonoModal';
 import { toast } from 'sonner';
+import { crearTelefono, actualizarTelefono, eliminarTelefono } from '@/lib/actions/studio/config/contacto';
 import {
     DndContext,
     closestCenter,
@@ -13,6 +14,7 @@ import {
     PointerSensor,
     useSensor,
     useSensors,
+    type DragEndEvent,
 } from '@dnd-kit/core';
 import {
     arrayMove,
@@ -26,6 +28,7 @@ import { CSS } from '@dnd-kit/utilities';
 interface TelefonosSectionProps {
     telefonos: Telefono[];
     onLocalUpdate: (data: Partial<{ telefonos: Telefono[] }>) => void;
+    studioSlug: string;
 }
 
 interface SortableTelefonoItemProps {
@@ -127,7 +130,7 @@ function SortableTelefonoItem({ telefono, onToggle, onEdit, onDelete }: Sortable
     );
 }
 
-export function TelefonosSection({ telefonos, onLocalUpdate }: TelefonosSectionProps) {
+export function TelefonosSection({ telefonos, onLocalUpdate, studioSlug }: TelefonosSectionProps) {
     const [telefonoModal, setTelefonoModal] = useState<{ open: boolean; telefono?: Telefono }>({ open: false });
     const [isReorderingTelefonos, setIsReorderingTelefonos] = useState(false);
 
@@ -138,33 +141,83 @@ export function TelefonosSection({ telefonos, onLocalUpdate }: TelefonosSectionP
         })
     );
 
-    const handleTelefonoSave = (telefono: Telefono) => {
-        if (telefono.id) {
-            const updated = telefonos.map(t => t.id === telefono.id ? telefono : t);
-            onLocalUpdate({ telefonos: updated });
-            toast.success('Teléfono actualizado exitosamente');
-        } else {
-            const newTelefono = { ...telefono, id: Date.now().toString(), is_active: true };
-            const updated = [...telefonos, newTelefono];
-            onLocalUpdate({ telefonos: updated });
-            toast.success('Teléfono agregado exitosamente');
+    const handleTelefonoSave = async (telefono: Telefono) => {
+        try {
+            if (telefono.id) {
+                // Actualizar teléfono existente
+                await actualizarTelefono(telefono.id, {
+                    numero: telefono.numero,
+                    tipo: telefono.tipo === 'whatsapp' ? 'WHATSAPP' :
+                        telefono.tipo === 'llamadas' ? 'LLAMADAS' : 'AMBOS',
+                    etiqueta: telefono.etiqueta,
+                    is_active: telefono.is_active
+                });
+                const updated = telefonos.map(t => t.id === telefono.id ? telefono : t);
+                onLocalUpdate({ telefonos: updated });
+                toast.success('Teléfono actualizado exitosamente');
+            } else {
+                // Crear nuevo teléfono
+                const nuevoTelefono = await crearTelefono(studioSlug, {
+                    numero: telefono.numero,
+                    tipo: telefono.tipo === 'whatsapp' ? 'WHATSAPP' :
+                        telefono.tipo === 'llamadas' ? 'LLAMADAS' : 'AMBOS',
+                    etiqueta: telefono.etiqueta,
+                    is_active: telefono.is_active ?? true
+                });
+                // Usar el teléfono completo devuelto por la base de datos
+                const updated = [...telefonos, {
+                    id: nuevoTelefono.id,
+                    numero: nuevoTelefono.number,
+                    tipo: (nuevoTelefono.type === 'WHATSAPP' ? 'whatsapp' :
+                        nuevoTelefono.type === 'LLAMADAS' ? 'llamadas' : 'ambos') as 'llamadas' | 'whatsapp' | 'ambos',
+                    etiqueta: undefined, // No hay campo label en studio_phones
+                    is_active: nuevoTelefono.is_active
+                }];
+                onLocalUpdate({ telefonos: updated }); // cspell:ignore telefonos
+                toast.success('Teléfono agregado exitosamente');
+            }
+        } catch (error) {
+            console.error('Error saving telefono:', error);
+            toast.error('Error al guardar teléfono');
+        } finally {
+            setTelefonoModal({ open: false });
         }
-        setTelefonoModal({ open: false });
     };
 
-    const handleTelefonoDelete = (id: string) => {
-        const updated = telefonos.filter(t => t.id !== id);
-        onLocalUpdate({ telefonos: updated });
-        toast.success('Teléfono eliminado exitosamente');
+    const handleTelefonoDelete = async (id: string) => {
+        try {
+            await eliminarTelefono(id);
+            const updated = telefonos.filter(t => t.id !== id);
+            onLocalUpdate({ telefonos: updated });
+            toast.success('Teléfono eliminado exitosamente');
+        } catch (error) {
+            console.error('Error deleting telefono:', error);
+            toast.error('Error al eliminar teléfono');
+        }
     };
 
-    const handleTelefonoToggle = (id: string, is_active: boolean) => {
-        const updated = telefonos.map(t => t.id === id ? { ...t, is_active } : t);
-        onLocalUpdate({ telefonos: updated });
-        toast.success(`Teléfono ${is_active ? 'activado' : 'desactivado'} exitosamente`);
+    const handleTelefonoToggle = async (id: string, is_active: boolean) => {
+        try {
+            const telefono = telefonos.find(t => t.id === id);
+            if (telefono) {
+                await actualizarTelefono(id, {
+                    numero: telefono.numero,
+                    tipo: telefono.tipo === 'whatsapp' ? 'WHATSAPP' :
+                        telefono.tipo === 'llamadas' ? 'LLAMADAS' : 'AMBOS',
+                    etiqueta: telefono.etiqueta,
+                    is_active
+                });
+                const updated = telefonos.map(t => t.id === id ? { ...t, is_active } : t);
+                onLocalUpdate({ telefonos: updated });
+                toast.success(`Teléfono ${is_active ? 'activado' : 'desactivado'} exitosamente`);
+            }
+        } catch (error) {
+            console.error('Error toggling telefono:', error);
+            toast.error('Error al cambiar estado del teléfono');
+        }
     };
 
-    const handleTelefonosDragEnd = async (event: any) => {
+    const handleTelefonosDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
         if (!over || active.id === over.id) return;
 

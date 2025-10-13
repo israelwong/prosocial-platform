@@ -69,22 +69,45 @@ export async function obtenerContactoStudio(studioSlug: string) {
 
 export async function actualizarContacto(studioSlug: string, data: Partial<ContactoData>) {
     try {
+        console.log('🔄 [actualizarContacto] Updating contacto for slug:', studioSlug, 'with data:', data);
+
         const studio = await prisma.studios.findUnique({
             where: { slug: studioSlug },
             select: { id: true }
         });
 
         if (!studio) {
+            console.error('❌ [actualizarContacto] Studio not found:', studioSlug);
             return { success: false, error: 'Studio no encontrado' };
         }
 
-        // TODO: Implementar actualización en base de datos
-        // Por ahora solo revalidamos la página
+        // Actualizar datos del studio
+        const updateData: { description?: string; address?: string } = {};
+
+        if (data.descripcion !== undefined) {
+            updateData.description = data.descripcion;
+        }
+
+        if (data.direccion !== undefined) {
+            updateData.address = data.direccion;
+        }
+
+        // Solo actualizar si hay datos que cambiar
+        if (Object.keys(updateData).length > 0) {
+            await prisma.studios.update({
+                where: { id: studio.id },
+                data: updateData
+            });
+            console.log('✅ [actualizarContacto] Studio updated successfully');
+        }
+
+        // Revalidar la página para reflejar los cambios
         revalidatePath(`/studio/${studioSlug}/builder/contacto`);
+        console.log('✅ [actualizarContacto] Page revalidated');
 
         return { success: true };
     } catch (error) {
-        console.error('Error actualizando contacto:', error);
+        console.error('❌ [actualizarContacto] Error:', error);
         return { success: false, error: 'Error interno del servidor' };
     }
 }

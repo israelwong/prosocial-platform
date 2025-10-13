@@ -115,12 +115,12 @@ export function ProfilePageClient({ profileData }: ProfilePageClientProps) {
 
                 {/* Column 2: Hero CTA (sticky) */}
                 <div className="lg:sticky lg:top-6 lg:h-fit">
-                    <ProfileCTA variant="hero" />
+                    <ProfileCTA />
                 </div>
 
                 {/* Column 3: AI Chat (sticky) */}
                 <div className="lg:sticky lg:top-6 lg:h-fit">
-                    <ProfileAIChat isProPlan={isPro} variant="chat" />
+                    <ProfileAIChat isProPlan={isPro} />
                 </div>
             </div>
         </div>

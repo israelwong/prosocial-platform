@@ -27,8 +27,18 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
 
         const profileData = result.data;
 
+        // Map items to include required properties
+        const mappedProfileData = {
+            ...profileData,
+            items: profileData.items.map(item => ({
+                ...item,
+                type: 'PRODUCTO' as const,
+                cost: item.price || 0
+            }))
+        };
+
         return (
-            <ProfilePageClient profileData={profileData} />
+            <ProfilePageClient profileData={mappedProfileData} />
         );
     } catch (error) {
         console.error('❌ [PublicProfilePage] Error:', error);

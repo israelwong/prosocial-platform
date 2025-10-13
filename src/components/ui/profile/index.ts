@@ -23,5 +23,12 @@ export { ProfileCTA } from './ProfileCTA';
 export { ProfileAIChat } from './ProfileAIChat';
 
 // Content Components (from sections)
-export { PostGridView, ShopView, InfoView, ProductCard } from './sections';
-export { PaymentsView, ClientesView } from './sections';
+export {
+    MainSection,
+    PortfolioSection,
+    CatalogSection,
+    ContactSection,
+    ProductCard,
+    PaymentsSection,
+    ClientsSection
+} from './sections';

@@ -36,16 +36,8 @@ export { Logo } from './shadcn/logo';
 export { ThemeToggle } from './shadcn/theme-toggle';
 export { Toaster } from './shadcn/sonner';
 
-// Shadcn Icons
-export { FacebookIcon } from './shadcn/icons/FacebookIcon';
-export { InstagramIcon } from './shadcn/icons/InstagramIcon';
-export { LinkedInIcon } from './shadcn/icons/LinkedInIcon';
-export { RedSocialIcon } from './shadcn/icons/RedSocialIcon';
-export { SpotifyIcon } from './shadcn/icons/SpotifyIcon';
-export { ThreadsIcon } from './shadcn/icons/ThreadsIcon';
-export { TikTokIcon } from './shadcn/icons/TikTokIcon';
-export { WhatsAppIcon } from './shadcn/icons/WhatsAppIcon';
-export { YouTubeIcon } from './shadcn/icons/YouTubeIcon';
+// Social Media Icons
+export * from './icons';
 
 // =============================================================================
 // ZEN DESIGN SYSTEM (Nuevos)

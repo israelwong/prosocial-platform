@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { Globe, Mail, Phone, MapPin, Hash } from 'lucide-react';
-import { WhatsAppIcon } from '@/components/ui/shadcn/icons/WhatsAppIcon';
-import InstagramIcon from '@/components/ui/shadcn/icons/InstagramIcon';
-import FacebookIcon from '@/components/ui/shadcn/icons/FacebookIcon';
-import TikTokIcon from '@/components/ui/shadcn/icons/TikTokIcon';
-import YouTubeIcon from '@/components/ui/shadcn/icons/YouTubeIcon';
-import LinkedInIcon from '@/components/ui/shadcn/icons/LinkedInIcon';
-import ThreadsIcon from '@/components/ui/shadcn/icons/ThreadsIcon';
-import SpotifyIcon from '@/components/ui/shadcn/icons/SpotifyIcon';
+import { WhatsAppIcon } from '@/components/ui/icons/WhatsAppIcon';
+import InstagramIcon from '@/components/ui/icons/InstagramIcon';
+import FacebookIcon from '@/components/ui/icons/FacebookIcon';
+import TikTokIcon from '@/components/ui/icons/TikTokIcon';
+import YouTubeIcon from '@/components/ui/icons/YouTubeIcon';
+import LinkedInIcon from '@/components/ui/icons/LinkedInIcon';
+import ThreadsIcon from '@/components/ui/icons/ThreadsIcon';
+import SpotifyIcon from '@/components/ui/icons/SpotifyIcon';
 
 interface ProfileFooterProps {
     data?: {
