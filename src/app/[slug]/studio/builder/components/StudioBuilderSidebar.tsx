@@ -41,10 +41,10 @@ export function StudioBuilderSidebar({ className, studioSlug }: StudioBuilderSid
         },
         {
             id: 'tabs',
-            title: 'Tabs',
+            title: 'Navegación',
             icon: Camera,
             items: [
-                { id: 'principal', name: 'Principal', href: `/principal`, icon: Home },
+                { id: 'inicio', name: 'Inicio', href: `/inicio`, icon: Home },
                 { id: 'portafolio', name: 'Portafolio', href: `/portafolio`, icon: Grid3X3 },
                 { id: 'catalogo', name: 'Catálogo', href: `/catalogo`, icon: Store },
                 { id: 'contacto', name: 'Contacto', href: `/contacto`, icon: Phone },

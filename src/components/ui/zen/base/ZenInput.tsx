@@ -5,6 +5,12 @@ import { cn } from '@/lib/utils';
 import { ZEN_COLORS } from '../tokens/colors';
 import { ZEN_SPACING } from '../tokens/spacing';
 
+// Hook para generar IDs estables en SSR
+function useStableId(prefix: string = 'zen-input'): string {
+  const [id] = React.useState(() => `${prefix}-${Math.random().toString(36).substr(2, 9)}`);
+  return id;
+}
+
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -69,8 +75,8 @@ const ZenInput = React.forwardRef<HTMLInputElement, ZenInputProps>(
     id,
     ...props
   }, ref) => {
-    // Generar ID único si no se proporciona
-    const generatedId = React.useId();
+    // Generar ID único si no se proporciona - usando hook estable para SSR
+    const generatedId = useStableId();
     const inputId = id || generatedId;
     const errorId = `${inputId}-error`;
     const hintId = `${inputId}-hint`;

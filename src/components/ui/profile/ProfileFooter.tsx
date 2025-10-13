@@ -88,7 +88,10 @@ export function ProfileFooter({ data, loading = false }: ProfileFooterProps) {
     };
 
     return (
-        <div className="bg-zinc-900/30 border-t border-zinc-800/50 p-3 mt-6 pb-5">
+        <div className="bg-zinc-900/30  p-3 mt-10 pt-5 pb-5 relative">
+            {/* Separador elegante con efecto de profundidad */}
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-zinc-900/60 to-transparent rounded-full shadow-lg shadow-zinc-900/20"></div>
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-24 h-0.5 bg-gradient-to-r from-transparent via-zinc-700/80 to-transparent rounded-full"></div>
             {loading ? (
                 // Skeleton del footer
                 <div className="space-y-2">
