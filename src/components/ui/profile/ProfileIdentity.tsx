@@ -32,7 +32,7 @@ export function ProfileIdentity({ data, loading = false }: ProfileIdentityProps)
     }
 
     return (
-        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full px-4 py-8">
+        <div className="sticky top-0 z-10 bg-zinc-900/90 backdrop-blur-lg w-full px-4 py-8">
             <div className="flex items-center">
                 {/* Columna 1: Logo, nombre y slogan */}
                 <div className="flex items-center space-x-3 flex-1">

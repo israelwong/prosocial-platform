@@ -54,6 +54,16 @@ export async function getBuilderProfileData(studioSlug: string) {
                         },
                         orderBy: { order: 'asc' }
                     },
+                    business_hours: {
+                        select: {
+                            id: true,
+                            day_of_week: true,
+                            start_time: true,
+                            end_time: true,
+                            is_active: true,
+                        },
+                        orderBy: { order: 'asc' }
+                    },
                     // Items for catalog section
                     items: {
                         where: { status: 'active' },
@@ -150,6 +160,13 @@ export async function getBuilderProfileData(studioSlug: string) {
                     })),
                     address: studio.address,
                     website: studio.website,
+                    horarios: studio.business_hours?.map(horario => ({
+                        id: horario.id,
+                        dia: horario.day_of_week,
+                        apertura: horario.start_time,
+                        cierre: horario.end_time,
+                        cerrado: !horario.is_active,
+                    })) || [],
                 },
                 // Catalog items
                 items: studio.items.map(item => ({
@@ -188,10 +205,14 @@ export async function getBuilderProfileData(studioSlug: string) {
                 items: builderData.items.length,
                 portfolios: builderData.portfolios.length,
                 zonas_trabajo: builderData.studio.zonas_trabajo?.length || 0,
+                horarios: builderData.contactInfo.horarios?.length || 0,
             });
             console.log('🔍 Builder studio.zonas_trabajo:', builderData.studio.zonas_trabajo);
             console.log('🔍 Builder studio.zonas_trabajo type:', typeof builderData.studio.zonas_trabajo);
             console.log('🔍 Builder studio.zonas_trabajo is array:', Array.isArray(builderData.studio.zonas_trabajo));
+            console.log('🔍 Builder contactInfo.horarios:', builderData.contactInfo.horarios);
+            console.log('🔍 Builder contactInfo.horarios type:', typeof builderData.contactInfo.horarios);
+            console.log('🔍 Builder contactInfo.horarios is array:', Array.isArray(builderData.contactInfo.horarios));
 
             return {
                 success: true,

@@ -23,7 +23,7 @@ export function ProfileNavigation({ activeSection }: ProfileNavigationProps) {
     ];
 
     return (
-        <div className="border-t border-zinc-800">
+        <div className="border-t border-zinc-800 bg-zinc-900/90 backdrop-blur-lg">
             <nav className="flex">
                 {navItems.map((item) => {
                     const Icon = item.icon;

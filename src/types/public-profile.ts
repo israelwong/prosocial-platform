@@ -67,6 +67,14 @@ export interface PublicPortfolio {
     items: PublicPortfolioItem[];
 }
 
+export interface PublicHorario {
+    id: string;
+    dia: string; // day_of_week mapeado a dia
+    apertura: string; // start_time mapeado a apertura
+    cierre: string; // end_time mapeado a cierre
+    cerrado: boolean; // !is_active mapeado a cerrado
+}
+
 export interface PublicContactInfo {
     phones: {
         id: string;
@@ -76,6 +84,7 @@ export interface PublicContactInfo {
     address: string | null;
     website: string | null;
     google_maps_url: string | null;
+    horarios: PublicHorario[];
 }
 
 export enum ProfileTab {

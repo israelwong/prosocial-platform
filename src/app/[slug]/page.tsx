@@ -32,14 +32,17 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
         const mappedProfileData = {
             ...profileData,
             items: profileData.items.map(item => ({
-                ...item,
-                type: 'PRODUCTO' as const,
-                cost: item.price || 0
+                id: item.id,
+                name: item.name,
+                type: 'SERVICIO' as const, // Default to SERVICIO since type field seems to be missing
+                cost: (item as { price?: number }).price || 0, // Use price field if cost doesn't exist
+                order: item.order
             })),
             // Ensure contactInfo has all required properties
             contactInfo: {
                 ...profileData.contactInfo,
-                google_maps_url: null
+                google_maps_url: null,
+                horarios: (profileData as { contactInfo?: { horarios?: import('@/types/public-profile').PublicHorario[] } }).contactInfo?.horarios || []
             }
         };
 

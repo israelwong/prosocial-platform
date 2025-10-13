@@ -124,6 +124,12 @@ export default function ContactoPage() {
                                     if (!prev) return null;
                                     const updateData = data as Partial<ContactoData>;
                                     console.log('📝 [ContactoPage] Updating builderData with:', updateData);
+
+                                    // Debug: Verificar si hay horarios en la actualización
+                                    if (updateData.horarios) {
+                                        console.log('🕐 [ContactoPage] Horarios update detected:', updateData.horarios);
+                                        console.log('🕐 [ContactoPage] Horarios length:', updateData.horarios.length);
+                                    }
                                     return {
                                         ...prev,
                                         studio: {
@@ -139,7 +145,14 @@ export default function ContactoPage() {
                                                 number: phone.numero,
                                                 type: phone.tipo === 'whatsapp' ? 'WHATSAPP' :
                                                     phone.tipo === 'llamadas' ? 'LLAMADAS' : 'AMBOS'
-                                            })) : prev.contactInfo.phones
+                                            })) : prev.contactInfo.phones,
+                                            horarios: updateData.horarios !== undefined ? updateData.horarios.map(horario => ({
+                                                id: horario.id || '',
+                                                dia: horario.dia,
+                                                apertura: horario.apertura,
+                                                cierre: horario.cierre,
+                                                cerrado: horario.cerrado,
+                                            })) : prev.contactInfo.horarios
                                         }
                                     };
                                 });

@@ -1,8 +1,20 @@
 import React from 'react';
-import { Phone, Calendar } from 'lucide-react';
+import { Phone, Calendar, Clock } from 'lucide-react';
 import { ZenButton, ZenBadge } from '@/components/ui/zen';
 import { WhatsAppIcon } from '@/components/ui/icons/WhatsAppIcon';
 import { PublicStudioProfile, PublicContactInfo } from '@/types/public-profile';
+
+interface Horario {
+    dia: string;
+    apertura: string;
+    cierre: string;
+    cerrado: boolean;
+}
+
+interface HorarioAgrupado {
+    dias: string;
+    horario: string;
+}
 
 interface InfoViewProps {
     studio: PublicStudioProfile;
@@ -15,7 +27,78 @@ interface InfoViewProps {
  * Shows contact actions, location, and social links
  */
 export function ContactSection({ studio, contactInfo }: InfoViewProps) {
-    // Debug: Verificar si las zonas de trabajo están llegando
+    // Debug: Verificar horarios en ContactSection
+    console.log('🔍 ContactSection Debug:');
+    console.log('  - contactInfo:', contactInfo);
+    console.log('  - contactInfo.horarios:', contactInfo.horarios);
+    console.log('  - contactInfo.horarios length:', contactInfo.horarios?.length);
+    console.log('  - contactInfo.horarios type:', typeof contactInfo.horarios);
+    console.log('  - contactInfo.horarios is array:', Array.isArray(contactInfo.horarios));
+
+    // Función para traducir días de la semana al español
+    const traducirDia = (dia: string): string => {
+        const traducciones: { [key: string]: string } = {
+            'monday': 'Lunes',
+            'tuesday': 'Martes',
+            'wednesday': 'Miércoles',
+            'thursday': 'Jueves',
+            'friday': 'Viernes',
+            'saturday': 'Sábado',
+            'sunday': 'Domingo'
+        };
+        return traducciones[dia.toLowerCase()] || dia;
+    };
+
+    // Función para formatear días en rangos legibles
+    const formatearDias = (dias: string[]): string => {
+        if (dias.length === 0) return '';
+        if (dias.length === 1) return dias[0];
+        if (dias.length === 2) return dias.join(' y ');
+
+        // Ordenar días según el orden de la semana
+        const ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        const diasOrdenados = dias.sort((a, b) =>
+            ordenDias.indexOf(a) - ordenDias.indexOf(b)
+        );
+
+        // Verificar si son días consecutivos
+        const esConsecutivo = diasOrdenados.every((dia, index) => {
+            if (index === 0) return true;
+            const diaActual = ordenDias.indexOf(dia);
+            const diaAnterior = ordenDias.indexOf(diasOrdenados[index - 1]);
+            return diaActual === diaAnterior + 1;
+        });
+
+        if (esConsecutivo && diasOrdenados.length > 2) {
+            return `${diasOrdenados[0]} a ${diasOrdenados[diasOrdenados.length - 1]}`;
+        }
+
+        return diasOrdenados.join(', ');
+    };
+
+    // Función para agrupar horarios por horario similar
+    const agruparHorarios = (horarios: Horario[]): HorarioAgrupado[] => {
+        const grupos: { [key: string]: string[] } = {};
+
+        horarios.forEach(horario => {
+            if (horario.cerrado) return; // Saltar días cerrados
+
+            const clave = `${horario.apertura}-${horario.cierre}`;
+            if (!grupos[clave]) {
+                grupos[clave] = [];
+            }
+            grupos[clave].push(traducirDia(horario.dia));
+        });
+
+        return Object.entries(grupos).map(([horario, dias]) => ({
+            dias: formatearDias(dias),
+            horario: horario.replace('-', ' a ')
+        }));
+    };
+
+    const horarios = contactInfo.horarios || [];
+    const horariosAgrupados = agruparHorarios(horarios);
+
     const handleCall = (phoneNumber: string) => {
         window.open(`tel:${phoneNumber}`, '_self');
     };
@@ -104,6 +187,27 @@ export function ContactSection({ studio, contactInfo }: InfoViewProps) {
                             <ZenBadge key={zona.id} variant="outline" className="text-xs">
                                 {zona.nombre}
                             </ZenBadge>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Horarios de atención - Diseño compacto con días completos */}
+            {horariosAgrupados.length > 0 && (
+                <div className="space-y-2">
+                    <h3 className="text-sm font-medium text-zinc-500 flex items-center gap-2">
+                        Horarios
+                    </h3>
+                    <div className="space-y-1.5">
+                        {horariosAgrupados.map((grupo, index) => (
+                            <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                                <span className="text-zinc-300 font-medium text-xs leading-tight">
+                                    {grupo.dias}
+                                </span>
+                                <span className="text-zinc-400 bg-zinc-800/40 px-2 py-1 rounded-full text-xs inline-block w-fit">
+                                    {grupo.horario}
+                                </span>
+                            </div>
                         ))}
                     </div>
                 </div>

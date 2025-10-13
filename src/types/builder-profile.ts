@@ -38,6 +38,14 @@ export interface BuilderSocialNetwork {
     order: number;
 }
 
+export interface BuilderHorario {
+    id: string;
+    dia: string;
+    apertura: string;
+    cierre: string;
+    cerrado: boolean;
+}
+
 export interface BuilderContactInfo {
     phones: {
         id: string;
@@ -46,6 +54,7 @@ export interface BuilderContactInfo {
     }[];
     address: string | null;
     website: string | null;
+    horarios?: BuilderHorario[];
 }
 
 export interface BuilderCatalogItem {

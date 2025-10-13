@@ -70,6 +70,16 @@ export async function getStudioProfileBySlug(
                         },
                         orderBy: { order: 'asc' }
                     },
+                    business_hours: {
+                        select: {
+                            id: true,
+                            day_of_week: true,
+                            start_time: true,
+                            end_time: true,
+                            is_active: true,
+                        },
+                        orderBy: { order: 'asc' }
+                    },
                     items: {
                         where: { status: 'active' },
                         select: {
@@ -164,6 +174,13 @@ export async function getStudioProfileBySlug(
                 order: network.order,
             }));
 
+            // Debug: Verificar business_hours
+            console.log('🔍 [getStudioProfileBySlug] Debug business_hours:');
+            console.log('  - studio.business_hours:', studio.business_hours);
+            console.log('  - studio.business_hours length:', studio.business_hours?.length);
+            console.log('  - studio.business_hours type:', typeof studio.business_hours);
+            console.log('  - studio.business_hours is array:', Array.isArray(studio.business_hours));
+
             const contactInfo: PublicContactInfo = {
                 phones: studio.phones.map(phone => ({
                     id: phone.id,
@@ -173,7 +190,21 @@ export async function getStudioProfileBySlug(
                 address: studio.address,
                 website: studio.website,
                 google_maps_url: null, // TODO: Add google_maps_url field to database schema
+                horarios: studio.business_hours?.map(horario => ({
+                    id: horario.id,
+                    dia: horario.day_of_week,
+                    apertura: horario.start_time,
+                    cierre: horario.end_time,
+                    cerrado: !horario.is_active,
+                })) || [],
             };
+
+            // Debug: Verificar horarios mapeados
+            console.log('🔍 [getStudioProfileBySlug] Debug horarios mapeados:');
+            console.log('  - contactInfo.horarios:', contactInfo.horarios);
+            console.log('  - contactInfo.horarios length:', contactInfo.horarios?.length);
+            console.log('  - contactInfo.horarios type:', typeof contactInfo.horarios);
+            console.log('  - contactInfo.horarios is array:', Array.isArray(contactInfo.horarios));
 
             const items: PublicCatalogItem[] = studio.items.map(item => ({
                 id: item.id,

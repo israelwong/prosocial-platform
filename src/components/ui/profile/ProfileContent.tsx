@@ -90,6 +90,10 @@ export function ProfileContent({
         console.log('  - studio.zonas_trabajo type:', typeof studio?.zonas_trabajo);
         console.log('  - studio.zonas_trabajo is array:', Array.isArray(studio?.zonas_trabajo));
         console.log('  - contactInfo:', contactInfo);
+        console.log('  - contactInfo.horarios:', contactInfo?.horarios);
+        console.log('  - contactInfo.horarios length:', contactInfo?.horarios?.length);
+        console.log('  - contactInfo.horarios type:', typeof contactInfo?.horarios);
+        console.log('  - contactInfo.horarios is array:', Array.isArray(contactInfo?.horarios));
 
         if (!studio || !contactInfo) {
             return (
