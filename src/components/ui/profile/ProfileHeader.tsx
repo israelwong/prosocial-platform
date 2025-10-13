@@ -26,9 +26,9 @@ interface ProfileHeaderProps {
  * - Inicial: Logo centrado, nombre y slogan debajo, navegación completa
  * - Compacto: Logo + nombre + slogan horizontal, navegación solo iconos
  */
-export function ProfileHeader({ 
-    data, 
-    loading = false, 
+export function ProfileHeader({
+    data,
+    loading = false,
     activeSection,
     scrollContainer,
     scrollThreshold = 100,
@@ -41,7 +41,7 @@ export function ProfileHeader({
     useEffect(() => {
         const handleScroll = () => {
             let scrollY = 0;
-            
+
             if (scrollContainer) {
                 // Usar contenedor específico si se proporciona
                 scrollY = scrollContainer.scrollTop;
@@ -49,7 +49,7 @@ export function ProfileHeader({
                 // Usar window scroll por defecto
                 scrollY = window.scrollY;
             }
-            
+
             // Cambiar a compacto después del threshold
             setIsCompact(scrollY > scrollThreshold);
         };
@@ -57,7 +57,7 @@ export function ProfileHeader({
         // Agregar listener al contenedor correcto
         const target = scrollContainer || window;
         target.addEventListener('scroll', handleScroll);
-        
+
         return () => target.removeEventListener('scroll', handleScroll);
     }, [scrollContainer, scrollThreshold]);
 

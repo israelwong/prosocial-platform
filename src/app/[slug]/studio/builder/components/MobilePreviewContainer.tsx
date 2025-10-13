@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { ProfileHeader, ProfileContent, ProfileFooter } from '@/components/ui/profile';
 
 interface MobilePreviewContainerProps {
@@ -37,12 +37,10 @@ export function MobilePreviewContainer({
     activeTab = 'inicio',
     contentVariant = 'skeleton'
 }: MobilePreviewContainerProps) {
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-
     return (
         <div className="w-full max-w-sm mx-auto">
             {/* Simulador de móvil con proporciones reales */}
-            <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 shadow-2xl w-[375px] h-[812px] flex flex-col">
+            <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 shadow-2xl w-[375px] min-h-[812px] flex flex-col">
                 {/* Header unificado con navegación */}
                 {showHeader && (
                     <div className="flex-shrink-0">
@@ -50,14 +48,12 @@ export function MobilePreviewContainer({
                             data={data}
                             loading={loading}
                             activeSection={activeTab}
-                            scrollContainer={scrollContainerRef.current}
-                            scrollThreshold={50}
                         />
                     </div>
                 )}
 
-                {/* Contenido principal con scroll */}
-                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+                {/* Contenido principal sin scroll interno */}
+                <div className="flex-1">
                     {showContent && !children && (
                         <ProfileContent
                             variant={contentVariant}
