@@ -42,7 +42,7 @@ export function MobilePreviewContainer({
     return (
         <div className="w-full max-w-sm mx-auto">
             {/* Simulador de móvil con proporciones reales */}
-            <div ref={scrollContainerRef} className="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 shadow-2xl w-[375px] h-[812px] flex flex-col overflow-y-auto">
+            <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 shadow-2xl w-[375px] h-[812px] flex flex-col overflow-hidden">
                 {/* Header unificado con navegación */}
                 {showHeader && (
                     <div className="flex-shrink-0">
@@ -56,8 +56,8 @@ export function MobilePreviewContainer({
                     </div>
                 )}
 
-                {/* Contenido principal sin scroll interno */}
-                <div className="flex-1">
+                {/* Contenido principal con scroll interno */}
+                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
                     {showContent && !children && (
                         <ProfileContent
                             variant={contentVariant}
