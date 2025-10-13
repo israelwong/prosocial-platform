@@ -55,7 +55,7 @@ export function HorarioModal({ isOpen, onClose, onSave, horario }: HorarioModalP
 
         const horarioData: Horario = {
             id: horario?.id,
-            dia: formData.day_of_week,
+            dia: formData.day_of_week as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday',
             apertura: formData.is_active ? formData.start_time : '',
             cierre: formData.is_active ? formData.end_time : '',
             cerrado: !formData.is_active

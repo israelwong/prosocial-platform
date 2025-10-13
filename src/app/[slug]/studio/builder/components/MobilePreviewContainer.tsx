@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { ProfileHeader, ProfileContent, ProfileFooter } from '@/components/ui/profile';
+import { ProfileIdentity, ProfileContent, ProfileFooter } from '@/components/ui/profile';
 
 interface MobilePreviewContainerProps {
     children?: React.ReactNode;
@@ -13,7 +13,6 @@ interface MobilePreviewContainerProps {
     showFooter?: boolean;
     showContent?: boolean;
     // Configuración de contenido
-    activeTab?: string;
     contentVariant?: 'skeleton' | 'posts' | 'shop' | 'info';
 }
 
@@ -34,7 +33,6 @@ export function MobilePreviewContainer({
     showHeader = true,
     showFooter = true,
     showContent = true,
-    activeTab = 'inicio',
     contentVariant = 'skeleton'
 }: MobilePreviewContainerProps) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -42,22 +40,17 @@ export function MobilePreviewContainer({
     return (
         <div className="w-full max-w-sm mx-auto">
             {/* Simulador de móvil con proporciones reales */}
-            <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 shadow-2xl w-[375px] h-[812px] flex flex-col overflow-hidden">
-                {/* Header unificado con navegación */}
+            <div ref={scrollContainerRef} className="bg-zinc-900 border border-zinc-700 rounded-3xl shadow-2xl w-[375px] h-[812px] flex flex-col overflow-y-auto">
+                {/* Header de identidad */}
                 {showHeader && (
-                    <div className="flex-shrink-0">
-                        <ProfileHeader
-                            data={data}
-                            loading={loading}
-                            activeSection={activeTab}
-                            scrollContainer={scrollContainerRef.current}
-                            scrollThreshold={50}
-                        />
-                    </div>
+                    <ProfileIdentity
+                        data={data}
+                        loading={loading}
+                    />
                 )}
 
-                {/* Contenido principal con scroll interno */}
-                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+                {/* Contenido principal sin scroll interno */}
+                <div className="flex-1 p-5">
                     {showContent && !children && (
                         <ProfileContent
                             variant={contentVariant}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConfiguracionSidebarZenV2 } from './components/ConfiguracionSidebarZenV2';
+import { ConfiguracionSidebarZen } from './components/ConfiguracionSidebarZen';
 import { AppHeader } from '../components/AppHeader';
 import { ZenSidebarProvider } from '@/components/ui/zen';
 
@@ -15,7 +15,7 @@ export default async function ConfiguracionLayout({
     return (
         <ZenSidebarProvider>
             <div className="flex h-screen overflow-hidden">
-                <ConfiguracionSidebarZenV2 studioSlug={slug} />
+                <ConfiguracionSidebarZen studioSlug={slug} />
                 <div className="flex flex-1 overflow-hidden">
                     <div className="flex flex-col flex-1 overflow-hidden">
                         <AppHeader studioSlug={slug} />

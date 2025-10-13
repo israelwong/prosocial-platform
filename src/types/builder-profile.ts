@@ -4,6 +4,12 @@
 // Types for studio builder preview data
 // Used in studio builder sections
 
+export interface BuilderZonaTrabajo {
+    id: string;
+    nombre: string;
+    orden: number;
+}
+
 export interface BuilderStudioProfile {
     id: string;
     studio_name: string;
@@ -18,6 +24,7 @@ export interface BuilderStudioProfile {
         name: string;
         slug: string;
     } | null;
+    zonas_trabajo?: BuilderZonaTrabajo[];
 }
 
 export interface BuilderSocialNetwork {

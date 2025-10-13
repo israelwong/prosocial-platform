@@ -81,7 +81,15 @@ export function ProfileContent({
     if (variant === 'info') {
         const studio = data?.studio as PublicStudioProfile;
         const contactInfo = data?.contactInfo as PublicContactInfo;
-        const socialNetworks = data?.socialNetworks as PublicSocialNetwork[] || [];
+
+        // Debug: Verificar datos en ProfileContent
+        console.log('🔍 ProfileContent Debug:');
+        console.log('  - data:', data);
+        console.log('  - studio:', studio);
+        console.log('  - studio.zonas_trabajo:', studio?.zonas_trabajo);
+        console.log('  - studio.zonas_trabajo type:', typeof studio?.zonas_trabajo);
+        console.log('  - studio.zonas_trabajo is array:', Array.isArray(studio?.zonas_trabajo));
+        console.log('  - contactInfo:', contactInfo);
 
         if (!studio || !contactInfo) {
             return (
@@ -96,7 +104,7 @@ export function ProfileContent({
             );
         }
 
-        return <ContactSection studio={studio} contactInfo={contactInfo} socialNetworks={socialNetworks} />;
+        return <ContactSection studio={studio} contactInfo={contactInfo} />;
     }
 
     // Default fallback

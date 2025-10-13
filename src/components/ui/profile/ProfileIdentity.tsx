@@ -32,20 +32,20 @@ export function ProfileIdentity({ data, loading = false }: ProfileIdentityProps)
     }
 
     return (
-        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full px-4 py-4">
+        <div className="sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full px-4 py-8">
             <div className="flex items-center">
                 {/* Columna 1: Logo, nombre y slogan */}
                 <div className="flex items-center space-x-3 flex-1">
                     {/* Logo/Avatar */}
-                    <div className="w-12 h-12 bg-zinc-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <div className="w-10 h-10 bg-zinc-700 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                         {loading ? (
                             <div className="w-6 h-6 bg-zinc-600 rounded-lg animate-pulse"></div>
                         ) : studioData.logo_url ? (
                             <Image
                                 src={studioData.logo_url}
                                 alt="Logo"
-                                width={48}
-                                height={48}
+                                width={40}
+                                height={40}
                                 className="w-full h-full object-cover"
                             />
                         ) : (
@@ -62,7 +62,7 @@ export function ProfileIdentity({ data, loading = false }: ProfileIdentityProps)
                             </>
                         ) : (
                             <>
-                                <h1 className="text-white font-semibold text-base">
+                                <h1 className="text-white font-semibold text-sm">
                                     {studioData.studio_name}
                                 </h1>
                                 {studioData.slogan && (

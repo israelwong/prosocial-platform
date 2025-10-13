@@ -18,6 +18,7 @@ export interface Horario {
 export interface ZonaTrabajo {
     id?: string;
     nombre: string;
+    orden?: number;
     color?: string; // para los badges (opcional)
 }
 

@@ -21,6 +21,14 @@ export function ProfilePageClient({ profileData }: ProfilePageClientProps) {
     const { studio } = profileData;
     const isPro = isProPlan(studio.plan?.slug);
 
+    // Debug: Verificar datos en ProfilePageClient
+    console.log('🔍 ProfilePageClient Debug:');
+    console.log('  - profileData:', profileData);
+    console.log('  - studio:', studio);
+    console.log('  - studio.zonas_trabajo:', studio?.zonas_trabajo);
+    console.log('  - studio.zonas_trabajo type:', typeof studio?.zonas_trabajo);
+    console.log('  - studio.zonas_trabajo is array:', Array.isArray(studio?.zonas_trabajo));
+
     return (
         <div className="min-h-screen bg-zinc-950">
             {/* Mobile Layout (default) */}

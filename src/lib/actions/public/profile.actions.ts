@@ -112,6 +112,14 @@ export async function getStudioProfileBySlug(
                             name: true,
                             slug: true,
                         }
+                    },
+                    zonas_trabajo: {
+                        select: {
+                            id: true,
+                            nombre: true,
+                            orden: true,
+                        },
+                        orderBy: { orden: 'asc' }
                     }
                 }
             });
@@ -123,6 +131,16 @@ export async function getStudioProfileBySlug(
                     error: 'Studio not found'
                 };
             }
+
+            // Debug: Verificar zonas de trabajo en la query
+            console.log('🔍 getStudioProfileBySlug Debug:');
+            console.log('  - studio.zonas_trabajo from DB:', studio.zonas_trabajo);
+            console.log('  - studio.zonas_trabajo length:', studio.zonas_trabajo?.length);
+            console.log('  - studio.zonas_trabajo type:', typeof studio.zonas_trabajo);
+            console.log('  - studio.zonas_trabajo is array:', Array.isArray(studio.zonas_trabajo));
+            console.log('  - studio.id:', studio.id);
+            console.log('  - studio.studio_name:', studio.studio_name);
+            console.log('  - Full studio object keys:', Object.keys(studio));
 
             // Transform data to match our types
             const studioProfile: PublicStudioProfile = {
@@ -136,6 +154,7 @@ export async function getStudioProfileBySlug(
                 address: studio.address,
                 plan_id: studio.plan_id,
                 plan: studio.plan,
+                zonas_trabajo: studio.zonas_trabajo,
             };
 
             const socialNetworks: PublicSocialNetwork[] = studio.social_networks.map(network => ({
@@ -153,6 +172,7 @@ export async function getStudioProfileBySlug(
                 })),
                 address: studio.address,
                 website: studio.website,
+                google_maps_url: null, // TODO: Add google_maps_url field to database schema
             };
 
             const items: PublicCatalogItem[] = studio.items.map(item => ({
@@ -197,7 +217,11 @@ export async function getStudioProfileBySlug(
                 phones: contactInfo.phones.length,
                 items: items.length,
                 portfolios: portfolios.length,
+                zonas_trabajo: studioProfile.zonas_trabajo?.length || 0,
             });
+            console.log('🔍 Final studioProfile.zonas_trabajo:', studioProfile.zonas_trabajo);
+            console.log('🔍 Final studioProfile.zonas_trabajo type:', typeof studioProfile.zonas_trabajo);
+            console.log('🔍 Final studioProfile.zonas_trabajo is array:', Array.isArray(studioProfile.zonas_trabajo));
 
             return {
                 success: true,

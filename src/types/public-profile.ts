@@ -4,6 +4,12 @@
 // Types for public-facing studio profile pages
 // Used in /[slug] route for public studio profiles
 
+export interface PublicZonaTrabajo {
+    id: string;
+    nombre: string;
+    orden: number;
+}
+
 export interface PublicStudioProfile {
     id: string;
     studio_name: string;
@@ -18,6 +24,7 @@ export interface PublicStudioProfile {
         name: string;
         slug: string;
     } | null;
+    zonas_trabajo?: PublicZonaTrabajo[];
 }
 
 export interface PublicSocialNetwork {

@@ -27,6 +27,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
 
         const profileData = result.data;
 
+
         // Map items to include required properties
         const mappedProfileData = {
             ...profileData,
@@ -34,7 +35,12 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
                 ...item,
                 type: 'PRODUCTO' as const,
                 cost: item.price || 0
-            }))
+            })),
+            // Ensure contactInfo has all required properties
+            contactInfo: {
+                ...profileData.contactInfo,
+                google_maps_url: null
+            }
         };
 
         return (

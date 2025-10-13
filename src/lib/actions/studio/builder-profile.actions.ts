@@ -98,6 +98,14 @@ export async function getBuilderProfileData(studioSlug: string) {
                             name: true,
                             slug: true,
                         }
+                    },
+                    zonas_trabajo: {
+                        select: {
+                            id: true,
+                            nombre: true,
+                            orden: true,
+                        },
+                        orderBy: { orden: 'asc' }
                     }
                 }
             });
@@ -124,6 +132,7 @@ export async function getBuilderProfileData(studioSlug: string) {
                     address: studio.address,
                     plan_id: studio.plan_id,
                     plan: studio.plan,
+                    zonas_trabajo: studio.zonas_trabajo,
                 },
                 // Social networks for footer
                 socialNetworks: studio.social_networks.map(network => ({
@@ -178,7 +187,11 @@ export async function getBuilderProfileData(studioSlug: string) {
                 phones: builderData.contactInfo.phones.length,
                 items: builderData.items.length,
                 portfolios: builderData.portfolios.length,
+                zonas_trabajo: builderData.studio.zonas_trabajo?.length || 0,
             });
+            console.log('🔍 Builder studio.zonas_trabajo:', builderData.studio.zonas_trabajo);
+            console.log('🔍 Builder studio.zonas_trabajo type:', typeof builderData.studio.zonas_trabajo);
+            console.log('🔍 Builder studio.zonas_trabajo is array:', Array.isArray(builderData.studio.zonas_trabajo));
 
             return {
                 success: true,

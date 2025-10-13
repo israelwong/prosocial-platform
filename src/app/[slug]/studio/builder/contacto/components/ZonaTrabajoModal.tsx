@@ -60,7 +60,7 @@ export function ZonaTrabajoModal({ isOpen, onClose, onSave, zona }: ZonaTrabajoM
                         name="nombre"
                         value={formData.nombre}
                         onChange={(e) => setFormData(prev => ({ ...prev, nombre: e.target.value }))}
-                        placeholder="Centro, Norte, Sur, etc."
+                        placeholder="Ingresa el nombre de la zona"
                         required
                     />
 

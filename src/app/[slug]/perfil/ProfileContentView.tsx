@@ -16,6 +16,15 @@ interface ProfileContentViewProps {
 export function ProfileContentView({ activeTab, profileData }: ProfileContentViewProps) {
     const { studio, socialNetworks, contactInfo, items, portfolios } = profileData;
 
+    // Debug: Verificar datos en ProfileContentView
+    console.log('🔍 ProfileContentView Debug:');
+    console.log('  - activeTab:', activeTab);
+    console.log('  - profileData:', profileData);
+    console.log('  - studio:', studio);
+    console.log('  - studio.zonas_trabajo:', studio?.zonas_trabajo);
+    console.log('  - studio.zonas_trabajo type:', typeof studio?.zonas_trabajo);
+    console.log('  - studio.zonas_trabajo is array:', Array.isArray(studio?.zonas_trabajo));
+
     switch (activeTab) {
         case 'inicio':
             return (
@@ -47,8 +56,7 @@ export function ProfileContentView({ activeTab, profileData }: ProfileContentVie
                     variant="info"
                     data={{
                         studio,
-                        contactInfo,
-                        socialNetworks
+                        contactInfo
                     }}
                 />
             );
