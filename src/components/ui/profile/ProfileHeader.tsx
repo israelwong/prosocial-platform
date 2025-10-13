@@ -12,6 +12,10 @@ interface ProfileHeaderProps {
     };
     loading?: boolean;
     activeSection?: string;
+    // Opciones para controlar el comportamiento de scroll
+    scrollContainer?: HTMLElement | null;
+    scrollThreshold?: number;
+    forceCompact?: boolean;
 }
 
 /**
@@ -22,21 +26,47 @@ interface ProfileHeaderProps {
  * - Inicial: Logo centrado, nombre y slogan debajo, navegación completa
  * - Compacto: Logo + nombre + slogan horizontal, navegación solo iconos
  */
-export function ProfileHeader({ data, loading = false, activeSection }: ProfileHeaderProps) {
-    const [isCompact, setIsCompact] = useState(false);
+export function ProfileHeader({ 
+    data, 
+    loading = false, 
+    activeSection,
+    scrollContainer,
+    scrollThreshold = 100,
+    forceCompact = false
+}: ProfileHeaderProps) {
+    const [isCompact, setIsCompact] = useState(forceCompact);
     const studioData = data || {};
 
     // Detectar scroll para cambiar estado
     useEffect(() => {
         const handleScroll = () => {
-            const scrollY = window.scrollY;
-            // Cambiar a compacto después de 100px de scroll
-            setIsCompact(scrollY > 100);
+            let scrollY = 0;
+            
+            if (scrollContainer) {
+                // Usar contenedor específico si se proporciona
+                scrollY = scrollContainer.scrollTop;
+            } else {
+                // Usar window scroll por defecto
+                scrollY = window.scrollY;
+            }
+            
+            // Cambiar a compacto después del threshold
+            setIsCompact(scrollY > scrollThreshold);
         };
 
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+        // Agregar listener al contenedor correcto
+        const target = scrollContainer || window;
+        target.addEventListener('scroll', handleScroll);
+        
+        return () => target.removeEventListener('scroll', handleScroll);
+    }, [scrollContainer, scrollThreshold]);
+
+    // Forzar estado compacto si se especifica
+    useEffect(() => {
+        if (forceCompact !== undefined) {
+            setIsCompact(forceCompact);
+        }
+    }, [forceCompact]);
 
     // Solo mostrar header si hay datos reales o está cargando
     const hasData = studioData.studio_name || studioData.logo_url || loading;

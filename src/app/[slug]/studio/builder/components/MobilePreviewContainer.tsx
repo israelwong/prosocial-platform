@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { ProfileHeader, ProfileContent, ProfileFooter } from '@/components/ui/profile';
 
 interface MobilePreviewContainerProps {
@@ -37,6 +37,8 @@ export function MobilePreviewContainer({
     activeTab = 'inicio',
     contentVariant = 'skeleton'
 }: MobilePreviewContainerProps) {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+
     return (
         <div className="w-full max-w-sm mx-auto">
             {/* Simulador de móvil con proporciones reales */}
@@ -48,12 +50,14 @@ export function MobilePreviewContainer({
                             data={data}
                             loading={loading}
                             activeSection={activeTab}
+                            scrollContainer={scrollContainerRef.current}
+                            scrollThreshold={50}
                         />
                     </div>
                 )}
 
                 {/* Contenido principal con scroll */}
-                <div className="flex-1 overflow-y-auto">
+                <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
                     {showContent && !children && (
                         <ProfileContent
                             variant={contentVariant}
