@@ -18,12 +18,12 @@ export function ProfileHeaderExample() {
     return (
         <div className="min-h-screen bg-zinc-950">
             {/* Header con transición automática */}
-            <ProfileHeader 
+            <ProfileHeader
                 data={studioData}
                 activeSection="inicio"
                 loading={false}
             />
-            
+
             {/* Contenido de ejemplo para probar el scroll */}
             <div className="px-4 py-8 space-y-8">
                 <div className="h-96 bg-zinc-900 rounded-lg p-6">
@@ -33,7 +33,7 @@ export function ProfileHeaderExample() {
                         Haz scroll hacia abajo para ver cómo el header se compacta automáticamente.
                     </p>
                 </div>
-                
+
                 <div className="h-96 bg-zinc-900 rounded-lg p-6">
                     <h2 className="text-white text-xl font-semibold mb-4">Sección 2</h2>
                     <p className="text-zinc-400">
@@ -41,7 +41,7 @@ export function ProfileHeaderExample() {
                         El header cambiará de centrado a horizontal automáticamente.
                     </p>
                 </div>
-                
+
                 <div className="h-96 bg-zinc-900 rounded-lg p-6">
                     <h2 className="text-white text-xl font-semibold mb-4">Sección 3</h2>
                     <p className="text-zinc-400">

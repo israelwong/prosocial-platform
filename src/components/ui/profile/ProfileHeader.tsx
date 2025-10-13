@@ -53,9 +53,8 @@ export function ProfileHeader({ data, loading = false, activeSection }: ProfileH
     ];
 
     return (
-        <div className={`sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full transition-all duration-500 ease-in-out ${
-            isCompact ? 'px-4 py-3' : 'px-4 py-6'
-        }`}>
+        <div className={`sticky top-0 z-10 bg-zinc-900/80 backdrop-blur-md w-full transition-all duration-500 ease-in-out ${isCompact ? 'px-4 py-3' : 'px-4 py-6'
+            }`}>
             {isCompact ? (
                 // Estado compacto: Layout horizontal
                 <div className="flex items-center justify-between">
@@ -109,11 +108,10 @@ export function ProfileHeader({ data, loading = false, activeSection }: ProfileH
                             return (
                                 <button
                                     key={item.id}
-                                    className={`p-2 rounded-lg transition-all duration-300 ${
-                                        isActive
-                                            ? 'text-blue-400 bg-blue-400/10'
-                                            : 'text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800/50'
-                                    }`}
+                                    className={`p-2 rounded-lg transition-all duration-300 ${isActive
+                                        ? 'text-blue-400 bg-blue-400/10'
+                                        : 'text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800/50'
+                                        }`}
                                 >
                                     <Icon className="h-4 w-4" />
                                 </button>

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ProfileIdentity, ProfileNavTabs, ProfileContent, ProfileFooter } from '@/components/ui/profile';
+import { ProfileHeader, ProfileContent, ProfileFooter } from '@/components/ui/profile';
 
 interface MobilePreviewContainerProps {
     children?: React.ReactNode;
@@ -11,17 +11,17 @@ interface MobilePreviewContainerProps {
     // Opciones de renderizado
     showHeader?: boolean;
     showFooter?: boolean;
-    showNavbar?: boolean;
     showContent?: boolean;
     // Configuración de contenido
     activeTab?: string;
-    onTabChange?: (tab: string) => void;
     contentVariant?: 'skeleton' | 'posts' | 'shop' | 'info';
 }
 
 /**
  * MobilePreviewContainer - Contenedor para preview móvil
  * Migrado desde la carpeta previews del builder
+ * 
+ * Actualizado para usar ProfileHeader unificado con transición fluida
  * 
  * Usado en:
  * - Builder preview (contenedor de preview móvil)
@@ -33,34 +33,21 @@ export function MobilePreviewContainer({
     loading = false,
     showHeader = true,
     showFooter = true,
-    showNavbar = true,
     showContent = true,
     activeTab = 'inicio',
-    onTabChange,
     contentVariant = 'skeleton'
 }: MobilePreviewContainerProps) {
     return (
         <div className="w-full max-w-sm mx-auto">
             {/* Simulador de móvil con proporciones reales */}
             <div className="bg-zinc-900 border border-zinc-700 rounded-3xl p-4 shadow-2xl w-[375px] h-[812px] flex flex-col">
-                {/* Header fijo */}
+                {/* Header unificado con navegación */}
                 {showHeader && (
-                    <div className="flex-shrink-0 sticky top-0 z-10">
-                        <ProfileIdentity
+                    <div className="flex-shrink-0">
+                        <ProfileHeader
                             data={data}
                             loading={loading}
-                        // variant="full" // TODO: Remove this
-                        // showStats={true} // TODO: Remove this
-                        />
-                    </div>
-                )}
-
-                {/* Navigation Tabs */}
-                {showNavbar && (
-                    <div className="flex-shrink-0">
-                        <ProfileNavTabs
-                            activeTab={activeTab}
-                            onTabChange={onTabChange || (() => { })}
+                            activeSection={activeTab}
                         />
                     </div>
                 )}
