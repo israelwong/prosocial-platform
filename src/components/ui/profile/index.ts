@@ -11,6 +11,7 @@
 // Core Profile Components
 export { ProfileIdentity } from './ProfileIdentity';
 export { ProfileNavigation } from './ProfileNavigation';
+export { ProfileHeader } from './ProfileHeader';
 export { ProfileNavTabs } from './ProfileNavTabs';
 export { ProfileContent } from './ProfileContent';
 export { ProfileFooter } from './ProfileFooter';
