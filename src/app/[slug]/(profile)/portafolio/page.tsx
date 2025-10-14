@@ -1,8 +1,13 @@
+'use client';
+
+import { PortfolioSection } from '@/components/ui/profile/sections';
+import { useStudio } from '@/contexts/StudioContext';
+
 export default function PortafolioPage() {
-    return (
-        <div className="p-8">
-            <h1 className="text-2xl font-bold text-white">Portafolio</h1>
-            <p className="text-zinc-400 mt-4">Esta es la página de portafolio.</p>
-        </div>
-    );
+    const { profileData } = useStudio();
+    
+    // Convertir datos del Context al formato esperado por PortfolioSection
+    const portfolios = profileData.portfolios || [];
+    
+    return <PortfolioSection portfolios={portfolios} />;
 }

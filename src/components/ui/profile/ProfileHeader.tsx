@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Home, Grid3X3, Store, Phone } from 'lucide-react';
 
 interface ProfileHeaderProps {
@@ -12,6 +14,7 @@ interface ProfileHeaderProps {
     };
     loading?: boolean;
     activeSection?: string;
+    slug?: string;
     // Opciones para controlar el comportamiento de scroll
     scrollContainer?: HTMLElement | null;
     scrollThreshold?: number;
@@ -30,12 +33,19 @@ export function ProfileHeader({
     data,
     loading = false,
     activeSection,
+    slug = '',
     scrollContainer,
     scrollThreshold = 100,
     forceCompact = false
 }: ProfileHeaderProps) {
     const [isCompact, setIsCompact] = useState(forceCompact);
     const studioData = data || {};
+    const router = useRouter();
+
+    // Función para navegar a una sección
+    const navigateToSection = (section: string) => {
+        router.push(`/${slug}/${section}`);
+    };
 
     // Detectar scroll con throttling agresivo para evitar loops
     useEffect(() => {
@@ -157,17 +167,21 @@ export function ProfileHeader({
                             const isActive = activeSection === item.id;
 
                             return (
-                                <div key={item.id} className={`
-                                    flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 text-sm font-medium
-                                    transition-colors duration-200
-                                    ${isActive
-                                        ? 'text-blue-400 border-b-2 border-blue-400 bg-blue-400/5'
-                                        : 'text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800/50'
-                                    }
-                                `}>
+                                <Link
+                                    key={item.id}
+                                    href={`/${slug}/${item.id}`}
+                                    className={`
+                                        flex-1 flex flex-col items-center justify-center gap-1 px-2 py-2 text-sm font-medium
+                                        transition-colors duration-200
+                                        ${isActive
+                                            ? 'text-blue-400 border-b-2 border-blue-400 bg-blue-400/5'
+                                            : 'text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800/50'
+                                        }
+                                    `}
+                                >
                                     <Icon className="h-5 w-5" />
                                     <span className="text-xs">{item.label}</span>
-                                </div>
+                                </Link>
                             );
                         })}
                     </nav>
@@ -228,15 +242,16 @@ export function ProfileHeader({
                             const isActive = activeSection === item.id;
 
                             return (
-                                <button
+                                <Link
                                     key={item.id}
+                                    href={`/${slug}/${item.id}`}
                                     className={`p-3 rounded-lg transition-colors duration-200 ${isActive
                                         ? 'text-blue-400 bg-blue-400/10'
                                         : 'text-zinc-400 hover:text-zinc-300 hover:bg-zinc-800/50'
                                         }`}
                                 >
                                     <Icon className="h-4 w-4" />
-                                </button>
+                                </Link>
                             );
                         })}
                     </nav>

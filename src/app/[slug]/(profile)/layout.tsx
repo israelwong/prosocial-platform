@@ -18,6 +18,7 @@ export default function ProfileLayout({
                 <ProfileHeader
                     data={profileData}
                     activeSection={activeSection}
+                    slug={profileData.slug}
                 />
 
                 {/* CONTENIDO DINÁMICO */}
@@ -26,7 +27,7 @@ export default function ProfileLayout({
                 </main>
 
                 {/* FOOTER: Siempre visible */}
-                <ProfileFooter />
+                <ProfileFooter data={profileData} />
             </div>
 
             {/* DESKTOP: Tres columnas */}
@@ -37,6 +38,7 @@ export default function ProfileLayout({
                     <ProfileHeader
                         data={profileData}
                         activeSection={activeSection}
+                        slug={profileData.slug}
                     />
 
                     {/* CONTENIDO DINÁMICO */}
@@ -45,7 +47,7 @@ export default function ProfileLayout({
                     </main>
 
                     {/* FOOTER: Siempre visible */}
-                    <ProfileFooter />
+                    <ProfileFooter data={profileData} />
                 </div>
 
                 {/* Columna 2: Promociones */}
