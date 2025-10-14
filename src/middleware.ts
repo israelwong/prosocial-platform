@@ -177,7 +177,17 @@ export async function middleware(request: NextRequest) {
     // - /[slug] (página pública del studio)
     // - /[slug]/studio (panel privado del studio)  
     // - /[slug]/cliente (portal de clientes)
-    if (!subPath || subPath.startsWith('/studio') || subPath.startsWith('/cliente')) {
+    // - /[slug]/inicio, /[slug]/portafolio, etc. (rutas públicas del perfil)
+    if (!subPath ||
+      subPath.startsWith('/studio') ||
+      subPath.startsWith('/cliente') ||
+      subPath.startsWith('/inicio') ||
+      subPath.startsWith('/portafolio') ||
+      subPath.startsWith('/paquetes') ||
+      subPath.startsWith('/contacto') ||
+      subPath.startsWith('/contacto') ||
+      subPath.startsWith('/payment') ||
+      subPath.startsWith('/clientes')) {
       return NextResponse.next();
     }
 
