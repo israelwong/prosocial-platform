@@ -33,37 +33,34 @@ export async function crearPaquete(
             data: {
                 // id se genera automáticamente con @default(cuid())
                 studio_id: studioId,
-                eventoTipoId: validatedData.eventoTipoId,
-                nombre: validatedData.nombre,
-                costo: validatedData.costo,
-                gasto: validatedData.gasto,
+                event_type_id: validatedData.eventoTipoId,
+                name: validatedData.nombre,
+                cost: validatedData.costo,
+                expense: validatedData.gasto,
                 utilidad: validatedData.utilidad,
                 precio: validatedData.precio,
-                updatedAt: new Date(),
-                paquete_servicios: {
+                paquete_items: {
                     create: validatedData.servicios.map((servicio, index) => ({
-                        servicioId: servicio.servicioId,
-                        servicioCategoriaId: servicio.servicioCategoriaId,
-                        cantidad: servicio.cantidad,
-                        posicion: index,
-                        updatedAt: new Date(),
-                        createdAt: new Date(),
-                        visible_cliente: true,
+                        item_id: servicio.servicioId,
+                        service_category_id: servicio.servicioCategoriaId,
+                        quantity: servicio.cantidad,
+                        position: index,
+                        visible_to_client: true,
                         status: "active"
                     }))
                 }
             },
             include: {
-                paquete_servicios: {
+                paquete_items: {
                     include: {
-                        servicios: true,
-                        servicio_categorias: true
+                        items: true,
+                        service_categories: true
                     }
                 }
             }
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes`)
+        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
 
         return {
             success: true,
@@ -91,36 +88,33 @@ export async function actualizarPaquete(
         const paquete = await prisma.studio_paquetes.update({
             where: { id: paqueteId },
             data: {
-                eventoTipoId: validatedData.eventoTipoId,
-                nombre: validatedData.nombre,
-                costo: validatedData.costo,
-                gasto: validatedData.gasto,
+                event_type_id: validatedData.eventoTipoId,
+                name: validatedData.nombre,
+                cost: validatedData.costo,
+                expense: validatedData.gasto,
                 utilidad: validatedData.utilidad,
-                precio: validatedData.precio,
-                updatedAt: new Date()
+                precio: validatedData.precio
             }
         })
 
-        // Eliminar servicios existentes y crear nuevos
-        await prisma.studio_paquete_servicios.deleteMany({
-            where: { paqueteId }
+        // Eliminar items existentes y crear nuevos
+        await prisma.studio_paquete_items.deleteMany({
+            where: { paquete_id: paqueteId }
         })
 
-        await prisma.studio_paquete_servicios.createMany({
+        await prisma.studio_paquete_items.createMany({
             data: validatedData.servicios.map((servicio, index) => ({
-                paqueteId,
-                servicioId: servicio.servicioId,
-                servicioCategoriaId: servicio.servicioCategoriaId,
-                cantidad: servicio.cantidad,
-                posicion: index,
-                updatedAt: new Date(),
-                createdAt: new Date(),
-                visible_cliente: true,
+                paquete_id: paqueteId,
+                item_id: servicio.servicioId,
+                service_category_id: servicio.servicioCategoriaId,
+                quantity: servicio.cantidad,
+                position: index,
+                visible_to_client: true,
                 status: "active"
             }))
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes`)
+        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
 
         return {
             success: true,
@@ -145,7 +139,7 @@ export async function eliminarPaquete(
             where: { id: paqueteId }
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes`)
+        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
 
         return {
             success: true,
@@ -165,14 +159,14 @@ export async function obtenerPaquete(paqueteId: string) {
         const paquete = await prisma.studio_paquetes.findUnique({
             where: { id: paqueteId },
             include: {
-                paquete_servicios: {
+                paquete_items: {
                     include: {
-                        servicios: true,
-                        servicio_categorias: true
+                        items: true,
+                        service_categories: true
                     },
-                    orderBy: { posicion: 'asc' }
+                    orderBy: { position: 'asc' }
                 },
-                evento_tipos: true
+                event_types: true
             }
         })
 
@@ -198,7 +192,7 @@ export async function duplicarPaquete(
         const paqueteOriginal = await prisma.studio_paquetes.findUnique({
             where: { id: paqueteId },
             include: {
-                paquete_servicios: true
+                paquete_items: true
             }
         })
 
@@ -213,37 +207,34 @@ export async function duplicarPaquete(
         const paqueteDuplicado = await prisma.studio_paquetes.create({
             data: {
                 studio_id: paqueteOriginal.studio_id,
-                eventoTipoId: paqueteOriginal.eventoTipoId,
-                nombre: `${paqueteOriginal.nombre} (Copia)`,
-                costo: paqueteOriginal.costo,
-                gasto: paqueteOriginal.gasto,
+                event_type_id: paqueteOriginal.event_type_id,
+                name: `${paqueteOriginal.name} (Copia)`,
+                cost: paqueteOriginal.cost,
+                expense: paqueteOriginal.expense,
                 utilidad: paqueteOriginal.utilidad,
                 precio: paqueteOriginal.precio,
-                updatedAt: new Date(),
-                paquete_servicios: {
-                    create: paqueteOriginal.paquete_servicios.map((servicio, index) => ({
-                        servicioId: servicio.servicioId,
-                        servicioCategoriaId: servicio.servicioCategoriaId,
-                        cantidad: servicio.cantidad,
-                        posicion: index,
-                        updatedAt: new Date(),
-                        createdAt: new Date(),
-                        visible_cliente: servicio.visible_cliente,
-                        status: servicio.status
+                paquete_items: {
+                    create: paqueteOriginal.paquete_items.map((item, index) => ({
+                        item_id: item.item_id,
+                        service_category_id: item.service_category_id,
+                        quantity: item.quantity,
+                        position: index,
+                        visible_to_client: item.visible_to_client,
+                        status: item.status
                     }))
                 }
             },
             include: {
-                paquete_servicios: {
+                paquete_items: {
                     include: {
-                        servicios: true,
-                        servicio_categorias: true
+                        items: true,
+                        service_categories: true
                     }
                 }
             }
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes`)
+        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
 
         return {
             success: true,
@@ -277,27 +268,27 @@ export async function obtenerPaquetes(studioSlug: string) {
         const paquetes = await prisma.studio_paquetes.findMany({
             where: { studio_id: studio.id },
             include: {
-                paquete_servicios: {
+                paquete_items: {
                     include: {
-                        servicios: {
-                            select: { nombre: true }
+                        items: {
+                            select: { name: true }
                         },
-                        servicio_categorias: {
-                            select: { nombre: true }
+                        service_categories: {
+                            select: { name: true }
                         }
                     },
-                    orderBy: { posicion: 'asc' }
+                    orderBy: { position: 'asc' }
                 },
-                evento_tipos: {
-                    select: { nombre: true }
+                event_types: {
+                    select: { name: true }
                 }
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { created_at: 'desc' }
         });
 
         return {
             success: true,
-            paquetes
+            data: paquetes
         };
     } catch (error) {
         console.error("Error obteniendo paquetes:", error);
@@ -331,7 +322,7 @@ export async function actualizarPosicionPaquete(
         const paquete = await prisma.studio_paquetes.findUnique({
             where: { id: paqueteId },
             include: {
-                paquete_servicios: true
+                paquete_items: true
             }
         });
 
@@ -343,26 +334,25 @@ export async function actualizarPosicionPaquete(
         }
 
         // Si se mueve a otro tipo de evento
-        if (newEventoTipoId && newEventoTipoId !== paquete.eventoTipoId) {
+        if (newEventoTipoId && newEventoTipoId !== paquete.event_type_id) {
             await prisma.studio_paquetes.update({
                 where: { id: paqueteId },
                 data: {
-                    eventoTipoId: newEventoTipoId,
-                    updatedAt: new Date()
+                    event_type_id: newEventoTipoId
                 }
             });
         }
 
         // Actualizar posiciones de otros paquetes en el mismo tipo de evento
-        const eventoTipoId = newEventoTipoId || paquete.eventoTipoId;
+        const eventoTipoId = newEventoTipoId || paquete.event_type_id;
 
         // Obtener todos los paquetes del mismo tipo de evento ordenados por posición
         const paquetesDelTipo = await prisma.studio_paquetes.findMany({
             where: {
-                eventoTipoId: eventoTipoId,
+                event_type_id: eventoTipoId,
                 id: { not: paqueteId }
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { created_at: 'desc' }
         });
 
         // Reordenar posiciones
@@ -372,12 +362,12 @@ export async function actualizarPosicionPaquete(
             if (i < newIndex) {
                 paquetesParaActualizar.push({
                     id: paquetesDelTipo[i].id,
-                    posicion: i
+                    position: i
                 });
             } else {
                 paquetesParaActualizar.push({
                     id: paquetesDelTipo[i].id,
-                    posicion: i + 1
+                    position: i + 1
                 });
             }
         }
@@ -387,12 +377,12 @@ export async function actualizarPosicionPaquete(
             await prisma.studio_paquetes.update({
                 where: { id: update.id },
                 data: {
-                    updatedAt: new Date()
+                    position: update.position
                 }
             });
         }
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/modules/manager/catalogo-servicios/paquetes`);
+        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`);
 
         return {
             success: true,

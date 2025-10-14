@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ZenButton, ZenInput, ZenTextarea } from '@/components/ui/zen';
 import { ZenCard, ZenCardContent } from '@/components/ui/zen';
-import { Plus, X, Save, Check, Info, Globe, Share2 } from 'lucide-react';
+import { Plus, X, Save, Check } from 'lucide-react';
 import { IdentidadData } from '../types';
 import { LogoManagerZen } from './LogoManagerZen';
 import { RedesSocialesSection } from './RedesSocialesSection';
@@ -84,9 +84,9 @@ export function IdentidadEditorZen({
     };
 
     const tabs = [
-        { id: 'encabezado', label: 'Encabezado', icon: Info },
-        { id: 'redes', label: 'Redes Sociales', icon: Share2 },
-        { id: 'footer', label: 'Pie de Página', icon: Globe }
+        { id: 'encabezado', label: 'Encabezado' },
+        { id: 'redes', label: 'Redes Sociales' },
+        { id: 'footer', label: 'Pie de Página' }
     ];
 
     return (
@@ -95,17 +95,15 @@ export function IdentidadEditorZen({
             <div className="border-b border-zinc-800">
                 <div className="flex space-x-8">
                     {tabs.map((tab) => {
-                        const Icon = tab.icon;
                         return (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
+                                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
                                     ? 'border-blue-500 text-blue-400'
                                     : 'border-transparent text-zinc-400 hover:text-zinc-300 hover:border-zinc-600'
                                     }`}
                             >
-                                <Icon className="h-4 w-4" />
                                 {tab.label}
                             </button>
                         );

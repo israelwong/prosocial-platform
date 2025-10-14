@@ -55,6 +55,44 @@ export interface PaqueteServicioData {
     cantidad: number;
 }
 
+// Tipo que devuelve Prisma (puede incluir o no las relaciones)
+export type PaqueteFromDB = {
+    id: string;
+    studio_id: string;
+    event_type_id: string;
+    name: string;
+    cost?: number | null;
+    expense?: number | null;
+    utilidad?: number | null;
+    precio?: number | null;
+    status: string;
+    position: number;
+    created_at: Date;
+    updated_at: Date;
+} & {
+    paquete_items?: Array<{
+        id: string;
+        item_id: string;
+        service_category_id: string;
+        quantity: number;
+        position: number;
+        visible_to_client: boolean;
+        status: string;
+        created_at: Date;
+        updated_at: Date;
+        items?: {
+            name: string;
+        };
+        service_categories?: {
+            name: string;
+        };
+    }>;
+    event_types?: {
+        name: string;
+    };
+};
+
+// Tipo para uso en componentes (compatible con el schema original)
 export interface PaqueteData {
     id: string;
     projectId: string;
