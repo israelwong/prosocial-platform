@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Phone, Calendar } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { ZenButton, ZenBadge } from '@/components/ui/zen';
 import { WhatsAppIcon } from '@/components/ui/icons/WhatsAppIcon';
 import { PublicStudioProfile, PublicContactInfo } from '@/types/public-profile';
@@ -159,10 +159,11 @@ export function ContactSection({ studio, contactInfo }: InfoViewProps) {
         setPhoneModal(null);
     };
 
-    const handleSchedule = () => {
-        // TODO: Open scheduling modal or redirect to booking page
-        console.log('Schedule appointment clicked');
-    };
+    // Temporalmente deshabilitado
+    // const handleSchedule = () => {
+    //     // TODO: Open scheduling modal or redirect to booking page
+    //     console.log('Schedule appointment clicked');
+    // };
 
     // Contar teléfonos disponibles por tipo
     const callPhonesCount = contactInfo.phones.filter(p =>
@@ -214,7 +215,7 @@ export function ContactSection({ studio, contactInfo }: InfoViewProps) {
                         </ZenButton>
                     )}
 
-                    {/* Botón de Agendar */}
+                    {/* Botón de Agendar - Temporalmente deshabilitado
                     <ZenButton
                         variant="outline"
                         onClick={handleSchedule}
@@ -222,7 +223,7 @@ export function ContactSection({ studio, contactInfo }: InfoViewProps) {
                     >
                         <Calendar className="h-4 w-4" />
                         Agendar
-                    </ZenButton>
+                    </ZenButton> */}
                 </div>
             </div>
 
