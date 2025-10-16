@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { CatalogoEditorZen } from './components/CatalogoEditorZen';
 import { SectionLayout } from '../components';
 import { useParams } from 'next/navigation';
-import { getBuilderProfileData } from '@/lib/actions/studio/builder-profile.actions';
+import { getBuilderProfileData } from '@/lib/actions/studio/builder/builder-profile.actions';
 import { CatalogoData } from './types';
 import { BuilderProfileData } from '@/types/builder-profile';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
@@ -80,7 +80,7 @@ export default function CatalogoPage() {
             is_active: true
         })),
         direccion: builderData.contactInfo.address,
-        google_maps_url: null // No hay google_maps_url en BuilderProfileData
+        google_maps_url: builderData.studio.maps_url
     } : null;
 
     return (

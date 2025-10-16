@@ -4,63 +4,42 @@ import React, { useState, useEffect } from 'react';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from '@/components/ui/zen';
 import { Clock } from 'lucide-react';
 import { Horario } from '../types';
-import { obtenerHorariosStudio, toggleHorarioEstado, actualizarHorario, inicializarHorariosPorDefecto } from '@/lib/actions/studio/config/contacto';
+import { toggleHorarioEstado, actualizarHorario, inicializarHorariosPorDefecto } from '@/lib/actions/studio/builder/contacto';
 import { toast } from 'sonner';
 
 interface HorariosSectionProps {
     studioSlug: string;
+    horarios: Horario[]; // Data from parent (builder-profile)
     onLocalUpdate: (data: Partial<{ horarios: Horario[] }>) => void;
 }
 
-export function HorariosSection({ studioSlug, onLocalUpdate }: HorariosSectionProps) {
-    const [horarios, setHorarios] = useState<Horario[]>([]);
+export function HorariosSection({ studioSlug, horarios: initialHorarios, onLocalUpdate }: HorariosSectionProps) {
+    const [horarios, setHorarios] = useState<Horario[]>(initialHorarios);
     const [loadingHorarios, setLoadingHorarios] = useState(false);
 
-    // Cargar horarios desde el servidor
+    // Sync with parent data
     useEffect(() => {
-        const loadHorarios = async () => {
-            setLoadingHorarios(true);
-            try {
-                const result = await obtenerHorariosStudio(studioSlug);
+        setHorarios(initialHorarios);
+    }, [initialHorarios]);
 
-                // Si no hay horarios, inicializar con valores por defecto
-                if (Array.isArray(result) && result.length === 0) {
+    // Initialize with defaults if empty (only once on mount)
+    useEffect(() => {
+        const initIfEmpty = async () => {
+            if (initialHorarios.length === 0) {
+                setLoadingHorarios(true);
+                try {
                     await inicializarHorariosPorDefecto(studioSlug);
-                    const horariosInicializados = await obtenerHorariosStudio(studioSlug);
-                    const horariosConvertidos: Horario[] = horariosInicializados.map((h: Record<string, unknown>): Horario => ({
-                        id: h.id as string,
-                        dia: h.day_of_week as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday',
-                        apertura: h.start_time as string,
-                        cierre: h.end_time as string,
-                        cerrado: !(h.is_active as boolean),
-                        order: h.order as number || 0
-                    }));
-                    setHorarios(horariosConvertidos);
-                    onLocalUpdate({ horarios: horariosConvertidos });
-                } else if (Array.isArray(result)) {
-                    const horariosConvertidos: Horario[] = result.map((h: Record<string, unknown>): Horario => ({
-                        id: h.id as string,
-                        dia: h.day_of_week as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday',
-                        apertura: h.start_time as string,
-                        cierre: h.end_time as string,
-                        cerrado: !(h.is_active as boolean),
-                        order: h.order as number || 0
-                    }));
-                    setHorarios(horariosConvertidos);
-                    onLocalUpdate({ horarios: horariosConvertidos });
+                    toast.success('Horarios inicializados. Recarga la página.');
+                } catch (error) {
+                    console.error('Error initializing horarios:', error);
+                    toast.error('Error al inicializar horarios');
+                } finally {
+                    setLoadingHorarios(false);
                 }
-            } catch (error) {
-                console.error('Error loading horarios:', error);
-                toast.error('Error al cargar horarios');
-            } finally {
-                setLoadingHorarios(false);
             }
         };
-
-        if (studioSlug) {
-            loadHorarios();
-        }
-    }, [studioSlug]); // eslint-disable-line react-hooks/exhaustive-deps
+        initIfEmpty();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleHorarioUpdate = async (id: string, field: 'start_time' | 'end_time', value: string) => {
         const horario = horarios.find(h => h.id === id);
@@ -95,25 +74,8 @@ export function HorariosSection({ studioSlug, onLocalUpdate }: HorariosSectionPr
         } catch (error) {
             console.error('Error updating horario:', error);
             toast.error('Error al actualizar horario');
-
-            // Revertir cambio optimístico - recargar desde el servidor
-            try {
-                const result = await obtenerHorariosStudio(studioSlug);
-                if (Array.isArray(result)) {
-                    const horariosConvertidos: Horario[] = result.map((h: Record<string, unknown>): Horario => ({
-                        id: h.id as string,
-                        dia: h.day_of_week as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday',
-                        apertura: h.start_time as string,
-                        cierre: h.end_time as string,
-                        cerrado: !(h.is_active as boolean),
-                        order: h.order as number || 0
-                    }));
-                    setHorarios(horariosConvertidos);
-                    onLocalUpdate({ horarios: horariosConvertidos });
-                }
-            } catch (reloadError) {
-                console.error('Error reloading horarios:', reloadError);
-            }
+            // Revert to initial data from parent
+            setHorarios(initialHorarios);
         }
     };
 

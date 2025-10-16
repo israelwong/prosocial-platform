@@ -7,7 +7,7 @@ import { Plus, X, Save, Check } from 'lucide-react';
 import { IdentidadData } from '../types';
 import { LogoManagerZen } from './LogoManagerZen';
 import { RedesSocialesSection } from './RedesSocialesSection';
-import { actualizarIdentidadCompleta } from '@/lib/actions/studio/config/identidad.actions';
+import { actualizarIdentidadCompleta } from '@/lib/actions/studio/builder/identidad.actions';
 import { toast } from 'sonner';
 
 interface IdentidadEditorZenProps {
@@ -34,6 +34,7 @@ export function IdentidadEditorZen({
     const [activeTab, setActiveTab] = useState('encabezado');
 
     const handleInputChange = (field: keyof IdentidadData, value: string) => {
+        console.log('🔄 handleInputChange:', field, value);
         onLocalUpdate({ [field]: value });
     };
 
@@ -62,7 +63,6 @@ export function IdentidadEditorZen({
                 nombre: data.studio_name || '',
                 slogan: data.slogan || undefined,
                 logo_url: data.logo_url || undefined,
-                isotipo_url: data.isotipo_url || undefined,
                 pagina_web: data.pagina_web || undefined,
                 palabras_clave: Array.isArray(data.palabras_clave) ? data.palabras_clave.join(', ') : data.palabras_clave || ''
             } as Parameters<typeof actualizarIdentidadCompleta>[1];

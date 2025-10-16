@@ -6,7 +6,6 @@ export interface IdentidadData {
     descripcion: string | null;
     palabras_clave: string[];
     logo_url: string | null;
-    isotipo_url: string | null;
     pagina_web?: string | null;
 }
 
@@ -16,7 +15,6 @@ export interface IdentidadUpdate {
     descripcion?: string;
     palabras_clave?: string;
     logo_url?: string;
-    isotipo_url?: string;
     pagina_web?: string;
 }
 
@@ -25,6 +23,6 @@ export interface PalabrasClaveUpdate {
 }
 
 export interface LogoUpdate {
-    tipo: "logo" | "isotipo";
+    tipo: "logo";
     url?: string;
 }

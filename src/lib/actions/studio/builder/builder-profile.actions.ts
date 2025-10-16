@@ -29,6 +29,7 @@ export async function getBuilderProfileData(studioSlug: string) {
                     slogan: true,
                     website: true,
                     address: true,
+                    maps_url: true,
                     plan_id: true,
                     // Social networks for footer
                     social_networks: {
@@ -46,11 +47,12 @@ export async function getBuilderProfileData(studioSlug: string) {
                     },
                     // Phones for contact section
                     phones: {
-                        where: { is_active: true },
                         select: {
                             id: true,
                             number: true,
                             type: true,
+                            label: true,
+                            is_active: true,
                         },
                         orderBy: { order: 'asc' }
                     },
@@ -140,6 +142,7 @@ export async function getBuilderProfileData(studioSlug: string) {
                     slogan: studio.slogan,
                     website: studio.website,
                     address: studio.address,
+                    maps_url: studio.maps_url,
                     plan_id: studio.plan_id,
                     plan: studio.plan,
                     zonas_trabajo: studio.zonas_trabajo,
@@ -157,6 +160,8 @@ export async function getBuilderProfileData(studioSlug: string) {
                         id: phone.id,
                         number: phone.number,
                         type: phone.type,
+                        label: phone.label,
+                        is_active: phone.is_active,
                     })),
                     address: studio.address,
                     website: studio.website,

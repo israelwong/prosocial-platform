@@ -4,10 +4,10 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { IdentidadEditorZen } from './components/';
 import { SectionLayout } from '../components';
 import { useParams } from 'next/navigation';
-import { getBuilderProfileData } from '@/lib/actions/studio/builder-profile.actions';
-import { actualizarLogo } from '@/lib/actions/studio/config/identidad.actions';
+import { getBuilderProfileData } from '@/lib/actions/studio/builder/builder-profile.actions';
+import { actualizarLogo } from '@/lib/actions/studio/builder/identidad.actions';
 import { IdentidadData } from './types';
-import { BuilderProfileData } from '@/types/builder-profile';
+import { BuilderProfileData, BuilderStudioProfile } from '@/types/builder-profile';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
 import { Image as ImageIcon } from 'lucide-react';
 
@@ -42,9 +42,43 @@ export default function IdentidadPage() {
         setBuilderData((prev: BuilderProfileData | null) => {
             if (!prev) return null;
             const updateData = data as Partial<IdentidadData>;
+
+            // Mapear campos específicos de IdentidadData a BuilderStudioProfile
+            const studioUpdate: Partial<BuilderStudioProfile> = {};
+
+            if ('studio_name' in updateData) studioUpdate.studio_name = updateData.studio_name;
+            if ('slogan' in updateData) studioUpdate.slogan = updateData.slogan;
+            if ('descripcion' in updateData) studioUpdate.description = updateData.descripcion;
+            if ('logo_url' in updateData) studioUpdate.logo_url = updateData.logo_url;
+            if ('pagina_web' in updateData) studioUpdate.website = updateData.pagina_web;
+            if ('palabras_clave' in updateData) {
+                studioUpdate.keywords = Array.isArray(updateData.palabras_clave)
+                    ? updateData.palabras_clave.join(', ')
+                    : updateData.palabras_clave;
+            }
+
+            // Manejar redes sociales si están en updateData
+            if ('redes_sociales' in updateData) {
+                const redesSociales = updateData.redes_sociales as Array<{ plataforma: string, url: string }>;
+                return {
+                    ...prev,
+                    studio: { ...prev.studio, ...studioUpdate },
+                    socialNetworks: redesSociales.map((red, index) => ({
+                        id: `temp-${index}`,
+                        url: red.url,
+                        platform: {
+                            id: `temp-platform-${index}`,
+                            name: red.plataforma,
+                            icon: null
+                        },
+                        order: index
+                    }))
+                };
+            }
+
             return {
                 ...prev,
-                studio: { ...prev.studio, ...updateData }
+                studio: { ...prev.studio, ...studioUpdate }
             };
         });
     }, []);
@@ -80,7 +114,7 @@ export default function IdentidadPage() {
             is_active: true
         })),
         direccion: builderData.contactInfo.address,
-        google_maps_url: null // No hay google_maps_url en BuilderProfileData
+        google_maps_url: builderData.studio.maps_url
     } : null;
 
     return (
@@ -116,7 +150,7 @@ export default function IdentidadPage() {
                                 descripcion: builderData.studio.description,
                                 palabras_clave: builderData.studio.keywords ? builderData.studio.keywords.split(',').map(k => k.trim()) : [],
                                 logo_url: builderData.studio.logo_url,
-                                isotipo_url: null,
+                                pagina_web: builderData.studio.website,
                             } : {
                                 id: 'temp-id',
                                 studio_name: 'Mi Estudio',
@@ -125,7 +159,7 @@ export default function IdentidadPage() {
                                 descripcion: null,
                                 palabras_clave: [],
                                 logo_url: null,
-                                isotipo_url: null,
+                                pagina_web: null,
                             }}
                             onLocalUpdate={handleLocalUpdate}
                             onLogoUpdate={async (url: string) => {

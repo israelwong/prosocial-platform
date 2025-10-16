@@ -19,6 +19,7 @@ export interface BuilderStudioProfile {
     slogan: string | null;
     website: string | null;
     address: string | null;
+    maps_url: string | null;
     plan_id: string | null;
     plan?: {
         name: string;
@@ -51,6 +52,8 @@ export interface BuilderContactInfo {
         id: string;
         number: string;
         type: string;
+        label: string | null;
+        is_active: boolean;
     }[];
     address: string | null;
     website: string | null;
@@ -67,7 +70,7 @@ export interface BuilderCatalogItem {
 
 export interface BuilderPortfolioItem {
     id: string;
-    title: string;
+    title: string | null;
     description: string | null;
     image_url: string | null;
     video_url: string | null;

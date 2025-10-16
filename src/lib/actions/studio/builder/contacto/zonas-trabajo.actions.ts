@@ -19,25 +19,11 @@ export interface ZonaTrabajoFormData {
 /**
  * Obtener todas las zonas de trabajo de un studio
  */
-export async function obtenerZonasTrabajoStudio(studioId: string) {
-  try {
-    const zonas = await prisma.studio_zonas_trabajo.findMany({
-      where: { studio_id: studioId },
-      orderBy: { orden: 'asc' }
-    });
-
-    return zonas;
-  } catch (error) {
-    console.error("Error obteniendo zonas de trabajo:", error);
-    return [];
-  }
-}
-
 /**
  * Crear una nueva zona de trabajo
  */
 export async function crearZonaTrabajo(
-  studioId: string, 
+  studioId: string,
   data: ZonaTrabajoFormData
 ) {
   try {

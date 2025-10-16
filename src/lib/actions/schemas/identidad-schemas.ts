@@ -5,8 +5,7 @@ export const IdentidadUpdateSchema = z.object({
   slogan: z.string().max(200, "El slogan es muy largo").optional(),
   descripcion: z.string().max(1000, "La descripción es muy larga").optional(),
   palabras_clave: z.string().optional(),
-  logo_url: z.string().url("URL de logo inválida").optional().or(z.literal("")), // Corregido: logoUrl → logo_url
-  isotipo_url: z.string().url("URL de isotipo inválida").optional().or(z.literal("")),
+  logo_url: z.string().url("URL de logo inválida").optional().or(z.literal("")),
   pagina_web: z.string().optional().or(z.literal("")).or(z.null()).or(z.undefined()),
 });
 
@@ -19,7 +18,7 @@ export const PalabrasClaveUpdateSchema = z.object({
 export type PalabrasClaveUpdateForm = z.infer<typeof PalabrasClaveUpdateSchema>;
 
 export const LogoUpdateSchema = z.object({
-  tipo: z.enum(["logo", "isotipo"]),
+  tipo: z.enum(["logo"]),
   url: z.string().url("URL inválida").optional().or(z.literal("")),
 });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { obtenerIdentidadStudio } from '@/lib/actions/studio/config/identidad.actions';
+import { obtenerIdentidadStudio } from '@/lib/actions/studio/builder/identidad.actions';
 import type { IdentidadData } from '@/app/studio/[slug]/configuracion/cuenta/identidad/types';
 
 interface UseStudioDataOptions {
@@ -23,17 +23,17 @@ export function useStudioData({ studioSlug, onUpdate }: UseStudioDataOptions) {
         setLoading(true);
         setError(null);
         console.log('🔄 [STUDIO_DATA] Cargando datos del studio:', studioSlug);
-        
+
         const data = await obtenerIdentidadStudio(studioSlug);
         console.log('📊 [STUDIO_DATA] Datos recibidos:', data);
-        
+
         setIdentidadData(data);
         onUpdate?.(data);
         console.log('✅ [STUDIO_DATA] Datos cargados exitosamente:', { name: data.name });
       } catch (err) {
         console.error('❌ [STUDIO_DATA] Error loading studio data:', err);
         setError('Error al cargar datos del estudio');
-        
+
         // Fallback a datos por defecto
         const fallbackData: IdentidadData = {
           id: studioSlug,
@@ -45,7 +45,7 @@ export function useStudioData({ studioSlug, onUpdate }: UseStudioDataOptions) {
           logoUrl: null,
           isotipo_url: null
         };
-        
+
         setIdentidadData(fallbackData);
         onUpdate?.(fallbackData);
         console.log('⚠️ [STUDIO_DATA] Usando datos de fallback:', fallbackData);
@@ -66,10 +66,10 @@ export function useStudioData({ studioSlug, onUpdate }: UseStudioDataOptions) {
       setLoading(true);
       setError(null);
       console.log('🔄 [STUDIO_DATA] Recargando datos del studio:', studioSlug);
-      
+
       const data = await obtenerIdentidadStudio(studioSlug);
       console.log('📊 [STUDIO_DATA] Datos recargados:', data);
-      
+
       setIdentidadData(data);
       onUpdate?.(data);
       console.log('✅ [STUDIO_DATA] Datos recargados exitosamente:', { name: data.name });

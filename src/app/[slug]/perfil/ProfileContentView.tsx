@@ -1,6 +1,6 @@
 import React from 'react';
 import { PublicProfileData } from '@/types/public-profile';
-import { ProfileContent } from '@/components/ui/profile';
+import { ProfileContent } from '@/components/profile';
 // PostGridView, ShopView, and InfoView are now handled by ProfileContent component
 
 interface ProfileContentViewProps {

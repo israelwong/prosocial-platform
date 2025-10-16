@@ -7,7 +7,7 @@ import { Save, Check } from 'lucide-react';
 import { ZonasTrabajoSection } from './ZonasTrabajoSection';
 import { TelefonosSection } from './TelefonosSection';
 import { HorariosSection } from './HorariosSection';
-import { actualizarContacto } from '@/lib/actions/studio/config/contacto';
+import { actualizarContacto } from '@/lib/actions/studio/builder/contacto';
 import { toast } from 'sonner';
 
 interface ContactoEditorZenProps {
@@ -151,6 +151,7 @@ export function ContactoEditorZen({
                 {activeTab === 'horarios' && (
                     <HorariosSection
                         studioSlug={studioSlug}
+                        horarios={data.horarios}
                         onLocalUpdate={onLocalUpdate}
                     />
                 )}
@@ -158,6 +159,7 @@ export function ContactoEditorZen({
                 {activeTab === 'zonas' && (
                     <ZonasTrabajoSection
                         studioId={data.studio_id}
+                        zonas={data.zonas_trabajo}
                         onLocalUpdate={onLocalUpdate}
                     />
                 )}

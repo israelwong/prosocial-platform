@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { ContactoEditorZen } from './components/ContactoEditorZen';
 import { SectionLayout } from '../components';
 import { useParams } from 'next/navigation';
-import { getBuilderProfileData } from '@/lib/actions/studio/builder-profile.actions';
+import { getBuilderProfileData } from '@/lib/actions/studio/builder/builder-profile.actions';
 import { ContactoData } from './types';
 import { BuilderProfileData } from '@/types/builder-profile';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
@@ -40,6 +40,62 @@ export default function ContactoPage() {
         loadData();
     }, [studioSlug]);
 
+    // Memoizar función para evitar re-renders
+    const handleLocalUpdate = useCallback((data: unknown) => {
+        console.log('🔄 [ContactoPage] onLocalUpdate called with:', data);
+        setBuilderData((prev: BuilderProfileData | null) => {
+            if (!prev) return null;
+            const updateData = data as Partial<ContactoData>;
+            console.log('📝 [ContactoPage] Updating builderData with:', updateData);
+
+            // Debug: Verificar si hay horarios en la actualización
+            if (updateData.horarios) {
+                console.log('🕐 [ContactoPage] Horarios update detected:', updateData.horarios);
+                console.log('🕐 [ContactoPage] Horarios length:', updateData.horarios.length);
+            }
+            return {
+                ...prev,
+                studio: {
+                    ...prev.studio,
+                    description: updateData.descripcion !== undefined ? updateData.descripcion : prev.studio.description,
+                    address: updateData.direccion !== undefined ? updateData.direccion : prev.studio.address,
+                    maps_url: updateData.google_maps_url !== undefined ? updateData.google_maps_url : prev.studio.maps_url
+                },
+                contactInfo: {
+                    ...prev.contactInfo,
+                    address: updateData.direccion !== undefined ? updateData.direccion : prev.contactInfo.address,
+                    website: updateData.google_maps_url !== undefined ? updateData.google_maps_url : prev.contactInfo.website,
+                    phones: updateData.telefonos !== undefined ? updateData.telefonos.map(phone => ({
+                        id: phone.id || '',
+                        number: phone.numero,
+                        type: phone.tipo === 'whatsapp' ? 'WHATSAPP' :
+                            phone.tipo === 'llamadas' ? 'LLAMADAS' : 'AMBOS',
+                        label: phone.etiqueta || null,
+                        is_active: phone.is_active !== undefined ? phone.is_active : true
+                    })) : prev.contactInfo.phones,
+                    horarios: updateData.horarios !== undefined ? updateData.horarios.map(horario => ({
+                        id: horario.id || '',
+                        dia: horario.dia,
+                        apertura: horario.apertura,
+                        cierre: horario.cierre,
+                        cerrado: horario.cerrado,
+                    })) : prev.contactInfo.horarios
+                },
+                // Manejar zonas de trabajo si están en updateData
+                ...(updateData.zonas_trabajo !== undefined && {
+                    studio: {
+                        ...prev.studio,
+                        zonas_trabajo: updateData.zonas_trabajo.map(zona => ({
+                            id: zona.id || '',
+                            nombre: zona.nombre,
+                            orden: zona.orden || 0
+                        }))
+                    }
+                })
+            };
+        });
+    }, []);
+
     // ✅ Mapear datos para preview - Header, Footer y Contenido de contacto
     const previewData = builderData ? {
         // Para ProfileIdentity
@@ -58,14 +114,19 @@ export default function ContactoPage() {
             numero: phone.number,
             tipo: phone.type === 'WHATSAPP' ? 'whatsapp' as const :
                 phone.type === 'LLAMADAS' ? 'llamadas' as const : 'ambos' as const,
-            is_active: true
+            etiqueta: phone.label || undefined,
+            is_active: phone.is_active
         })),
         direccion: builderData.contactInfo.address,
-        google_maps_url: null, // No hay google_maps_url en BuilderProfileData
+        google_maps_url: builderData.studio.maps_url,
         // Para ProfileContent (sección contacto)
         studio: builderData.studio,
-        contactInfo: builderData.contactInfo,
-        socialNetworks: builderData.socialNetworks
+        contactInfo: {
+            ...builderData.contactInfo,
+            google_maps_url: builderData.studio.maps_url
+        },
+        socialNetworks: builderData.socialNetworks,
+        zonas_trabajo: builderData.studio.zonas_trabajo || []
     } : null;
 
     return (
@@ -98,16 +159,27 @@ export default function ContactoPage() {
                                 studio_id: builderData.studio.id,
                                 descripcion: builderData.studio.description || '',
                                 direccion: builderData.contactInfo.address || '',
-                                google_maps_url: '',
-                                horarios: [],
+                                google_maps_url: builderData.studio.maps_url || '',
+                                horarios: builderData.contactInfo.horarios?.map(h => ({
+                                    id: h.id,
+                                    dia: h.dia as 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday',
+                                    apertura: h.apertura,
+                                    cierre: h.cierre,
+                                    cerrado: h.cerrado
+                                })) || [],
                                 telefonos: builderData.contactInfo.phones.map(phone => ({
                                     id: phone.id,
                                     numero: phone.number,
                                     tipo: (phone.type === 'WHATSAPP' ? 'whatsapp' :
                                         phone.type === 'LLAMADAS' ? 'llamadas' : 'ambos') as 'llamadas' | 'whatsapp' | 'ambos',
-                                    is_active: true
+                                    etiqueta: phone.label || undefined,
+                                    is_active: phone.is_active
                                 })),
-                                zonas_trabajo: []
+                                zonas_trabajo: builderData.studio.zonas_trabajo?.map(z => ({
+                                    id: z.id,
+                                    nombre: z.nombre,
+                                    orden: z.orden
+                                })) || []
                             } : {
                                 id: 'temp-id',
                                 studio_id: 'temp-studio-id',
@@ -118,45 +190,7 @@ export default function ContactoPage() {
                                 telefonos: [],
                                 zonas_trabajo: []
                             }}
-                            onLocalUpdate={(data: unknown) => {
-                                console.log('🔄 [ContactoPage] onLocalUpdate called with:', data);
-                                setBuilderData((prev: BuilderProfileData | null) => {
-                                    if (!prev) return null;
-                                    const updateData = data as Partial<ContactoData>;
-                                    console.log('📝 [ContactoPage] Updating builderData with:', updateData);
-
-                                    // Debug: Verificar si hay horarios en la actualización
-                                    if (updateData.horarios) {
-                                        console.log('🕐 [ContactoPage] Horarios update detected:', updateData.horarios);
-                                        console.log('🕐 [ContactoPage] Horarios length:', updateData.horarios.length);
-                                    }
-                                    return {
-                                        ...prev,
-                                        studio: {
-                                            ...prev.studio,
-                                            description: updateData.descripcion !== undefined ? updateData.descripcion : prev.studio.description,
-                                            address: updateData.direccion !== undefined ? updateData.direccion : prev.studio.address
-                                        },
-                                        contactInfo: {
-                                            ...prev.contactInfo,
-                                            address: updateData.direccion !== undefined ? updateData.direccion : prev.contactInfo.address,
-                                            phones: updateData.telefonos !== undefined ? updateData.telefonos.map(phone => ({
-                                                id: phone.id || '',
-                                                number: phone.numero,
-                                                type: phone.tipo === 'whatsapp' ? 'WHATSAPP' :
-                                                    phone.tipo === 'llamadas' ? 'LLAMADAS' : 'AMBOS'
-                                            })) : prev.contactInfo.phones,
-                                            horarios: updateData.horarios !== undefined ? updateData.horarios.map(horario => ({
-                                                id: horario.id || '',
-                                                dia: horario.dia,
-                                                apertura: horario.apertura,
-                                                cierre: horario.cierre,
-                                                cerrado: horario.cerrado,
-                                            })) : prev.contactInfo.horarios
-                                        }
-                                    };
-                                });
-                            }}
+                            onLocalUpdate={handleLocalUpdate}
                             studioSlug={studioSlug}
                             loading={loading}
                         />

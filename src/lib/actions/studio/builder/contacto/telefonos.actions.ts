@@ -24,35 +24,6 @@ export interface TelefonoFormData {
 }
 
 /**
- * Obtener todos los teléfonos de un studio
- */
-export async function obtenerTelefonosStudio(studioSlug: string) {
-    try {
-        console.log('🔍 [obtenerTelefonosStudio] Buscando studio con slug:', studioSlug);
-
-        const studio = await prisma.studios.findUnique({
-            where: { slug: studioSlug },
-            select: { id: true }
-        });
-
-        if (!studio) {
-            throw new Error("Studio no encontrado");
-        }
-
-        const telefonos = await prisma.studio_phones.findMany({
-            where: { studio_id: studio.id },
-            orderBy: { order: 'asc' }
-        });
-
-        console.log('📞 [obtenerTelefonosStudio] Teléfonos encontrados:', telefonos.length);
-        return telefonos;
-    } catch (error) {
-        console.error('❌ [obtenerTelefonosStudio] Error:', error);
-        return [];
-    }
-}
-
-/**
  * Crear un nuevo teléfono
  */
 export async function crearTelefono(

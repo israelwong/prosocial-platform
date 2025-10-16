@@ -85,6 +85,16 @@ export function TelefonoModal({ isOpen, onClose, onSave, telefono }: TelefonoMod
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <ZenInput
+                        label="Etiqueta (opcional)"
+                        name="etiqueta"
+                        type="text"
+                        value={formData.etiqueta}
+                        onChange={(e) => setFormData(prev => ({ ...prev, etiqueta: e.target.value }))}
+                        placeholder="Recepción, Ventas, Personal..."
+                        hint="Ejemplo: Recepción, Ventas, WhatsApp Atención"
+                    />
+
+                    <ZenInput
                         label="Número de Teléfono"
                         name="numero"
                         type="tel"
@@ -94,17 +104,10 @@ export function TelefonoModal({ isOpen, onClose, onSave, telefono }: TelefonoMod
                             const value = e.target.value.replace(/[^0-9\s+\-()]/g, '');
                             setFormData(prev => ({ ...prev, numero: value }));
                         }}
-                        placeholder="+1 234 567 8900"
+                        placeholder="+52 55 1234 5678"
                         required
                     />
 
-                    <ZenInput
-                        label="Etiqueta (Opcional)"
-                        name="etiqueta"
-                        value={formData.etiqueta}
-                        onChange={(e) => setFormData(prev => ({ ...prev, etiqueta: e.target.value }))}
-                        placeholder="Principal, Emergencias, etc."
-                    />
 
                     <div className="space-y-3">
                         <label className="text-sm font-medium text-zinc-300 mb-5">Funcionalidad</label>

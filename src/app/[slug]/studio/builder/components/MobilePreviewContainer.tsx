@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { ProfileIdentity, ProfileContent, ProfileFooter, ProfileNavigation } from '@/components/ui/profile';
+import { ProfileIdentity, ProfileContent, ProfileFooter, ProfileNavigation } from '@/components/profile';
 
 interface MobilePreviewContainerProps {
     children?: React.ReactNode;

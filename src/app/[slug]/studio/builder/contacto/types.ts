@@ -2,7 +2,7 @@ export interface Telefono {
     id?: string;
     numero: string;
     tipo: 'llamadas' | 'whatsapp' | 'ambos';
-    etiqueta?: string; // ej: "Principal", "Emergencias"
+    etiqueta?: string; // Etiqueta opcional: "Recepción", "Ventas", "Personal"
     is_active?: boolean; // Estado activo/inactivo
 }
 

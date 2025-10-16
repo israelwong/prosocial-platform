@@ -12,55 +12,6 @@ import {
     type HorarioToggleForm,
 } from "@/lib/actions/schemas/horarios-schemas";
 
-// Obtener horarios del studio
-export async function obtenerHorariosStudio(studioSlug: string) {
-    try {
-        console.log('🔍 [obtenerHorariosStudio] Buscando studio con slug:', studioSlug);
-
-        // 1. Obtener studio
-        const studio = await prisma.studios.findUnique({
-            where: { slug: studioSlug },
-            select: {
-                id: true,
-                studio_name: true,
-                slug: true,
-            },
-        });
-
-        console.log('🏢 [obtenerHorariosStudio] Studio encontrado:', studio);
-
-        if (!studio) {
-            throw new Error("Studio no encontrado");
-        }
-
-        // 2. Obtener horarios del studio usando el nuevo schema
-        const horarios = await prisma.studio_business_hours.findMany({
-            where: { studio_id: studio.id },
-            select: {
-                id: true,
-                day_of_week: true,
-                start_time: true,
-                end_time: true,
-                is_active: true,
-                order: true,
-                created_at: true,
-                updated_at: true,
-            },
-            orderBy: [
-                { order: 'asc' },
-                { day_of_week: 'asc' }
-            ],
-        });
-
-        console.log('⏰ [obtenerHorariosStudio] Horarios encontrados:', horarios.length);
-
-        return horarios;
-    } catch (error) {
-        console.error('❌ [obtenerHorariosStudio] Error:', error);
-        throw new Error("Error al obtener los horarios del studio");
-    }
-}
-
 // Crear nuevo horario
 export async function crearHorario(studioSlug: string, data: HorarioCreateForm) {
     try {

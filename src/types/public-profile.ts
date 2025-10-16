@@ -80,6 +80,8 @@ export interface PublicContactInfo {
         id: string;
         number: string;
         type: string;
+        label: string | null;
+        is_active: boolean;
     }[];
     address: string | null;
     website: string | null;

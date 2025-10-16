@@ -4,7 +4,7 @@
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { ServicioParaCotizacion } from '@/components/ui/paquetes/columns'
+import { ServicioParaCotizacion } from '@/components/paquetes/columns'
 import { ZenCard, ZenInput, ZenTextarea, ZenButton, ZenBadge } from '@/components/ui/zen'
 import { calcularPrecios, formatCurrency } from '@/lib/utils/pricing'
 import type { SeccionData } from '@/lib/actions/schemas/catalogo-schemas'

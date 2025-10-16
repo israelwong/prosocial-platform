@@ -5,7 +5,7 @@ import { ZenButton, ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle } from 
 import { MapPin, Plus, GripVertical, Edit3, Trash2 } from 'lucide-react';
 import { ZonaTrabajo } from '../types';
 import { ZonaTrabajoModal } from './ZonaTrabajoModal';
-import { obtenerZonasTrabajoStudio, crearZonaTrabajo, actualizarZonaTrabajo, eliminarZonaTrabajo, reordenarZonasTrabajo } from '@/lib/actions/studio/config/contacto';
+import { crearZonaTrabajo, actualizarZonaTrabajo, eliminarZonaTrabajo, reordenarZonasTrabajo } from '@/lib/actions/studio/builder/contacto';
 import { toast } from 'sonner';
 import {
     DndContext,
@@ -25,6 +25,7 @@ import { useSortable } from '@dnd-kit/sortable';
 
 interface ZonasTrabajoSectionProps {
     studioId: string;
+    zonas: ZonaTrabajo[]; // Data from parent (builder-profile)
     onLocalUpdate: (data: Partial<{ zonas_trabajo: ZonaTrabajo[] }>) => void;
 }
 
@@ -84,17 +85,11 @@ function SortableZonaItem({ zona, onEdit, onDelete }: SortableZonaItemProps) {
     );
 }
 
-export function ZonasTrabajoSection({ studioId, onLocalUpdate }: ZonasTrabajoSectionProps) {
-    const [zonasTrabajo, setZonasTrabajo] = useState<ZonaTrabajo[]>([]);
+export function ZonasTrabajoSection({ studioId, zonas: initialZonas, onLocalUpdate }: ZonasTrabajoSectionProps) {
+    const [zonasTrabajo, setZonasTrabajo] = useState<ZonaTrabajo[]>(initialZonas);
     const [loadingZonas, setLoadingZonas] = useState(false);
     const [isReorderingZonas, setIsReorderingZonas] = useState(false);
     const [zonaModal, setZonaModal] = useState<{ open: boolean; zona?: ZonaTrabajo }>({ open: false });
-    const onLocalUpdateRef = useRef(onLocalUpdate);
-
-    // Actualizar la referencia cuando cambie onLocalUpdate
-    useEffect(() => {
-        onLocalUpdateRef.current = onLocalUpdate;
-    }, [onLocalUpdate]);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -103,28 +98,10 @@ export function ZonasTrabajoSection({ studioId, onLocalUpdate }: ZonasTrabajoSec
         })
     );
 
-    // Cargar zonas de trabajo
-    const loadZonas = useCallback(async () => {
-        setLoadingZonas(true);
-        try {
-            const result = await obtenerZonasTrabajoStudio(studioId);
-            if (Array.isArray(result)) {
-                setZonasTrabajo(result);
-                onLocalUpdateRef.current({ zonas_trabajo: result });
-            }
-        } catch (error) {
-            console.error('Error loading zonas:', error);
-            toast.error('Error al cargar zonas de trabajo');
-        } finally {
-            setLoadingZonas(false);
-        }
-    }, [studioId]);
-
+    // Sync with parent data
     useEffect(() => {
-        if (studioId) {
-            loadZonas();
-        }
-    }, [studioId, loadZonas]);
+        setZonasTrabajo(initialZonas);
+    }, [initialZonas]);
 
     const handleZonaSave = async (zona: ZonaTrabajo) => {
         try {
@@ -134,7 +111,7 @@ export function ZonasTrabajoSection({ studioId, onLocalUpdate }: ZonasTrabajoSec
                 if (result.success && result.zona) {
                     const updated = zonasTrabajo.map(z => z.id === zona.id ? result.zona : z);
                     setZonasTrabajo(updated);
-                    onLocalUpdateRef.current({ zonas_trabajo: updated });
+                    onLocalUpdate({ zonas_trabajo: updated });
                     toast.success('Zona actualizada exitosamente');
                 } else {
                     toast.error(result.error || 'Error al actualizar la zona');
@@ -146,7 +123,7 @@ export function ZonasTrabajoSection({ studioId, onLocalUpdate }: ZonasTrabajoSec
                 if (result.success && result.zona) {
                     const updated = [...zonasTrabajo, result.zona];
                     setZonasTrabajo(updated);
-                    onLocalUpdateRef.current({ zonas_trabajo: updated });
+                    onLocalUpdate({ zonas_trabajo: updated });
                     toast.success('Zona creada exitosamente');
                 } else {
                     toast.error(result.error || 'Error al crear la zona');
@@ -166,7 +143,7 @@ export function ZonasTrabajoSection({ studioId, onLocalUpdate }: ZonasTrabajoSec
             if (result.success) {
                 const updated = zonasTrabajo.filter(z => z.id !== zonaId);
                 setZonasTrabajo(updated);
-                onLocalUpdateRef.current({ zonas_trabajo: updated });
+                onLocalUpdate({ zonas_trabajo: updated });
                 toast.success('Zona eliminada exitosamente');
             } else {
                 toast.error(result.error || 'Error al eliminar la zona');
@@ -187,7 +164,7 @@ export function ZonasTrabajoSection({ studioId, onLocalUpdate }: ZonasTrabajoSec
 
         // Actualizar estado local primero
         setZonasTrabajo(reorderedZonas);
-        onLocalUpdateRef.current({ zonas_trabajo: reorderedZonas });
+        onLocalUpdate({ zonas_trabajo: reorderedZonas });
 
         // Actualizar en el servidor de forma asíncrona
         const updateServerOrder = async () => {
@@ -205,14 +182,14 @@ export function ZonasTrabajoSection({ studioId, onLocalUpdate }: ZonasTrabajoSec
                     toast.error(result.error || 'Error al actualizar orden');
                     // Revertir cambios locales si falla
                     setZonasTrabajo(zonasTrabajo);
-                    onLocalUpdateRef.current({ zonas_trabajo: zonasTrabajo });
+                    onLocalUpdate({ zonas_trabajo: zonasTrabajo });
                 }
             } catch (error) {
                 console.error('Error reordering zonas:', error);
                 toast.error('Error al actualizar orden');
                 // Revertir cambios locales si falla
                 setZonasTrabajo(zonasTrabajo);
-                onLocalUpdateRef.current({ zonas_trabajo: zonasTrabajo });
+                onLocalUpdate({ zonas_trabajo: zonasTrabajo });
             } finally {
                 setIsReorderingZonas(false);
             }

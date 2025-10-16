@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { PublicProfileData } from '@/types/public-profile';
-import { ProfileIdentity, ProfileNavTabs, ProfileCTA, ProfileAIChat, ProfileFooter } from '@/components/ui/profile';
+import { ProfileIdentity, ProfileNavTabs, ProfileCTA, ProfileAIChat, ProfileFooter } from '@/components/profile';
 import { ProfileContentView } from './ProfileContentView';
 import { isProPlan } from '@/lib/utils/profile-utils';
 

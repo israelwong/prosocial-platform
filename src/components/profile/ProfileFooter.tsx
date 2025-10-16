@@ -58,7 +58,7 @@ export function ProfileFooter({ data, loading = false }: ProfileFooterProps) {
         plataforma: string;
         url: string;
     }>;
-    const telefonoActivo = telefonos.find(t => t.is_active !== false);
+    const telefonosActivos = telefonos.filter(t => t.is_active !== false);
 
     // Función para obtener icono de red social
     const getSocialIcon = (plataforma: string | undefined | null) => {
@@ -164,22 +164,26 @@ export function ProfileFooter({ data, loading = false }: ProfileFooterProps) {
                     )}
 
                     {/* Teléfono con iconos según tipo */}
-                    {telefonoActivo && (
-                        <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1">
-                                {telefonoActivo.tipo === 'llamadas' || telefonoActivo.tipo === 'ambos' ? (
-                                    <Phone className="w-3 h-3 text-zinc-400" />
-                                ) : null}
-                                {telefonoActivo.tipo === 'whatsapp' || telefonoActivo.tipo === 'ambos' ? (
-                                    <WhatsAppIcon className="w-3 h-3 text-zinc-400" />
-                                ) : null}
-                            </div>
-                            <a
-                                href={`tel:${telefonoActivo.numero}`}
-                                className="text-zinc-300 text-xs hover:text-zinc-200 transition-colors truncate"
-                            >
-                                {telefonoActivo.numero}
-                            </a>
+                    {telefonosActivos.length > 0 && (
+                        <div className="space-y-1.5">
+                            {telefonosActivos.map((telefono, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                    <div className="flex items-center gap-1">
+                                        {telefono.tipo === 'llamadas' || telefono.tipo === 'ambos' ? (
+                                            <Phone className="w-3 h-3 text-zinc-400" />
+                                        ) : null}
+                                        {telefono.tipo === 'whatsapp' || telefono.tipo === 'ambos' ? (
+                                            <WhatsAppIcon className="w-3 h-3 text-zinc-400" />
+                                        ) : null}
+                                    </div>
+                                    <a
+                                        href={`tel:${telefono.numero}`}
+                                        className="text-zinc-300 text-xs hover:text-zinc-200 transition-colors truncate"
+                                    >
+                                        {telefono.numero}
+                                    </a>
+                                </div>
+                            ))}
                         </div>
                     )}
 

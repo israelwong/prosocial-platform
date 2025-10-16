@@ -23,7 +23,6 @@ export async function obtenerIdentidadStudio(studioSlug: string) {
         description: true,
         keywords: true,
         logo_url: true,
-        isotipo_url: true,
       },
     });
 
@@ -77,7 +76,6 @@ export async function actualizarIdentidadBasica(
         slogan: validatedData.slogan,
         description: validatedData.descripcion,
         logo_url: validatedData.logo_url,      // Corregido: logoUrl → logo_url
-        isotipo_url: validatedData.isotipo_url, // ✅ Ya correcto
       },
       select: {
         studio_name: true,
@@ -145,9 +143,7 @@ export async function actualizarLogo(
 
     const validatedData = LogoUpdateSchema.parse(data);
 
-    const updateData = validatedData.tipo === "logo"
-      ? { logo_url: validatedData.url }      // ✅ Cambiar a logo_url
-      : { isotipo_url: validatedData.url };
+    const updateData = { logo_url: validatedData.url };
 
     const studioActualizado = await prisma.studios.update({
       where: { id: studio.id },
@@ -186,7 +182,6 @@ export async function actualizarIdentidadCompleta(
       slogan: string | null;
       description: string | null;
       logo_url: string | null;
-      isotipo_url: string | null;
       website: string | null;
       keywords?: string;
     } = {
@@ -194,7 +189,6 @@ export async function actualizarIdentidadCompleta(
       slogan: validatedData.slogan ?? null,
       description: validatedData.descripcion ?? null,
       logo_url: validatedData.logo_url ?? null, // Corregido: logoUrl → logo_url
-      isotipo_url: validatedData.isotipo_url ?? null,
       website: validatedData.pagina_web ?? null,
     };
 
@@ -212,7 +206,6 @@ export async function actualizarIdentidadCompleta(
         description: true,
         keywords: true,
         logo_url: true,
-        isotipo_url: true,
         website: true,
       },
     });
