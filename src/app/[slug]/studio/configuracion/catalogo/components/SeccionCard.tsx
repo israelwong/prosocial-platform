@@ -8,7 +8,7 @@ import { Pencil, Plus, Trash2, FolderOpen } from 'lucide-react';
 import { ZenBadge, ZenButton } from '@/components/ui/zen';
 import { CategoriaCard } from './CategoriaCard';
 import type { SeccionData, CategoriaData, ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
-import type { ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
+import type { ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 
 interface SeccionCardProps {
     seccion: SeccionData;

@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { TipoEventoData } from '@/lib/actions/schemas/tipos-evento-schemas';
 import { ZenCard, ZenCardContent, ZenButton, ZenBadge } from '@/components/ui/zen';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/shadcn/dialog';
-import { formatearMoneda } from '@/lib/utils/calcular-precio';
+import { formatearMoneda } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 import { eliminarPaquete, duplicarPaquete, actualizarPosicionPaquete } from '@/lib/actions/studio/dashboard/paquetes.actions';
 import { toast } from 'sonner';
 import { Plus, Edit, Copy, Trash2, GripVertical } from 'lucide-react';

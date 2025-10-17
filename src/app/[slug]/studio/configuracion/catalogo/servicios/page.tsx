@@ -6,7 +6,7 @@ import { CatalogoList, CatalogoSkeleton } from '../components';
 import { obtenerCatalogo } from '@/lib/actions/studio/config/catalogo.actions';
 import { obtenerConfiguracionPrecios } from '@/lib/actions/studio/config/configuracion-precios.actions';
 import type { SeccionData } from '@/lib/actions/schemas/catalogo-schemas';
-import type { ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
+import type { ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 
 export default function ServiciosPage() {
   const params = useParams();

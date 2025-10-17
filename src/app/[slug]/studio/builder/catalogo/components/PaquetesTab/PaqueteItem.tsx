@@ -8,7 +8,7 @@ import {
     eliminarPaquete,
     duplicarPaquete,
 } from '@/lib/actions/studio/builder/catalogo/paquetes.actions';
-import { formatearMoneda } from '@/lib/utils/calcular-precio';
+import { formatearMoneda } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 
 interface PaqueteItemProps {
     paquete: {

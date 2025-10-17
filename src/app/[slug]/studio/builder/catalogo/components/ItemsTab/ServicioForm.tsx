@@ -15,7 +15,7 @@ import {
     obtenerCategorias,
 } from '@/lib/actions/studio/builder/catalogo/items.actions';
 import { obtenerConfiguracionPrecios as cargarConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/utilidad.actions';
-import { calcularPrecio, formatearMoneda, type ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
+import { calcularPrecio, formatearMoneda, type ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 import type { ServicioData, CategoriaData } from '@/lib/actions/schemas/catalogo-schemas';
 
 interface ServicioFormProps {

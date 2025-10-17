@@ -23,7 +23,7 @@ import {
     eliminarCategoria,
     eliminarServicio,
 } from '@/lib/actions/studio/builder/catalogo/items.actions';
-import type { ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
+import type { ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 import {
     DndContext,
     closestCenter,

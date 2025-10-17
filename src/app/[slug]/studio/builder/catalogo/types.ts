@@ -20,7 +20,7 @@ import type {
     ServiciosExistentes,
 } from "@/lib/actions/schemas/configuracion-precios-schemas";
 
-import type { ConfiguracionPrecios } from "@/lib/utils/calcular-precio";
+import type { ConfiguracionPrecios } from "@/lib/actions/studio/builder/catalogo/calcular-precio";
 
 // ============================================
 // TABS ARCHITECTURE TYPES

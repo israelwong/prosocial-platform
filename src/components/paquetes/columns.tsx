@@ -2,7 +2,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { formatearMoneda } from "@/lib/utils/calcular-precio"
+import { formatearMoneda } from "@/lib/actions/studio/builder/catalogo/calcular-precio"
 import { ZenInput } from "@/components/ui/zen"
 
 export interface ServicioParaCotizacion {

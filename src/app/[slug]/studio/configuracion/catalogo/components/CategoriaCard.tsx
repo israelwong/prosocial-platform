@@ -8,7 +8,7 @@ import { GripVertical, Pencil, Plus, Trash2, Package } from 'lucide-react';
 import { ZenBadge, ZenButton } from '@/components/ui/zen';
 import { ServicioCard } from './ServicioCard';
 import type { CategoriaData, ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
-import { calcularPrecio, type ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
+import { calcularPrecio, type ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 
 interface CategoriaCardProps {
     categoria: CategoriaData;

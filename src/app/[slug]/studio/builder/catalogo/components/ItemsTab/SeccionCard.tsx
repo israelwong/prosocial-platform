@@ -8,7 +8,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Pencil, Plus, Trash2, FolderOpen, MoreVertical } from 'lucide-react';
 import { CategoriaCard } from './CategoriaCard';
 import type { SeccionData, CategoriaData, ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
-import type { ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
+import type { ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 
 interface SeccionCardProps {
     seccion: SeccionData;
