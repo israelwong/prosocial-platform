@@ -23,7 +23,7 @@ import {
     eliminarCategoria,
     eliminarServicio,
 } from '@/lib/actions/studio/config/catalogo.actions';
-import type { PricingConfig } from '@/lib/utils/pricing';
+import type { ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
 import {
     DndContext,
     closestCenter,
@@ -46,7 +46,7 @@ interface CatalogoListProps {
     studioSlug: string;
     initialCatalogo: SeccionData[];
     onCatalogoChange: (catalogo: SeccionData[]) => void;
-    studioConfig: PricingConfig;
+    studioConfig: ConfiguracionPrecios;
 }
 
 export function CatalogoList({

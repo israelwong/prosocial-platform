@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { TipoEventoData } from '@/lib/actions/schemas/tipos-evento-schemas';
 import { ZenCard, ZenCardContent, ZenButton, ZenBadge } from '@/components/ui/zen';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/shadcn/dialog';
-import { formatCurrency } from '@/lib/utils/pricing';
+import { formatearMoneda } from '@/lib/utils/calcular-precio';
 import { eliminarPaquete, duplicarPaquete, actualizarPosicionPaquete } from '@/lib/actions/studio/dashboard/paquetes.actions';
 import { toast } from 'sonner';
 import { Plus, Edit, Copy, Trash2, GripVertical } from 'lucide-react';
@@ -156,14 +156,14 @@ function SortablePaqueteItem({
                             <div className="text-center">
                                 <div className="text-zinc-500 text-xs">Precio</div>
                                 <div className="font-semibold text-emerald-400">
-                                    {formatCurrency(paquete.precio)}
+                                    {formatearMoneda(paquete.precio)}
                                 </div>
                             </div>
                             <div className="text-center">
                                 <div className="text-zinc-500 text-xs">Utilidad</div>
                                 <div className={`font-semibold ${paquete.utilidad > 0 ? 'text-emerald-400' : 'text-red-400'
                                     }`}>
-                                    {formatCurrency(paquete.utilidad)}
+                                    {formatearMoneda(paquete.utilidad)}
                                 </div>
                             </div>
                             <div className="text-center">

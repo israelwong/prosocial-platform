@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { ServicioParaCotizacion } from '@/components/paquetes/columns'
 import { ZenCard, ZenInput, ZenTextarea, ZenButton, ZenBadge } from '@/components/ui/zen'
-import { calcularPrecios, formatCurrency } from '@/lib/utils/pricing'
+import { calcularPrecio, formatearMoneda, type ConfiguracionPrecios } from '@/lib/utils/calcular-precio'
 import type { SeccionData } from '@/lib/actions/schemas/catalogo-schemas'
 import type { PaqueteConServiciosCompletos, PaqueteServicioData } from '@/lib/actions/schemas/paquete-schemas'
 import { crearPaquete, actualizarPaquete } from '@/lib/actions/studio/dashboard/paquetes.actions'
@@ -15,12 +15,7 @@ interface CotizacionFormularioClientProps {
     catalogo: SeccionData[]
     eventoId: string
     cotizacion: PaqueteConServiciosCompletos | null // Tipo completo de tu cotización
-    studioConfig: {
-        utilidad_servicio: number
-        utilidad_producto: number
-        sobreprecio: number
-        comision_venta: number
-    }
+    studioConfig: ConfiguracionPrecios
     studioId: string
     studioSlug: string
 }
@@ -71,7 +66,7 @@ export function CotizacionFormularioClient({
         catalogo.forEach(seccion => {
             seccion.categorias.forEach(categoria => {
                 categoria.servicios.forEach(servicio => {
-                    const precios = calcularPrecios(
+                    const precios = calcularPrecio(
                         servicio.costo,
                         servicio.gasto,
                         servicio.tipo_utilidad as 'servicio' | 'producto',
@@ -83,7 +78,7 @@ export function CotizacionFormularioClient({
                         categoria: categoria.nombre,
                         categoriaId: categoria.id,
                         seccion: seccion.nombre,
-                        precioUnitario: precios.precio_publico,
+                        precioUnitario: precios.precio_final,
                         costo: servicio.costo,
                         gasto: servicio.gasto,
                         tipo_utilidad: servicio.tipo_utilidad as 'servicio' | 'producto'
@@ -313,7 +308,7 @@ export function CotizacionFormularioClient({
                                                         </thead>
                                                         <tbody>
                                                             {categoria.servicios.map((servicio) => {
-                                                                const precios = calcularPrecios(
+                                                                const precios = calcularPrecio(
                                                                     servicio.costo,
                                                                     servicio.gasto,
                                                                     servicio.tipo_utilidad as 'servicio' | 'producto',
@@ -340,7 +335,7 @@ export function CotizacionFormularioClient({
                                                                         </td>
                                                                         <td className="py-3 px-3 text-right">
                                                                             <div className="font-medium text-white">
-                                                                                {formatCurrency(precios.precio_publico)}
+                                                                                {formatearMoneda(precios.precio_publico)}
                                                                             </div>
                                                                         </td>
                                                                         <td className="py-3 px-3 text-center">
@@ -366,7 +361,7 @@ export function CotizacionFormularioClient({
                                                                         <td className="py-3 px-3 text-right">
                                                                             <div className={`font-medium ${cantidad > 0 ? 'text-emerald-400' : 'text-zinc-500'
                                                                                 }`}>
-                                                                                {formatCurrency(subtotal)}
+                                                                                {formatearMoneda(subtotal)}
                                                                             </div>
                                                                         </td>
                                                                     </tr>
@@ -416,7 +411,7 @@ export function CotizacionFormularioClient({
                                 <div className="flex justify-between text-sm">
                                     <span className="text-zinc-400">Subtotal</span>
                                     <span className="text-white font-medium">
-                                        {formatCurrency(calculoCotizacion.subtotal)}
+                                        {formatearMoneda(calculoCotizacion.subtotal)}
                                     </span>
                                 </div>
 
@@ -436,7 +431,7 @@ export function CotizacionFormularioClient({
                                     />
                                     {precioPersonalizado > 0 && (
                                         <div className="text-xs text-zinc-500 mt-1">
-                                            Precio calculado: {formatCurrency(calculoCotizacion.subtotal - calculoCotizacion.descuentoMonto)}
+                                            Precio calculado: {formatearMoneda(calculoCotizacion.subtotal - calculoCotizacion.descuentoMonto)}
                                         </div>
                                     )}
                                 </div>
@@ -501,7 +496,7 @@ export function CotizacionFormularioClient({
                                             analisisFinanciero.estado === 'precaucion' ? 'text-yellow-400' :
                                                 'text-emerald-400'
                                         }`}>
-                                        {formatCurrency(analisisFinanciero.utilidadReal)}
+                                        {formatearMoneda(analisisFinanciero.utilidadReal)}
                                     </div>
                                     <div className="text-sm text-zinc-400">
                                         {analisisFinanciero.margenPorcentaje.toFixed(1)}% del total
@@ -568,7 +563,7 @@ export function CotizacionFormularioClient({
                                                             <span className="text-zinc-500">Costos</span>
                                                         </div>
                                                         <span className="text-zinc-400 font-mono">
-                                                            {formatCurrency(calculoCotizacion.totalCosto)} · {porcentajeCostos.toFixed(0)}%
+                                                            {formatearMoneda(calculoCotizacion.totalCosto)} · {porcentajeCostos.toFixed(0)}%
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center justify-between text-xs">
@@ -577,7 +572,7 @@ export function CotizacionFormularioClient({
                                                             <span className="text-zinc-500">Gastos</span>
                                                         </div>
                                                         <span className="text-zinc-400 font-mono">
-                                                            {formatCurrency(calculoCotizacion.totalGasto)} · {porcentajeGastos.toFixed(0)}%
+                                                            {formatearMoneda(calculoCotizacion.totalGasto)} · {porcentajeGastos.toFixed(0)}%
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center justify-between text-xs">
@@ -586,7 +581,7 @@ export function CotizacionFormularioClient({
                                                             <span className="text-zinc-500">Comisión</span>
                                                         </div>
                                                         <span className="text-zinc-400 font-mono">
-                                                            {formatCurrency(calculoCotizacion.comisionMonto)} · {porcentajeComision.toFixed(0)}%
+                                                            {formatearMoneda(calculoCotizacion.comisionMonto)} · {porcentajeComision.toFixed(0)}%
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center justify-between text-xs">
@@ -595,7 +590,7 @@ export function CotizacionFormularioClient({
                                                             <span className="text-zinc-500">Utilidad</span>
                                                         </div>
                                                         <span className="text-emerald-400 font-mono font-medium">
-                                                            {formatCurrency(calculoCotizacion.utilidadNeta)} · {porcentajeUtilidad.toFixed(0)}%
+                                                            {formatearMoneda(calculoCotizacion.utilidadNeta)} · {porcentajeUtilidad.toFixed(0)}%
                                                         </span>
                                                     </div>
                                                 </>

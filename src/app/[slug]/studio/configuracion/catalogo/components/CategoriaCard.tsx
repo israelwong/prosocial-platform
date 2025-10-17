@@ -8,7 +8,7 @@ import { GripVertical, Pencil, Plus, Trash2, Package } from 'lucide-react';
 import { ZenBadge, ZenButton } from '@/components/ui/zen';
 import { ServicioCard } from './ServicioCard';
 import type { CategoriaData, ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
-import { calcularPrecios, type PricingConfig } from '@/lib/utils/pricing';
+import { calcularPrecio, type ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
 
 interface CategoriaCardProps {
     categoria: CategoriaData;
@@ -19,7 +19,7 @@ interface CategoriaCardProps {
     onDeleteServicio: (servicio: ServicioData) => void;
     onDuplicateServicio: (servicioId: string) => void;
     isParentDragging?: boolean;
-    studioConfig: PricingConfig;
+    studioConfig: ConfiguracionPrecios;
 }
 
 // Componente para zona de drop vacía
@@ -156,7 +156,7 @@ export function CategoriaCard({
                                         const costo = Number(servicio.costo);
                                         const gasto = Number(servicio.gasto);
 
-                                        const precios = calcularPrecios(
+                                        const precios = calcularPrecio(
                                             costo,
                                             gasto,
                                             servicio.tipo_utilidad as 'servicio' | 'producto',
@@ -170,8 +170,8 @@ export function CategoriaCard({
                                                 onEdit={onEditServicio}
                                                 onDelete={onDeleteServicio}
                                                 onDuplicate={onDuplicateServicio}
-                                                utilidadCalculada={precios.utilidad}
-                                                precioPublicoCalculado={precios.precio_publico}
+                                                utilidadCalculada={precios.utilidad_base}
+                                                precioPublicoCalculado={precios.precio_final}
                                             />
                                         );
                                     })}

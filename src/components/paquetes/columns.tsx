@@ -2,7 +2,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { formatCurrency } from "@/lib/utils/pricing"
+import { formatearMoneda } from "@/lib/utils/calcular-precio"
 import { ZenInput } from "@/components/ui/zen"
 
 export interface ServicioParaCotizacion {
@@ -39,7 +39,7 @@ export const columnsCotizacion: ColumnDef<ServicioParaCotizacion>[] = [
       const amount = parseFloat(row.getValue("precioUnitario"))
       return (
         <div className="text-right">
-          <div className="font-medium text-white">{formatCurrency(amount)}</div>
+          <div className="font-medium text-white">{formatearMoneda(amount)}</div>
           <div className="text-xs text-zinc-500">c/u</div>
         </div>
       )
@@ -97,7 +97,7 @@ export const columnsCotizacion: ColumnDef<ServicioParaCotizacion>[] = [
 
       return (
         <div className="text-right font-medium text-white">
-          {cantidad > 0 ? formatCurrency(subtotal) : '-'}
+          {cantidad > 0 ? formatearMoneda(subtotal) : '-'}
         </div>
       )
     },

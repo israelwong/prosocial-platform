@@ -8,7 +8,7 @@ import { Pencil, Plus, Trash2, FolderOpen } from 'lucide-react';
 import { ZenBadge, ZenButton } from '@/components/ui/zen';
 import { CategoriaCard } from './CategoriaCard';
 import type { SeccionData, CategoriaData, ServicioData } from '@/lib/actions/schemas/catalogo-schemas';
-import type { PricingConfig } from '@/lib/utils/pricing';
+import type { ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
 
 interface SeccionCardProps {
     seccion: SeccionData;
@@ -22,7 +22,7 @@ interface SeccionCardProps {
     onDeleteServicio: (servicio: ServicioData) => void;
     onDuplicateServicio: (servicioId: string) => void;
     isDragging?: boolean;
-    studioConfig: PricingConfig;
+    studioConfig: ConfiguracionPrecios;
 }
 
 // Componente para zona de drop vacía

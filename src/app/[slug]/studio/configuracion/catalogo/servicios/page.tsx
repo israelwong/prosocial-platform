@@ -6,7 +6,7 @@ import { CatalogoList, CatalogoSkeleton } from '../components';
 import { obtenerCatalogo } from '@/lib/actions/studio/config/catalogo.actions';
 import { obtenerConfiguracionPrecios } from '@/lib/actions/studio/config/configuracion-precios.actions';
 import type { SeccionData } from '@/lib/actions/schemas/catalogo-schemas';
-import type { PricingConfig } from '@/lib/utils/pricing';
+import type { ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
 
 export default function ServiciosPage() {
   const params = useParams();
@@ -14,7 +14,7 @@ export default function ServiciosPage() {
 
   const [loading, setLoading] = useState(true);
   const [catalogo, setCatalogo] = useState<SeccionData[]>([]);
-  const [studioConfig, setStudioConfig] = useState<PricingConfig | null>(null);
+  const [studioConfig, setStudioConfig] = useState<ConfiguracionPrecios | null>(null);
 
   // Cargar datos iniciales
   useEffect(() => {

@@ -4,7 +4,7 @@
 
 import { ZenCard, ZenButton, ZenInput, ZenTextarea } from "@/components/ui/zen"; // Revisa tus rutas
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/shadcn/tabs"; // Revisa tus rutas
-import { formatCurrency } from "@/lib/utils/pricing";
+import { formatearMoneda } from "@/lib/utils/calcular-precio";
 
 // Tipos para los datos que este componente espera recibir.
 // Deberían coincidir con los que ya tienes en tu lógica.
@@ -110,7 +110,7 @@ export function ResumenPaquete({
                                     Precio Sugerido (Sistema)
                                 </div>
                                 <div className="text-2xl font-bold text-yellow-400">
-                                    {formatCurrency(calculoPaquete.precioSistema)}
+                                    {formatearMoneda(calculoPaquete.precioSistema)}
                                 </div>
                             </div>
 
@@ -177,7 +177,7 @@ export function ResumenPaquete({
                                         </div>
                                         <div className="mb-1">
                                             <div className="text-xs text-zinc-500 mb-1 uppercase">Ganancia</div>
-                                            <div className={`text-3xl font-bold ${colorActual.color}`}>{formatCurrency(utilidadReal)}</div>
+                                            <div className={`text-3xl font-bold ${colorActual.color}`}>{formatearMoneda(utilidadReal)}</div>
                                         </div>
                                         <div className="flex items-baseline gap-2">
                                             <span className={`text-md font-semibold ${colorActual.color}`}>
@@ -194,9 +194,9 @@ export function ResumenPaquete({
                                                     const porcentajeComision = (calculoPaquete.comisionVentaReal / precioVenta) * 100;
                                                     return (
                                                         <>
-                                                            <div className="absolute h-full bg-red-500" style={{ width: `${porcentajeCostos}%` }} title={`Costos: ${formatCurrency(costosTotal)}`} />
-                                                            <div className="absolute h-full bg-orange-500" style={{ left: `${porcentajeCostos}%`, width: `${porcentajeComision}%` }} title={`Comisión: ${formatCurrency(calculoPaquete.comisionVentaReal)}`} />
-                                                            <div className="absolute h-full bg-emerald-500" style={{ left: `${porcentajeCostos + porcentajeComision}%`, width: `auto`, right: '0' }} title={`Ganancia: ${formatCurrency(utilidadReal)}`} />
+                                                            <div className="absolute h-full bg-red-500" style={{ width: `${porcentajeCostos}%` }} title={`Costos: ${formatearMoneda(costosTotal)}`} />
+                                                            <div className="absolute h-full bg-orange-500" style={{ left: `${porcentajeCostos}%`, width: `${porcentajeComision}%` }} title={`Comisión: ${formatearMoneda(calculoPaquete.comisionVentaReal)}`} />
+                                                            <div className="absolute h-full bg-emerald-500" style={{ left: `${porcentajeCostos + porcentajeComision}%`, width: `auto`, right: '0' }} title={`Ganancia: ${formatearMoneda(utilidadReal)}`} />
                                                         </>
                                                     );
                                                 })()}
