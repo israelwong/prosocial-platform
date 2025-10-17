@@ -80,17 +80,17 @@ const SECTION_CONFIG = {
     // Catálogo
     'catalogo_servicios': {
         icon: Package,
-        href: '/configuracion/catalogo/servicios',
+        href: '/builder/catalogo',
         category: 'Catálogo'
     },
     'catalogo_paquetes': {
         icon: Gift,
-        href: '/configuracion/catalogo/paquetes',
+        href: '/builder/catalogo',
         category: 'Catálogo'
     },
     'catalogo_especialidades': {
         icon: Star,
-        href: '/configuracion/catalogo/especialidades',
+        href: '/builder/catalogo',
         category: 'Catálogo'
     },
 
