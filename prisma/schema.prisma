@@ -1073,13 +1073,6 @@ model studios {
   lead_forms           studio_lead_forms[]
   client_portal_access studio_client_portal_access[]
 
-  // Relaciones - Multimedia & Storage (V2.3)
-  section_media     studio_section_media[] @relation("section_media") // NEW: Media de secciones
-  category_media    studio_category_media[] @relation("category_media") // NEW: Media de categorías
-  item_media        studio_item_media[] @relation("item_media") // NEW: Media de items
-  storage_usage     studio_storage_usage? // NEW: Tracking almacenamiento
-  storage_log       studio_storage_log[] // NEW: Audit log almacenamiento
-
   // Relaciones - Zonas de Trabajo (V2.1)
   zonas_trabajo        studio_zonas_trabajo[]
 
@@ -1338,25 +1331,16 @@ model studio_items {
   utility_type        String   @default("service") // "service" o "product" // ✅ Migrado de tipo_utilidad
   order               Int      @default(0) // ✅ Migrado de orden
   status              String   @default("active")
-  description         String? // NEW: Descripción detallada del item
-  specifications      Json? // NEW: Especificaciones técnicas
-  is_featured         Boolean  @default(false) // NEW: Destacado en catálogo
-  is_new              Boolean  @default(false) // NEW: Nuevo producto
-  new_badge_expires_at DateTime? // NEW: Cuándo expira el badge de nuevo
-  visibility_settings Json? // NEW: Configuración de visibilidad
   created_at          DateTime @default(now())
   updated_at          DateTime @updatedAt
 
   quote_items        studio_cotizacion_items[]
   package_items      studio_paquete_items[]
   item_expenses      studio_service_expenses[]
-  item_media         studio_item_media[] // NEW: Galerías multimedia
   studio             studios                       @relation(fields: [studio_id], references: [id])
   service_categories studio_service_categories     @relation(fields: [service_category_id], references: [id])
 
   @@index([studio_id, status])
-  @@index([is_featured])
-  @@index([is_new])
 }
 
 // NOTA: utilidad y precio_publico se calculan dinámicamente
@@ -1367,16 +1351,12 @@ model studio_service_categories {
   id                   String                        @id @default(cuid())
   name                 String                        @unique
   order                Int                           @default(0)
-  description          String? // NEW: Descripción de la categoría
-  settings             Json? // NEW: Configuración (colores, layout)
-  visibility_mode      String   @default("public") // NEW: "public" | "hidden" | "private"
   created_at           DateTime                      @default(now())
   updated_at           DateTime                      @updatedAt
   cotizacion_items studio_cotizacion_items[]
   paquete_items        studio_paquete_items[]
   section_categories   studio_section_categories?
   items                studio_items[] // ✅ Migrado de studio_services
-  category_media       studio_category_media[] // NEW: Galerías multimedia
 
   @@index([name])
 }
@@ -1386,12 +1366,9 @@ model studio_service_sections {
   name               String                      @unique
   description        String?
   order              Int                         @default(0)
-  settings           Json? // NEW: Configuración (colores, layout)
-  visibility_mode    String   @default("public") // NEW: "public" | "hidden" | "private"
   created_at         DateTime                    @default(now())
   updated_at         DateTime                    @updatedAt
   section_categories studio_section_categories[]
-  section_media      studio_section_media[] // NEW: Galerías multimedia
 
   @@index([name])
 }
@@ -2709,7 +2686,6 @@ model studio_pages {
   og_image_url     String? // Open Graph para redes sociales
   analytics_code   String? // Google Analytics
   theme_color      String?  @default("#8B5CF6") // Color principal
-  catalog_display_mode String? @default("HIERARCHICAL") // NEW: "HIERARCHICAL" | "PACKAGES_ONLY" | "HYBRID"
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
@@ -2899,121 +2875,4 @@ model user_access_logs {
   @@index([action])
   @@index([created_at])
   @@index([success])
-}
-
-// =====================================================
-// NEW: MULTIMEDIA & STORAGE MODELS (V2.3)
-// =====================================================
-
-// NEW: Media para secciones del catálogo
-model studio_section_media {
-  id              String   @id @default(cuid())
-  section_id      String
-  studio_id       String
-  file_url        String
-  file_type       String // "IMAGE" | "VIDEO"
-  filename        String
-  storage_bytes   BigInt
-  mime_type       String
-  dimensions      Json? // { width, height } para imágenes
-  display_order   Int      @default(0)
-  alt_text        String?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-
-  section studio_service_sections @relation(fields: [section_id], references: [id], onDelete: Cascade)
-  studio  studios                  @relation("section_media", fields: [studio_id], references: [id], onDelete: Cascade)
-
-  @@index([section_id])
-  @@index([studio_id])
-  @@index([storage_bytes])
-}
-
-// NEW: Media para categorías del catálogo
-model studio_category_media {
-  id               String   @id @default(cuid())
-  category_id      String
-  studio_id        String
-  file_url         String
-  file_type        String // "IMAGE" | "VIDEO"
-  filename         String
-  storage_bytes    BigInt
-  mime_type        String
-  dimensions       Json? // { width, height } para imágenes
-  duration_seconds Int? // Para videos
-  display_order    Int      @default(0)
-  alt_text         String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-
-  category studio_service_categories @relation(fields: [category_id], references: [id], onDelete: Cascade)
-  studio   studios                    @relation("category_media", fields: [studio_id], references: [id], onDelete: Cascade)
-
-  @@index([category_id])
-  @@index([studio_id])
-  @@index([storage_bytes])
-}
-
-// NEW: Media para items del catálogo
-model studio_item_media {
-  id               String   @id @default(cuid())
-  item_id          String
-  studio_id        String
-  file_url         String
-  file_type        String // "IMAGE" | "VIDEO"
-  filename         String
-  storage_bytes    BigInt
-  mime_type        String
-  dimensions       Json? // { width, height } para imágenes
-  duration_seconds Int? // Para videos
-  display_order    Int      @default(0)
-  alt_text         String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-
-  item   studio_items @relation(fields: [item_id], references: [id], onDelete: Cascade)
-  studio studios      @relation("item_media", fields: [studio_id], references: [id], onDelete: Cascade)
-
-  @@index([item_id])
-  @@index([studio_id])
-  @@index([storage_bytes])
-}
-
-// NEW: Tracking de uso de almacenamiento por studio
-model studio_storage_usage {
-  id                    String   @id @default(cuid())
-  studio_id             String   @unique
-  total_storage_bytes   BigInt   @default(0)
-  section_media_bytes   BigInt   @default(0)
-  category_media_bytes  BigInt   @default(0)
-  item_media_bytes      BigInt   @default(0)
-  portfolio_media_bytes BigInt   @default(0)
-  page_media_bytes      BigInt   @default(0)
-  quota_limit_bytes     BigInt
-  last_calculated_at    DateTime @default(now())
-  created_at            DateTime @default(now())
-  updated_at            DateTime @updatedAt
-
-  studio studios @relation(fields: [studio_id], references: [id], onDelete: Cascade)
-
-  @@index([studio_id])
-  @@index([total_storage_bytes])
-}
-
-// NEW: Audit log para cambios de almacenamiento
-model studio_storage_log {
-  id                String   @id @default(cuid())
-  studio_id         String
-  action            String // "UPLOAD" | "DELETE" | "UPDATE"
-  media_type        String // "SECTION" | "CATEGORY" | "ITEM"
-  storage_bytes     BigInt
-  filename          String
-  reason            String?
-  triggered_by_user String?
-  created_at        DateTime @default(now())
-
-  studio studios @relation(fields: [studio_id], references: [id], onDelete: Cascade)
-
-  @@index([studio_id, action])
-  @@index([studio_id, created_at])
 }
