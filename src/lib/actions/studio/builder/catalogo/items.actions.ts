@@ -650,8 +650,6 @@ export async function crearServicio(
                 name: validatedData.nombre,
                 cost: validatedData.costo,
                 expense: validatedData.gasto,
-                // utilidad: validatedData.utilidad,
-                // precio_publico: validatedData.precio_publico,
                 utility_type: validatedData.tipo_utilidad,
                 order: nuevoOrden,
                 status: validatedData.status,
@@ -715,11 +713,21 @@ export async function actualizarServicio(
         const validatedData = ServicioSchema.partial().parse(data);
         const { gastos, ...servicioData } = validatedData;
 
+        // Mapear campos del esquema Zod al modelo Prisma
+        const prismaData: any = {};
+        if (servicioData.nombre !== undefined) prismaData.name = servicioData.nombre;
+        if (servicioData.costo !== undefined) prismaData.cost = servicioData.costo;
+        if (servicioData.gasto !== undefined) prismaData.expense = servicioData.gasto;
+        if (servicioData.tipo_utilidad !== undefined) prismaData.utility_type = servicioData.tipo_utilidad;
+        if (servicioData.servicioCategoriaId !== undefined) prismaData.service_category_id = servicioData.servicioCategoriaId;
+        if (servicioData.status !== undefined) prismaData.status = servicioData.status;
+        if (servicioData.orden !== undefined) prismaData.order = servicioData.orden;
+
         // Actualizar servicio y reemplazar gastos si se proporcionan
         const servicio = await prisma.studio_items.update({
             where: { id: servicioId },
             data: {
-                ...servicioData,
+                ...prismaData,
                 ...(gastos !== undefined && {
                     item_expenses: {
                         deleteMany: {}, // Eliminar todos los gastos existentes
@@ -829,8 +837,6 @@ export async function duplicarServicio(
                 name: `${servicioOriginal.name} (Copia)`,
                 cost: servicioOriginal.cost,
                 expense: servicioOriginal.expense,
-                // utilidad: servicioOriginal.utilidad,
-                // precio_publico: servicioOriginal.precio_publico,
                 utility_type: servicioOriginal.utility_type,
                 order: nuevoOrden,
                 status: servicioOriginal.status,
@@ -857,8 +863,6 @@ export async function duplicarServicio(
                 nombre: servicioNuevo.name,
                 costo: servicioNuevo.cost,
                 gasto: servicioNuevo.expense,
-                //  utilidad: servicioNuevo.utilidad,
-                // precio_publico: servicioNuevo.precio_publico,
                 tipo_utilidad: servicioNuevo.utility_type,
                 orden: servicioNuevo.order,
                 status: servicioNuevo.status,

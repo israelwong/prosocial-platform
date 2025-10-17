@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import {
     ZenButton,
     ZenTextarea,
@@ -61,6 +61,9 @@ export function ServicioForm({
     // Campos temporales para agregar gastos
     const [nuevoGastoNombre, setNuevoGastoNombre] = useState('');
     const [nuevoGastoCosto, setNuevoGastoCosto] = useState('');
+
+    // Estados para secciones colapsables
+    const [showDesglosePrecios, setShowDesglosePrecios] = useState(false);
 
     // ✅ Función para validar y formatear números a 2 decimales sin negativos
     const formatearNumero = (valor: string): string => {
@@ -303,8 +306,8 @@ export function ServicioForm({
 
                 {/* Contenido */}
                 <ZenCardContent className="p-6">
-                    <form onSubmit={handleSave} className="space-y-6">
-                        {/* Categoría y Tipo */}
+                    <form onSubmit={handleSave} className="space-y-4">
+                        {/* Información básica */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-zinc-300">
@@ -351,66 +354,104 @@ export function ServicioForm({
                             onChange={(e) => setNombre(e.target.value)}
                             placeholder="Ej: Shooting en estudio fotográfico hasta por 45 minutos"
                             required
-                            minRows={3}
+                            minRows={2}
                             maxLength={500}
                         />
 
-                        {/* Gastos Fijos Asociados */}
-                        <div className="p-4 rounded-lg border border-zinc-700/70 bg-zinc-800/50 space-y-4">
-                            <h3 className="text-base font-medium text-zinc-200">Gastos Fijos Asociados</h3>
-
-                            {/* Lista de gastos */}
+                        {/* Precios - Sección principal */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                {gastos.map((gasto, index) => (
-                                    <div key={index} className="flex items-center gap-2">
-                                        <input
-                                            value={gasto.nombre}
-                                            onChange={(e) => {
-                                                const newGastos = [...gastos];
-                                                newGastos[index].nombre = e.target.value;
-                                                setGastos(newGastos);
-                                            }}
-                                            placeholder="Concepto"
-                                            className="flex h-9 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-white"
-                                        />
-                                        <input
-                                            value={gasto.costo}
-                                            onChange={(e) => {
-                                                const newGastos = [...gastos];
-                                                newGastos[index].costo = validarNumeroInput(e.target.value);
-                                                setGastos(newGastos);
-                                            }}
-                                            onBlur={(e) => {
-                                                if (e.target.value) {
-                                                    const newGastos = [...gastos];
-                                                    newGastos[index].costo = formatearNumero(e.target.value);
-                                                    setGastos(newGastos);
-                                                }
-                                            }}
-                                            placeholder="Monto"
-                                            type="number"
-                                            step="0.01"
-                                            min="0"
-                                            className="flex h-9 w-32 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-white"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleEliminarGasto(index)}
-                                            className="p-2 text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                ))}
+                                <label className="block text-sm font-medium text-zinc-300">
+                                    Costo Base <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={costo}
+                                    onChange={(e) => setCosto(validarNumeroInput(e.target.value))}
+                                    onBlur={(e) => {
+                                        if (e.target.value) {
+                                            setCosto(formatearNumero(e.target.value));
+                                        }
+                                    }}
+                                    placeholder="0.00"
+                                    required
+                                    className="flex h-10 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                />
                             </div>
 
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-zinc-300">
+                                    Precio Sugerido
+                                </label>
+                                <div className="flex h-10 w-full items-center rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-emerald-400 font-semibold">
+                                    {formatearMoneda(resultadoPrecio.precio_final)}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Gastos - Compacto */}
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-medium text-zinc-300">Gastos Asociados</h3>
+                                <span className="text-xs text-zinc-500">{gastos.length} gasto{gastos.length !== 1 ? 's' : ''}</span>
+                            </div>
+
+                            {/* Lista de gastos compacta */}
+                            {gastos.length > 0 && (
+                                <div className="space-y-2 max-h-32 overflow-y-auto">
+                                    {gastos.map((gasto, index) => (
+                                        <div key={index} className="flex items-center gap-2 text-sm">
+                                            <input
+                                                value={gasto.nombre}
+                                                onChange={(e) => {
+                                                    const newGastos = [...gastos];
+                                                    newGastos[index].nombre = e.target.value;
+                                                    setGastos(newGastos);
+                                                }}
+                                                placeholder="Concepto"
+                                                className="flex h-8 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-white"
+                                            />
+                                            <input
+                                                value={gasto.costo}
+                                                onChange={(e) => {
+                                                    const newGastos = [...gastos];
+                                                    newGastos[index].costo = validarNumeroInput(e.target.value);
+                                                    setGastos(newGastos);
+                                                }}
+                                                onBlur={(e) => {
+                                                    if (e.target.value) {
+                                                        const newGastos = [...gastos];
+                                                        newGastos[index].costo = formatearNumero(e.target.value);
+                                                        setGastos(newGastos);
+                                                    }
+                                                }}
+                                                placeholder="Monto"
+                                                type="number"
+                                                step="0.01"
+                                                min="0"
+                                                className="flex h-8 w-24 rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-white"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => handleEliminarGasto(index)}
+                                                className="p-1 text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             {/* Agregar nuevo gasto */}
-                            <div className="flex items-center gap-2 pt-2 border-t border-zinc-700/50">
+                            <div className="flex items-center gap-2">
                                 <input
                                     value={nuevoGastoNombre}
                                     onChange={(e) => setNuevoGastoNombre(e.target.value)}
                                     placeholder="Nuevo concepto"
-                                    className="flex h-9 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-white"
+                                    className="flex h-8 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-white"
                                 />
                                 <input
                                     value={nuevoGastoCosto}
@@ -424,146 +465,116 @@ export function ServicioForm({
                                     type="number"
                                     step="0.01"
                                     min="0"
-                                    className="flex h-9 w-32 rounded-md border border-zinc-700 bg-zinc-900 px-3 text-sm text-white"
+                                    className="flex h-8 w-24 rounded-md border border-zinc-700 bg-zinc-900 px-2 text-xs text-white"
                                 />
                                 <button
                                     type="button"
                                     onClick={handleAgregarGasto}
-                                    className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-md transition-colors"
+                                    className="p-1 text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
                                 >
-                                    <Plus className="h-4 w-4" />
+                                    <Plus className="h-3 w-3" />
                                 </button>
                             </div>
                         </div>
 
-                        {/* Precios */}
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-zinc-300">
-                                        Costo Base del Servicio <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={costo}
-                                        onChange={(e) => setCosto(validarNumeroInput(e.target.value))}
-                                        onBlur={(e) => {
-                                            if (e.target.value) {
-                                                setCosto(formatearNumero(e.target.value));
-                                            }
-                                        }}
-                                        placeholder="0.00"
-                                        required
-                                        className="flex h-10 w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    />
+                        {/* Desglose de precios - Colapsable */}
+                        <div className="border border-zinc-700/70 rounded-lg bg-zinc-800/30">
+                            <button
+                                type="button"
+                                onClick={() => setShowDesglosePrecios(!showDesglosePrecios)}
+                                className="w-full flex items-center justify-between p-3 text-left hover:bg-zinc-700/30 transition-colors"
+                            >
+                                <div>
+                                    <span className="text-sm font-medium text-zinc-300">Desglose de Precios</span>
+                                    <span className="text-xs text-zinc-500 ml-2">
+                                        {formatearMoneda(resultadoPrecio.precio_final)} final
+                                    </span>
                                 </div>
+                                {showDesglosePrecios ? (
+                                    <ChevronUp className="h-4 w-4 text-zinc-400" />
+                                ) : (
+                                    <ChevronDown className="h-4 w-4 text-zinc-400" />
+                                )}
+                            </button>
 
-                                <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-zinc-300">
-                                        Precio Sistema (Sugerido)
-                                    </label>
-                                    <div className="flex h-10 w-full items-center rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-semibold">
-                                        {formatearMoneda(resultadoPrecio.precio_final)}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Desglose de precios */}
-                            <div className="p-4 rounded-lg border border-zinc-700/70 bg-zinc-800/50 space-y-3">
-                                <h4 className="text-sm font-medium text-zinc-200 mb-3">Desglose de precios</h4>
-
-                                {/* Precio Final */}
-                                <div className="text-center p-3 bg-zinc-900/50 rounded-lg">
-                                    <div className="text-zinc-400 text-sm mb-1">Precio Final al Cliente</div>
-                                    <div className="text-2xl font-bold text-white">{formatearMoneda(resultadoPrecio.precio_final)}</div>
-                                </div>
-
-                                {/* Desglose paso a paso */}
-                                <div className="space-y-2 text-sm">
-                                    {/* Componentes base */}
-                                    <div className="flex justify-between">
-                                        <span className="text-zinc-400">Costo base:</span>
-                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.costo)}</span>
+                            {showDesglosePrecios && (
+                                <div className="px-3 pb-3 space-y-3 border-t border-zinc-700/50">
+                                    {/* Precio Final destacado */}
+                                    <div className="text-center p-3 bg-zinc-900/50 rounded-lg">
+                                        <div className="text-zinc-400 text-xs mb-1">Precio Final al Cliente</div>
+                                        <div className="text-xl font-bold text-emerald-400">{formatearMoneda(resultadoPrecio.precio_final)}</div>
                                     </div>
 
-                                    <div className="flex justify-between">
-                                        <span className="text-zinc-400">Gastos:</span>
-                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.gasto)}</span>
-                                    </div>
-
-                                    <div className="flex justify-between">
-                                        <span className="text-zinc-400">Utilidad ({resultadoPrecio.porcentaje_utilidad}%):</span>
-                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.utilidad_base)}</span>
-                                    </div>
-
-                                    <div className="border-t border-zinc-700 pt-2">
-                                        <div className="flex justify-between font-medium">
-                                            <span className="text-zinc-300">Subtotal:</span>
-                                            <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.subtotal)}</span>
+                                    {/* Desglose compacto */}
+                                    <div className="space-y-1 text-xs">
+                                        <div className="flex justify-between">
+                                            <span className="text-zinc-400">Costo base:</span>
+                                            <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.costo)}</span>
                                         </div>
-                                    </div>
-
-                                    {/* Desglose de precios */}
-                                    <div className="flex justify-between">
-                                        <span className="text-zinc-400">Comisión ({resultadoPrecio.porcentaje_comision}%):</span>
-                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.monto_comision)}</span>
-                                    </div>
-
-                                    <div className="flex justify-between">
-                                        <span className="text-zinc-400">Sobreprecio ({resultadoPrecio.porcentaje_sobreprecio}%):</span>
-                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.monto_sobreprecio)}</span>
-                                    </div>
-
-                                    <div className="border-t border-zinc-700 pt-2">
-                                        <div className="flex justify-between font-medium">
-                                            <span className="text-zinc-200">Precio de sistema:</span>
-                                            <span className="text-emerald-400">{formatearMoneda(resultadoPrecio.precio_final)}</span>
+                                        <div className="flex justify-between">
+                                            <span className="text-zinc-400">Gastos:</span>
+                                            <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.gasto)}</span>
                                         </div>
-                                    </div>
-
-                                    {/* Verificación de utilidad real */}
-                                    <div className="bg-zinc-700/30 rounded p-3 mt-3">
-                                        <div className="text-xs text-zinc-400 mb-2">Verificación de utilidad:</div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-zinc-300">Utilidad real:</span>
-                                            <span className="text-emerald-400">{formatearMoneda(resultadoPrecio.utilidad_real)}</span>
+                                        <div className="flex justify-between">
+                                            <span className="text-zinc-400">Utilidad ({resultadoPrecio.porcentaje_utilidad}%):</span>
+                                            <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.utilidad_base)}</span>
                                         </div>
-                                        <div className="flex justify-between text-sm">
-                                            <span className="text-zinc-300">% Utilidad real:</span>
-                                            <span className="text-emerald-400">{resultadoPrecio.porcentaje_utilidad_real}%</span>
+                                        <div className="border-t border-zinc-700 pt-1">
+                                            <div className="flex justify-between font-medium">
+                                                <span className="text-zinc-300">Subtotal:</span>
+                                                <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.subtotal)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-zinc-400">Comisión ({resultadoPrecio.porcentaje_comision}%):</span>
+                                            <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.monto_comision)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-zinc-400">Sobreprecio ({resultadoPrecio.porcentaje_sobreprecio}%):</span>
+                                            <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.monto_sobreprecio)}</span>
+                                        </div>
+                                        <div className="border-t border-zinc-700 pt-1">
+                                            <div className="flex justify-between font-medium">
+                                                <span className="text-zinc-200">Precio sistema:</span>
+                                                <span className="text-emerald-400">{formatearMoneda(resultadoPrecio.precio_final)}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Verificación compacta */}
+                                        <div className="bg-zinc-700/20 rounded p-2 mt-2">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-zinc-300">Utilidad real:</span>
+                                                <span className="text-emerald-400">{resultadoPrecio.porcentaje_utilidad_real}%</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
-                        {/* Status */}
-                        <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-700/70 bg-zinc-800/50">
-                            <div className="flex flex-col">
-                                <span className="text-sm font-medium text-zinc-300">
-                                    Estado del Servicio
-                                </span>
-                                <span className="text-xs text-zinc-400 mt-0.5">
-                                    {status === 'active' ? 'Visible en cotizaciones' : 'Oculto en cotizaciones'}
+                        {/* Status - Compacto */}
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-zinc-700/50 bg-zinc-800/30">
+                            <div>
+                                <span className="text-sm font-medium text-zinc-300">Estado</span>
+                                <span className="text-xs text-zinc-500 ml-2">
+                                    {status === 'active' ? 'Visible' : 'Oculto'}
                                 </span>
                             </div>
                             <button
                                 type="button"
                                 onClick={() => setStatus(status === 'active' ? 'inactive' : 'active')}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${status === 'active' ? 'bg-blue-600' : 'bg-zinc-600'
+                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${status === 'active' ? 'bg-blue-600' : 'bg-zinc-600'
                                     }`}
                             >
                                 <span
-                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${status === 'active' ? 'translate-x-6' : 'translate-x-1'
+                                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${status === 'active' ? 'translate-x-5' : 'translate-x-1'
                                         }`}
                                 />
                             </button>
                         </div>
 
                         {/* Botones */}
-                        <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">
+                        <div className="flex items-center justify-end gap-3 pt-3 border-t border-zinc-800">
                             <ZenButton type="button" variant="ghost" onClick={onClose}>
                                 Cancelar
                             </ZenButton>
@@ -573,7 +584,7 @@ export function ServicioForm({
                                 loading={loading}
                                 disabled={loading}
                             >
-                                {servicio ? 'Actualizar Servicio' : 'Crear Servicio'}
+                                {servicio ? 'Actualizar' : 'Crear Servicio'}
                             </ZenButton>
                         </div>
                     </form>
