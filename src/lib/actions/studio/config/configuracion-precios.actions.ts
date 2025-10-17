@@ -5,10 +5,19 @@ import { retryDatabaseOperation } from '@/lib/actions/utils/database-retry';
 import { revalidatePath } from 'next/cache';
 import {
     ConfiguracionPreciosSchema,
-    ServiciosExistentesSchema,
     type ConfiguracionPreciosForm,
     type ServiciosExistentes
 } from '@/lib/actions/schemas/configuracion-precios-schemas';
+
+// =====================================================
+// CONSTANTES DE CONFIGURACIÓN POR DEFECTO
+// =====================================================
+
+/**
+ * NOTA: Los márgenes y comisiones NO tienen valores por defecto hardcodeados.
+ * El usuario DEBE configurar estos valores a través de la UI.
+ * Si no existen, retornamos null para que el frontend maneje esto.
+ */
 
 // Tipos específicos para los servicios
 type ServicioItem = {
@@ -55,33 +64,24 @@ export async function obtenerConfiguracionPrecios(studioSlug: string) {
             throw new Error("Studio no encontrado");
         }
 
-        // Obtener la configuración activa o crear una por defecto
-        let configuracion = studio.configuraciones[0];
+        // Obtener la configuración activa
+        const configuracion = studio.configuraciones[0];
 
+        // Si no existe configuración, retornar null
+        // El usuario DEBE configurar estos valores a través de la UI
         if (!configuracion) {
-            // Crear configuración por defecto
-            configuracion = await prisma.studio_configuraciones.create({
-                data: {
-                    studio: { connect: { id: studio.id } },
-                    name: 'Configuración de Precios',
-                    service_margin: 0.30, // 30%
-                    product_margin: 0.40, // 40%
-                    sales_commission: 0.10, // 10%
-                    markup: 0.05, // 5%
-                    status: 'active',
-                    updated_at: new Date(),
-                },
-            });
+            console.log(`[obtenerConfiguracionPrecios] No hay configuración para studio: ${studioSlug}`);
+            return null;
         }
 
         return {
             id: studio.id,
             nombre: studio.studio_name,
             slug: studio.slug,
-            utilidad_servicio: String((configuracion.service_margin ?? 0.30) * 100), // Convertir a porcentaje
-            utilidad_producto: String((configuracion.product_margin ?? 0.40) * 100),
-            comision_venta: String((configuracion.sales_commission ?? 0.10) * 100),
-            sobreprecio: String((configuracion.markup ?? 0.05) * 100),
+            utilidad_servicio: String((configuracion.service_margin ?? 0) * 100), // Convertir a porcentaje
+            utilidad_producto: String((configuracion.product_margin ?? 0) * 100),
+            comision_venta: String((configuracion.sales_commission ?? 0) * 100),
+            sobreprecio: String((configuracion.markup ?? 0) * 100),
         };
     });
 }
@@ -129,13 +129,9 @@ export async function verificarServiciosExistentes(studioSlug: string): Promise<
 
         // Verificar si hay cambios en los porcentajes
         const configuracionActual = studio.configuraciones[0];
-        const requiere_actualizacion_masiva = total_servicios > 0 && (
-            !configuracionActual || // Si no hay configuración, se necesita actualizar
-            configuracionActual.service_margin !== 0.30 || // Si los valores son diferentes a los por defecto
-            configuracionActual.product_margin !== 0.40 ||
-            configuracionActual.sales_commission !== 0.10 ||
-            configuracionActual.markup !== 0.05
-        );
+
+        // Se requiere actualización si hay servicios pero no hay configuración
+        const requiere_actualizacion_masiva = total_servicios > 0 && !configuracionActual;
 
         return {
             total_servicios,
@@ -161,7 +157,7 @@ export async function actualizarConfiguracionPrecios(
             };
         }
 
-        const { id, ...validatedData } = validationResult.data;
+        const { id: _, ...validatedData } = validationResult.data;
 
         // Convertir porcentajes a decimales para almacenamiento
         const dataToSave = {
@@ -207,7 +203,7 @@ export async function actualizarConfiguracionPrecios(
         } else {
             await prisma.studio_configuraciones.create({
                 data: {
-                    studio: { connect: { id: studio.id } },
+                    studio_id: studio.id,
                     name: 'Configuración de Precios',
                     service_margin: dataToSave.service_margin,
                     product_margin: dataToSave.product_margin,

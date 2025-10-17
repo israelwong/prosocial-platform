@@ -68,7 +68,7 @@ export const ServicioSchema = z.object({
     //     .number()
     //     .min(0, 'El precio no puede ser negativo')
     //     .max(999999.99, 'El precio es demasiado alto'),
-    tipo_utilidad: z.enum(["servicio", "porcentaje"]).refine(val => val, {
+    tipo_utilidad: z.enum(["servicio", "producto"]).refine(val => val, {
         message: "Tipo de utilidad inválido"
     }).default('servicio'),
     servicioCategoriaId: z

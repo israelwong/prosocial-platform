@@ -4,34 +4,53 @@
 // Types para la sección de catálogo del builder
 // Basado en el patrón de contacto y portafolio
 
-export interface CatalogoItem {
-    id: string;
-    name: string;
-    type: 'PRODUCTO' | 'SERVICIO';
-    cost: number;
-    order: number;
-    description?: string;
-    image_url?: string;
-    is_active?: boolean;
+import type {
+    SeccionData,
+    CategoriaData,
+    ServicioData,
+} from "@/lib/actions/schemas/catalogo-schemas";
+
+import type {
+    PaqueteFromDB,
+    PaqueteData,
+} from "@/lib/actions/schemas/paquete-schemas";
+
+import type {
+    ConfiguracionPreciosForm,
+    ServiciosExistentes,
+} from "@/lib/actions/schemas/configuracion-precios-schemas";
+
+import type { ConfiguracionPrecios } from "@/lib/utils/calcular-precio";
+
+// ============================================
+// TABS ARCHITECTURE TYPES
+// ============================================
+
+// Re-export para facilitar imports
+export type {
+    SeccionData,
+    CategoriaData,
+    ServicioData,
+    PaqueteFromDB,
+    PaqueteData,
+    ConfiguracionPreciosForm,
+    ServiciosExistentes,
+    PricingConfig,
+};
+
+// Types específicos del Builder
+export interface CatalogoTabsData {
+    items: {
+        catalogo: SeccionData[];
+        studioConfig: PricingConfig | null;
+    };
+    paquetes: {
+        paquetes: PaqueteFromDB[];
+    };
+    utilidad: {
+        config: ConfiguracionPreciosForm;
+        estadisticas: ServiciosExistentes | null;
+    };
 }
 
-export interface CatalogoData {
-    items: CatalogoItem[];
-}
-
-export interface CatalogoItemFormData {
-    name: string;
-    type: 'PRODUCTO' | 'SERVICIO';
-    cost: number;
-    description?: string;
-    image_url?: string;
-    is_active?: boolean;
-}
-
-export interface CatalogoCategory {
-    id: string;
-    name: string;
-    description?: string;
-    order: number;
-    items: CatalogoItem[];
-}
+export type TabValue = "items" | "paquetes" | "utilidad";

@@ -1,3 +1,4 @@
-export { CatalogoEditorZen } from './CatalogoEditorZen';
-export { CatalogoItemModal } from './CatalogoItemModal';
-export { SortableCatalogoItem } from './SortableCatalogoItem';
+// Tabs architecture exports
+export { ItemsTab } from './ItemsTab';
+export { PaquetesTab } from './PaquetesTab';
+export { UtilidadTab } from './UtilidadTab';

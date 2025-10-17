@@ -13,8 +13,9 @@ import {
     crearServicio,
     actualizarServicio,
     obtenerCategorias,
-} from '@/lib/actions/studio/config/catalogo.actions';
-import { obtenerConfiguracionPrecios as obtenerConfiguracionPreciosConfig } from '@/lib/actions/studio/config/configuracion-precios.actions';
+} from '@/lib/actions/studio/builder/catalogo/items.actions';
+import { obtenerConfiguracionPrecios as cargarConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/utilidad.actions';
+import { calcularPrecio, formatearMoneda, type ConfiguracionPrecios } from '@/lib/utils/calcular-precio';
 import type { ServicioData, CategoriaData } from '@/lib/actions/schemas/catalogo-schemas';
 
 interface ServicioFormProps {
@@ -31,19 +32,9 @@ interface Gasto {
     costo: string;
 }
 
-interface ConfiguracionPrecios {
-    utilidad_servicio: number; // Fracción (ej: 0.30 para 30%)
-    utilidad_producto: number;
-    comision_venta: number;
-    sobreprecio: number;
-}
-
 /**
- * FACTOR DE SEGURIDAD: Porcentaje adicional para garantizar utilidad mínima
- * Debe coincidir con el valor en /lib/utils/pricing.ts
+ * Calcular precios dinámicamente usando la función centralizada
  */
-const FACTOR_SEGURIDAD_UTILIDAD = 0.045; // 4.5% adicional para garantizar 30% mínimo
-
 export function ServicioForm({
     isOpen,
     onClose,
@@ -52,6 +43,9 @@ export function ServicioForm({
     servicio,
     categoriaId,
 }: ServicioFormProps) {
+
+    console.log('servicio', servicio);
+
     const [loading, setLoading] = useState(false);
     const [categorias, setCategorias] = useState<CategoriaData[]>([]);
     const [configuracion, setConfiguracion] = useState<ConfiguracionPrecios | null>(null);
@@ -96,6 +90,18 @@ export function ServicioForm({
         return valorLimpio;
     };
 
+    // Función para resetear el formulario
+    const resetForm = () => {
+        setNombre('');
+        setCosto('');
+        setTipoUtilidad('servicio');
+        setSelectedCategoriaId('');
+        setStatus('active');
+        setGastos([]);
+        setNuevoGastoNombre('');
+        setNuevoGastoCosto('');
+    };
+
     // Cargar categorías y configuración
     useEffect(() => {
         if (isOpen) {
@@ -132,21 +138,20 @@ export function ServicioForm({
     const cargarDatos = async () => {
         try {
             const [resultCategorias, resultConfiguracion] = await Promise.all([
-                obtenerCategorias(studioSlug),
-                obtenerConfiguracionPreciosConfig(studioSlug),
+                obtenerCategorias(),
+                cargarConfiguracionPrecios(studioSlug),
             ]);
 
             if (resultCategorias.success && resultCategorias.data) {
                 setCategorias(resultCategorias.data);
             }
 
-            if (resultConfiguracion) {
-                // Convertir de string porcentaje a fracción
+            if (resultConfiguracion) {                // Convertir strings a números - calcularPrecios() normalizará automáticamente
                 setConfiguracion({
-                    utilidad_servicio: parseFloat(resultConfiguracion.utilidad_servicio) / 100,
-                    utilidad_producto: parseFloat(resultConfiguracion.utilidad_producto) / 100,
-                    comision_venta: parseFloat(resultConfiguracion.comision_venta) / 100,
-                    sobreprecio: parseFloat(resultConfiguracion.sobreprecio) / 100,
+                    utilidad_servicio: parseFloat(resultConfiguracion.utilidad_servicio),
+                    utilidad_producto: parseFloat(resultConfiguracion.utilidad_producto),
+                    comision_venta: parseFloat(resultConfiguracion.comision_venta),
+                    sobreprecio: parseFloat(resultConfiguracion.sobreprecio),
                 });
             }
         } catch (error) {
@@ -155,61 +160,40 @@ export function ServicioForm({
         }
     };
 
-    // Cálculos automáticos basados en la lógica del legacy
-    const {
-        utilidadBase,
-        totalGastos,
-        sobreprecioMonto,
-        comisionVentaMonto,
-        precioSistema,
-    } = useMemo(() => {
+    // Cálculo del precio usando la función única
+    const resultadoPrecio = useMemo(() => {
         const costoNum = parseFloat(costo) || 0;
         const gastosArray = gastos.map(g => parseFloat(g.costo) || 0);
         const totalGastos = parseFloat(gastosArray.reduce((acc, g) => acc + g, 0).toFixed(2));
 
-        // Obtener porcentajes según tipo de utilidad
-        const utilidadPorcentaje = tipoUtilidad === 'servicio'
-            ? (configuracion?.utilidad_servicio ?? 0.30)
-            : (configuracion?.utilidad_producto ?? 0.40);
-        const comisionPorcentaje = configuracion?.comision_venta ?? 0.10;
-        const sobreprecioPorcentaje = configuracion?.sobreprecio ?? 0.05;
+        if (!configuracion) {
+            return {
+                // Precios finales
+                precio_final: costoNum + totalGastos,
+                precio_base: costoNum + totalGastos,
 
-        // NUEVA FÓRMULA: Garantiza utilidad del 30% incluso con descuento máximo
-        // 1. Calcular utilidad base
-        const utilidadBase = parseFloat((costoNum * utilidadPorcentaje).toFixed(2));
+                // Componentes base
+                costo: costoNum,
+                gasto: totalGastos,
+                utilidad_base: 0,
 
-        // 2. Calcular subtotal (costo + gastos + utilidad)
-        const subtotal = parseFloat((costoNum + totalGastos + utilidadBase).toFixed(2));
+                // Desglose de precios
+                subtotal: costoNum + totalGastos,
+                monto_comision: 0,
+                monto_sobreprecio: 0,
 
-        // 3. Calcular precio base que cubre utilidad + comisión
-        // Este precio GARANTIZA la utilidad incluso después de descuentos
-        const denominador = 1 - comisionPorcentaje;
-        const precioBase = denominador > 0
-            ? parseFloat((subtotal / denominador).toFixed(2))
-            : Infinity;
+                // Porcentajes
+                porcentaje_utilidad: 0,
+                porcentaje_comision: 0,
+                porcentaje_sobreprecio: 0,
 
-        // 4. Aplicar factor de seguridad para garantizar utilidad mínima
-        // Compensa la pérdida cuando se aplican descuentos máximos + comisión
-        const precioConSeguridad = parseFloat((precioBase * (1 + FACTOR_SEGURIDAD_UTILIDAD)).toFixed(2));
+                // Verificación
+                utilidad_real: 0,
+                porcentaje_utilidad_real: 0,
+            };
+        }
 
-        // 5. Aplicar sobreprecio como margen de descuento
-        // El sobreprecio se agrega DESPUÉS de asegurar utilidad + comisión + factor de seguridad
-        const precioSistema = parseFloat((precioConSeguridad * (1 + sobreprecioPorcentaje)).toFixed(2));
-
-        // 6. Calcular montos para desglose
-        const comisionVentaMonto = parseFloat((precioConSeguridad * comisionPorcentaje).toFixed(2));
-        const sobreprecioMonto = parseFloat((precioConSeguridad * sobreprecioPorcentaje).toFixed(2));
-        const montoTrasSobreprecio = precioSistema;
-
-        return {
-            utilidadBase,
-            totalGastos,
-            subtotal,
-            sobreprecioMonto,
-            montoTrasSobreprecio,
-            comisionVentaMonto,
-            precioSistema,
-        };
+        return calcularPrecio(costoNum, totalGastos, tipoUtilidad, configuracion);
     }, [costo, gastos, tipoUtilidad, configuracion]);
 
     const handleAgregarGasto = () => {
@@ -258,9 +242,9 @@ export function ServicioForm({
             const data = {
                 nombre,
                 costo: costoNum,
-                gasto: totalGastos, // Total de gastos calculado
-                utilidad: utilidadBase, // Utilidad calculada
-                precio_publico: precioSistema, // Precio calculado automáticamente
+                gasto: gastos.reduce((sum, g) => sum + parseFloat(g.costo) || 0, 0), // Total de gastos
+                utilidad: 0, // Se calculará en el backend
+                precio_publico: resultadoPrecio.precio_final, // Precio calculado automáticamente
                 tipo_utilidad: tipoUtilidad,
                 servicioCategoriaId: selectedCategoriaId,
                 status,
@@ -298,23 +282,6 @@ export function ServicioForm({
         }
     };
 
-    const resetForm = () => {
-        setNombre('');
-        setCosto('');
-        setTipoUtilidad('servicio');
-        setSelectedCategoriaId('');
-        setStatus('active');
-        setGastos([]);
-        setNuevoGastoNombre('');
-        setNuevoGastoCosto('');
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('es-MX', {
-            style: 'currency',
-            currency: 'MXN',
-        }).format(amount);
-    };
 
     if (!isOpen) return null;
 
@@ -367,8 +334,12 @@ export function ServicioForm({
                                     onChange={(e) => setTipoUtilidad(e.target.value as 'servicio' | 'producto')}
                                     className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
-                                    <option value="servicio">Servicio ({(configuracion?.utilidad_servicio ?? 0.30) * 100}% utilidad)</option>
-                                    <option value="producto">Producto ({(configuracion?.utilidad_producto ?? 0.40) * 100}% utilidad)</option>
+                                    <option value="servicio">
+                                        Servicio ({configuracion ? configuracion.utilidad_servicio.toFixed(0) : '30'}% utilidad)
+                                    </option>
+                                    <option value="producto">
+                                        Producto ({configuracion ? configuracion.utilidad_producto.toFixed(0) : '40'}% utilidad)
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -494,38 +465,75 @@ export function ServicioForm({
                                         Precio Sistema (Sugerido)
                                     </label>
                                     <div className="flex h-10 w-full items-center rounded-md border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 font-semibold">
-                                        {formatCurrency(precioSistema)}
+                                        {formatearMoneda(resultadoPrecio.precio_final)}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Desglose de Cálculo */}
-                            <div className="p-4 rounded-lg border border-zinc-700/70 bg-zinc-800/50 space-y-4">
-                                <h3 className="text-base font-medium text-zinc-200">Desglose de Cálculo</h3>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-                                    <div className="text-center">
-                                        <div className="font-medium text-zinc-300 mb-1">
-                                            Utilidad Base ({tipoUtilidad === 'servicio'
-                                                ? `${(configuracion?.utilidad_servicio ?? 0.30) * 100}%`
-                                                : `${(configuracion?.utilidad_producto ?? 0.40) * 100}%`})
-                                        </div>
-                                        <div className="text-zinc-400">{formatCurrency(utilidadBase)}</div>
+                            {/* Desglose de precios */}
+                            <div className="p-4 rounded-lg border border-zinc-700/70 bg-zinc-800/50 space-y-3">
+                                <h4 className="text-sm font-medium text-zinc-200 mb-3">Desglose de precios</h4>
+
+                                {/* Precio Final */}
+                                <div className="text-center p-3 bg-zinc-900/50 rounded-lg">
+                                    <div className="text-zinc-400 text-sm mb-1">Precio Final al Cliente</div>
+                                    <div className="text-2xl font-bold text-white">{formatearMoneda(resultadoPrecio.precio_final)}</div>
+                                </div>
+
+                                {/* Desglose paso a paso */}
+                                <div className="space-y-2 text-sm">
+                                    {/* Componentes base */}
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-400">Costo base:</span>
+                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.costo)}</span>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="font-medium text-zinc-300 mb-1">Gastos Totales</div>
-                                        <div className="text-zinc-400">{formatCurrency(totalGastos)}</div>
+
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-400">Gastos:</span>
+                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.gasto)}</span>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="font-medium text-zinc-300 mb-1">
-                                            Sobreprecio ({(configuracion?.sobreprecio ?? 0.05) * 100}%)
-                                        </div>
-                                        <div className="text-zinc-400">{formatCurrency(sobreprecioMonto)}</div>
+
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-400">Utilidad ({resultadoPrecio.porcentaje_utilidad}%):</span>
+                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.utilidad_base)}</span>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="font-medium text-zinc-300 mb-1">
-                                            Comisión Venta ({(configuracion?.comision_venta ?? 0.10) * 100}%)
+
+                                    <div className="border-t border-zinc-700 pt-2">
+                                        <div className="flex justify-between font-medium">
+                                            <span className="text-zinc-300">Subtotal:</span>
+                                            <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.subtotal)}</span>
                                         </div>
-                                        <div className="text-zinc-400">{formatCurrency(comisionVentaMonto)}</div>
+                                    </div>
+
+                                    {/* Desglose de precios */}
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-400">Comisión ({resultadoPrecio.porcentaje_comision}%):</span>
+                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.monto_comision)}</span>
+                                    </div>
+
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-400">Sobreprecio ({resultadoPrecio.porcentaje_sobreprecio}%):</span>
+                                        <span className="text-zinc-200">{formatearMoneda(resultadoPrecio.monto_sobreprecio)}</span>
+                                    </div>
+
+                                    <div className="border-t border-zinc-700 pt-2">
+                                        <div className="flex justify-between font-medium">
+                                            <span className="text-zinc-200">Precio de sistema:</span>
+                                            <span className="text-emerald-400">{formatearMoneda(resultadoPrecio.precio_final)}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Verificación de utilidad real */}
+                                    <div className="bg-zinc-700/30 rounded p-3 mt-3">
+                                        <div className="text-xs text-zinc-400 mb-2">Verificación de utilidad:</div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-zinc-300">Utilidad real:</span>
+                                            <span className="text-emerald-400">{formatearMoneda(resultadoPrecio.utilidad_real)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-zinc-300">% Utilidad real:</span>
+                                            <span className="text-emerald-400">{resultadoPrecio.porcentaje_utilidad_real}%</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
