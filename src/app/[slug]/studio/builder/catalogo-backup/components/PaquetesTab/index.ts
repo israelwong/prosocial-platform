@@ -1,0 +1,1 @@
+export { PaquetesTab } from "./PaquetesTab";

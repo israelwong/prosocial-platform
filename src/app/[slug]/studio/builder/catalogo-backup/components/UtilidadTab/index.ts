@@ -1,0 +1,1 @@
+export { UtilidadTab } from "./UtilidadTab";
