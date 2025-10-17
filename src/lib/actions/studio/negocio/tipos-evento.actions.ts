@@ -33,7 +33,8 @@ async function getStudioIdFromSlug(studioSlug: string): Promise<string | null> {
  */
 function revalidateTiposEvento(studioSlug: string) {
     revalidatePath(`/${studioSlug}/configuracion/negocio/tipos-evento`);
-    revalidatePath(`/${studioSlug}/configuracion/catalogo/paquetes`);
+    revalidatePath(`/[slug]/studio/builder/catalogo`);
+    revalidatePath(`/${studioSlug}/builder/catalogo`);
 }
 
 /**

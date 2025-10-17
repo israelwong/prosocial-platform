@@ -4,6 +4,12 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
+// Helper para revalidar rutas de paquetes
+const revalidatePaquetesRoutes = (studioSlug: string) => {
+    revalidatePath(`/[slug]/studio/builder/catalogo`)
+    revalidatePath(`/studio/${studioSlug}/builder/catalogo`)
+}
+
 // Schema para crear/actualizar paquete
 const PaqueteSchema = z.object({
     nombre: z.string().min(1, "El nombre es requerido"),
@@ -60,7 +66,7 @@ export async function crearPaquete(
             }
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
+        revalidatePaquetesRoutes(studioSlug)
 
         return {
             success: true,
@@ -114,7 +120,7 @@ export async function actualizarPaquete(
             }))
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
+        revalidatePaquetesRoutes(studioSlug)
 
         return {
             success: true,
@@ -139,7 +145,7 @@ export async function eliminarPaquete(
             where: { id: paqueteId }
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
+        revalidatePaquetesRoutes(studioSlug)
 
         return {
             success: true,
@@ -234,7 +240,7 @@ export async function duplicarPaquete(
             }
         })
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`)
+        revalidatePaquetesRoutes(studioSlug)
 
         return {
             success: true,
@@ -382,7 +388,7 @@ export async function actualizarPosicionPaquete(
             });
         }
 
-        revalidatePath(`/studio/${studioSlug}/configuracion/catalogo/paquetes`);
+        revalidatePaquetesRoutes(studioSlug);
 
         return {
             success: true,

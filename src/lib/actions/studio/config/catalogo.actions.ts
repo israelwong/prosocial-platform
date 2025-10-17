@@ -33,7 +33,8 @@ async function getstudio_idFromSlug(slug: string): Promise<string | null> {
  * Revalidar rutas del catálogo
  */
 function revalidateCatalogo(slug: string) {
-    revalidatePath(`/studio/${slug}/configuracion/catalogo`);
+    revalidatePath(`/[slug]/studio/builder/catalogo`);
+    revalidatePath(`/studio/${slug}/builder/catalogo`);
 }
 
 // =====================================================
