@@ -5,6 +5,12 @@
  * para facilitar los imports en los componentes
  */
 
+// Secciones (CRUD Completo)
+export * from "./secciones.actions";
+
+// Categorías (CRUD Completo)
+export * from "./categorias.actions";
+
 // Items (Servicios, Secciones, Categorías)
 export * from "./items.actions";
 

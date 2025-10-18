@@ -92,23 +92,21 @@ export function IdentidadEditorZen({
     return (
         <div className="space-y-6">
             {/* Tabs Navigation */}
-            <div className="border-b border-zinc-800">
-                <div className="flex space-x-8">
-                    {tabs.map((tab) => {
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${activeTab === tab.id
-                                    ? 'border-blue-500 text-blue-400'
-                                    : 'border-transparent text-zinc-400 hover:text-zinc-300 hover:border-zinc-600'
-                                    }`}
-                            >
-                                {tab.label}
-                            </button>
-                        );
-                    })}
-                </div>
+            <div className="bg-zinc-800/50 p-1 rounded-lg flex gap-1 w-full">
+                {tabs.map((tab) => {
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`flex-1 py-2 px-4 font-medium text-sm transition-all duration-200 rounded text-center ${activeTab === tab.id
+                                ? 'bg-zinc-900 text-blue-400 shadow-lg'
+                                : 'text-zinc-400 hover:text-zinc-300'
+                                }`}
+                        >
+                            {tab.label}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Tab Content */}

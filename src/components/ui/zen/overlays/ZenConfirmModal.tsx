@@ -8,6 +8,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogOverlay,
 } from '@/components/ui/shadcn/dialog';
 import { ZenButton } from '@/components/ui/zen';
 import { AlertTriangle } from 'lucide-react';
@@ -22,6 +23,7 @@ interface ZenConfirmModalProps {
     cancelText?: string;
     variant?: 'default' | 'destructive';
     loading?: boolean;
+    disabled?: boolean;
 }
 
 export function ZenConfirmModal({
@@ -33,7 +35,8 @@ export function ZenConfirmModal({
     confirmText = 'Confirmar',
     cancelText = 'Cancelar',
     variant = 'destructive',
-    loading = false
+    loading = false,
+    disabled = false
 }: ZenConfirmModalProps) {
     const handleConfirm = () => {
         onConfirm();
@@ -41,6 +44,7 @@ export function ZenConfirmModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogOverlay className="bg-black/40" />
             <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-700">
                 <DialogHeader>
                     <div className="flex items-center space-x-3">
@@ -81,6 +85,7 @@ export function ZenConfirmModal({
                             ? 'bg-red-600 hover:bg-red-700 text-white'
                             : 'bg-blue-600 hover:bg-blue-700 text-white'
                             }`}
+                        disabled={disabled}
                     >
                         {confirmText}
                     </ZenButton>

@@ -1,44 +1,74 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
-import { obtenerCatalogo } from '@/lib/actions/studio/builder/catalogo/items.actions';
+import { obtenerSeccionesConStats } from '@/lib/actions/studio/builder/catalogo';
 import { obtenerConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/utilidad.actions';
-import { ItemsList } from './ItemsList';
-import { CatalogoSkeleton } from './CatalogoSkeleton';
-import type { SeccionData } from '@/lib/actions/schemas/catalogo-schemas';
+import { CatalogoContainer, CatalogoTabSkeletonContainer } from '../CatalogoTab';
 import type { ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 
 interface ItemsTabProps {
     studioSlug: string;
+    onNavigateToUtilidad?: () => void;
 }
 
-export function ItemsTab({ studioSlug }: ItemsTabProps) {
+interface Categoria {
+    id: string;
+    nombre: string;
+    servicios?: Servicio[];
+}
+
+interface Servicio {
+    id: string;
+    nombre: string;
+    costo: number;
+}
+
+interface Seccion {
+    id: string;
+    name: string;
+    order: number;
+    createdAt: Date;
+    categories?: Categoria[];
+    items?: number;
+    mediaSize?: number;
+}
+
+export function ItemsTab({ studioSlug, onNavigateToUtilidad }: ItemsTabProps) {
     const [loading, setLoading] = useState(true);
-    const [catalogo, setCatalogo] = useState<SeccionData[]>([]);
+    const [secciones, setSecciones] = useState<Seccion[]>([]);
     const [studioConfig, setStudioConfig] = useState<ConfiguracionPrecios | null>(null);
 
-    useEffect(() => {
-        cargarDatos();
-    }, [studioSlug]);
-
-    const cargarDatos = async () => {
+    const cargarDatos = useCallback(async () => {
         try {
             setLoading(true);
 
-            // Cargar catálogo y configuración en paralelo
-            const [resultCatalogo, config] = await Promise.all([
-                obtenerCatalogo(studioSlug),
+            // Cargar secciones y configuración en paralelo
+            const [resultSecciones, config] = await Promise.all([
+                obtenerSeccionesConStats(studioSlug),
                 obtenerConfiguracionPrecios(studioSlug),
             ]);
 
-            if (resultCatalogo.success && resultCatalogo.data) {
-                setCatalogo(resultCatalogo.data);
+            if (resultSecciones.success && resultSecciones.data) {
+                // Transformar datos de secciones al formato esperado
+                const seccionesTransformadas = resultSecciones.data.map((seccion: {
+                    id: string;
+                    name: string;
+                    order: number;
+                    createdAt: Date;
+                }) => ({
+                    id: seccion.id,
+                    name: seccion.name,
+                    order: seccion.order,
+                    createdAt: seccion.createdAt,
+                    categories: [],
+                    items: 0,
+                    mediaSize: 0,
+                }));
+                setSecciones(seccionesTransformadas);
             }
 
             if (config) {
-                // El action retorna decimales como strings (ej: "0.30" para 30%)
-                // Convertir a número decimal directamente
                 setStudioConfig({
                     utilidad_servicio: Number(config.utilidad_servicio),
                     utilidad_producto: Number(config.utilidad_producto),
@@ -52,10 +82,14 @@ export function ItemsTab({ studioSlug }: ItemsTabProps) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [studioSlug]);
+
+    useEffect(() => {
+        cargarDatos();
+    }, [cargarDatos]);
 
     if (loading) {
-        return <CatalogoSkeleton />;
+        return <CatalogoTabSkeletonContainer />;
     }
 
     if (!studioConfig) {
@@ -73,11 +107,10 @@ export function ItemsTab({ studioSlug }: ItemsTabProps) {
     }
 
     return (
-        <ItemsList
+        <CatalogoContainer
             studioSlug={studioSlug}
-            initialCatalogo={catalogo}
-            onCatalogoChange={setCatalogo}
-            studioConfig={studioConfig}
+            secciones={secciones}
+            onNavigateToUtilidad={onNavigateToUtilidad}
         />
     );
 }

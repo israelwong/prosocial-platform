@@ -15,14 +15,10 @@ import { CategoriasModal } from './CategoriasModal';
 import { ServicioForm } from './ServicioForm';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { SearchBar } from './SearchBar';
-import {
-    obtenerCatalogo,
-    actualizarPosicionCatalogo,
-    duplicarServicio,
-    eliminarSeccion,
-    eliminarCategoria,
-    eliminarServicio,
-} from '@/lib/actions/studio/builder/catalogo/items.actions';
+import { eliminarItem } from '@/lib/actions/studio/builder/catalogo/items.actions';
+import { eliminarCategoria } from '@/lib/actions/studio/builder/catalogo/categorias.actions';
+import { eliminarSeccion } from '@/lib/actions/studio/builder/catalogo/secciones.actions';
+import { obtenerSeccionesConStats } from '@/lib/actions/studio/builder/catalogo';
 import type { ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
 import {
     DndContext,
@@ -146,10 +142,11 @@ export function ItemsList({
     const recargarCatalogo = useCallback(async () => {
         try {
             console.log('🔄 Recargando catálogo desde servidor...');
-            const result = await obtenerCatalogo(studioSlug);
+            const result = await obtenerSeccionesConStats(studioSlug);
             if (result.success && result.data) {
                 console.log('✅ Catálogo recargado:', result.data.length, 'secciones');
-                updateCatalogo(result.data);
+                // TODO: Transformar datos al formato correcto
+                updateCatalogo(result.data as unknown as SeccionData[]);
             } else {
                 console.error('❌ Error recargando:', result.error);
             }
@@ -172,87 +169,38 @@ export function ItemsList({
 
             // Determinar tipo de elemento arrastrado
             const activeData = active.data.current;
-            const overData = over.data.current;
+            // const overData = over.data.current;
 
             if (!activeData) return;
 
             const itemType = activeData.type as 'seccion' | 'categoria' | 'servicio';
 
             // Determinar índice destino y parentId
-            let newIndex = 0;
-            let parentId: string | null = null;
+            // let parentId: string | null = null;
 
             if (itemType === 'seccion') {
                 // Reordenar secciones
-                const overIndex = catalogo.findIndex((s) => s.id === overId);
-                newIndex = overIndex;
+                // TODO: Implementar reordenamiento de secciones
             } else if (itemType === 'categoria') {
-                // Mover categoría entre secciones o reordenar
-                if (overId.startsWith('seccion-empty-')) {
-                    // Drop en sección vacía
-                    parentId = overId.replace('seccion-empty-', '');
-                    newIndex = 0;
-                } else if (overData?.type === 'categoria') {
-                    // Drop sobre otra categoría
-                    const targetCategoria = overData.categoria as CategoriaData;
-                    parentId = targetCategoria.seccionId || null;
-
-                    // Encontrar índice en la sección destino
-                    const seccionDestino = catalogo.find(s => s.id === parentId);
-                    if (seccionDestino) {
-                        newIndex = seccionDestino.categorias.findIndex(c => c.id === overId);
-                    }
-                }
+                // TODO: Implementar movimiento de categorías
             } else if (itemType === 'servicio') {
-                // Mover servicio entre categorías o reordenar
-                if (overId.startsWith('categoria-empty-')) {
-                    // Drop en categoría vacía
-                    parentId = overId.replace('categoria-empty-', '');
-                    newIndex = 0;
-                } else if (overData?.type === 'servicio') {
-                    // Drop sobre otro servicio
-                    const targetServicio = overData.servicio as ServicioData;
-                    parentId = targetServicio.servicioCategoriaId;
-
-                    // Encontrar índice en la categoría destino
-                    for (const seccion of catalogo) {
-                        const categoria = seccion.categorias.find(c => c.id === parentId);
-                        if (categoria) {
-                            newIndex = categoria.servicios.findIndex(s => s.id === overId);
-                            break;
-                        }
-                    }
-                }
+                // TODO: Implementar movimiento de servicios
             }
 
             // Guardar estado original para rollback
             const originalCatalogo = [...catalogo];
 
             try {
-                // Actualizar en el backend
-                const result = await actualizarPosicionCatalogo(
-                    studioSlug,
-                    activeId,
-                    itemType,
-                    newIndex,
-                    parentId
-                );
-
-                if (result.success) {
-                    // Recargar catálogo completo del servidor
-                    await recargarCatalogo();
-                    toast.success('Orden actualizado exitosamente');
-                } else {
-                    toast.error(result.error || 'Error al actualizar el orden');
-                    setCatalogo(originalCatalogo);
-                }
+                // TODO: Implementar actualización de posición
+                toast.info('Reordenar elementos - próximamente');
+                setCatalogo(originalCatalogo);
             } catch (error) {
                 console.error('Error updating position:', error);
                 toast.error('Error al actualizar la posición');
                 setCatalogo(originalCatalogo);
             }
         },
-        [catalogo, studioSlug, recargarCatalogo]
+        [catalogo]
     );
 
     // Handlers de eventos
@@ -302,19 +250,9 @@ export function ItemsList({
         setIsDeleteModalOpen(true);
     };
 
-    const handleDuplicateServicio = async (servicioId: string) => {
-        try {
-            const result = await duplicarServicio(studioSlug, servicioId);
-            if (result.success) {
-                toast.success('Servicio duplicado exitosamente');
-                await recargarCatalogo();
-            } else {
-                toast.error(result.error || 'Error al duplicar servicio');
-            }
-        } catch (error) {
-            console.error('Error duplicando servicio:', error);
-            toast.error('Error al duplicar servicio');
-        }
+    const handleDuplicateServicio = async () => {
+        // TODO: Implementar duplicación de servicio
+        toast.info('Duplicar servicio - próximamente');
     };
 
     const handleServicioFormSuccess = () => {
@@ -366,10 +304,10 @@ export function ItemsList({
                     result = await eliminarSeccion(studioSlug, deleteItem.id);
                     break;
                 case 'categoria':
-                    result = await eliminarCategoria(studioSlug, deleteItem.id);
+                    result = await eliminarCategoria(deleteItem.id);
                     break;
                 case 'servicio':
-                    result = await eliminarServicio(studioSlug, deleteItem.id);
+                    result = await eliminarItem(deleteItem.id);
                     break;
             }
 

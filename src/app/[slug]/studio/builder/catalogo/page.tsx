@@ -92,23 +92,35 @@ export default function CatalogoPage() {
 
                 <ZenCardContent className="p-6">
                     <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as TabValue)}>
-                        <TabsList className="grid w-full grid-cols-3 mb-6">
-                            <TabsTrigger value="items" className="flex items-center gap-2">
+                        <TabsList className="grid w-full grid-cols-3 mb-6 bg-zinc-800/50 p-1 rounded-lg">
+                            <TabsTrigger
+                                value="items"
+                                className="flex items-center gap-2 data-[state=active]:bg-zinc-900 data-[state=active]:text-purple-400 data-[state=active]:shadow-lg transition-all duration-200"
+                            >
                                 <Package className="h-4 w-4" />
                                 <span>Catálogo</span>
                             </TabsTrigger>
-                            <TabsTrigger value="paquetes" className="flex items-center gap-2">
+                            <TabsTrigger
+                                value="paquetes"
+                                className="flex items-center gap-2 data-[state=active]:bg-zinc-900 data-[state=active]:text-purple-400 data-[state=active]:shadow-lg transition-all duration-200"
+                            >
                                 <Layers className="h-4 w-4" />
                                 <span>Paquetes</span>
                             </TabsTrigger>
-                            <TabsTrigger value="utilidad" className="flex items-center gap-2">
+                            <TabsTrigger
+                                value="utilidad"
+                                className="flex items-center gap-2 data-[state=active]:bg-zinc-900 data-[state=active]:text-purple-400 data-[state=active]:shadow-lg transition-all duration-200"
+                            >
                                 <DollarSign className="h-4 w-4" />
                                 <span>Utilidad</span>
                             </TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="items">
-                            <ItemsTab studioSlug={studioSlug} />
+                            <ItemsTab
+                                studioSlug={studioSlug}
+                                onNavigateToUtilidad={() => setActiveTab('utilidad')}
+                            />
                         </TabsContent>
 
                         <TabsContent value="paquetes">
