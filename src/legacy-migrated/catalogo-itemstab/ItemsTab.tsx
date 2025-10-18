@@ -56,14 +56,17 @@ export function ItemsTab({ studioSlug, onNavigateToUtilidad }: ItemsTabProps) {
                     name: string;
                     order: number;
                     createdAt: Date;
+                    totalCategorias?: number;
+                    totalItems?: number;
+                    mediaSize?: number;
                 }) => ({
                     id: seccion.id,
                     name: seccion.name,
                     order: seccion.order,
                     createdAt: seccion.createdAt,
-                    categories: [],
-                    items: 0,
-                    mediaSize: 0,
+                    categories: seccion.totalCategorias ? Array(seccion.totalCategorias).fill(null) : [],
+                    items: seccion.totalItems ?? 0,
+                    mediaSize: seccion.mediaSize ?? 0,
                 }));
                 setSecciones(seccionesTransformadas);
             }

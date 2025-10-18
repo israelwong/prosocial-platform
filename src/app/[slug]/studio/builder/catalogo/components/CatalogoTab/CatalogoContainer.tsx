@@ -34,7 +34,8 @@ interface Seccion {
   name: string;
   order: number;
   createdAt: Date;
-  itemCount?: number;
+  categories?: Array<{ id: string; name: string }>;
+  items?: number;
   mediaSize?: number;
 }
 
@@ -700,23 +701,23 @@ export function CatalogoContainer({
           }}
           onConfirm={handleConfirmDeleteSeccion}
           title={
-            (seccionToDelete?.itemCount ?? 0) > 0
+            (seccionToDelete?.items ?? 0) > 0
               ? "No se puede eliminar esta sección"
               : "Eliminar sección"
           }
           description={
-            (seccionToDelete?.itemCount ?? 0) > 0
-              ? `La sección "${seccionToDelete?.name}" contiene contenido. Primero debes eliminar todas las categorías e items para poder borrar la sección.`
+            (seccionToDelete?.items ?? 0) > 0
+              ? `La sección "${seccionToDelete?.name}" contiene ${seccionToDelete?.items} item${(seccionToDelete?.items ?? 0) !== 1 ? "s" : ""}. Primero debes eliminar todo el contenido.`
               : `¿Estás seguro de que deseas eliminar la sección vacía "${seccionToDelete?.name}"? Esta acción no se puede deshacer.`
           }
           confirmText={
-            (seccionToDelete?.itemCount ?? 0) > 0 ? "Entendido" : "Eliminar"
+            (seccionToDelete?.items ?? 0) > 0 ? "Entendido" : "Eliminar"
           }
           cancelText="Cancelar"
           variant={
-            (seccionToDelete?.itemCount ?? 0) > 0 ? "default" : "destructive"
+            (seccionToDelete?.items ?? 0) > 0 ? "default" : "destructive"
           }
-          disabled={(seccionToDelete?.itemCount ?? 0) > 0}
+          disabled={(seccionToDelete?.items ?? 0) > 0}
           loading={isLoading}
         />
       </div>

@@ -6,10 +6,25 @@ import { Store, Package, Layers, DollarSign } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/shadcn/tabs';
 import { ZenCard, ZenCardContent, ZenCardHeader, ZenCardTitle, ZenCardDescription } from '@/components/ui/zen';
 import { SectionLayout } from '../components';
-import { ItemsTab, PaquetesTab, UtilidadTab } from './components';
+import { PaquetesTab, UtilidadTab } from './components';
+import { CatalogoContainer, CatalogoTabSkeletonContainer } from './components/CatalogoTab';
 import { getBuilderProfileData } from '@/lib/actions/studio/builder/builder-profile.actions';
+import { obtenerSeccionesConStats } from '@/lib/actions/studio/builder/catalogo';
+import { obtenerConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/utilidad.actions';
 import type { BuilderProfileData } from '@/types/builder-profile';
 import type { TabValue } from './types';
+import type { ConfiguracionPrecios } from '@/lib/actions/studio/builder/catalogo/calcular-precio';
+import { toast } from 'sonner';
+
+interface Seccion {
+    id: string;
+    name: string;
+    order: number;
+    createdAt: Date;
+    categories?: Array<{ id: string; name: string }>;
+    items?: number;
+    mediaSize?: number;
+}
 
 export default function CatalogoPage() {
     const params = useParams();
@@ -18,6 +33,8 @@ export default function CatalogoPage() {
     const [activeTab, setActiveTab] = useState<TabValue>('items');
     const [loading, setLoading] = useState(true);
     const [builderData, setBuilderData] = useState<BuilderProfileData | null>(null);
+    const [secciones, setSecciones] = useState<Seccion[]>([]);
+    const [studioConfig, setStudioConfig] = useState<ConfiguracionPrecios | null>(null);
 
     // Cargar datos del builder (para preview móvil)
     useEffect(() => {
@@ -39,6 +56,54 @@ export default function CatalogoPage() {
         };
 
         loadBuilderData();
+    }, [studioSlug]);
+
+    // Cargar secciones y configuración de precios
+    useEffect(() => {
+        const loadCatalogoData = async () => {
+            try {
+                const [resultSecciones, config] = await Promise.all([
+                    obtenerSeccionesConStats(studioSlug),
+                    obtenerConfiguracionPrecios(studioSlug),
+                ]);
+
+                if (resultSecciones.success && resultSecciones.data) {
+                    // Transformar datos de secciones al formato esperado
+                    const seccionesTransformadas = resultSecciones.data.map((seccion: {
+                        id: string;
+                        name: string;
+                        order: number;
+                        createdAt: Date;
+                        totalCategorias?: number;
+                        totalItems?: number;
+                        mediaSize?: number;
+                    }) => ({
+                        id: seccion.id,
+                        name: seccion.name,
+                        order: seccion.order,
+                        createdAt: seccion.createdAt,
+                        categories: seccion.totalCategorias ? Array(seccion.totalCategorias).fill(null) : [],
+                        items: seccion.totalItems ?? 0,
+                        mediaSize: seccion.mediaSize ?? 0,
+                    }));
+                    setSecciones(seccionesTransformadas);
+                }
+
+                if (config) {
+                    setStudioConfig({
+                        utilidad_servicio: Number(config.utilidad_servicio),
+                        utilidad_producto: Number(config.utilidad_producto),
+                        sobreprecio: Number(config.sobreprecio),
+                        comision_venta: Number(config.comision_venta),
+                    });
+                }
+            } catch (error) {
+                console.error('Error cargando datos del catálogo:', error);
+                toast.error('Error al cargar el catálogo');
+            }
+        };
+
+        loadCatalogoData();
     }, [studioSlug]);
 
     // Datos para el preview móvil
@@ -117,10 +182,15 @@ export default function CatalogoPage() {
                         </TabsList>
 
                         <TabsContent value="items">
-                            <ItemsTab
-                                studioSlug={studioSlug}
-                                onNavigateToUtilidad={() => setActiveTab('utilidad')}
-                            />
+                            {!studioConfig ? (
+                                <CatalogoTabSkeletonContainer />
+                            ) : (
+                                <CatalogoContainer
+                                    studioSlug={studioSlug}
+                                    secciones={secciones}
+                                    onNavigateToUtilidad={() => setActiveTab('utilidad')}
+                                />
+                            )}
                         </TabsContent>
 
                         <TabsContent value="paquetes">
